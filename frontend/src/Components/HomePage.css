@@ -1,0 +1,20 @@
+
+.dashboardContainer {
+    width: 100%;
+    background-image: url('./../assets/PhotoReal_Design_a_captivating_background_image_for_the_main_s_3.jpg');
+    background-size: cover;
+    background-position: center;
+
+    position: absolute;
+    background-repeat: no-repeat;
+}
+
+.logo-container {
+    margin-left: 2%;
+}
+
+
+/* @tailwind utilities; */
+.Group {
+    background-image: url('./../assets/google.png');
+}
