@@ -12,7 +12,7 @@ services:
       - "3000:3000"
     volumes:
       - ./auth:/app
-      - node_modules_back:/app/node_modules
+      - node_modules_auth:/app/node_modules
     networks:
       - backend
     labels:
@@ -35,7 +35,7 @@ services:
     networks:
       - backend
     volumes:
-      - ./frontEnd:/app
+      - ./frontend:/app
       - node_modules_front:/app/node_modules
     labels:
       - 'traefik.enable=true'
@@ -181,8 +181,8 @@ networks:
 #   web:
 #     address: ":80"
 volumes:
-  node_modules_back:
-    name: node_modules_back
+  node_modules_auth:
+    name: node_modules_auth
     driver: local
     driver_opts:
       type: none
