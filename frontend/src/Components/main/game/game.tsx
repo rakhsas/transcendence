@@ -14,15 +14,15 @@ interface CarouselItemProps {
 }
 
 const CarouselItem: React.FC<CarouselItemProps> = ({ image, heading }) => (
-  <div className="shadow-2xl slide-item transition-all px-4 py-4">
-    <Card href="#" className="max-w-sm w-64 bg-main-2">
+  // <div className=" slide-item transition-all px-4 py-4">
+    <Card href="#" className="max-w-sm w-64 custom-shadow bg-main-2 hover:text-gray-900 text-white">
       <div className="flex flex-col">
-        <h5 className="text-2xl font-bold tracking-tight hover:text-gray-900 text-white">{heading}</h5>
+        <h5 className="text-2xl font-bold tracking-tight ">{heading}</h5>
         <img src={image} className="object-cover h-48 rounded" alt="" />
         <Button className='bg-[#e15253] hover:bg-orange-500 border-2 border-main-1'> Play Now </Button>
       </div>
     </Card>
-  </div>
+  // </div>
 );
 
 
@@ -42,7 +42,7 @@ const GameModesCarousel: React.FC = () => {
     
     return (
       <div className="flex items-center justify-center">
-        <div className="w-full flex flex-row flex-wrap items-center justify-center">
+        <div className="w-full flex flex-row flex-wrap items-center justify-center p-4 gap-4">
           {/* <Slider {...settings}>{
           }</Slider> */}
           {renderImages()}
