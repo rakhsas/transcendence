@@ -8,7 +8,7 @@ import ProfileComponent from '../main/profile/profile';
 function DashboardComponent(props: any) {
 
   return (
-    <div className="all flex">
+    <div className="all flex bg-main-1">
       <SidebarComponent />
       <div className="overflow-hidden flex-1 w-3/4">
         <NavbarComponent />
