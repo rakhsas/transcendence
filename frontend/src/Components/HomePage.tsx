@@ -4,7 +4,7 @@ import "./HomePage.css";
 import Logo from "./../assets/Frame 1.png";
 import Google from "./../assets/icons8-google.svg";
 import Intra from "./../assets/Group.png";
-function HomeComponent(): JSX.Element {
+function HomePageComponent(): JSX.Element {
 	const [openModal, setOpenModal] = useState(false);
 	const [searchParams] = useSearchParams();
 	let accessToken: any, provider: any, firstLogin: any;
@@ -77,4 +77,4 @@ function HomeComponent(): JSX.Element {
 	);
 }
 
-export default HomeComponent;
+export default HomePageComponent;

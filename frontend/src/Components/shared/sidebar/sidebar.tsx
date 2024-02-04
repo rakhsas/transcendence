@@ -9,28 +9,27 @@ import AnalyticsIcon from '../icons/Analytics';
 import ChatIcon from '../icons/Chat';
 import SettingsIcon from '../icons/Settings';
 import LogoutIcon from '../icons/Logout';
-
+import { NavLink } from "react-router-dom";
 
 function SidebarComponent(): JSX.Element {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  	const [isSidebarOpen, setSidebarOpen] = useState(true);
 
-  const handleSideIcon = () => {
-	// Toggle the state when an icon is clicked
-	setSidebarOpen(!isSidebarOpen);
-  };
+	const handleSideIcon = () => {
+		// Toggle the state when an icon is clicked
+		setSidebarOpen(!isSidebarOpen);
+	};
   
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const handleIconClick = (index: number) => {
-	setActiveIndex(index);
-  };
+	const [activeIndex, setActiveIndex] = useState<number>(0);
+	const handleIconClick = (index: number) => {
+		setActiveIndex(index);
+	};
 
   const icons = [
-	{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home' },
-	{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile' },
-	{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics' },
-	{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat' },
-	{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings' }
-	// Add more icons as needed
+	{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: '' },
+	{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile', path:'profile' },
+	{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path:'analytics' },
+	{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat' , path:'chat'},
+	{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path:'settings' }
   ];
 
   return (
@@ -50,7 +49,9 @@ function SidebarComponent(): JSX.Element {
 			</div>
 
 			<div className="w-auto ">
+				
 				{icons.map((icon, index) => (
+				<NavLink to={icon.path} key={index} className="w-full">
 				<div
 					key={index}
 					className={`px-3 py-4 rounded-lg justify-start items-center gap-3 flex cursor-pointer ${activeIndex === index ? 'bg-[#2C2729]' : ''
@@ -59,6 +60,7 @@ function SidebarComponent(): JSX.Element {
 				>
 						{icon.icon}
 				</div>
+				</NavLink>
 				))}
 			</div>
 			<div className="w-full flex flex-col justify-end items-center">

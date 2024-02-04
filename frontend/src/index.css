@@ -23,3 +23,19 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+:root 
+{
+    --main-color: #161A30;
+    --second-color: #31304D;
+    --third-color: #B6BBC4;
+    --fourth-color: #F0ECE5;
+}
+
+*{
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    box-sizing: border-box;
+    font-weight: bolder;
+}
