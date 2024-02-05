@@ -3,6 +3,7 @@
 // import "owl.carousel/dist/assets/owl.theme.default.css";
 import './Home.css'
 import avatar from './../../../assets/img/Frame.svg'
+import achievement from './../../../assets/img/bronze-medal-award-success-symbol-badge-icon-achievement-competition-sport-winner-sign-isolated-trophy-bronze-medal-illustration-prize-victory-champion-game-place-reward-circle-icon-vector.png'
 import coin from './../../../assets/img/icons8-coin-48.png'
 import GameModesCarousel from './../game/game';
 const HomeComponent: React.FC = () => {
@@ -46,7 +47,7 @@ const HomeComponent: React.FC = () => {
                             </div>
                             <div className="divider border-s-2 border-gray-600 h-fill"></div>
                             <div className="achievement">
-                                
+                                <img src={avatar} height={60} width={60} alt=""/>
                             </div>
                         </div>
                         <div className="info"></div>
