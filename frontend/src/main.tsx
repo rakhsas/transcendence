@@ -23,7 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Route path="/" element={<HomePageComponent/>}/>
       <Route
           path="/dashboard/*"
-          element={token === 'true' ? (<DashboardComponent/>) : (<Navigate to="/" replace />)}
+          element={((token) && ( token.length > 0 ) && (token === 'true')) ? (<DashboardComponent/>) : (<Navigate to="/" replace />)}
         >
           <Route index element={<HomeComponent />} />
           <Route path="profile" element={<ProfileComponent />} />

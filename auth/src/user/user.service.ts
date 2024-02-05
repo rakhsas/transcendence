@@ -4,6 +4,8 @@ import { Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create.user";
 import { Injectable } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
+import { map } from 'rxjs';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 
@@ -21,14 +23,19 @@ export class UserService {
 	 * we have defined what are the keys we are expecting from body
 	 * @returns promise of user
 	*/
-   	async createUser(createUser: CreateUserDto): Promise<User> {
+   	async createUser(createUser: CreateUserDto): Promise<any> {
 		const user: User = new User();
 		user.firstName = createUser.firstName;
 		user.lastName = createUser.lastName;
 		user.username = createUser.username;
 		user.email = createUser.email;
+		user.picture = createUser.picture;
+		user.provider = createUser.provider;
+		user.coalition = createUser.coalition;
+		user.coalitionPic = createUser.coalitionPic;
 		user.id = createUser.id;
-		return this.userRepository.save(user);
+		const object = await this.userRepository.save(user)
+		return { object, firstLogin: true };
 	}
 	
 	/**
@@ -67,10 +74,10 @@ export class UserService {
 
 	async findOrCreateUser(userData: Partial<User>): Promise<any> {
 		let firstLogin: boolean = false;
-		const { email, firstName, lastName, picture, username, id, provider } = userData;
+		const { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic } = userData;
 	
 		// Check if the user already exists
-		let user = await this.userRepository.findOne({ where: { email, firstName, lastName, picture, username, id, provider } });
+		let user = await this.userRepository.findOne({ where: { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic } });
 	
 		// If the user doesn't exist, create a new user
 		if (!user) {
@@ -80,7 +87,30 @@ export class UserService {
 		return {user, firstLogin};
 	}
 
-	async getCoalition(id: number): Promise<any> {
-		const coalition = await this.http.get('')
+	async findOne(userData: Partial<User>): Promise<any> {
+		const { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic } = userData;
+		let user = await this.userRepository.findOne({ where: { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic } });
+		return (user) ? { user: user, firstLogin: true } : null;
+	}
+
+	async getCoalition(id: number, providerAccessToken: string): Promise<any> {
+		const headers = {
+			'Authorization': `Bearer ${providerAccessToken}`
+		}
+		try {
+			const coalition = this.http.get('https://api.intra.42.fr/v2/users/' + id + '/coalitions', { headers })
+				.pipe(map(
+					(response: AxiosResponse) => {
+						console.log(response.data);
+						return response.data
+					}
+				))
+				.toPromise();
+				return coalition;
+			// console.log(coalition);
+			return coalition;
+		} catch (error) {
+			console.error(error);
+		}
 	}
 }

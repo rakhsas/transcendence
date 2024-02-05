@@ -5,12 +5,13 @@ import { User } from './entities/user';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { Repository } from 'typeorm';
-// import { ConfigModule } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+    HttpModule
   ],
   providers: [UserService],
   controllers: [UserController],

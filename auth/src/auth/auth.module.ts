@@ -8,6 +8,7 @@ import { UserModule } from 'src/user/user.module';
 import { UserService } from 'src/user/user.service';
 import { ConfigModule } from '@nestjs/config';
 import { GithubStrategy } from './utils/GithubStrategy';
+import { HttpService } from '@nestjs/axios';
 
 // console.log('process.env:', process.env);
 // console.log('GITHUB_CLIENT_SECRET:', process.env.GITHUB_CLIENT_SECRET);

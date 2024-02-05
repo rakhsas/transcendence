@@ -29,8 +29,7 @@ import { HttpModule } from '@nestjs/axios';
       autoLoadEntities: true,
     }),
     UserModule,
-    AuthModule,
-    HttpModule
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

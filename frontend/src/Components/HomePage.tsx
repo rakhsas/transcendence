@@ -11,6 +11,11 @@ function HomePageComponent(): JSX.Element {
 	function stringToBoolean(str: string): boolean {
 		return str === "true";
 	}
+
+	function loginWithIntra() {
+		window.location.href = "http://localhost:3000/api/auth/42/login";
+	}
+
 	accessToken = searchParams.get("accessToken");
 	provider = searchParams.get("provider");
 	firstLogin = searchParams.get("firstLogin");
@@ -58,7 +63,7 @@ function HomePageComponent(): JSX.Element {
 							</div>
 						</div>
 					</div>
-					<div className="Button lg:ml-4 md:ml-0 mt-4 lg:w-48 lg:h-12 w-full md:w-44 px-2 py-2 bg-neutral-800 rounded-lg shadow border-2 border-red-600 justify-center items-center gap-2 inline-flex">
+					<div className="Button lg:ml-4 md:ml-0 mt-4 lg:w-48 lg:h-12 w-full md:w-44 px-2 py-2 bg-neutral-800 rounded-lg shadow border-2 border-red-600 justify-center items-center gap-2 inline-flex hover:cursor-pointer" onClick={loginWithIntra}>
 						<div className="ContinueWith text-white text-base font-semibold font-['Inter'] leading-snug">Continue with</div>
 						<div className="Plus w-6 h-6 p-1 justify-center items-center flex">
 							<div className="Group w-4 h-4 relative">

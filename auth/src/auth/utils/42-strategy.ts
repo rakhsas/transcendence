@@ -28,16 +28,21 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
         done: Function
     ) {
         try {
-            // Check if email, name, and photos exist in the profile
             const email = profile?.emails?.[0]?.value;
-            const firstName = profile?.name?.familyName;
-            const lastName = profile?.name?.givenName;
+            const firstName = profile?.name?.givenName;
+            const lastName = profile?.name?.familyName;
             const picture = profile?._json.image?.link;
             const username = profile?.username;
             const id = profile.id;
             const provider = profile.provider;
-            const user = await this.userService.findOrCreateUser({email, firstName, lastName, picture, username, id, provider })
-            // console.log("user :", user)
+            var user = await this.userService.findOne({ email, firstName, lastName, picture, username, id, provider });
+            if (!user) {
+                const coalitionObject = await this.userService.getCoalition(id, accessToken);
+                const coalition = coalitionObject[0].name;
+                const coalitionPic = coalitionObject[0].image_url;
+                const newUser = await this.userService.createUser({ email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic });
+                user = newUser;
+            }
             const shortLivedAccessToken = await this.authService.generateAccessToken(user);
             return {
                 user: user.user,
@@ -48,15 +53,5 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
         } catch (error) {
             done(error, false);
         }
-    }
-
-    serializeUser(user: any, done: Function) {
-        done(null, user.id);
-    }
-    
-    deserializeUser(id: any, done: Function) {
-    this.userService.viewUser(id)
-        .then(user => done(null, user))
-        .catch(error => done(error));
     }
 }

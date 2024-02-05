@@ -55,6 +55,20 @@ export class CreateUserDto {
         message: 'Picture must be Set'
     })
     picture: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    @MinLength(4, {
+        message: 'Coalition must be Set'
+    })
+    coalition: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    @MinLength(4, {
+        message: 'Coalition Picture must be Set'
+    })
+    coalitionPic: string;
     // @IsNotEmpty()
     // @ApiProperty()
     // @Matches(passwordRegEx, { message: `Password too weak` })

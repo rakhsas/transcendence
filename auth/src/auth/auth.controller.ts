@@ -28,9 +28,11 @@ export class AuthController {
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
+        res.cookie('user', JSON.stringify(user.user), {secure : true});
         res.cookie('access_token', accessToken, { httpOnly: true, secure : true});
         res.cookie('provider_access_token', providerAccessToken, { httpOnly: true, secure : true});
         res.cookie('isAuthenticated', true, {secure : true});
+        res.cookie('firstLogin', firstLogin, {secure : true});
         res.redirect(`http://localhost:4200/dashboard`)
     }
 
