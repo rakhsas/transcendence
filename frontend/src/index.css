@@ -18,7 +18,7 @@ body {
   height: 100vh;
 }
 .custom-shadow {
-  box-shadow: 0 0 10px rgb(234, 144, 144);
+  box-shadow: 0 0 20px rgb(234, 144, 144);
 }
 
 code {
