@@ -40,4 +40,12 @@ export class UserController {
 	deleteUser(@Param('id') id: string) {
 		return this.userService.deleteUser(+id);
 	}
+
+
+	@Get('get-user')
+    @UseGuards(AuthGuard('42'))
+    async getIntraUserInfo(@Req() req) {
+        const id = req.user.id;
+        const coalition = this.userService.getCoalition(id);
+    }
 }

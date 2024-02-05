@@ -1,9 +1,16 @@
 import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
 import { FortyTwoStrategy } from "./utils/42-strategy";
 import { AuthGuard } from "@nestjs/passport";
+import { UserService } from "src/user/user.service";
 
 @Controller('auth')
 export class AuthController {
+
+    /**
+     *
+     */
+    constructor(
+    ) {}
 
     @Get('42/login')
     @UseGuards(AuthGuard('42'))
@@ -13,7 +20,6 @@ export class AuthController {
         }
     }
 
-
     @Get('42/callback')
     @UseGuards(AuthGuard('42'))
     async handle42Redirect(@Req() req, @Res() res) {
@@ -22,7 +28,10 @@ export class AuthController {
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
-        res.redirect(`http://localhost:4200/dashboard?firstLogin=${firstLogin}&accessToken=${accessToken}&provider=${providerAccessToken}`)
+        res.cookie('access_token', accessToken, { httpOnly: true, secure : true});
+        res.cookie('provider_access_token', providerAccessToken, { httpOnly: true, secure : true});
+        res.cookie('isAuthenticated', true, {secure : true});
+        res.redirect(`http://localhost:4200/dashboard`)
     }
 
     @Get('github/login')
@@ -44,4 +53,5 @@ export class AuthController {
         res.redirect(`http://localhost:4200/dashboard?firstLogin=${firstLogin}&accessToken=${accessToken}&provider=${providerAccessToken}`);
     }
 
+    
 }

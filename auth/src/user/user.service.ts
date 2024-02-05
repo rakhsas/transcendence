@@ -3,12 +3,14 @@ import { User } from "./entities/user";
 import { Repository } from "typeorm";
 import { CreateUserDto } from "./dto/create.user";
 import { Injectable } from "@nestjs/common";
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 
 export class UserService {
 	constructor (
-		@InjectRepository(User) private readonly userRepository: Repository<User>
+		@InjectRepository(User) private readonly userRepository: Repository<User>,
+		private readonly http: HttpService
 	) {
 	}
 
@@ -76,5 +78,9 @@ export class UserService {
 			firstLogin = true;
 		}
 		return {user, firstLogin};
-	  }
+	}
+
+	async getCoalition(id: number): Promise<any> {
+		const coalition = await this.http.get('')
+	}
 }

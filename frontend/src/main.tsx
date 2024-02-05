@@ -11,8 +11,9 @@ import React from 'react';
 import ProfileComponent from './Components/main/profile/profile.tsx';
 import GameComponent from './Components/main/game/game.tsx';
 import AnalyticsComponent from './Components/main/analytics/analytics.tsx';
+import Cookies from 'js-cookie';
 
-const isAuthenticated = (localStorage.getItem("isAuthenticated")) ? true : true;
+const token = Cookies.get('isAuthenticated');
 ReactDOM.createRoot(document.getElementById('root')!).render(
   // <React.StrictMode>
   //   <DashboardComponent />
@@ -22,7 +23,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Route path="/" element={<HomePageComponent/>}/>
       <Route
           path="/dashboard/*"
-          element={isAuthenticated ? (<DashboardComponent/>) : (<Navigate to="/" replace />)}
+          element={token === 'true' ? (<DashboardComponent/>) : (<Navigate to="/" replace />)}
         >
           <Route index element={<HomeComponent />} />
           <Route path="profile" element={<ProfileComponent />} />
