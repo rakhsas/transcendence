@@ -11,6 +11,13 @@ export class AuthService {
     constructor (
         private jwtService: JwtService
     ) {}
+
+        validateToken(token: string) {
+            return this.jwtService.verifyAsync(token, {
+                secret: this.jwtSecret
+            });
+        }
+
     async generateAccessToken(user: User): Promise<string> {
         const payload = {
             id: user.id,

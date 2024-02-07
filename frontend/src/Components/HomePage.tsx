@@ -4,21 +4,25 @@ import "./HomePage.css";
 import Logo from "./../assets/Frame 1.png";
 import Google from "./../assets/icons8-google.svg";
 import Intra from "./../assets/Group.png";
+import UserService from "../services/user.service";
 function HomePageComponent(): JSX.Element {
 	const [openModal, setOpenModal] = useState(false);
 	const [searchParams] = useSearchParams();
+	const userService = new UserService();
 	let accessToken: any, provider: any, firstLogin: any;
 	function stringToBoolean(str: string): boolean {
 		return str === "true";
 	}
 
-	function loginWithIntra() {
+	async function loginWithIntra() {
 		window.location.href = "http://localhost:3000/api/auth/42/login";
+		// const data = await userService.login();
+		// console.log("data" , data)
 	}
 
-	accessToken = searchParams.get("accessToken");
-	provider = searchParams.get("provider");
-	firstLogin = searchParams.get("firstLogin");
+	// accessToken = searchParams.get("accessToken");
+	// provider = searchParams.get("provider");
+	// firstLogin = searchParams.get("firstLogin");
 	// if (accessToken)
 	// 	localStorage.setItem('accessToken', accessToken)
 	// if (provider)

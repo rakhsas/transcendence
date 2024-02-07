@@ -3,10 +3,31 @@
 // import "owl.carousel/dist/assets/owl.theme.default.css";
 import './Home.css'
 import avatar from './../../../assets/img/Frame.svg'
-import achievement from './../../../assets/img/bronze-medal-award-success-symbol-badge-icon-achievement-competition-sport-winner-sign-isolated-trophy-bronze-medal-illustration-prize-victory-champion-game-place-reward-circle-icon-vector.png'
 import coin from './../../../assets/img/icons8-coin-48.png'
 import GameModesCarousel from './../game/game';
-const HomeComponent: React.FC = () => {
+import User from './../../../model/user.model'
+import UserService from '../../../services/user.service';
+import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
+
+const HomeComponent: React.FC = (props) => {
+    // const [token, setToken ] = useState('');
+    var data;
+    const userService = new UserService;
+    useEffect(() => {
+        const authToken = Cookies.get('access_token');
+        console.log(authToken)
+        data = userService.getUser(authToken || '', 95248);
+        console.log(data)
+        // setToken(authToken || '');
+    }, []);
+    // const token = Cookies.get('access_token');
+    // if (token)
+    // {
+    //     data = userService.getUser(token, 95248 );
+    //     console.log(data);
+    // }
+    // console.log(token);
     return (
         <>
             <main className="flex-1 px-4 overflow-hidden">

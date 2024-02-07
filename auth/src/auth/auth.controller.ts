@@ -33,6 +33,12 @@ export class AuthController {
         res.cookie('provider_access_token', providerAccessToken, { httpOnly: true, secure : true});
         res.cookie('isAuthenticated', true, {secure : true});
         res.cookie('firstLogin', firstLogin, {secure : true});
+        // return {
+        //     user,
+        //     accessToken,
+        //     providerAccessToken,
+        //     firstLogin
+        // }
         res.redirect(`http://localhost:4200/dashboard`)
     }
 

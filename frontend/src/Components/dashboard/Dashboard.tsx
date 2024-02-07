@@ -6,7 +6,7 @@ import "./Dashboard.css"
 import HomeComponent from '../main/home/Home';
 import ProfileComponent from '../main/profile/profile';
 function DashboardComponent(props: any) {
-
+  console.log(props.token)
   return (
     <div className="all flex bg-main-1">
       <SidebarComponent />

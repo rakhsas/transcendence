@@ -20,7 +20,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: [
-      'localhost'
+      'http://localhost:4200'
     ]
   })
   const config = new DocumentBuilder()
