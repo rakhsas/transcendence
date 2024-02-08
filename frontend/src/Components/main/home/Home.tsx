@@ -12,28 +12,21 @@ import { useEffect, useState } from 'react';
 
 const HomeComponent: React.FC = (props) => {
     // const [token, setToken ] = useState('');
+    const [userData, setUserData] = useState<User | null>(null); // Initialize userData state
+
     useEffect(() => {
-        const userService = new UserService;
         const fetchData = async () => {
             try {
-                const res = await userService.getUser(95248);
-                console.log("data: ", res);
-                // Update state or do further processing here
+                const userService = new UserService();
+                const fetchedUserData = await userService.getUser(95248);
+                setUserData(fetchedUserData); // Update userData state with fetched data
             } catch (error) {
-                // console.error('Error fetching user:', error);
-                // Handle error gracefully
+                console.error('Error fetching user data:', error);
             }
         };
         
         fetchData();
     }, []);
-    // const token = Cookies.get('access_token');
-    // if (token)
-    // {
-    //     data = userService.getUser(token, 95248 );
-    //     console.log(data);
-    // }
-    // console.log(token);
     return (
         <>
             <main className="flex-1 px-4 overflow-hidden">
@@ -62,11 +55,11 @@ const HomeComponent: React.FC = (props) => {
                     </div>
                     <div className="body flex justify-start items-start flex-row p-4">
                         <div className="data flex flex-row gap-2">
-                            <div className="pic rounded-sm">
-                                <img src={avatar} height={60} width={60} alt=""/>
+                            <div className="pic rounded-3xl">
+                                <img src={userData ? userData.picture : avatar} height={60} width={60} alt=""/>
                             </div>
                             <div className="info mt-1">
-                                <span className="text-yellow-100"> Rakhsas </span>
+                                <span className="text-yellow-100"> {userData ? userData.username : 'Loading...'} </span>
                                 <div className="row flex flex-row">
                                     <img src={coin} height={12} width={14} alt=""/>
                                     <span className="text-red-400 text-sm"> Level 0</span>

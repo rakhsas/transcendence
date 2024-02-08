@@ -23,7 +23,8 @@ import { HttpService } from '@nestjs/axios';
         UserModule,
         JwtModule.register({
             global: true,
-            secret: 'fsdkfjdklsj345rklefjkldjsfksdkjfjdksfndsfnkds',
+            secret: process.env.JWTSECRET,
+            signOptions: { expiresIn: '60s' }
         })
     ],
     controllers: [AuthController],

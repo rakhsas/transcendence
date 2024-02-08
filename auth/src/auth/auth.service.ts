@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt/dist";
 import { User } from "src/user/entities/user";
 
@@ -6,29 +6,28 @@ import { User } from "src/user/entities/user";
 
 
 export class AuthService {
-    private readonly jwtSecret: string = 'jfdhsfjksdfdksf'
 
     constructor (
         private jwtService: JwtService
     ) {}
 
-        validateToken(token: string) {
-            return this.jwtService.verifyAsync(token, {
-                secret: this.jwtSecret
-            });
+        async validateToken(token: string) {
+            try {
+                const payload = await this.jwtService.verifyAsync(token);
+            } catch {
+                throw new UnauthorizedException();
+            }
+            return true;
         }
 
     async generateAccessToken(user: User): Promise<string> {
         const payload = {
             id: user.id,
             username: user.username,
-            provider: user.provider
+            provider: user.provider,
         }
-
-        const expiresIn = 84000;
         return await this.jwtService.signAsync(payload, {
-            expiresIn: expiresIn,
-            secret: this.jwtSecret
+            secret: process.env.JWTSECRET
         });
     }
 }

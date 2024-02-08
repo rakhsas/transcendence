@@ -8,18 +8,23 @@ class UserService {
                 method: 'GET',
                 credentials: "include"
             });
-            if (!response.ok) {
-                if (response.status === 401 || response.status === 403)
-                {
-                    window.location.href = '/'
-                    return ;
-                }
+            if (response.ok) {
+                const userData = await response.json();
+                return userData;
+            }
+            else if (response.status === 401 || response.status === 403)
+            {
+                window.location.href = '/';
+                document.cookie = 'provider_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                return ;
+            }
+            else {
                 throw new Error('Request failed');
             }
-            const userData = await response.json();
-            return userData;
         } catch (error) {
             console.error('Request error:', error);
+            window.location.href = '/';
+            document.cookie = 'provider_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             throw error;
         }
     }

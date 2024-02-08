@@ -30,7 +30,7 @@ export class AuthController {
         const providerAccessToken = req.user.providerAccessToken;
         res.cookie('user', JSON.stringify(user.user));
         res.cookie('access_token', accessToken, { httpOnly: true});
-        res.cookie('provider_access_token', providerAccessToken, { httpOnly: true});
+        res.cookie('provider_access_token', providerAccessToken);
         res.cookie('isAuthenticated', true);
         res.cookie('firstLogin', firstLogin);
         // return {
