@@ -25,7 +25,7 @@ export class AuthService {
             provider: user.provider
         }
 
-        const expiresIn = 300;
+        const expiresIn = 84000;
         return await this.jwtService.signAsync(payload, {
             expiresIn: expiresIn,
             secret: this.jwtSecret

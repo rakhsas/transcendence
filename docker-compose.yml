@@ -120,7 +120,7 @@ services:
     container_name: postgres
     image: postgres:latest
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - ./postgres:/app
     networks:

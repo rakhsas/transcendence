@@ -24,15 +24,15 @@ export class AuthController {
     @UseGuards(AuthGuard('42'))
     async handle42Redirect(@Req() req, @Res() res) {
         const user = req.user;
-        console.log("user :", user)
+        // console.log("user :", user)
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
-        res.cookie('user', JSON.stringify(user.user), {secure : true});
-        res.cookie('access_token', accessToken, { httpOnly: true, secure : true});
-        res.cookie('provider_access_token', providerAccessToken, { httpOnly: true, secure : true});
-        res.cookie('isAuthenticated', true, {secure : true});
-        res.cookie('firstLogin', firstLogin, {secure : true});
+        res.cookie('user', JSON.stringify(user.user));
+        res.cookie('access_token', accessToken, { httpOnly: true});
+        res.cookie('provider_access_token', providerAccessToken, { httpOnly: true});
+        res.cookie('isAuthenticated', true);
+        res.cookie('firstLogin', firstLogin);
         // return {
         //     user,
         //     accessToken,
@@ -54,7 +54,7 @@ export class AuthController {
     @UseGuards(AuthGuard('github'))
     async handleGithubRedirect(@Req() req, @Res() res) {
         const user = req.user;
-        console.log("user :", user);
+        // console.log("user :", user);
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;

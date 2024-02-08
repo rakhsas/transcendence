@@ -101,7 +101,7 @@ export class UserService {
 			const coalition = this.http.get('https://api.intra.42.fr/v2/users/' + id + '/coalitions', { headers })
 				.pipe(map(
 					(response: AxiosResponse) => {
-						console.log(response.data);
+						// console.log(response.data);
 						return response.data
 					}
 				))

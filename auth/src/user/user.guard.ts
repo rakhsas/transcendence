@@ -13,6 +13,7 @@ export class UserGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
         try {
             const request = context.switchToHttp().getRequest();
+            console.log(request.headers);
             const { authorization }: any = request.headers;
             if ( !authorization || authorization.trim() === '') {
                 throw new UnauthorizedException('Please provide a token');

@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Post, Patch, Param, Body, Delete, UsePipes, UseFilters } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update.user';
@@ -30,7 +30,8 @@ export class UserController {
 
 	@Get(':id')
 	@UseGuards(UserGuard)
-	findUser(@Param('id') id: string) {
+	findUser(@Req() req, @Res() res, @Param('id') id: string) {
+		console.log(req);
 		return this.userService.viewUser(id);
 	}
 	

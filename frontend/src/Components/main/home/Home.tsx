@@ -13,13 +13,20 @@ import { useEffect, useState } from 'react';
 const HomeComponent: React.FC = (props) => {
     // const [token, setToken ] = useState('');
     var data;
-    const userService = new UserService;
     useEffect(() => {
-        const authToken = Cookies.get('access_token');
-        console.log(authToken)
-        data = userService.getUser(authToken || '', 95248);
-        console.log(data)
-        // setToken(authToken || '');
+        const userService = new UserService;
+        const fetchData = async () => {
+            try {
+                const res = await userService.getUser(95248);
+                console.log("data: ", res.data);
+                // Update state or do further processing here
+            } catch (error) {
+                // console.error('Error fetching user:', error);
+                // Handle error gracefully
+            }
+        };
+        
+        fetchData();
     }, []);
     // const token = Cookies.get('access_token');
     // if (token)
