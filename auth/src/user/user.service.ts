@@ -48,8 +48,8 @@ export class UserService {
 	/**
 	 * this function is used to find user by id from User Entity.
 	*/
-	viewUser(id: string): Promise<User> {
-		return this.userRepository.findOne({ where: {id: id} });
+	async viewUser(id: string): Promise<User> {
+		return await this.userRepository.findOne({ where: {id: id} });
 	}
 
 	/**

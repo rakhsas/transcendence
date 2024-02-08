@@ -30,9 +30,8 @@ export class UserController {
 
 	@Get(':id')
 	@UseGuards(UserGuard)
-	findUser(@Req() req, @Res() res, @Param('id') id: string) {
-		console.log(req);
-		return this.userService.viewUser(id);
+	async findUser(@Param('id') id: string) {
+		return await this.userService.viewUser(id);
 	}
 	
 	@Patch(':id')

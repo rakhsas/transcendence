@@ -6,17 +6,20 @@ class UserService {
         try {
             const response = await fetch(`http://localhost:3000/api/user/${userId}`, {
                 method: 'GET',
-                credentials: "same-origin"
+                credentials: "include"
             });
-
             if (!response.ok) {
-                throw new Error('Authentication failed');
+                if (response.status === 401 || response.status === 403)
+                {
+                    window.location.href = '/'
+                    return ;
+                }
+                throw new Error('Request failed');
             }
-
             const userData = await response.json();
             return userData;
         } catch (error) {
-            console.error('Authentication error:', error);
+            console.error('Request error:', error);
             throw error;
         }
     }

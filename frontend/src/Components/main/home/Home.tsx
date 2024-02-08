@@ -12,13 +12,12 @@ import { useEffect, useState } from 'react';
 
 const HomeComponent: React.FC = (props) => {
     // const [token, setToken ] = useState('');
-    var data;
     useEffect(() => {
         const userService = new UserService;
         const fetchData = async () => {
             try {
                 const res = await userService.getUser(95248);
-                console.log("data: ", res.data);
+                console.log("data: ", res);
                 // Update state or do further processing here
             } catch (error) {
                 // console.error('Error fetching user:', error);
