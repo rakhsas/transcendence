@@ -44,78 +44,78 @@ services:
       - 'traefik.http.routers.frontend.entrypoints=web'
       - "traefik.http.routers.frontend.middlewares=frontend-prefix"
       - "traefik.http.middlewares.frontend-prefix.stripprefix.prefixes=/front"
-  chat:
-    container_name: chat
-    image: chat                                           
-    hostname: rakhsas.com
-    build:
-      context: ./chat
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3001"
-    depends_on:
-      - auth
-    networks:
-      - backend
-    dns:
-      - 8.8.8.8
-    env_file: ./.env
-    volumes:
-      - ./chat:/app
-      - node_modules_chat:/app/node_modules
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.chat.rule=Host(`rakhsas.com`) && PathPrefix(`/chat`)'
-      - 'traefik.http.services.chat.loadbalancer.server.port=3001'
-      - 'traefik.http.routers.chat.entrypoints=web'
-      - "traefik.http.routers.chat.middlewares=chat-prefix"
-      - "traefik.http.middlewares.chat-prefix.stripprefix.prefixes=/chat"
-  profile:
-    container_name: profile
-    image: profile
-    build:
-      context: ./profile
-      dockerfile: Dockerfile
-    ports:
-      - "3003:3003"
-    depends_on:
-      - auth
-    networks:
-      - backend
-    volumes:
-      - ./profile:/app
-      - node_modules_profile:/app/node_modules
-    env_file: ./.env
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.profile.rule=Host(`rakhsas.com`) && PathPrefix(`/profile`)'
-      - 'traefik.http.services.profile.loadbalancer.server.port=3003'
-      - 'traefik.http.routers.profile.entrypoints=web'
-      - "traefik.http.routers.profile.middlewares=profile-prefix"
-      - "traefik.http.middlewares.profile-prefix.stripprefix.prefixes=/profile"
-  game:
-    container_name: game
-    image: game
-    build:
-      context: ./game
-      dockerfile: Dockerfile
-    ports:
-      - "3002:3002"
-    depends_on:
-      - auth
-    networks:
-      - backend
-    volumes:
-      - ./game:/app
-      - node_modules_game:/app/node_modules
-    env_file: ./.env
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.game.rule=Host(`rakhsas.com`) && PathPrefix(`/game`)'
-      - 'traefik.http.services.game.loadbalancer.server.port=3002'
-      - 'traefik.http.routers.game.entrypoints=web'
-      - "traefik.http.routers.game.middlewares=game-prefix"
-      - "traefik.http.middlewares.game-prefix.stripprefix.prefixes=/game"
+  # chat:
+  #   container_name: chat
+  #   image: chat                                           
+  #   hostname: rakhsas.com
+  #   build:
+  #     context: ./chat
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     - auth
+  #   networks:
+  #     - backend
+  #   dns:
+  #     - 8.8.8.8
+  #   env_file: ./.env
+  #   volumes:
+  #     - ./chat:/app
+  #     - node_modules_chat:/app/node_modules
+  #   labels:
+  #     - 'traefik.enable=true'
+  #     - 'traefik.http.routers.chat.rule=Host(`rakhsas.com`) && PathPrefix(`/chat`)'
+  #     - 'traefik.http.services.chat.loadbalancer.server.port=3001'
+  #     - 'traefik.http.routers.chat.entrypoints=web'
+  #     - "traefik.http.routers.chat.middlewares=chat-prefix"
+  #     - "traefik.http.middlewares.chat-prefix.stripprefix.prefixes=/chat"
+  # profile:
+  #   container_name: profile
+  #   image: profile
+  #   build:
+  #     context: ./profile
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3003:3003"
+  #   depends_on:
+  #     - auth
+  #   networks:
+  #     - backend
+  #   volumes:
+  #     - ./profile:/app
+  #     - node_modules_profile:/app/node_modules
+  #   env_file: ./.env
+  #   labels:
+  #     - 'traefik.enable=true'
+  #     - 'traefik.http.routers.profile.rule=Host(`rakhsas.com`) && PathPrefix(`/profile`)'
+  #     - 'traefik.http.services.profile.loadbalancer.server.port=3003'
+  #     - 'traefik.http.routers.profile.entrypoints=web'
+  #     - "traefik.http.routers.profile.middlewares=profile-prefix"
+  #     - "traefik.http.middlewares.profile-prefix.stripprefix.prefixes=/profile"
+  # game:
+  #   container_name: game
+  #   image: game
+  #   build:
+  #     context: ./game
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3002:3002"
+  #   depends_on:
+  #     - auth
+  #   networks:
+  #     - backend
+  #   volumes:
+  #     - ./game:/app
+  #     - node_modules_game:/app/node_modules
+  #   env_file: ./.env
+  #   labels:
+  #     - 'traefik.enable=true'
+  #     - 'traefik.http.routers.game.rule=Host(`rakhsas.com`) && PathPrefix(`/game`)'
+  #     - 'traefik.http.services.game.loadbalancer.server.port=3002'
+  #     - 'traefik.http.routers.game.entrypoints=web'
+  #     - "traefik.http.routers.game.middlewares=game-prefix"
+  #     - "traefik.http.middlewares.game-prefix.stripprefix.prefixes=/game"
   postgres:
     container_name: postgres
     image: postgres:latest
@@ -135,42 +135,42 @@ services:
     networks:
       - backend
     restart: always
-  traefik:
-    image: "traefik:v2.10"
-    container_name: "traefik"
-    command:
-      - "--log.level=DEBUG"
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443" 
-    ports:
-      - "80:80"
-      - "8080:8080"
-    depends_on:
-      - auth
-      - frontend
-      - chat
-      - profile
-      - game
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    networks:
-      - backend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`rakhsas.com`) && PathPrefix(`/traefik/`)"
-      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-  whoami:
-    image: "traefik/whoami"
-    container_name: "simple-service"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`rakhsas.com`)"
-      - "traefik.http.routers.whoami.entrypoints=web"
-    networks:
-      - backend
+  # traefik:
+  #   image: "traefik:v2.10"
+  #   container_name: "traefik"
+  #   command:
+  #     - "--log.level=DEBUG"
+  #     - "--api.insecure=true"
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entrypoints.web.address=:80"
+  #     - "--entrypoints.websecure.address=:443" 
+  #   ports:
+  #     - "80:80"
+  #     - "8080:8080"
+  #   depends_on:
+  #     - auth
+  #     - frontend
+  #     - chat
+  #     - profile
+  #     - game
+  #   volumes:
+  #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  #   networks:
+  #     - backend
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.traefik.rule=Host(`rakhsas.com`) && PathPrefix(`/traefik/`)"
+  #     - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+  # whoami:
+  #   image: "traefik/whoami"
+  #   container_name: "simple-service"
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.whoami.rule=Host(`rakhsas.com`)"
+  #     - "traefik.http.routers.whoami.entrypoints=web"
+  #   networks:
+  #     - backend
 
 networks:
   backend:

@@ -1,6 +1,6 @@
 import './sidebar.css';
 import logo from './../../../assets/Frame 1.svg'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ExpandLeft from './../../../assets/Icon/Expand_left.png'
 import ExpandRight from './../../../assets/Icon/Expand_right.png'
 import ProfileIcon from '../icons/Profile';
@@ -10,16 +10,39 @@ import ChatIcon from '../icons/Chat';
 import SettingsIcon from '../icons/Settings';
 import LogoutIcon from '../icons/Logout';
 import { NavLink } from "react-router-dom";
+import UserService from '../../../services/user.service';
+import User from '../../../model/user.model';
 
 function SidebarComponent(): JSX.Element {
-  	const [isSidebarOpen, setSidebarOpen] = useState(true);
+	const [userData, setUserData] = useState<User | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isSidebarOpen, setSidebarOpen] = useState(true);
+	const [activeIndex, setActiveIndex] = useState<number>(0);
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const userService = new UserService();
+				const fetchedUserData = await userService.getUser(95248);
+				setUserData(fetchedUserData);
+			} catch (error) {
+				console.error('Error fetching user data:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+            fetchData();
+	}, []);
+	if (isLoading)
+	{
+		console.log("returned")
+		return <div> Loading... </div>
+	}
 
 	const handleSideIcon = () => {
 		// Toggle the state when an icon is clicked
 		setSidebarOpen(!isSidebarOpen);
 	};
   
-	const [activeIndex, setActiveIndex] = useState<number>(0);
 	const handleIconClick = (index: number) => {
 		setActiveIndex(index);
 	};
@@ -51,7 +74,7 @@ function SidebarComponent(): JSX.Element {
 			<div className="w-auto ">
 				
 				{icons.map((icon, index) => (
-				<NavLink to={icon.path} key={index} className="w-full">
+				<NavLink to={ icon.path } state={ userData } key={index} className="w-full">
 				<div
 					key={index}
 					className={`px-3 py-4 rounded-lg justify-start items-center gap-3 flex cursor-pointer ${activeIndex === index ? 'bg-[#2C2729]' : ''

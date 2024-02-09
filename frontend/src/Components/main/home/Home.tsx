@@ -3,30 +3,18 @@
 // import "owl.carousel/dist/assets/owl.theme.default.css";
 import './Home.css'
 import avatar from './../../../assets/img/Frame.svg'
-import coin from './../../../assets/img/icons8-coin-48.png'
+// import coin from './../../../assets/img/icons8-coin-48.png'
 import GameModesCarousel from './../game/game';
 import User from './../../../model/user.model'
-import UserService from '../../../services/user.service';
-import Cookies from 'js-cookie';
-import { useEffect, useState } from 'react';
+// import UserService from '../../../services/user.service';
+// import Cookies from 'js-cookie';
+// import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const HomeComponent: React.FC = (props) => {
-    // const [token, setToken ] = useState('');
-    const [userData, setUserData] = useState<User | null>(null); // Initialize userData state
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const userService = new UserService();
-                const fetchedUserData = await userService.getUser(95248);
-                setUserData(fetchedUserData); // Update userData state with fetched data
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
-        
-        fetchData();
-    }, []);
+    const location = useLocation();
+    const userData = location.state as User;
+    console.log(userData)
     return (
         <>
             <main className="flex-1 px-4 overflow-hidden">
@@ -48,7 +36,7 @@ const HomeComponent: React.FC = (props) => {
                     </ul>
                 </section>
             </main>
-            <aside className="w-[25%] bg-main-1 hidden md:block xs:hidden lg:block p-8 border-2 rounded-lg">
+            <aside className="w-[25%] bg-main-1 hidden md:block lg:block p-8 border-2 rounded-lg">
                 <div className="profile bg-transparent h-72 rounded-2xl border-white border-2">
                     <div className="header flex justify-center h-[15%] text-white items-center bg-red-500 rounded-t-2xl">
                         <h3>My Profile</h3>
@@ -61,7 +49,8 @@ const HomeComponent: React.FC = (props) => {
                             <div className="info mt-1">
                                 <span className="text-yellow-100"> {userData ? userData.username : 'Loading...'} </span>
                                 <div className="row flex flex-row">
-                                    <img src={coin} height={12} width={14} alt=""/>
+                                    
+                                    {/* <img src={coin} height={12} width={14} alt=""/> */}
                                     <span className="text-red-400 text-sm"> Level 0</span>
                                 </div>
                             </div>
