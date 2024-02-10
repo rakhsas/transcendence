@@ -7,6 +7,8 @@ interface User {
     email: string;
     coalition: string;
     coalitionPic: string;
+    coalitionCover: string;
+    coalitionColor: string;
 }
 
 export default User;
