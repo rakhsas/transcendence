@@ -34,7 +34,6 @@ function SidebarComponent(): JSX.Element {
 	}, []);
 	if (isLoading)
 	{
-		console.log("returned")
 		return <div> Loading... </div>
 	}
 
@@ -48,11 +47,11 @@ function SidebarComponent(): JSX.Element {
 	};
 
   const icons = [
-	{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: '' },
-	{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile', path:'profile' },
-	{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path:'analytics' },
-	{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat' , path:'chat'},
-	{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path:'settings' }
+	{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: '', userData: userData},
+	{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile', path:'profile', userData },
+	{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path:'analytics', userData },
+	{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat' , path:'chat', userData },
+	{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path:'settings', userData }
   ];
 
   return (
@@ -70,11 +69,10 @@ function SidebarComponent(): JSX.Element {
 			<div className="w-8 h-8 p-1  bg-white rounded-lg z-10 cursor-pointer self-end " onClick={handleSideIcon}>
 				{isSidebarOpen ? <img src={ExpandLeft} alt="expand-left" /> : <img src={ExpandRight} alt="expand-right" />}
 			</div>
-
 			<div className="w-auto ">
 				
 				{icons.map((icon, index) => (
-				<NavLink to={ icon.path } state={ userData } key={index} className="w-full">
+				<NavLink to={ icon.path } state={ icon.userData } key={index} className="w-full">
 				<div
 					key={index}
 					className={`px-3 py-4 rounded-lg justify-start items-center gap-3 flex cursor-pointer ${activeIndex === index ? 'bg-[#2C2729]' : ''

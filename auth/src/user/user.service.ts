@@ -33,9 +33,11 @@ export class UserService {
 		user.provider = createUser.provider;
 		user.coalition = createUser.coalition;
 		user.coalitionPic = createUser.coalitionPic;
+		user.coalitionCover = createUser.coalitionCover;
+		user.coalitionColor = createUser.coalitionColor;
 		user.id = createUser.id;
 		const object = await this.userRepository.save(user)
-		return { object, firstLogin: true };
+		return { user: object, firstLogin: true };
 	}
 	
 	/**
@@ -74,10 +76,10 @@ export class UserService {
 
 	async findOrCreateUser(userData: Partial<User>): Promise<any> {
 		let firstLogin: boolean = false;
-		const { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic } = userData;
+		const { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic, coalitionCover, coalitionColor } = userData;
 	
 		// Check if the user already exists
-		let user = await this.userRepository.findOne({ where: { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic } });
+		let user = await this.userRepository.findOne({ where: { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic, coalitionCover, coalitionColor } });
 	
 		// If the user doesn't exist, create a new user
 		if (!user) {
@@ -88,8 +90,8 @@ export class UserService {
 	}
 
 	async findOne(userData: Partial<User>): Promise<any> {
-		const { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic } = userData;
-		let user = await this.userRepository.findOne({ where: { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic } });
+		const { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic, coalitionCover, coalitionColor } = userData;
+		let user = await this.userRepository.findOne({ where: { email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic, coalitionCover, coalitionColor } });
 		return (user) ? { user: user, firstLogin: true } : null;
 	}
 
