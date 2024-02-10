@@ -1,14 +1,23 @@
 // import OwlCarousel from "react-owl-carousel";
 // import "owl.carousel/dist/assets/owl.carousel.css";
 // import "owl.carousel/dist/assets/owl.theme.default.css";
-import classicI from './../../../assets/classicM.svg';
-import blackHole from './../../../assets/BlackHole.svg';
 import './Home.css'
+import avatar from './../../../assets/img/Frame.svg'
+// import coin from './../../../assets/img/icons8-coin-48.png'
 import GameModesCarousel from './../game/game';
-const HomeComponent: React.FC = () => {
+import User from './../../../model/user.model'
+// import UserService from '../../../services/user.service';
+// import Cookies from 'js-cookie';
+// import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+
+const HomeComponent: React.FC = (props) => {
+    const location = useLocation();
+    const userData = location.state as User;
+    console.log(userData)
     return (
         <>
-            <main className="flex-1 px-4">
+            <main className="flex-1 px-4 overflow-hidden">
                 <section className="min-h-1/2 border-2 border-fuchsia-700 rounded-3xl">
                     <div className='flex items-center flex-col mt-4 w-full p-2 justify-center'>
                         <p className="uppercase ... text-yellow-200 self-start">Games Mode</p>
@@ -27,10 +36,33 @@ const HomeComponent: React.FC = () => {
                     </ul>
                 </section>
             </main>
-            <aside className="w-[25%] bg-orange-400 hidden md:block xs:hidden lg:block">
-                <div>one</div>
-                <div>one</div>
-                <div>one</div>
+            <aside className="w-[25%] bg-main-1 hidden md:block lg:block p-8 border-2 rounded-lg">
+                <div className="profile bg-transparent h-72 rounded-2xl border-white border-2">
+                    <div className="header flex justify-center h-[15%] text-white items-center bg-red-500 rounded-t-2xl">
+                        <h3>My Profile</h3>
+                    </div>
+                    <div className="body flex justify-start items-start flex-row p-4">
+                        <div className="data flex flex-row gap-2">
+                            <div className="pic rounded-3xl">
+                                <img src={userData ? userData.picture : avatar} height={60} width={60} alt=""/>
+                            </div>
+                            <div className="info mt-1">
+                                <span className="text-yellow-100"> {userData ? userData.username : 'Loading...'} </span>
+                                <div className="row flex flex-row">
+                                    
+                                    {/* <img src={coin} height={12} width={14} alt=""/> */}
+                                    <span className="text-red-400 text-sm"> Level 0</span>
+                                </div>
+                            </div>
+                            <div className="divider border-s-2 border-gray-600 h-fill"></div>
+                            <div className="achievement">
+                                <img src={avatar} height={60} width={60} alt=""/>
+                            </div>
+                        </div>
+                        <div className="info"></div>
+                    </div>
+                </div>
+                <div className="activity"></div>
             </aside>
         </>
     )

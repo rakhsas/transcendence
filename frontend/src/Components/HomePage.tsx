@@ -4,16 +4,25 @@ import "./HomePage.css";
 import Logo from "./../assets/Frame 1.png";
 import Google from "./../assets/icons8-google.svg";
 import Intra from "./../assets/Group.png";
+import UserService from "../services/user.service";
 function HomePageComponent(): JSX.Element {
 	const [openModal, setOpenModal] = useState(false);
 	const [searchParams] = useSearchParams();
+	const userService = new UserService();
 	let accessToken: any, provider: any, firstLogin: any;
 	function stringToBoolean(str: string): boolean {
 		return str === "true";
 	}
-	accessToken = searchParams.get("accessToken");
-	provider = searchParams.get("provider");
-	firstLogin = searchParams.get("firstLogin");
+
+	async function loginWithIntra() {
+		window.location.href = "http://localhost:3000/api/auth/42/login";
+		// const data = await userService.login();
+		// console.log("data" , data)
+	}
+
+	// accessToken = searchParams.get("accessToken");
+	// provider = searchParams.get("provider");
+	// firstLogin = searchParams.get("firstLogin");
 	// if (accessToken)
 	// 	localStorage.setItem('accessToken', accessToken)
 	// if (provider)
@@ -58,7 +67,7 @@ function HomePageComponent(): JSX.Element {
 							</div>
 						</div>
 					</div>
-					<div className="Button lg:ml-4 md:ml-0 mt-4 lg:w-48 lg:h-12 w-full md:w-44 px-2 py-2 bg-neutral-800 rounded-lg shadow border-2 border-red-600 justify-center items-center gap-2 inline-flex">
+					<div className="Button lg:ml-4 md:ml-0 mt-4 lg:w-48 lg:h-12 w-full md:w-44 px-2 py-2 bg-neutral-800 rounded-lg shadow border-2 border-red-600 justify-center items-center gap-2 inline-flex hover:cursor-pointer" onClick={loginWithIntra}>
 						<div className="ContinueWith text-white text-base font-semibold font-['Inter'] leading-snug">Continue with</div>
 						<div className="Plus w-6 h-6 p-1 justify-center items-center flex">
 							<div className="Group w-4 h-4 relative">

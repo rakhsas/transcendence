@@ -27,9 +27,9 @@ function NavbarComponent(): JSX.Element {
                     <div className="rounded-lg cursor-pointer">
                         <HomeIcon activeIndex={0} />
                     </div>
-                    <div className="rounded-lg cursor-pointer">
+                    {/* <div className="rounded-lg cursor-pointer">
                         <HomeIcon activeIndex={0} />
-                    </div>
+                    </div> */}
                     {/* <div className="rounded-lg cursor-pointer">
                         <HomeIcon activeIndex={1} />
                     </div> */}
