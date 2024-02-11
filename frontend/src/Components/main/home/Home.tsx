@@ -1,14 +1,8 @@
-// import OwlCarousel from "react-owl-carousel";
-// import "owl.carousel/dist/assets/owl.carousel.css";
-// import "owl.carousel/dist/assets/owl.theme.default.css";
 import './Home.css'
 import avatar from './../../../assets/img/Frame.svg'
 import coin from './../../../assets/img/icons8-coin-48.png'
 import GameModesCarousel from './../game/game';
 import User from './../../../model/user.model'
-// import UserService from '../../../services/user.service';
-// import Cookies from 'js-cookie';
-// import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const HomeComponent: React.FC = (props) => {
@@ -21,7 +15,7 @@ const HomeComponent: React.FC = (props) => {
                     <div className='flex items-center flex-col mt-4 w-full p-2 justify-center'>
                         <p className="uppercase ... text-yellow-200 self-start">Games Mode</p>
                         <div className='container mx-auto flex-1'>
-                            <GameModesCarousel />
+                            <GameModesCarousel />``
                         </div>
                     </div>
                 </section>

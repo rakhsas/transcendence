@@ -13,9 +13,9 @@ function HomePageComponent(): JSX.Element {
 	function stringToBoolean(str: string): boolean {
 		return str === "true";
 	}
-
+	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 	async function loginWithIntra() {
-		window.location.href = "http://localhost:3000/api/auth/42/login";
+		window.location.href = APIURL + "auth/42/login";
 		// const data = await userService.login();
 		// console.log("data" , data)
 	}
