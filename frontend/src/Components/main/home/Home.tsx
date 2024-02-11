@@ -14,6 +14,7 @@ import { useLocation } from 'react-router-dom';
 const HomeComponent: React.FC = (props) => {
     const location = useLocation();
     const userData = location.state as User;
+    console.log(userData)
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto">
@@ -33,14 +34,14 @@ const HomeComponent: React.FC = (props) => {
                 </section>
             </main>
             <aside className="bg-main-1  p-8 border-2 rounded-lg">
-                <div className={`profile bg-transparent h-72 rounded-2xl border-white border-2 bg-cover bg-[url('${userData ? userData.coalitionCover : 0}')]`}>
+            {/* bg-[url('/img/hero-pattern.svg')] */}
+                <div className="profile h-72 rounded-2xl border-white border-2 bg-cover" style={{backgroundImage: `url(${userData.coalitionCover})`}}>
                     <div className="header flex justify-center h-[15%] text-white items-center bg-red-500 rounded-t-2xl">
                         <h3>My Profile</h3>
                     </div>
                     <div className="body flex flex-col p-4">
                         <div className="data flex flex-row gap-4">
-                            <div className="pic rounded-3xl bg-white w-20 h-20">
-                                <img src={userData ? userData.picture : avatar} alt="" />
+                            <div className="pic rounded-3xl w-20 h-20" style={{backgroundImage: `url(${userData.picture})`, backgroundPosition: `center`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat'}}>
                             </div>
                             <div className="info mt-1">
                                 <span className="text-yellow-100"> {userData ? userData.username : 'Loading...'}</span>

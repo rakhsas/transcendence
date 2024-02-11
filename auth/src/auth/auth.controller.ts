@@ -1,7 +1,6 @@
 import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
-import { FortyTwoStrategy } from "./utils/42-strategy";
 import { AuthGuard } from "@nestjs/passport";
-import { UserService } from "src/user/user.service";
+import { AuthService } from "./auth.service";
 
 @Controller('auth')
 export class AuthController {
@@ -10,6 +9,7 @@ export class AuthController {
      *
      */
     constructor(
+        private readonly authService: AuthService
     ) {}
 
     @Get('42/login')
@@ -61,5 +61,10 @@ export class AuthController {
         res.redirect(`http://localhost:4200/dashboard?firstLogin=${firstLogin}&accessToken=${accessToken}&provider=${providerAccessToken}`);
     }
 
+    @Get('decodedToken')
+    @UseGuards(UseGuards)
+    async decodedToken(@Req() req) {
+        return await this.authService.decodeToken(req);
+    }
     
 }
