@@ -25,6 +25,18 @@ export class User {
     
     @Column({ type: 'varchar', length: 255 })
     picture: string;
+
+    @Column({ type: 'varchar', length: 255 })
+    coalition: string;
+
+    @Column({ type: 'varchar', length: 255 })
+    coalitionPic: string;
+
+    @Column({ type: 'varchar', length: 255 })
+    coalitionCover: string;
+
+    @Column({ type: 'varchar', length: 255 })
+    coalitionColor: string;
     // @Column({ type: 'varchar' })
     // accessToken: string;
 

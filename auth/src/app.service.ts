@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
+  /**
+   *
+   */
+  constructor(
+  ) {}
   googleLogin(req) {
     if (!req.user) {
       return 'No User From Google.'
@@ -22,4 +27,5 @@ export class AppService {
   hello() {
     return "Hello"
   }
+
 }
