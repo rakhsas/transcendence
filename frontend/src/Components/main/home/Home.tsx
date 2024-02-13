@@ -2,13 +2,30 @@ import './Home.css'
 import avatar from './../../../assets/img/Frame.svg'
 import coin from './../../../assets/img/icons8-coin-48.png'
 import GameModesCarousel from './../game/game';
-import User from './../../../model/user.model'
-import { useLocation } from 'react-router-dom';
+import { useContext } from 'react';
+import DataContext from '../../../services/data.context';
+import LoadingComponent from '../../shared/loading/loading';
+import { Progress } from 'flowbite-react';
+import type { CustomFlowbiteTheme } from 'flowbite-react';
 
-const HomeComponent: React.FC = (props) => {
-    const location = useLocation();
-    const userData = location.state as User;
-    console.log(userData)
+
+const HomeComponent: React.FC = () => {
+    const active = "#B8F170"
+    const inactive = "#e0a91d"
+    const userData = useContext(DataContext)
+    if (!userData) {
+        return <LoadingComponent />;
+    }
+    const customProgressTheme: CustomFlowbiteTheme['progress'] = {
+        color: {
+            primary: `bg-[${userData.coalitionColor}]`,
+            secondary: 'bg-yellow-500',
+        },
+        bar: `rounded-full text-center font-medium leading-none space-x-2`,
+        base: `w-64 overflow-hidden rounded-full bg-white dark:bg-gray-700`,
+        label: "mb-1 flex justify-between font-medium dark:text-white",
+    }
+    console.log(customProgressTheme.color)
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto">
@@ -16,53 +33,70 @@ const HomeComponent: React.FC = (props) => {
                     <div className='flex items-center flex-col mt-4 w-full p-2 justify-center'>
                         <p className="uppercase ... text-yellow-200 self-start">Games Mode</p>
                         <div className='container mx-auto flex-1'>
-                            <GameModesCarousel />``
+                            <GameModesCarousel />
                         </div>
                     </div>
                 </section>
-                <section className="bg-green-700 h-2/3 mt-4">
+                <section className="bg-green-500 h-2/3 mt-4">
                     <ul>
                         <li>mode2</li>
                         <li>mode3</li>
                     </ul>
                 </section>
             </main>
-            <aside className="bg-main-1  p-8 border-2 rounded-lg">
-            {/* bg-[url('/img/hero-pattern.svg')] */}
-                <div className="profile h-72 rounded-2xl border-white border-2 bg-cover" style={{backgroundImage: `url(${userData.coalitionCover})`}}>
-                    <div className="header flex justify-center h-[15%] text-white items-center bg-red-500 rounded-t-2xl">
-                        <h3>My Profile</h3>
-                    </div>
-                    <div className="body flex flex-col p-4">
-                        <div className="data flex flex-row gap-4">
-                            <div className="pic rounded-3xl w-20 h-20" style={{backgroundImage: `url(${userData.picture})`, backgroundPosition: `center`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat'}}>
-                            </div>
-                            <div className="info mt-1">
-                                <span className="text-yellow-100"> {userData ? userData.username : 'Loading...'}</span>
-                                <div className="row flex items-center">
-                                    <img src={coin} height={16} width={16} alt="" />
-                                    <span className="text-red-400 text-sm"> Level 0</span>
+            <aside className="bg-main-1 p-8 border-2 rounded-lg lg:block md:block hidden">
+                <div className="profile rounded-2xl border-white border-2 bg-cover overflow-hidden" style={{ backgroundImage: `url(${userData.coalitionCover})` }}>
+                    <div className="flex flex-col w-full sm:gap-3 justify-between p-4">
+                        <div className="flex flex-col lg:flex-row">
+                            <div className="grid place-items-center relative">
+                                <div
+                                    className="w-48 h-48 text-black md:w-36 md:h-36 lg:h-24 lg:w-24 bg-cover bg-no-repeat bg-center rounded-full bg-gray-300 border-2 shadow-base"
+                                    style={{ backgroundImage: `url(${userData.picture})`, borderColor: `${userData.coalitionColor}`, borderWidth: '3px' }}>
                                 </div>
-                            </div>
-                            <div className="divider border-s-2 border-gray-600 h-12"></div>
-                            <div className="achievement">
-                                <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" version="1.1" id="banner" x="0px" y="0px" width="70" height="70" viewBox="0 0 68 104" fill={userData ? userData.coalitionColor : '#000'} xmlSpace="preserve" className="coalition-flag--flag">
-                                    <g id="banner-content">
-                                        <g id="UI-Intranet-banner-content" transform="translate(-96.000000, -60.000000)">
-                                            <g id="banner-content-g-1" transform="translate(96.000000, 60.000000)">
-                                                <polygon id="banner-content-polygon-1" points="0,0 0,80.5 34.3,104 68,80.5 68,0"></polygon>
+                                <a>
+                                    <div className="relative mt-[-2px] grid place-items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" version="1.1" id="banner" x="0px" y="0px" width="70" height="70" viewBox="0 0 68 104" fill={userData ? userData.coalitionColor : '#000'} xmlSpace="preserve" className="coalition-flag--flag">
+                                            <g id="banner-content">
+                                                <g id="UI-Intranet-banner-content" transform="translate(-96.000000, -60.000000)">
+                                                    <g id="banner-content-g-1" transform="translate(96.000000, 60.000000)">
+                                                        <polygon id="banner-content-polygon-1" points="0,0 0,80.5 34.3,104 68,80.5 68,0"></polygon>
+                                                    </g>
+                                                </g>
                                             </g>
-                                        </g>
-                                    </g>
-                                    <foreignObject x="0" y="0" width="68" height="50">
-                                        <img src={userData ? userData.coalitionPic : avatar} alt="" />
-                                    </foreignObject>
-                                </svg>
+                                            <foreignObject x="0" y="0" width="68" height="50" >
+                                                <img src={ userData.coalitionPic } alt="" />
+                                            </foreignObject>
+                                        </svg>
+                                    </div>
+                                </a>
+                            </div>
+                            <div className="lg:pl-2 overflow-hidden">
+                                <h2 className="text-2xl text-white font-bold text-center py-4 lg:text-left lg:py-0 drop-shadow-md">
+                                    {userData.firstName + ' ' + userData.lastName}
+                                </h2>
+                                <p className="text-sm text-white lg:text-black">
+                                    {userData.username}
+                                </p>
+                                <div className="text-sm flex flex-row items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="#B8F170" stroke="#10742C">
+                                        <circle cx="5" cy="5" r="4" fill={ inactive } stroke="#000"></circle>
+                                    </svg>
+                                <div className="drop-shadow-md text-white">Status</div></div>
+                            </div>
+                            <div className="flex flex-col gap-6 lg:gap-3">
+                                <Progress
+                                    theme={customProgressTheme}
+                                    progress={50}
+                                    color='primary'
+                                    progressLabelPosition="inside"
+                                    size="xl"
+                                    labelProgress
+                                    labelText
+                                    textLabel='Level 0'
+                                />
                             </div>
                         </div>
-                        <div className="info">
-                            <h1>fsfafdsfsjkdhfjksdhkfhdskkfsdksd</h1>
-                        </div>
+                        {/* Add other elements */}
                     </div>
                 </div>
                 <div className="activity"></div>

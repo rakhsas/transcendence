@@ -13,9 +13,11 @@ import AnalyticsComponent from './Components/main/analytics/analytics';
 import HomeComponent from './Components/main/home/Home';
 import ProfileComponent from './Components/main/profile/profile';
 import Cookies from 'js-cookie';
+import { useEffect, useState } from 'react';
 
-const isAuthenticated = Cookies.get('isAuthenticated');
 function App() {
+  const isAuthenticated = Cookies.get('isAuthenticated');
+
   return (
     <>
       {/* <BrowserRouter> */}

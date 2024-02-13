@@ -6,39 +6,38 @@ import "./Dashboard.css"
 import User from './../../model/user.model';
 import { useEffect, useState } from 'react';
 import UserService from '../../services/user.service';
-
-function DashboardComponent(props: any) {
+import AuthService from './../../services/auth.service';
+import DataContext from '../../services/data.context';
+function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const fetchData = async () => {
 		  try {
+			const authService = new AuthService();
+			const fetchedPayloadData = await authService.getPayload();
 			const userService = new UserService();
-			const fetchedUserData = await userService.getUser(95248);
+			const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
 			setUserData(fetchedUserData);
-		  } catch (error) {
+		} catch (error) {
 			console.error('Error fetching user ', error);
-		  } finally {
-			setIsLoading(false);
 		  }
 		};
 		fetchData();
-	  }, []);
-	  if (isLoading) {
-		return <div> Loading... </div>;
-	  }
+	}, []);
   return (
-	<div className="all flex bg-main-1">
-	  <SidebarComponent {...userData!}/>
-	  <div className="overflow-hidden flex-1 w-3/4">
-		<NavbarComponent />
-		
-		<div className="h-[100vh] flex-1 flex ">
-			<Outlet />
+	<DataContext.Provider value={userData}>
+		<div className="all flex bg-main-1">
+			
+			<SidebarComponent />
+		<div className="overflow-hidden flex-1 w-3/4">
+			<NavbarComponent />
+			<div className="h-[100vh] flex-1 flex ">
+				<Outlet />
+			</div>
 		</div>
-	  </div>
-	</div>
+		</div>
+	</DataContext.Provider>
   )
 }
 

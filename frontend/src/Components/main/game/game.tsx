@@ -35,8 +35,6 @@ const GameModesCarousel: React.FC = () => {
     return (
         <div className="flex items-center justify-center">
             <div className="flex flex-row flex-wrap items-center justify-center p-4 gap-8">
-                {/* <Slider {...settings}>{
-          }</Slider> */}
                 {renderImages()}
             </div>
         </div>

@@ -23,12 +23,9 @@ export class AuthController {
     @Get('42/callback')
     @UseGuards(AuthGuard('42'))
     async handle42Redirect(@Req() req, @Res() res) {
-        const user = req.user;
-        // console.log("user :", user)
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
-        res.cookie('user', JSON.stringify(user.user));
         res.cookie('access_token', accessToken, { httpOnly: true});
         res.cookie('provider_access_token', providerAccessToken);
         res.cookie('isAuthenticated', true);
@@ -61,7 +58,7 @@ export class AuthController {
         res.redirect(`http://localhost:4200/dashboard?firstLogin=${firstLogin}&accessToken=${accessToken}&provider=${providerAccessToken}`);
     }
 
-    @Get('decodedToken')
+    @Get('decodeToken')
     @UseGuards(UseGuards)
     async decodedToken(@Req() req) {
         return await this.authService.decodeToken(req);

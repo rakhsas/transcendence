@@ -10,3 +10,8 @@
     left: toRem(4);
 
 }
+
+[aria-label="progressbar"] .rounded-full {
+    border-radius: 5px;
+    background-color: #202026bf;
+}
