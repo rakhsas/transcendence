@@ -10,49 +10,24 @@ import ChatIcon from '../icons/Chat';
 import SettingsIcon from '../icons/Settings';
 import LogoutIcon from '../icons/Logout';
 import { NavLink } from "react-router-dom";
-import UserService from '../../../services/user.service';
 import User from '../../../model/user.model';
 
-function SidebarComponent(): JSX.Element {
-	const [userData, setUserData] = useState<User | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
+function SidebarComponent(props: User): JSX.Element {
 	const [isSidebarOpen, setSidebarOpen] = useState(true);
 	const [activeIndex, setActiveIndex] = useState<number>(0);
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const userService = new UserService();
-				const fetchedUserData = await userService.getUser(95248);
-				setUserData(fetchedUserData);
-			} catch (error) {
-				console.error('Error fetching user data:', error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-            fetchData();
-	}, []);
-	if (isLoading)
-	{
-		return <div> Loading... </div>
-	}
-
 	const handleSideIcon = () => {
-		// Toggle the state when an icon is clicked
 		setSidebarOpen(!isSidebarOpen);
 	};
-  
 	const handleIconClick = (index: number) => {
 		setActiveIndex(index);
 	};
-
-  const icons = [
-	{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: '', userData: userData},
-	{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile', path:'profile', userData },
-	{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path:'analytics', userData },
-	{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat' , path:'chat', userData },
-	{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path:'settings', userData }
-  ];
+	const icons = [
+		{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: '', userData: props },
+		{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile', path: 'profile',userData: props },
+		{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path: 'analytics',userData: props },
+		{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat', path: 'chat',userData: props },
+		{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path: 'settings',userData: props }
+	  ];
 
   return (
 	<>
@@ -97,15 +72,3 @@ function SidebarComponent(): JSX.Element {
   );
 }
 export default SidebarComponent;
-
-// {
-// 	ana
-// 	stooph
-// 	mostapha
-// 	youssef
-// 	hicham
-// 	walid
-// 	fanti
-//	GaouGaou
-//	Redouane
-// }
