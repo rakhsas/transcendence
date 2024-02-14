@@ -12,7 +12,11 @@ export default {
         main: {
           1: '#2C2729',
           2: '#47302E'
-        }
+        },
+        Pandora: "#b61282",
+        Freax: "#f5bc39",
+        Commodore: "#235a16",
+        Bios: "#02cdd1"
       }
     },
     screens: {
