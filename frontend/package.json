@@ -14,12 +14,17 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.7",
     "@mui/material": "^5.15.7",
+    "@types/tiny-slider-react": "^0.3.8",
     "flowbite-react": "^0.7.2",
+    "framer-motion": "^11.0.5",
     "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-owl-carousel": "^2.3.3",
     "react-router-dom": "^6.22.0",
     "react-tsparticles": "^2.9.3",
+    "styled-components": "^6.1.8",
+    "tiny-slider-react": "^0.5.7",
     "tsparticles": "^2.9.3"
   },
   "devDependencies": {

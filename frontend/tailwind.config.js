@@ -9,14 +9,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        main: {
-          1: '#2C2729',
-          2: '#47302E'
-        },
-        Pandora: "#b61282",
-        Freax: "#f5bc39",
-        Commodore: "#235a16",
-        Bios: "#02cdd1"
+        main : {
+          dark: {
+            1: '#2C2729',
+            2: '#47302E'
+          },
+          light: {
+            SPRUCE: '#1D1E22',
+            FERN: '#3DBDA7',
+            EGGSHELL: '#F2E2DA',
+            PUMPKIN: '#E86931'
+          }
+        }
       }
     },
     screens: {

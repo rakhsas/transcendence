@@ -1,49 +1,65 @@
-import './Home.css'
-import avatar from './../../../assets/img/Frame.svg'
-import coin from './../../../assets/img/icons8-coin-48.png'
+import './Home.css';
 import GameModesCarousel from './../game/game';
 import { useContext } from 'react';
 import DataContext from '../../../services/data.context';
 import LoadingComponent from '../../shared/loading/loading';
 import { Progress } from 'flowbite-react';
 import type { CustomFlowbiteTheme } from 'flowbite-react';
-
-
+import Robot from './../../../assets/robot.png'
+import image from './../../../assets/Image.png'
 const HomeComponent: React.FC = () => {
 	const active = "#B8F170";
-	// const inactive = "#e0a91d";
 	const userData = useContext(DataContext);
-	let customProgressTheme: CustomFlowbiteTheme['progress'];
 	if (!userData) {
 		return <LoadingComponent />;
-	} else {
-		customProgressTheme = {
-			base: `w-64 overflow-hidden rounded-full bg-white dark:bg-gray-700`,
-			label: "flex justify-between font-medium dark:text-white",
-			"bar": "rounded-full text-center font-medium bg-white leading-auto text-black dark:text-cyan-100 space-x-2",
-			"color": {
-				coalition: `bg-${userData.coalition}`,
-			}
-		}
 	}
-	// console.log(customProgressTheme.base)
+	const customProgressTheme: CustomFlowbiteTheme['progress'] = {
+		base: `w-64 overflow-hidden rounded-full bg-white dark:bg-gray-700`,
+		bar: ` rounded-full text-center font-medium bg-[var(--${userData.coalition})] leading-auto text-white dark:text-cyan-100 space-x-2; `,
+		color: {
+			"red": `bg-${userData.coalition}`,
+		},
+	};
 	return (
 		<>
 			<main className="flex-1 p-4 overflow-y-auto">
-				<section className="min-h-1/2 border-2 border-fuchsia-700 rounded-3xl">
-					<div className='flex items-center flex-col mt-4 w-full p-2 justify-center'>
-						<p className="uppercase text-yellow-200 self-start">Games Mode</p>
-						{/* <div className='container mx-auto flex-1'> */}
-							<GameModesCarousel />
-						{/* </div> */}
+				<section className="min-h-2/3 flex items-center justify-center">
+					<div className="w-full h-fill relative overflow-hidden">
+						<div className="relative flex justify-between flex-col mt-8">
+							<div className="w-full h-full absolute top-0 left-0 bg-gradient-to-b from-neutral-700 to-slate-900 rounded-3xl overflow-hidden">
+								<div className="absolute inset-0 bg-teal-600 blur-[20px]"></div>
+								<div className="absolute top-20 left-0 flex items-center">
+									<img className="object-cover w-full h-full bg-cover" src={image} alt="Robot" />
+								</div>
+							</div>
+							<div className="flex flex-col p-8 justify-between relative">
+								<div className="flex flex-col justify-between">
+									<div className="w-fit p-1 bg-gradient-to-br from-orange-700 to-amber-400 rounded-md">
+										<div className="text-white font-bold text-sm">New Release</div>
+									</div>
+									<div className="div mt-4">
+										<div className="text-white font-semibold text-3xl leading-10">AI: The Next Frontier</div>
+									</div>
+								</div>
+								<div className="w-fit p-4 bg-gradient-to-r from-slate-900 via-gray-900 to-zinc-600 rounded-full">
+									<div className="bg-emerald-400 rounded-3xl flex flex-col justify-center px-4 py-2">
+										<div className="text-white font-bold">Play Now</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div className="robot absolute top-[-10%] z-10 -right-4">
+							<img className="w-72 h-72" src={Robot} alt="Robot" />
+						</div>
 					</div>
 				</section>
-				<section className="bg-green-500 h-2/3 mt-4">
-					<ul>
-						<li>mode2</li>
-						<li>mode3</li>
-					</ul>
-				</section>
+
+
+
+				{/* <div className='flex items-center flex-col mt-4 w-full p-2 justify-center'>
+            <p className="uppercase text-white self-start">Games Mode</p>
+                <GameModesCarousel />
+        </div> */}
 			</main>
 			<aside className="bg-main-1 p-8 border-2 rounded-lg lg:block md:block hidden">
 				<div className="profile rounded-2xl border-white border-2 bg-cover overflow-hidden" style={{ backgroundImage: `url(${userData.coalitionCover})` }}>
@@ -89,13 +105,12 @@ const HomeComponent: React.FC = () => {
 							<Progress
 								theme={customProgressTheme}
 								progress={72}
-								color='coalition'
+								color='red'
 								size="xl"
 								labelText
 								textLabel='Level 0'
 							/>
 						</div>
-						{/* Add other elements */}
 					</div>
 				</div>
 				<div className="activity"></div>

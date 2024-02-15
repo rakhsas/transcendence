@@ -33,42 +33,25 @@ function SidebarComponent(): JSX.Element {
 
   return (
 	<>
-	<div className={`bg-transparent h-[100vh] w-32 relative flex items-center justify-center ${isSidebarOpen ? 'block' : 'hidden'} `}>
-		<div className="Side max-h-[600px] w-20 h-3/4 rounded-[25px] border-2 relative">
-			<div className="h-full bg-[#2C2729] rounded-3xl py-8 top-0 left-0 right-0 bottom-0 flex flex-col  flex-wrap justify-between items-center">
-			<div className="w-auto h-auto">
-				<div className="w-auto h-[45px] relative flex flex-col justify-center items-center">
-				<img src={logo} alt="" />
-				</div>
-			</div>
-			<div className="w-8 h-8 p-1  bg-white rounded-lg z-10 cursor-pointer self-end " onClick={handleSideIcon}>
-				{isSidebarOpen ? <img src={ExpandLeft} alt="expand-left" /> : <img src={ExpandRight} alt="expand-right" />}
-			</div>
-			<div className="w-auto flex-grow justify-center">
-				<div className="icon-container flex-col justify-center">
-					{icons.map((icon, index) => (
-						<NavLink to={ icon.path } key={index} className="w-full">
+		<div className="w-[100px] bg-zinc-900 shadow overflow-y-auto flex flex-col justify-between h-screen">
+			<img src={logo} alt="Logo" className="mx-auto pt-10" />
+			<div className="flex flex-col justify-center flex-grow mx-auto">
+				{icons.map((icon, index) => (
+					<NavLink to={icon.path} key={index} className="w-full">
 						<div
 							key={index}
-							className={`px-3 py-4 rounded-lg justify-start items-center gap-3 flex cursor-pointer ${activeIndex === index ? 'bg-[#2C2729]' : ''
-							}`}
+							className="px-3 py-4 rounded-lg justify-start items-center gap-3 flex cursor-pointer"
 							onClick={() => handleIconClick(index)}
 						>
 							{icon.icon}
 						</div>
 					</NavLink>
-					))}
-				</div>
+				))}
 			</div>
-			<div className="w-full flex flex-col justify-end items-center">
-				<div className="p-2  rounded-lg justify-center items-center gap-2 flex">
-					<LogoutIcon activeIndex={false} />
-				</div>
-			</div>
-			
-			</div>
+			{/* <div className="mx-auto pb-10">
+				<LogoutIcon activeIndex={false} />
+			</div> */}
 		</div>
-	</div>
 	</>
   );
 }

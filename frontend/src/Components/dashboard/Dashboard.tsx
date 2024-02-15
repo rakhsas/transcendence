@@ -27,7 +27,7 @@ function DashboardComponent() {
 	}, []);
   return (
 	<DataContext.Provider value={userData}>
-		<div className="all flex bg-main-1">
+		<div className="all flex bg-main-light-SPRUCE">
 			
 			<SidebarComponent />
 		<div className="overflow-hidden flex-1 w-3/4">
