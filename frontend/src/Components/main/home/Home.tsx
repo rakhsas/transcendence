@@ -9,13 +9,28 @@ import Robot from './../../../assets/robot.png';
 import image from './../../../assets/Image.png';
 import fire from './../../../assets/Icon/fire.svg';
 import group from './../../../assets/Icon/Group_light.svg'
+import avatar from './../../../assets/img/wepik-export-20240216142312HeMy.png';
+import avatar1 from './../../../assets/img/wepik-export-20240216142735Xpq3.png';
+import avatar2 from './../../../assets/img/wepik-export-20240216143758sn9c.png';
+import avatar3 from './../../../assets/img/wepik-export-20240216144328sF6H.png';
+import play from './../../../assets/img/Play.svg'
 const HomeComponent: React.FC = () => {
     const active = "#B8F170";
     const userData = useContext(DataContext);
     if (!userData) {
         return <LoadingComponent />;
     }
-    const colors = ['#FFBEB8', '#FFDCB9', '#FF8A8A', '#F7C5BF']
+    const friendData = {
+        colors : ['#FFBEB8', '#FFDCB9', '#FF8A8A', '#F7C5BF'],
+        friends : [avatar, avatar1, avatar2, avatar3],
+        isOnline : [true, false, true, false],
+        isInGame : [true, false, true, false]
+    }
+    const roomData = {
+        pictures: ['room1', 'room2'],
+        title: ['Magic room', 'Traditional room'],
+        description: ['This is a magic room', 'This is a Traditional room']
+    }
     const customProgressTheme: CustomFlowbiteTheme['progress'] = {
         base: `w-64 overflow-hidden rounded-full bg-white dark:bg-gray-700`,
         bar: ` rounded-full text-center font-medium bg-[var(--${userData.coalition})] leading-auto text-white dark:text-cyan-100 space-x-2; `,
@@ -26,16 +41,16 @@ const HomeComponent: React.FC = () => {
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto">
-                <section className="min-h-2/3 flex items-center justify-center">
-                    <div className="w-full h-full relative overflow-hidden">
+                <section className="min-h-2/3 flex items-center justify-center p-2">
+                    <div className="w-full relative overflow-hidden p-4">
                         <div className="relative flex justify-between flex-col mt-8">
                             <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-b from-neutral-700 to-slate-900 rounded-3xl overflow-hidden">
                                 <div className="absolute inset-0 bg-teal-600 blur-[20px]"></div>
-                                <div className="absolute top-0 left-0 w-full h-full flex items-center z-0"> {/* Updated z-index */}
+                                <div className="absolute top-0 left-0 w-full h-full flex items-center z-10">
                                     <img className="object-cover w-full h-full" src={image} alt="Background" />
                                 </div>
                             </div>
-                            <div className="flex flex-col p-8 justify-between relative z-10"> {/* Updated z-index */}
+                            <div className="flex flex-col p-8 justify-between relative z-0">
                                 <div className="flex flex-col justify-between">
                                     <div className="w-fit flex flex-row p-2 bg-gradient-to-br from-orange-700 to-amber-400 rounded-xl">
                                         <img src={fire} alt="Fire" />
@@ -56,112 +71,59 @@ const HomeComponent: React.FC = () => {
                             <img className="w-72 h-72" src={Robot} alt="Robot" />
                         </div>
                     </div>
-
-                </section>
-
-
-
-                {/* <div className='flex items-center flex-col mt-4 w-full p-2 justify-center'>
-            <p className="uppercase text-white self-start">Games Mode</p>
-                <GameModesCarousel />
-        </div> */}
-            </main>
-            {/* <aside className="bg-main-1 p-8 border-2 rounded-lg lg:block md:block hidden">
-                <div className="profile rounded-2xl border-white border-2 bg-cover overflow-hidden" style={{ backgroundImage: `url(${userData.coalitionCover})` }}>
-                    <div className="flex flex-col w-full sm:gap-3 justify-between p-4">
-                        <div className="flex flex-col lg:flex-row">
-                            <div className="grid place-items-center relative">
-                                <div
-                                    className="w-48 h-48 text-black md:w-36 md:h-36 lg:h-24 lg:w-24 bg-cover bg-no-repeat bg-center rounded-full bg-gray-300 border-2 shadow-base"
-                                    style={{ backgroundImage: `url(${userData.picture})`, borderColor: `${userData.coalitionColor}`, borderWidth: '3px' }}>
-                                </div>
-                                <a>
-                                    <div className="relative mt-[-2px] grid place-items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" version="1.1" id="banner" x="0px" y="0px" width="70" height="70" viewBox="0 0 68 104" fill={userData ? userData.coalitionColor : '#000'} xmlSpace="preserve" className="coalition-flag--flag">
-                                            <g id="banner-content">
-                                                <g id="UI-Intranet-banner-content" transform="translate(-96.000000, -60.000000)">
-                                                    <g id="banner-content-g-1" transform="translate(96.000000, 60.000000)">
-                                                        <polygon id="banner-content-polygon-1" points="0,0 0,80.5 34.3,104 68,80.5 68,0"></polygon>
-                                                    </g>
-                                                </g>
-                                            </g>
-                                            <foreignObject x="0" y="0" width="68" height="50" >
-                                                <img src={userData.coalitionPic} alt="" />
-                                            </foreignObject>
-                                        </svg>
+                    <div className="w-2/3 bg-transparent flex flex-col justify-around p-4 space-y-4 blur-[0.5px]">
+                        <div className="title text-2xl text-white">Public Rooms</div>
+                        {
+                            roomData.pictures.map((room, index) => {
+                                return (
+                                    <div className="public-room1 custom-shadow rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2" key={index}>
+                                        <div className="infos flex flex-row items-center space-x-4">
+                                            <div className="pic w-12 h-12 bg-white rounded-2xl">
+                                                <img src={roomData.pictures[index]} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
+                                            </div>
+                                            <div className="description">
+                                                <div className="text-white font-bold">{ roomData.title[index] }</div>
+                                                <span className='text-gray-500'>{ roomData.description[index] }</span>
+                                            </div>
+                                        </div>
+                                        <div className="action">
+                                            <img src={play} alt="Play" />
+                                        </div>
                                     </div>
-                                </a>
-                            </div>
-                            <div className="lg:pl-2 overflow-hidden">
-                                <h2 className="text-2xl text-white font-bold text-center py-4 lg:text-left lg:py-0 drop-shadow-md">
-                                    {userData.firstName + ' ' + userData.lastName}
-                                </h2>
-                                <p className="text-sm text-white lg:text-black">
-                                    {userData.username}
-                                </p>
-                                <div className="text-sm flex flex-row items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="#B8F170" stroke="#10742C">
-                                        <circle cx="5" cy="5" r="4" fill={active} stroke="#000"></circle>
-                                    </svg>
-                                    <div className="drop-shadow-md text-white">Status</div></div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-6 lg:gap-3">
-                            <Progress
-                                theme={customProgressTheme}
-                                progress={72}
-                                color='red'
-                                size="xl"
-                                labelText
-                                textLabel='Level 0'
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="activity"></div>
-            </aside> */}
+                                )
+                            })
+                        }
+                    </div> 
+                </section>
+                {/* <div className='flex items-center flex-col mt-4 w-full p-2 justify-center'>
+                    <p className="uppercase text-white self-start">Games Mode</p>
+                        <GameModesCarousel />
+                </div> */}
+            </main>
             <aside className="m-2 p-4 border-2 rounded-lg lg:block md:block hidden h-fit bg-[#2e2e30]">
                 <div className="contain flex flex-col justify-between items-center mx-auto">
                     <div className="profile rounded-full mt-2 w-12 h-12 bg-white">
                         <img src={userData.picture} className='bg-contain h-full bg-no-repeat bg-center' alt={userData.username} />
                     </div>
-                    <div className="groupslogo mt-4">
+                    <div className="groupslogo mt-8">
                         <img src={group} alt='Groups' />
                     </div>
                     <div className="friends mt-4">
-                        <div className="w-16 h-16 relative">
-                            <div className="w-12 h-12 bg-[#FFBEB8] rounded-full overflow-hidden mb-1">
-                                <img src="friend-picture.jpg" alt="Friend Picture" />
-                            </div>
-                            <div className="absolute top-0 right-2 mb-1 mr-1">
-                                <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-main-light-SPRUCE"></div>
-                            </div>
-                        </div>
-                        <div className="w-16 h-16 relative">
-                            <div className="w-12 h-12 bg-[#FFDCB9] rounded-full overflow-hidden mb-1">
-                                <img src="friend-picture.jpg" alt="Friend Picture" />
-                            </div>
-                            <div className="absolute top-0 right-2 mb-1 mr-1">
-                                <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-main-light-SPRUCE"></div>
-                            </div>
-                        </div>
-                        <div className="w-16 h-16 relative">
-                            <div className="w-12 h-12 bg-[#FF8A8A] rounded-full overflow-hidden mb-1">
-                                <img src="friend-picture.jpg" alt="Friend Picture" />
-                            </div>
-                            <div className="absolute top-0 right-2 mb-1 mr-1">
-                                <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-main-light-SPRUCE"></div>
-                            </div>
-                        </div>
-                        <div className="w-16 h-16 relative">
-                            <div className="w-12 h-12 bg-[#F7C5BF] rounded-full overflow-hidden mb-1">
-                                <img src="friend-picture.jpg" alt="Friend Picture" />
-                            </div>
-                            <div className="absolute top-0 right-2 mb-1 mr-1">
-                                <div className="w-4 h-4 rounded-full bg-[#A5BAA9] border-2 border-main-light-SPRUCE"></div>
-                            </div>
-                        </div>
-
+                        {
+                            friendData.friends.map((friend, index) => {
+                                return (
+                                    <div className="w-20 h-20 relative flex flex-col items-center" key={index}>
+                                        <div className={`w-12 h-12 bg-[${friendData.colors[index]}] rounded-full`}>
+                                            <img src={friendData.friends[index]} alt="Friend Picture" />
+                                        </div>
+                                        <div className="absolute top-0 right-2 mb-1 mr-[1px]">
+                                            <div className={`w-4 h-4 rounded-full ${friendData.isOnline[index] === true ? 'bg-green-500' : 'bg-[#A5BAA9]' }  border-2 border-main-light-SPRUCE`}></div>
+                                        </div>
+                                        <div className={`text-sm rounded-lg text-white bg-red-500 p-[2px] top-2 ${friendData.isInGame[index] ? '' : 'hidden'} `}>In Game</div>
+                                    </div>
+                                )
+                            })
+                        }
                     </div>
                 </div>
             </aside>

@@ -17,7 +17,7 @@ export default {
           light: {
             SPRUCE: '#1D1E22',
             FERN: '#3DBDA7',
-            EGGSHELL: '#F2E2DA',
+            EGGSHELL: '#00453F',
             PUMPKIN: '#E86931'
           }
         }
