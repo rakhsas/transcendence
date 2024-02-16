@@ -5,14 +5,17 @@ import DataContext from '../../../services/data.context';
 import LoadingComponent from '../../shared/loading/loading';
 import { Progress } from 'flowbite-react';
 import type { CustomFlowbiteTheme } from 'flowbite-react';
-import Robot from './../../../assets/robot.png'
-import image from './../../../assets/Image.png'
+import Robot from './../../../assets/robot.png';
+import image from './../../../assets/Image.png';
+import fire from './../../../assets/Icon/fire.svg';
+import group from './../../../assets/Icon/Group_light.svg'
 const HomeComponent: React.FC = () => {
     const active = "#B8F170";
     const userData = useContext(DataContext);
     if (!userData) {
         return <LoadingComponent />;
     }
+    const colors = ['#FFBEB8', '#FFDCB9', '#FF8A8A', '#F7C5BF']
     const customProgressTheme: CustomFlowbiteTheme['progress'] = {
         base: `w-64 overflow-hidden rounded-full bg-white dark:bg-gray-700`,
         bar: ` rounded-full text-center font-medium bg-[var(--${userData.coalition})] leading-auto text-white dark:text-cyan-100 space-x-2; `,
@@ -34,7 +37,8 @@ const HomeComponent: React.FC = () => {
                             </div>
                             <div className="flex flex-col p-8 justify-between relative z-10"> {/* Updated z-index */}
                                 <div className="flex flex-col justify-between">
-                                    <div className="w-fit p-1 bg-gradient-to-br from-orange-700 to-amber-400 rounded-xl">
+                                    <div className="w-fit flex flex-row p-2 bg-gradient-to-br from-orange-700 to-amber-400 rounded-xl">
+                                        <img src={fire} alt="Fire" />
                                         <div className="text-white font-bold text-xl"> Popular</div>
                                     </div>
                                     <div className="div mt-4">
@@ -42,7 +46,7 @@ const HomeComponent: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="w-fit p-4 bg-gradient-to-r from-slate-900 via-gray-900 to-zinc-600 rounded-full">
-                                    <div className="bg-emerald-400 rounded-3xl flex flex-col justify-center px-4 py-2">
+                                    <div className="bg-emerald-400 rounded-3xl flex flex-col justify-center hover:cursor-pointer px-4 py-2">
                                         <div className="text-white font-bold">Play Now</div>
                                     </div>
                                 </div>
@@ -62,7 +66,7 @@ const HomeComponent: React.FC = () => {
                 <GameModesCarousel />
         </div> */}
             </main>
-            <aside className="bg-main-1 p-8 border-2 rounded-lg lg:block md:block hidden">
+            {/* <aside className="bg-main-1 p-8 border-2 rounded-lg lg:block md:block hidden">
                 <div className="profile rounded-2xl border-white border-2 bg-cover overflow-hidden" style={{ backgroundImage: `url(${userData.coalitionCover})` }}>
                     <div className="flex flex-col w-full sm:gap-3 justify-between p-4">
                         <div className="flex flex-col lg:flex-row">
@@ -115,6 +119,51 @@ const HomeComponent: React.FC = () => {
                     </div>
                 </div>
                 <div className="activity"></div>
+            </aside> */}
+            <aside className="m-2 p-4 border-2 rounded-lg lg:block md:block hidden h-fit bg-[#2e2e30]">
+                <div className="contain flex flex-col justify-between items-center mx-auto">
+                    <div className="profile rounded-full mt-2 w-12 h-12 bg-white">
+                        <img src={userData.picture} className='bg-contain h-full bg-no-repeat bg-center' alt={userData.username} />
+                    </div>
+                    <div className="groupslogo mt-4">
+                        <img src={group} alt='Groups' />
+                    </div>
+                    <div className="friends mt-4">
+                        <div className="w-16 h-16 relative">
+                            <div className="w-12 h-12 bg-[#FFBEB8] rounded-full overflow-hidden mb-1">
+                                <img src="friend-picture.jpg" alt="Friend Picture" />
+                            </div>
+                            <div className="absolute top-0 right-2 mb-1 mr-1">
+                                <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-main-light-SPRUCE"></div>
+                            </div>
+                        </div>
+                        <div className="w-16 h-16 relative">
+                            <div className="w-12 h-12 bg-[#FFDCB9] rounded-full overflow-hidden mb-1">
+                                <img src="friend-picture.jpg" alt="Friend Picture" />
+                            </div>
+                            <div className="absolute top-0 right-2 mb-1 mr-1">
+                                <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-main-light-SPRUCE"></div>
+                            </div>
+                        </div>
+                        <div className="w-16 h-16 relative">
+                            <div className="w-12 h-12 bg-[#FF8A8A] rounded-full overflow-hidden mb-1">
+                                <img src="friend-picture.jpg" alt="Friend Picture" />
+                            </div>
+                            <div className="absolute top-0 right-2 mb-1 mr-1">
+                                <div className="w-4 h-4 rounded-full bg-green-500 border-2 border-main-light-SPRUCE"></div>
+                            </div>
+                        </div>
+                        <div className="w-16 h-16 relative">
+                            <div className="w-12 h-12 bg-[#F7C5BF] rounded-full overflow-hidden mb-1">
+                                <img src="friend-picture.jpg" alt="Friend Picture" />
+                            </div>
+                            <div className="absolute top-0 right-2 mb-1 mr-1">
+                                <div className="w-4 h-4 rounded-full bg-[#A5BAA9] border-2 border-main-light-SPRUCE"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </aside>
         </>
     )
