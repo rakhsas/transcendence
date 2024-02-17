@@ -96,12 +96,12 @@ const HomeComponent: React.FC = () => {
                         }
                     </div>
                 </section>
-                <section className='min-h-2/3 flex items-center flex-row justify-between p-2'>
-                    <div className='flex flex-col max-w-[50rem] items-center w-full p-2 justify-center'>
+                <section className='flex flex-row flex-wrap justify-between p-2'>
+                    <div className='flex min-w-[400px] flex-1 flex-col items-center  p-2'>
                         <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
                         <GameModesCarousel />
                     </div>
-                    <div className='flex min-w-96 max-w-[50rem] flex-col items-center place-self-start p-4 justify-center min-h-full'>
+                    <div className='flex max-w-[50rem] flex-col items-center place-self-start p-4 justify-center '>
                         <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> your statistic </p>
                         <div className="w-full m-4 p-2 bg-main-light-EGGSHELL rounded-3xl">
                             <div className="flex min-h-[50vh] flex-row justify-between items-center p-4">

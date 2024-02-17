@@ -4,6 +4,7 @@ import OwlCarousel from "react-owl-carousel";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 import playFill from './../../../assets/img/Play-Fill.svg'
+import { HtmlHTMLAttributes, useEffect } from 'react';
 
 interface CarouselItemProps {
     image: string;
@@ -24,6 +25,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ image, heading }) => (
 
 
 const GameModesCarousel: React.FC = () => {
+
     const images = [playFill, playFill, playFill];
     const heading = ['Uncharted 1', 'Uncharted 2', 'Uncharted 3'];
 
@@ -37,15 +39,21 @@ const GameModesCarousel: React.FC = () => {
 
     return (
         <div
-            style={{ margin: 4 }}
+            style={{  marginTop: '24px', marginLeft: '4px', marginRight: '4px'}}
             className='gamesmodeCont'>
             <OwlCarousel
                 nav={false}
                 dots={false}
-                className="owl-theme p-2"
-                center={true}
+                className="owl-theme"
                 autoplay={true}
-                
+                center
+                responsive={
+                    {
+                        0: {
+                            items: 4,
+                        }
+                    }
+                }
                 autoplayHoverPause={true}
                 animateOut={true}
                 smartSpeed={500}

@@ -1,3 +1,8 @@
 .gamesmodeCont {
     width: 70rem;
 }
+
+.owl-carousel .owl-stage-outer .owl-stage {
+    /* box-shadow: 0 0 300px rgba(255, 0, 0, 0.5); */
+    background-color: aqua;
+}
