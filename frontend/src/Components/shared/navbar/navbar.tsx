@@ -24,7 +24,7 @@ function NavbarComponent(): JSX.Element {
     return (
         <div className="p-8 flex flex-row justify-between">
             <div className="heading mt-2">
-                <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased">Good Evening,<span className="text-white uppercase"> {userData ? userData.username: 'User'}</span></span>
+                <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased font-poppins">Good Evening,<span className="text-white uppercase font-poppins"> {userData ? userData.username: 'User'}</span></span>
             </div>
             <div className="max-w-md pl-4">
                 <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" />

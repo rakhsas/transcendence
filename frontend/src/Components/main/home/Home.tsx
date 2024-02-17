@@ -14,6 +14,7 @@ import avatar1 from './../../../assets/img/wepik-export-20240216142735Xpq3.png';
 import avatar2 from './../../../assets/img/wepik-export-20240216143758sn9c.png';
 import avatar3 from './../../../assets/img/wepik-export-20240216144328sF6H.png';
 import play from './../../../assets/img/Play.svg'
+import playFill from './../../../assets/img/Play-Fill.svg'
 const HomeComponent: React.FC = () => {
     const active = "#B8F170";
     const userData = useContext(DataContext);
@@ -21,10 +22,10 @@ const HomeComponent: React.FC = () => {
         return <LoadingComponent />;
     }
     const friendData = {
-        colors : ['#FFBEB8', '#FFDCB9', '#FF8A8A', '#F7C5BF'],
-        friends : [avatar, avatar1, avatar2, avatar3],
-        isOnline : [true, false, true, false],
-        isInGame : [true, false, true, false]
+        colors: ['#FFBEB8', '#FFDCB9', '#FF8A8A', '#F7C5BF'],
+        friends: [avatar, avatar1, avatar2, avatar3],
+        isOnline: [true, false, true, false],
+        isInGame: [true, false, true, false]
     }
     const roomData = {
         pictures: ['room1', 'room2'],
@@ -50,7 +51,7 @@ const HomeComponent: React.FC = () => {
                                     <img className="object-cover w-full h-full" src={image} alt="Background" />
                                 </div>
                             </div>
-                            <div className="flex flex-col p-8 justify-between relative z-0">
+                            <div className="flex flex-col p-8 justify-between relative z-10">
                                 <div className="flex flex-col justify-between">
                                     <div className="w-fit flex flex-row p-2 bg-gradient-to-br from-orange-700 to-amber-400 rounded-xl">
                                         <img src={fire} alt="Fire" />
@@ -72,7 +73,7 @@ const HomeComponent: React.FC = () => {
                         </div>
                     </div>
                     <div className="w-2/3 bg-transparent flex flex-col justify-around p-4 space-y-4 blur-[0.5px]">
-                        <div className="title text-2xl text-white">Public Rooms</div>
+                        <div className="title text-2xl text-white font-poppins overflow-hidden">Public Rooms</div>
                         {
                             roomData.pictures.map((room, index) => {
                                 return (
@@ -82,8 +83,8 @@ const HomeComponent: React.FC = () => {
                                                 <img src={roomData.pictures[index]} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
                                             </div>
                                             <div className="description">
-                                                <div className="text-white font-bold">{ roomData.title[index] }</div>
-                                                <span className='text-gray-500'>{ roomData.description[index] }</span>
+                                                <div className="text-white font-bold">{roomData.title[index]}</div>
+                                                <span className='text-gray-500'>{roomData.description[index]}</span>
                                             </div>
                                         </div>
                                         <div className="action">
@@ -93,17 +94,38 @@ const HomeComponent: React.FC = () => {
                                 )
                             })
                         }
-                    </div> 
+                    </div>
                 </section>
-                {/* <div className='flex items-center flex-col mt-4 w-full p-2 justify-center'>
-                    <p className="uppercase text-white self-start">Games Mode</p>
+                <section className='min-h-2/3 flex items-center flex-row justify-between p-2'>
+                    <div className='flex flex-col max-w-[50rem] items-center w-full p-2 justify-center'>
+                        <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
                         <GameModesCarousel />
-                </div> */}
+                    </div>
+                    <div className='flex min-w-96 max-w-[50rem] flex-col items-center place-self-start p-4 justify-center min-h-full'>
+                        <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> your statistic </p>
+                        <div className="w-full m-4 p-2 bg-main-light-EGGSHELL rounded-3xl">
+                            <div className="flex min-h-[50vh] flex-row justify-between items-center p-4">
+                                <div className="flex flex-col justify-between">
+                                    <div className="text-white font-bold text-2xl">Win Rate</div>
+                                    <div className="text-white font-bold text-2xl">K/D</div>
+                                    <div className="text-white font-bold text-2xl">Matches Played</div>
+                                </div>
+                                <div className="flex flex-col justify-between">
+                                    <div className="text-white font-bold text-2xl">70%</div>
+                                    <div className="text-white font-bold text-2xl">1.5</div>
+                                    <div className="text-white font-bold text-2xl">100</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </section>
+
             </main>
-            <aside className="m-2 p-4 border-2 rounded-lg lg:block md:block hidden h-fit bg-[#2e2e30]">
+            <aside className="m-2 p-4 rounded-lg lg:block md:block hidden h-fit bg-zinc-900">
                 <div className="contain flex flex-col justify-between items-center mx-auto">
-                    <div className="profile rounded-full mt-2 w-12 h-12 bg-white">
-                        <img src={userData.picture} className='bg-contain h-full bg-no-repeat bg-center' alt={userData.username} />
+                    <div className="profile mt-2 w-14 h-14 bg-white">
+                        <img src={userData.picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData.username} />
                     </div>
                     <div className="groupslogo mt-8">
                         <img src={group} alt='Groups' />
@@ -113,13 +135,13 @@ const HomeComponent: React.FC = () => {
                             friendData.friends.map((friend, index) => {
                                 return (
                                     <div className="w-20 h-20 relative flex flex-col items-center" key={index}>
-                                        <div className={`w-12 h-12 bg-[${friendData.colors[index]}] rounded-full`}>
+                                        <div className={`w-12 h-12 rounded-full`} style={{ backgroundColor: friendData.colors[index] }}>
                                             <img src={friendData.friends[index]} alt="Friend Picture" />
                                         </div>
                                         <div className="absolute top-0 right-2 mb-1 mr-[1px]">
-                                            <div className={`w-4 h-4 rounded-full ${friendData.isOnline[index] === true ? 'bg-green-500' : 'bg-[#A5BAA9]' }  border-2 border-main-light-SPRUCE`}></div>
+                                            <div className={`w-4 h-4 rounded-full ${friendData.isOnline[index] === true ? 'bg-green-500' : 'bg-[#A5BAA9]'}  border-2 border-main-light-SPRUCE`}></div>
                                         </div>
-                                        <div className={`text-sm rounded-lg text-white bg-red-500 p-[2px] top-2 ${friendData.isInGame[index] ? '' : 'hidden'} `}>In Game</div>
+                                        <div className={`absolute text-sm rounded-lg text-white bg-main-light-FERN p-[3px] top-8 ${friendData.isInGame[index] ? '' : 'hidden'} `}>In Game</div>
                                     </div>
                                 )
                             })

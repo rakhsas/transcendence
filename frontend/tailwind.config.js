@@ -29,6 +29,9 @@ export default {
       'md': '768px',
       'xs': '320px'
     },
+    fontFamily: {
+      'poppins': ['Poppins'],
+   }
   },
   plugins: [
     require('flowbite/plugin'),
