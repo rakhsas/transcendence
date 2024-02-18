@@ -13,7 +13,7 @@ import AnalyticsComponent from './Components/main/analytics/analytics';
 import HomeComponent from './Components/main/home/Home';
 import ProfileComponent from './Components/main/profile/profile';
 import Cookies from 'js-cookie';
-import { useEffect, useState } from 'react';
+import Game from './Components/Game/Game';
 
 function App() {
   const isAuthenticated = Cookies.get('isAuthenticated');
@@ -33,6 +33,7 @@ function App() {
             </Route>
           {/* <Route path="/SignIn" element={<FunctionSignUpForm/>} /> */}
           <Route path="/login"  element={<ValidInformation/>}/>
+          <Route path="/game" element={<Game />} />
         </Routes>
     {/* </BrowserRouter> */}
     </>

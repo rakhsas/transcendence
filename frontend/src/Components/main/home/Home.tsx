@@ -1,12 +1,12 @@
 import './Home.css';
 import GameModesCarousel from './../game/game';
-import { useContext } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import DataContext from '../../../services/data.context';
 import LoadingComponent from '../../shared/loading/loading';
 import { Progress } from 'flowbite-react';
 import type { CustomFlowbiteTheme } from 'flowbite-react';
 import Robot from './../../../assets/robot.png';
-import image from './../../../assets/Image.png';
+import avatarGirl from './../../../assets/avatars/Beautiful_Elf.png'
 import fire from './../../../assets/Icon/fire.svg';
 import group from './../../../assets/Icon/Group_light.svg'
 import avatar from './../../../assets/img/wepik-export-20240216142312HeMy.png';
@@ -14,13 +14,81 @@ import avatar1 from './../../../assets/img/wepik-export-20240216142735Xpq3.png';
 import avatar2 from './../../../assets/img/wepik-export-20240216143758sn9c.png';
 import avatar3 from './../../../assets/img/wepik-export-20240216144328sF6H.png';
 import play from './../../../assets/img/Play.svg'
+import videoSource from './../../../assets/avatars/490488ec-2f13-402b-b203-951e4a4775cd.mp4';
 import playFill from './../../../assets/img/Play-Fill.svg'
+import Chart from 'chart.js/auto';
+
 const HomeComponent: React.FC = () => {
     const active = "#B8F170";
     const userData = useContext(DataContext);
     if (!userData) {
         return <LoadingComponent />;
     }
+    const chartRef = useRef<HTMLCanvasElement | null>(null);
+
+    let chartInstance: Chart | null = null;
+
+    useEffect(() => {
+        if (chartRef.current) {
+            const ctx = chartRef.current.getContext('2d');
+            if (ctx) {
+                chartInstance = new Chart(ctx, {
+                    type: 'radar',
+                    data : {
+                        labels: [
+                          'Eating',
+                          'Drinking',
+                          'Sleeping',
+                          'Designing',
+                          'Coding',
+                        ],
+                        datasets: [{
+                          label: 'My First Dataset',
+                          data: [65, 59, 90, 81, 56],
+                          fill: true,
+                          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                          borderColor: 'rgb(255, 99, 132)',
+                          pointBackgroundColor: 'rgb(255, 99, 132)',
+                          pointBorderColor: '#fff',
+                          pointHoverBackgroundColor: '#fff',
+                          pointHoverBorderColor: 'rgb(255, 99, 132)',
+                          pointBorderWidth: 0,
+                        }, {
+                          label: 'My Second Dataset',
+                          data: [28, 48, 40, 19, 96],
+                          fill: true,
+                          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                          borderColor: 'rgb(54, 162, 235)',
+                          pointBackgroundColor: 'rgb(54, 162, 235)',
+                          pointBorderColor: '#fff',
+                          pointHoverBackgroundColor: '#fff',
+                          pointHoverBorderColor: 'rgb(54, 162, 235)'
+                        },]
+                    },
+                    options: {
+                        elements: {
+                            line: {
+                                borderWidth: 3,
+                            }
+                        },
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false,
+                            }
+                        }
+                    },
+                });
+            }
+        }
+
+        return () => {
+            // Cleanup function to destroy the chart instance when component unmounts
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+        };
+    }, []);
     const friendData = {
         colors: ['#FFBEB8', '#FFDCB9', '#FF8A8A', '#F7C5BF'],
         friends: [avatar, avatar1, avatar2, avatar3],
@@ -45,12 +113,14 @@ const HomeComponent: React.FC = () => {
                 <section className="min-h-2/3 flex items-center justify-center p-2">
                     <div className="w-full relative overflow-hidden p-4">
                         <div className="relative flex justify-between flex-col mt-8">
-                            <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-b from-neutral-700 to-slate-900 rounded-3xl overflow-hidden">
-                                <div className="absolute inset-0 bg-teal-600 blur-[20px]"></div>
-                                <div className="absolute top-0 left-0 w-full h-full flex items-center z-10">
-                                    <img className="object-cover w-full h-full" src={image} alt="Background" />
-                                </div>
+                        <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-b from-neutral-700 to-slate-900 rounded-3xl overflow-hidden">
+                            <div className="absolute inset-0 bg-teal-600 blur-[20px]"></div>
+                            <div className="absolute top-0 left-0 w-full h-full flex items-center z-10">
+                                <video className="object-cover w-full h-full" autoPlay loop muted>
+                                    <source src={videoSource} type="video/mp4" />
+                                </video>
                             </div>
+                        </div>
                             <div className="flex flex-col p-8 justify-between relative z-10">
                                 <div className="flex flex-col justify-between">
                                     <div className="w-fit flex flex-row p-2 bg-gradient-to-br from-orange-700 to-amber-400 rounded-xl">
@@ -97,24 +167,28 @@ const HomeComponent: React.FC = () => {
                     </div>
                 </section>
                 <section className='flex flex-row flex-wrap justify-between p-2'>
-                    <div className='flex min-w-[400px] flex-1 flex-col items-center  p-2'>
+                    <div className='flex min-w-[400px] flex-1 flex-col items-center h-full p-2'>
                         <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
                         <GameModesCarousel />
                     </div>
-                    <div className='flex max-w-[50rem] flex-col items-center place-self-start p-4 justify-center '>
+                    <div className='flex w-[30rem] max-w-[60rem] flex-col items-center place-self-start p-4 justify-center'>
                         <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> your statistic </p>
-                        <div className="w-full m-4 p-2 bg-main-light-EGGSHELL rounded-3xl">
-                            <div className="flex min-h-[50vh] flex-row justify-between items-center p-4">
-                                <div className="flex flex-col justify-between">
-                                    <div className="text-white font-bold text-2xl">Win Rate</div>
-                                    <div className="text-white font-bold text-2xl">K/D</div>
-                                    <div className="text-white font-bold text-2xl">Matches Played</div>
+                        <div className="w-full m-4 p-2 bg-main-light-EGGSHELL rounded-3xl relative">
+                            <div className="flex min-h-[50vh] flex-col items-start p-4">
+                                <div className="top overflow-hidden">
+                                    <span className='font-poppins text-stone-300 text-3xl font-semibold overflow-hidden'> Top Weekend </span>
                                 </div>
-                                <div className="flex flex-col justify-between">
-                                    <div className="text-white font-bold text-2xl">70%</div>
-                                    <div className="text-white font-bold text-2xl">1.5</div>
-                                    <div className="text-white font-bold text-2xl">100</div>
+                                <div className="content flex flex-row py-px">
+                                    <div className="item-left flex flex-col items-start pr-4">
+                                        <span className='text-3xl font-bold text-white'> Kratos </span>
+                                        <span className='text-2xl font-bold text-white'> 2000 </span>
+                                        <p className='text-stone-400 text-xl'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. </p>
+                                        <canvas ref={chartRef} className='w-24 h-24'></canvas>
+                                    </div>
                                 </div>
+                            </div>
+                            <div className="item-right absolute bottom-0 right-0">
+                                <img className='w-32 h-[28rem]' src={avatarGirl} alt="Avatar" />
                             </div>
                         </div>
                     </div>
@@ -122,9 +196,9 @@ const HomeComponent: React.FC = () => {
                 </section>
 
             </main>
-            <aside className="m-2 p-4 rounded-lg lg:block md:block hidden h-fit bg-zinc-900">
+            <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit bg-zinc-900">
                 <div className="contain flex flex-col justify-between items-center mx-auto">
-                    <div className="profile mt-2 w-14 h-14 bg-white">
+                    <div className="profile mt-2 w-12 h-12 bg-white">
                         <img src={userData.picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData.username} />
                     </div>
                     <div className="groupslogo mt-8">
@@ -134,7 +208,7 @@ const HomeComponent: React.FC = () => {
                         {
                             friendData.friends.map((friend, index) => {
                                 return (
-                                    <div className="w-20 h-20 relative flex flex-col items-center" key={index}>
+                                    <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
                                         <div className={`w-12 h-12 rounded-full`} style={{ backgroundColor: friendData.colors[index] }}>
                                             <img src={friendData.friends[index]} alt="Friend Picture" />
                                         </div>
