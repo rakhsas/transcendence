@@ -2,7 +2,7 @@
 all: build up
 
 up:
-	docker compose -f docker-compose.yml up -d
+	sudo docker compose -f docker-compose.yml up -d
 
 build:
 	mkdir -p auth/node_modules/
@@ -10,12 +10,12 @@ build:
 	mkdir -p game/node_modules/
 	mkdir -p profile/node_modules/
 	mkdir -p frontend/node_modules/
-	docker compose -f docker-compose.yml build
+	sudo docker compose -f docker-compose.yml build
 
 down:
-	docker compose -f docker-compose.yml down -v
+	sudo docker compose -f docker-compose.yml down -v
 
 clean: down remove
-	docker compose -f docker-compose.yml down --rmi all
+	sudo docker compose -f docker-compose.yml down --rmi all
 
 re: down up

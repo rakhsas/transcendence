@@ -18,7 +18,7 @@ model User1 {
   added       Int[] // who add this user
   blocks      Int[] // what the user block
   blocking    Int[] // who block the user
-  blocked     Int[] // ...
+  // blocked     Int[] // ...
   owner       Channel[] @relation("owner")
   admin       Channel[] @relation("admin")
   member      Channel[] @relation("member")
@@ -35,7 +35,6 @@ model Channel {
   id Int @id @default(autoincrement())
 
   name       String   @default(uuid())
-  //picture    String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   dm         Boolean  @default(false)
@@ -56,12 +55,12 @@ model Channel {
 model Msg {
   id        Int      @id @default(autoincrement())
   msg       String
-  history   String[]
-  unsent    Boolean  @default(false)
+  // history   String[]
+  // unsent    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  owner     User1    @relation(fields: [userId], references: [id])
-  userId    Int
+  owner     User1    @relation(fields: [userId], references: [id]) // sender
+  userId    Int // recipient
   channel   Channel  @relation(fields: [cid], references: [id])
   cid       Int
 }
@@ -76,3 +75,9 @@ model Mute {
   channel  Channel  @relation(fields: [cid], references: [id])
   cid      Int
 }
+
+
+
+// ======================================================================================
+
+

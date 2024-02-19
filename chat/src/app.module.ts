@@ -2,13 +2,14 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HttpModule } from '@nestjs/axios';
-import { SocketGateway } from './socket/socket.gateway';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
-    HttpModule
+    HttpModule,
+    ChatModule
   ],
   controllers: [AppController],
-  providers: [AppService, SocketGateway],
+  providers: [AppService],
 })
 export class AppModule {}
