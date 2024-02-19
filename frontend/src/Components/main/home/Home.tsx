@@ -19,16 +19,17 @@ import playFill from './../../../assets/img/Play-Fill.svg'
 import Chart from 'chart.js/auto';
 
 const HomeComponent: React.FC = () => {
-    const active = "#B8F170";
-    const userData = useContext(DataContext);
-    if (!userData) {
-        return <LoadingComponent />;
-    }
+    // const active = "#B8F170";
     const chartRef = useRef<HTMLCanvasElement | null>(null);
-
+    const userData = useContext(DataContext);
+    
     let chartInstance: Chart | null = null;
-
+    
     useEffect(() => {
+
+        if (!userData) {
+            return ;
+        }
         if (chartRef.current) {
             const ctx = chartRef.current.getContext('2d');
             if (ctx) {
@@ -83,12 +84,14 @@ const HomeComponent: React.FC = () => {
         }
 
         return () => {
-            // Cleanup function to destroy the chart instance when component unmounts
             if (chartInstance) {
                 chartInstance.destroy();
             }
         };
-    }, []);
+    }, [chartRef, userData]);
+
+    if (!userData)
+        return <LoadingComponent />;
     const friendData = {
         colors: ['#FFBEB8', '#FFDCB9', '#FF8A8A', '#F7C5BF'],
         friends: [avatar, avatar1, avatar2, avatar3],
@@ -100,13 +103,13 @@ const HomeComponent: React.FC = () => {
         title: ['Magic room', 'Traditional room'],
         description: ['This is a magic room', 'This is a Traditional room']
     }
-    const customProgressTheme: CustomFlowbiteTheme['progress'] = {
-        base: `w-64 overflow-hidden rounded-full bg-white dark:bg-gray-700`,
-        bar: ` rounded-full text-center font-medium bg-[var(--${userData.coalition})] leading-auto text-white dark:text-cyan-100 space-x-2; `,
-        color: {
-            "red": `bg-${userData.coalition}`,
-        },
-    };
+    // const customProgressTheme: CustomFlowbiteTheme['progress'] = {
+    //     base: `w-64 overflow-hidden rounded-full bg-white dark:bg-gray-700`,
+    //     bar: ` rounded-full text-center font-medium bg-[var(--${userData.coalition})] leading-auto text-white dark:text-cyan-100 space-x-2; `,
+    //     color: {
+    //         "red": `bg-${userData.coalition}`,
+    //     },
+    // };
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto">
@@ -139,7 +142,7 @@ const HomeComponent: React.FC = () => {
                             </div>
                         </div>
                         <div className="robot absolute top-[-10%] z-10 -right-4">
-                            <img className="w-72 h-72" src={Robot} alt="Robot" />
+                            <img className="w-80 h-[23rem]" src={Robot} alt="Robot" />
                         </div>
                     </div>
                     <div className="w-2/3 bg-transparent flex flex-col justify-around p-4 space-y-4 blur-[0.5px]">
@@ -183,7 +186,7 @@ const HomeComponent: React.FC = () => {
                                         <span className='text-3xl font-bold text-white'> Kratos </span>
                                         <span className='text-2xl font-bold text-white'> 2000 </span>
                                         <p className='text-stone-400 text-xl'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. </p>
-                                        <canvas ref={chartRef} className='w-24 h-24'></canvas>
+                                        <canvas ref={chartRef}></canvas>
                                     </div>
                                 </div>
                             </div>

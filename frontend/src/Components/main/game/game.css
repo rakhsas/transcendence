@@ -2,7 +2,27 @@
     width: 70rem;
 }
 
-.owl-carousel .owl-stage-outer .owl-stage {
-    /* box-shadow: 0 0 300px rgba(255, 0, 0, 0.5); */
-    background-color: aqua;
+.owl-item .outli{
+    border: dashed 2px rgb(97, 92, 92);
+}
+
+.owl-item :hover {
+
+    /* background-color: red; */
+    /* transform: rotate(22deg); */
+    transition: 0.7s;
+    /* .container { */
+    /* } */
+}
+
+.center .container {
+     background-color: black;
+    background: radial-gradient(circle, rgba(34,193,195,0.237114914325105) 0%, rgba(6,6,6,1) 100%); 
+}
+ /* .owl-carousel .owl-stage-outer .owl-stage .active .container {
+    background-color: black;
+} */
+
+.owl-nav .disabled {
+    display: block;
 }

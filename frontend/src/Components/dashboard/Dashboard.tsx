@@ -32,7 +32,7 @@ function DashboardComponent() {
 			<SidebarComponent />
 		<div className="overflow-hidden flex-1 w-3/4">
 			<NavbarComponent />
-			<div className="h-[100vh] flex-1 flex ">
+			<div className="h-screen flex-1 flex ">
 				<Outlet />
 			</div>
 		</div>
