@@ -49,18 +49,24 @@ const GameModesCarousel: React.FC = () => {
             style={{ }}
             className='gamesmodeCont w-full z-10'>
             <OwlCarousel
-                nav={true}
+                nav={false}
                 dots={false}
                 className="owl-theme"
                 autoplay={false}
                 center
-                // responsive={
-                //     {
-                //         1000: {
-                //             items: 5,
-                //         }
-                //     }
-                // }
+                responsive={
+                    {
+                        1000: {
+                            items: 3,
+                        },
+                        600: {
+                            items: 2,
+                        },
+                        0: {
+                            items: 1,
+                        }
+                    }
+                }
                 autoplayHoverPause={true}
                 animateOut={true}
                 smartSpeed={700}

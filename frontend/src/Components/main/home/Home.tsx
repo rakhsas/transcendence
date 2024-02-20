@@ -169,10 +169,10 @@ const HomeComponent: React.FC = () => {
                         }
                     </div>
                 </section>
-                <section className='flex flex-row mb-20 flex-wrap justify-between p-2'>
-                    <div className='min-w-[400px] flex-row flex-1 h-full p-2'>
+                <section className='flex flex-row mb-20  flex-wrap justify-between p-2'>
+                    <div className='min-w-[601px] flex-row flex-1 h-full p-2'>
                         <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
-                        <div className="flex flex-col flex-1">
+                        <div className="flex flex-col w-full flex-1">
                             <GameModesCarousel />
                             <div className="hamza flex col flex-1 items-start rounded-3xl bg-red-900">
                                 <div className="div w-96 h-80"></div>

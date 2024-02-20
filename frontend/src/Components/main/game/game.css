@@ -51,3 +51,7 @@
 .gamesmodeCont {
     width: 100% !important;
 }
+
+.owl-stage {
+    height: 350px;
+}
