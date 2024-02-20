@@ -21,6 +21,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
+    console.log(payload);
     if (payload.to)
     {
       const toUserSocket = this.connectedUsers.get(payload.to);
