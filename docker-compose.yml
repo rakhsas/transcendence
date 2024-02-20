@@ -30,8 +30,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4200:4200"
-    depends_on:
-      - auth
+        #depends_on:
+      #  - auth
     networks:
       - backend
     volumes:
@@ -101,8 +101,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3002:3002"
-    depends_on:
-      - auth
+        #depends_on:
+      # - auth
     networks:
       - backend
     volumes:

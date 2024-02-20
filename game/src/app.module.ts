@@ -1,13 +1,13 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Module, forwardRef } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
+import { GameGetwayModule } from './game-getway/game-getway.module';
 
 @Module({
   imports: [
-    HttpModule
+    HttpModule,
+   GameGetwayModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
