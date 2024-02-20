@@ -6,7 +6,6 @@ import "owl.carousel/dist/assets/owl.theme.default.css";
 import playFill from './../../../assets/img/Play-Fill.svg'
 import expandLeft from './../../../assets/Icon/Expand_left.png'
 import expandRight from './../../../assets/Icon/Expand_right.png'
-import { useEffect } from 'react';
 import './game.css';
 interface CarouselItemProps {
     image: string;
@@ -15,9 +14,9 @@ interface CarouselItemProps {
 
 const CarouselItem: React.FC<CarouselItemProps> = ({ image, heading }) => (
     <>
-        <div className='w-80 h-[21rem]'>
-            <div className="outli mt-6 mx-auto w-64 h-72 rounded-3xl -z-10" style={{ background: 'transparent'}}>
-                <div className="container overflow-hidden mt-6 top-0 left-8 w-64 h-72 rounded-[1.4rem] p-4 flex absolute flex-col justify-between bg-zinc-900 hover:origin-bottom hover:-rotate-6 hover:scale-105 ">
+        <div className='w-[21rem] h-[21rem]'>
+            <div className="outli mt-6 mx-auto w-64 h-64 rounded-[1.7rem] -z-10" style={{ background: 'transparent'}}>
+                <div className="container overflow-hidden mt-6 top-0 left-10 w-64 h-64 rounded-[1.7rem] p-4 flex absolute flex-col justify-between bg-zinc-900 hover:origin-bottom hover:-rotate-6 hover:scale-105 ">
                     <div className="play rounded-full w-8 h-8 bg-main-light-FERN">
                         <img src={image} alt="Play" />
                     </div>
@@ -47,10 +46,10 @@ const GameModesCarousel: React.FC = () => {
 
     return (
         <div
-            style={{  marginTop: '24px', marginLeft: '4px', marginRight: '4px', padding: '2 100px'}}
-            className='gamesmodeCont p-4 z-10'>
+            style={{ }}
+            className='gamesmodeCont z-10'>
             <OwlCarousel
-                nav={false}
+                nav={true}
                 dots={false}
                 className="owl-theme"
                 autoplay={false}
@@ -64,10 +63,10 @@ const GameModesCarousel: React.FC = () => {
                 }
                 autoplayHoverPause={true}
                 animateOut={true}
-                smartSpeed={500}
+                smartSpeed={700}
                 autoplayTimeout={2000}
                 navClass={[expandLeft, expandRight]}
-                navText={['<', '>']}
+                // navText={['<', '>']}
                 loop
             >
                 {renderImages()}

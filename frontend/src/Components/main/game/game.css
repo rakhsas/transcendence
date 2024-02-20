@@ -16,8 +16,8 @@
 }
 
 .center .container {
-     background-color: black;
-    background: radial-gradient(circle, rgba(34,193,195,0.237114914325105) 0%, rgba(6,6,6,1) 100%); 
+    /* background: theme('colors.zinc.900'); */
+    background: radial-gradient(circle, rgba(34,193,195,0.237114914325105) 0%, theme('colors.zinc.900') 80%);
 }
  /* .owl-carousel .owl-stage-outer .owl-stage .active .container {
     background-color: black;
