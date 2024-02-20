@@ -55,4 +55,32 @@ export class UpdateUserDto {
         message: 'Picture must be Set'
     })
     picture: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    @MinLength(4, {
+        message: 'Coalition must be Set'
+    })
+    coalition: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    @MinLength(4, {
+        message: 'Coalition Picture must be Set'
+    })
+    coalitionPic: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    @MinLength(4, {
+        message: 'Coalition Cover must be Set'
+    })
+    coalitionCover: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    @MinLength(4, {
+        message: 'Coalition Color must be Set'
+    })
+    coalitionColor: string;
 }

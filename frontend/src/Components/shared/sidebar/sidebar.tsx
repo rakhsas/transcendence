@@ -1,6 +1,6 @@
 import './sidebar.css';
 import logo from './../../../assets/Frame 1.svg'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ExpandLeft from './../../../assets/Icon/Expand_left.png'
 import ExpandRight from './../../../assets/Icon/Expand_right.png'
 import ProfileIcon from '../icons/Profile';
@@ -9,28 +9,49 @@ import AnalyticsIcon from '../icons/Analytics';
 import ChatIcon from '../icons/Chat';
 import SettingsIcon from '../icons/Settings';
 import LogoutIcon from '../icons/Logout';
-
+import { NavLink } from "react-router-dom";
+import UserService from '../../../services/user.service';
+import User from '../../../model/user.model';
 
 function SidebarComponent(): JSX.Element {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+	const [userData, setUserData] = useState<User | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isSidebarOpen, setSidebarOpen] = useState(true);
+	const [activeIndex, setActiveIndex] = useState<number>(0);
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const userService = new UserService();
+				const fetchedUserData = await userService.getUser(95248);
+				setUserData(fetchedUserData);
+			} catch (error) {
+				console.error('Error fetching user data:', error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+            fetchData();
+	}, []);
+	if (isLoading)
+	{
+		return <div> Loading... </div>
+	}
 
-  const handleSideIcon = () => {
-	// Toggle the state when an icon is clicked
-	setSidebarOpen(!isSidebarOpen);
-  };
+	const handleSideIcon = () => {
+		// Toggle the state when an icon is clicked
+		setSidebarOpen(!isSidebarOpen);
+	};
   
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const handleIconClick = (index: number) => {
-	setActiveIndex(index);
-  };
+	const handleIconClick = (index: number) => {
+		setActiveIndex(index);
+	};
 
   const icons = [
-	{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home' },
-	{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile' },
-	{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics' },
-	{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat' },
-	{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings' }
-	// Add more icons as needed
+	{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: '', userData: userData},
+	{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile', path:'profile', userData },
+	{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path:'analytics', userData },
+	{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat' , path:'chat', userData },
+	{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path:'settings', userData }
   ];
 
   return (
@@ -48,9 +69,10 @@ function SidebarComponent(): JSX.Element {
 			<div className="w-8 h-8 p-1  bg-white rounded-lg z-10 cursor-pointer self-end " onClick={handleSideIcon}>
 				{isSidebarOpen ? <img src={ExpandLeft} alt="expand-left" /> : <img src={ExpandRight} alt="expand-right" />}
 			</div>
-
 			<div className="w-auto ">
+				
 				{icons.map((icon, index) => (
+				<NavLink to={ icon.path } state={ icon.userData } key={index} className="w-full">
 				<div
 					key={index}
 					className={`px-3 py-4 rounded-lg justify-start items-center gap-3 flex cursor-pointer ${activeIndex === index ? 'bg-[#2C2729]' : ''
@@ -59,6 +81,7 @@ function SidebarComponent(): JSX.Element {
 				>
 						{icon.icon}
 				</div>
+				</NavLink>
 				))}
 			</div>
 			<div className="w-full flex flex-col justify-end items-center">

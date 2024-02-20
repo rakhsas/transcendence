@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserController } from './user/user.controller';
 import { AuthService } from './auth/auth.service';
 // import { ConfigModule } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 
 
 @Module({
@@ -28,7 +29,7 @@ import { AuthService } from './auth/auth.service';
       autoLoadEntities: true,
     }),
     UserModule,
-    AuthModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
