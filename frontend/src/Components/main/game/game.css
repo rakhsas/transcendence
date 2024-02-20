@@ -6,17 +6,38 @@
     border: dashed 2px rgb(97, 92, 92);
 }
 
-.owl-item :hover {
+/* .owl-item :hover { */
 
     /* background-color: red; */
     /* transform: rotate(22deg); */
-    transition: 0.7s;
     /* .container { */
-    /* } */
+        /* } */
+/* } */
+    
+.owl-item {
+    filter: blur(calc(10px / 5));
 }
 
-.center .container {
-    /* background: theme('colors.zinc.900'); */
+.center :hover {
+    transition: 0.7s;
+}
+
+.center {
+    filter: none;
+}
+@keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+.center :hover .container{
+    transform-origin: bottom;
+    transform: scale(1.05);
+    transform: rotate(-6deg);
     background: radial-gradient(circle, rgba(34,193,195,0.237114914325105) 0%, theme('colors.zinc.900') 80%);
 }
  /* .owl-carousel .owl-stage-outer .owl-stage .active .container {
@@ -25,4 +46,8 @@
 
 .owl-nav .disabled {
     display: block;
+}
+
+.gamesmodeCont {
+    width: 100% !important;
 }

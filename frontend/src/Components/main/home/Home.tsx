@@ -174,7 +174,7 @@ const HomeComponent: React.FC = () => {
                         <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
                         <div className="flex flex-col flex-1">
                             <GameModesCarousel />
-                            <div className="hamza flex col flex-1 h-96 rounded-3xl bg-red-900">
+                            <div className="hamza flex col flex-1 items-start rounded-3xl bg-red-900">
                                 <div className="div w-96 h-80"></div>
                             </div>
                         </div>
