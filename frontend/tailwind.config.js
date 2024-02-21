@@ -31,6 +31,7 @@ export default {
     },
     fontFamily: {
       'poppins': ['Poppins'],
+      'onest': ['Onest']
    }
   },
   plugins: [

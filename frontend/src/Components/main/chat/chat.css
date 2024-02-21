@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css?family=Manrope:300,400,500,600,700&display=swap&subset=latin-ext");
 
 :root {
   --body-bg-color: #e5ecef;
@@ -110,7 +109,7 @@ body {
 }
 
 .detail-area {
-  border-left: 1px solid var(--border-color);
+  border-left: 1px solid theme('colors.gray.700');
   margin-left: auto;
   padding: 30px 30px 0 30px;
   display: flex;
@@ -168,7 +167,7 @@ body {
 }
 
 .conversation-area {
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid theme('colors.gray.700');
   overflow-y: auto;
   overflow-x: hidden;
   display: flex;

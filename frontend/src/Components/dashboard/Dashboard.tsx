@@ -31,7 +31,7 @@ function DashboardComponent() {
 			<SidebarComponent />
 			<div className="overflow-auto  flex flex-col w-full">
 				<NavbarComponent />
-				<div className="m-4 flex flex-1  ">
+				<div className="m-2 flex flex-1  ">
 					<Outlet />
 				</div>
 			</div>
