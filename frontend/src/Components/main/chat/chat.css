@@ -118,9 +118,6 @@ body {
   overflow: auto;
 }
 
-.chat-area {
-  flex-grow: 1;
-}
 
 .logo {
   color: var(--theme-color);
@@ -213,7 +210,7 @@ body {
 
 .msg.active {
   background: var(--active-conversation-bg);
-  border-left: 4px solid var(--theme-color);
+  border-left: 4px solid theme('colors.main.light.FERN');
 }
 
 .msg.online:before {
@@ -291,11 +288,11 @@ body {
   height: 80px;
 }
 
-.chat-area {
+/* .chat-area {
   display: flex;
   flex-direction: column;
   overflow: auto;
-}
+} */
 
 .chat-area-profile {
   width: 32px;
@@ -328,13 +325,12 @@ body {
 }
 
 .chat-msg-date {
-
-  position: absolute;
+  /* position: absolute; */
   left: calc(100% + 12px);
-  bottom: 0;
+  margin-top: 4px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--msg-date);
+  color: theme('colors.main.dark.MSGDATE');
   white-space: nowrap;
 }
 
@@ -395,18 +391,17 @@ body {
 }
 
 .footer {
-  display: flex;
+  /* display: flex;
   border-top: 1px solid var(--border-color);
   width: 100%;
-  padding: 10px 20px;
   align-items: center;
   background-color: var(--theme-bg-color);
   position: sticky;
   bottom: 0;
-  left: 0;
+  left: 0; */
 }
 
-.footer svg {
+/* .footer svg {
   color: var(--settings-icon-color);
   width: 20px;
   height: 20px;
@@ -436,7 +431,7 @@ body {
 
 .footer input::placeholder {
   color: var(--input-chat-color);
-}
+} */
 
 .detail-area-header {
   display: flex;
