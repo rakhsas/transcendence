@@ -7,10 +7,11 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   constructor() {
+    // console.log("----+> " + process.env.DATABASE_URL);
     super({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL,
+          url: process.env.DATABASE_URL || 'postgresql://postgres:root@localhost:5432/db1',
         },
       },
     });
@@ -28,24 +29,29 @@ export class PrismaService
     await this.$disconnect();
   }
 
+  //readonly prisma = new PrismaClient();
 
-  readonly prisma = new PrismaClient();
-
-  async createDirectMessage(userId: number, channelId: number, content: string): Promise<any> {
-    return this.prisma.msg.create({
+  async createDirectMessage(senderId: number, receiverId: number, content: string): Promise<any> {
+    console.log("the message is cradted.!")
+    return this.msg.create({
       data: {
         msg: content,
-        userId,
-        cid: channelId,
+        cid: 0, 
+        rec_id: receiverId,
+        senderId,
       },
     });
   }
 
-  async getDirectMessages(userId: number): Promise<any[]> {
-    return this.prisma.msg.findMany({
+  async getDirectMessages(senderId: number): Promise<any[]> {
+    return this.msg.findMany({
       where: {
-        userId,
+        senderId,
       },
     });
   }
+  
+
+
+
 }

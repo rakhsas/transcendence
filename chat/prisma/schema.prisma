@@ -25,7 +25,8 @@ model User1 {
   invited     Channel[] @relation("invite")
   chanBlocked Channel[] @relation("blocked")
   Muted       Mute[]
-  messages    Msg[]
+  sendmessages    Msg[]     @relation("sender")
+  receivedMessages Msg[]   @relation("receiver")
 
   @@unique([id, email])
   @@map("users") //mapped to another name ( from user1 to users :)
@@ -59,10 +60,12 @@ model Msg {
   // unsent    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  owner     User1    @relation(fields: [userId], references: [id]) // sender
-  userId    Int // recipient
+  owner     User1    @relation("sender", fields: [senderId], references: [id]) // sender
+  senderId    Int // sender id
+  receiver  User1    @relation("receiver", fields: [rec_id], references: [id])
+  rec_id    Int
   channel   Channel  @relation(fields: [cid], references: [id])
-  cid       Int
+  cid       Int // recipient userid as channelId
 }
 
 model Mute {

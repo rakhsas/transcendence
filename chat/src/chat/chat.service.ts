@@ -12,6 +12,7 @@ export class ChatService {
   }
 
   async addDirectMessage(userId: number, channelId: number, content: string): Promise<void> {
+    console.log("enter here in add direct message in chat service");
     await this.prismaService.createDirectMessage(userId, channelId, content);
   }
 }
