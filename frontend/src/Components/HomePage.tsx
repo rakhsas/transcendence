@@ -1,47 +1,13 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import "./HomePage.css";
 import Logo from "./../assets/Frame 1.png";
 import Google from "./../assets/icons8-google.svg";
-import Intra from "./../assets/Group.png";
-import UserService from "../services/user.service";
+import Intra from "./../assets/favicon.ico"
 function HomePageComponent(): JSX.Element {
-	const [openModal, setOpenModal] = useState(false);
-	const [searchParams] = useSearchParams();
-	const userService = new UserService();
-	let accessToken: any, provider: any, firstLogin: any;
-	function stringToBoolean(str: string): boolean {
-		return str === "true";
-	}
 	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 	async function loginWithIntra() {
 		window.location.href = APIURL + "auth/42/login";
-		// const data = await userService.login();
-		// console.log("data" , data)
 	}
 
-	// accessToken = searchParams.get("accessToken");
-	// provider = searchParams.get("provider");
-	// firstLogin = searchParams.get("firstLogin");
-	// if (accessToken)
-	// 	localStorage.setItem('accessToken', accessToken)
-	// if (provider)
-	// 	localStorage.setItem('provider', provider)
-	// if (firstLogin) {
-	// 	setOpenModal(stringToBoolean(firstLogin))
-	// }
-
-	useEffect(() => {
-		if (accessToken) localStorage.setItem("accessToken", accessToken);
-		if (provider) localStorage.setItem("provider", provider);
-		if (firstLogin) setOpenModal(stringToBoolean(firstLogin));
-	}, [accessToken, provider, firstLogin]);
-	const ele: Element | null = document.querySelector("[role=dialog]");
-	var btn: HTMLButtonElement | null;
-	if (ele && ele != null) {
-		btn = ele?.querySelector("button");
-		if (btn) btn.style.display = "none";
-	}
 
 	return (
 		<>
