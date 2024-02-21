@@ -11,8 +11,8 @@ export default {
       colors: {
         main : {
           dark: {
-            1: '#2C2729',
-            2: '#47302E'
+            SIDEMESSAGE: '#969eaa',
+            MSGDATE: '#c0c7d2',
           },
           light: {
             SPRUCE: '#1D1E22',
