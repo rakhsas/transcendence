@@ -17,7 +17,8 @@ import Game from './Components/Game/Game';
 import chatComponent from './Components/main/chat/chat';
 
 function App() {
-  const isAuthenticated = Cookies.get('isAuthenticated');
+  const isAuthenticated = 'true'
+  // Cookies.get('isAuthenticated');
 
   return (
     <>

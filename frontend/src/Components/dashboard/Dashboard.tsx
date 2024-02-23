@@ -39,5 +39,4 @@ function DashboardComponent() {
 	</DataContext.Provider>
   )
 }
-
 export default DashboardComponent;
