@@ -19,7 +19,6 @@ import playFill from './../../../assets/img/Play-Fill.svg'
 import Chart from 'chart.js/auto';
 
 const HomeComponent: React.FC = () => {
-    // const active = "#B8F170";
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const userData = useContext(DataContext);
     
