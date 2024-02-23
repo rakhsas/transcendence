@@ -1,0 +1,90 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User1 {
+  id              Int       @id @default(autoincrement())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  firstName       String
+  lastName        String
+  picture         String
+  coalition       String
+  coalitionPic    String
+  coalitionCover  String
+  coalitionColor  String
+  email       String    @unique
+  username    String?   @unique
+  friends     Int[]
+  adding      Int[] // what the user add
+  added       Int[] // who add this user
+  blocks      Int[] // what the user block
+  blocking    Int[] // who block the user
+  // blocked     Int[] // ...
+  owner       Channel[] @relation("owner")
+  admin       Channel[] @relation("admin")
+  member      Channel[] @relation("member")
+  invited     Channel[] @relation("invite")
+  chanBlocked Channel[] @relation("blocked")
+  Muted       Mute[]
+  sendmessages    Msg[]     @relation("sender")
+  receivedMessages Msg[]   @relation("receiver")
+
+  @@unique([id, email])
+  @@map("users") //mapped to another name ( from user1 to users :)
+}
+
+model Channel {
+  id Int @id @default(autoincrement())
+  name       String   @default(uuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  dm         Boolean  @default(false)
+  private    Boolean  @default(false)
+  isPassword Boolean  @default(false)
+  password   String?
+  owners     User1[]  @relation("owner")
+  admins     User1[]  @relation("admin")
+  members    User1[]  @relation("member")
+  inviteds   User1[]  @relation("invite")
+  blocked    User1[]  @relation("blocked")
+  muted      Mute[]
+  messages   Msg[]
+
+  @@unique([id])
+}
+
+model Msg {
+  id        Int      @id @default(autoincrement())
+  msg       String
+  // history   String[]
+  // unsent    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner     User1    @relation("sender", fields: [senderId], references: [id]) // sender
+  senderId    Int // sender id
+  receiver  User1    @relation("receiver", fields: [rec_id], references: [id])
+  rec_id    Int
+  channel   Channel  @relation(fields: [cid], references: [id])
+  cid       Int // recipient userid as channelId
+}
+
+model Mute {
+  id       Int      @id @default(autoincrement())
+  finishAt DateTime
+  // checkAt  DateTime @default(now())
+  finished Boolean  @default(false)
+  muted    User1    @relation(fields: [userId], references: [id])
+  userId   Int
+  channel  Channel  @relation(fields: [cid], references: [id])
+  cid      Int
+}
+
+// ======================================================================================
+
+

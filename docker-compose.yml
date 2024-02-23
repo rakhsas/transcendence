@@ -44,32 +44,32 @@ services:
       - 'traefik.http.routers.frontend.entrypoints=web'
       - "traefik.http.routers.frontend.middlewares=frontend-prefix"
       - "traefik.http.middlewares.frontend-prefix.stripprefix.prefixes=/front"
-  # chat:
-  #   container_name: chat
-  #   image: chat                                           
-  #   hostname: rakhsas.com
-  #   build:
-  #     context: ./chat
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3001:3001"
-  #   depends_on:
-  #     - auth
-  #   networks:
-  #     - backend
-  #   dns:
-  #     - 8.8.8.8
-  #   env_file: ./.env
-  #   volumes:
-  #     - ./chat:/app
-  #     - node_modules_chat:/app/node_modules
-  #   labels:
-  #     - 'traefik.enable=true'
-  #     - 'traefik.http.routers.chat.rule=Host(`rakhsas.com`) && PathPrefix(`/chat`)'
-  #     - 'traefik.http.services.chat.loadbalancer.server.port=3001'
-  #     - 'traefik.http.routers.chat.entrypoints=web'
-  #     - "traefik.http.routers.chat.middlewares=chat-prefix"
-  #     - "traefik.http.middlewares.chat-prefix.stripprefix.prefixes=/chat"
+  chat:
+    container_name: chat
+    image: chat                                           
+    hostname: rakhsas.com
+    build:
+      context: ./chat
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - auth
+    networks:
+      - backend
+    dns:
+      - 8.8.8.8
+    env_file: ./.env
+    volumes:
+      - ./chat:/app
+      - node_modules_chat:/app/node_modules
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.chat.rule=Host(`rakhsas.com`) && PathPrefix(`/chat`)'
+      - 'traefik.http.services.chat.loadbalancer.server.port=3001'
+      - 'traefik.http.routers.chat.entrypoints=web'
+      - "traefik.http.routers.chat.middlewares=chat-prefix"
+      - "traefik.http.middlewares.chat-prefix.stripprefix.prefixes=/chat"
   # profile:
   #   container_name: profile
   #   image: profile
@@ -187,32 +187,32 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ${PWD}/auth/node_modules
+      device: /home/woumecht/Desktop/transcendence/auth/node_modules
   node_modules_front:
     name: node_modules_front
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${PWD}/frontend/node_modules
+      device: /home/woumecht/Desktop/transcendence/frontend/node_modules
   node_modules_chat:
     name: node_modules_chat
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${PWD}/chat/node_modules
+      device: /home/woumecht/Desktop/transcendence/chat/node_modules
   node_modules_game:
     name: node_modules_game
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${PWD}/game/node_modules
+      device: /home/woumecht/Desktop/transcendence/game/node_modules
   node_modules_profile:
     name: node_modules_profile
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${PWD}/profile/node_modules
+      device: /home/woumecht/Desktop/transcendence/profile/node_modules
