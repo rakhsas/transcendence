@@ -24,23 +24,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.connectedUsers.delete(userName);
   }
 
+
+
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
-    console.log("event message catched!");
+    const areBlocked = await this.chatService.areUsersBlocked(payload.from, payload.to);
+    if (areBlocked)
+    {
+      // users are blocked, the message should not be send.
+
+      return;
+    }
     if (payload.to)
     {
+      // userName is equale to the target user (receiver user).
       const userName = String(client.handshake.query.userName);
       const toUserSocket = this.connectedUsers.get(userName);
-      console.log("username: " + userName);
       if (toUserSocket)
       {
-        //console.log(payload);
-        toUserSocket.emit('message', payload);
-        console.log("-to : " + payload.to);
-        console.log("-from : " + payload.from);
-        console.log("-content : " + payload.content);
+        // you can put here the logic of blocked users and send Error message
+        // in the socker arguments. 
+
+        // The code goes here ...
+
+        toUserSocket.emit('message', {
+          "to": payload.to,
+          "from": payload.from,
+          "content": payload.content,
+          "isOwner": false
+        });
         await this.chatService.addDirectMessage(payload.from, payload.to, payload.content)
       }
+      client.emit('message', payload);
     }
     else
       this.server.emit('message', payload);

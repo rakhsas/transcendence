@@ -11,8 +11,12 @@ export class ChatService {
     return this.prismaService.getDirectMessages(userId);
   }
 
+  async areUsersBlocked(IdSender: number, idReceiver: number): Promise<boolean>
+  {
+      return await this.prismaService.areUsersBlocked(IdSender, idReceiver);
+  }
+
   async addDirectMessage(userId: number, channelId: number, content: string): Promise<void> {
-    console.log("enter here in add direct message in chat service");
     await this.prismaService.createDirectMessage(userId, channelId, content);
   }
 }

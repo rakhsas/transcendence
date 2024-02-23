@@ -8,9 +8,16 @@ generator client {
 }
 
 model User1 {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id              Int       @id @default(autoincrement())
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  firstName       String
+  lastName        String
+  picture         String
+  coalition       String
+  coalitionPic    String
+  coalitionCover  String
+  coalitionColor  String
   email       String    @unique
   username    String?   @unique
   friends     Int[]
@@ -34,7 +41,6 @@ model User1 {
 
 model Channel {
   id Int @id @default(autoincrement())
-
   name       String   @default(uuid())
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -71,7 +77,7 @@ model Msg {
 model Mute {
   id       Int      @id @default(autoincrement())
   finishAt DateTime
-  checkAt  DateTime @default(now())
+  // checkAt  DateTime @default(now())
   finished Boolean  @default(false)
   muted    User1    @relation(fields: [userId], references: [id])
   userId   Int

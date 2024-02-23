@@ -30,6 +30,17 @@ export class PrismaService
 
   //readonly prisma = new PrismaClient();
 
+  async areUsersBlocked(IdSender: number, IdReceiver: number): Promise<boolean>
+  {
+    const sender = await this.user1.findUnique({where: {id: IdSender}, select: { blocks: true }});
+    const receiver = await this.user1.findUnique({where: { id: IdReceiver}, select: { blocks: true}})
+    
+    const isReceiverBlocked = sender?.blocks.includes(IdReceiver) ?? false;
+    const isSenderBlocker = receiver?.blocks.includes(IdSender) ?? false;
+
+    return isReceiverBlocked || isSenderBlocker;
+  }
+
   async createDirectMessage(senderId: number, receiverId: number, content: string): Promise<any> {
     console.log("the message is cradted.!")
     return this.msg.create({
