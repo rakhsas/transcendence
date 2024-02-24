@@ -9,26 +9,34 @@ import AnalyticsIcon from '../icons/Analytics';
 import ChatIcon from '../icons/Chat';
 import SettingsIcon from '../icons/Settings';
 import LogoutIcon from '../icons/Logout';
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import User from '../../../model/user.model';
 import DataContext from '../../../services/data.context';
-
+import { PathLiteral, Paths } from '../../../utils/types';
+const paths = {
+	[Paths.EMPTY]: 0,
+	[Paths.PROFILE]: 1,
+	[Paths.ANALYTICS]: 2,
+	[Paths.CHAT]: 3,
+	[Paths.SETTINGS]: 4
+}
 function SidebarComponent(): JSX.Element {
-	const [isSidebarOpen, setSidebarOpen] = useState(true);
+	const location = useLocation();
 	const [activeIndex, setActiveIndex] = useState<number>(0);
-	const handleSideIcon = () => {
-		setSidebarOpen(!isSidebarOpen);
-	};
 	const handleIconClick = (index: number) => {
 		setActiveIndex(index);
 	};
-	
+	const pathname = (location.pathname.split('/')[2]) as PathLiteral;
+	useEffect(() => {
+		if (pathname)
+			setActiveIndex(paths[pathname]);
+	}, [pathname]);
 	const icons = [
-		{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: '' },
-		{ icon: <ProfileIcon activeIndex={activeIndex} />, label: 'Profile', path: 'profile' },
-		{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path: 'analytics' },
-		{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat', path: 'chat' },
-		{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path: 'settings' }
+		{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: Paths.EMPTY },
+		{ icon: <ProfileIcon activeIndex={activeIndex} />, label: (Paths.PROFILE), path: Paths.PROFILE },
+		{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path: Paths.ANALYTICS },
+		{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat', path: Paths.CHAT},
+		{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path: Paths.SETTINGS }
 	];
 
   return (
@@ -41,16 +49,16 @@ function SidebarComponent(): JSX.Element {
 						<div
 							key={index}
 							className="px-3 py-4 rounded-lg justify-start items-center gap-3 flex cursor-pointer"
-							onClick={() => handleIconClick(index)}
+							onClick={() => handleIconClick(index)} 
 						>
 							{icon.icon}
 						</div>
 					</NavLink>
 				))}
 			</div>
-			{/* <div className="mx-auto pb-10">
+			<div className="mx-auto pb-10">
 				<LogoutIcon activeIndex={false} />
-			</div> */}
+			</div>
 		</div>
 	</>
   );
