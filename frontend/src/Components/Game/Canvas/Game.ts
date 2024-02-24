@@ -116,8 +116,8 @@ class Game {
   drawText (text: Number, x: number, y: number, color: string)
   {
     this.ctx.fillStyle = color;
-    this.ctx.font = " 70px fantasy"
-    this.ctx.fillText(text, x, y);
+    this.ctx.font = " 70px MedievalSharp cursive"
+    this.ctx.fillText(text , x, y);
 
   }
 

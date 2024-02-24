@@ -128,7 +128,7 @@ class Game {
   drawText (text: Number, x: number, y: number, color: string)
   {
     this.ctx.fillStyle = color;
-    this.ctx.font = " 70px fantasy"
+    this.ctx.font = " 70px MedievalSharp"
     this.ctx.fillText(text, x, y);
 
   }
