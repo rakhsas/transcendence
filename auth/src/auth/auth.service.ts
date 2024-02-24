@@ -20,7 +20,8 @@ export class AuthService {
             return true;
         }
 
-    async generateAccessToken(user: User): Promise<string> {
+    async generateAccessToken(user: any): Promise<string> {
+        console.log(user)
         const payload = {
             id: user.id,
             username: user.username,

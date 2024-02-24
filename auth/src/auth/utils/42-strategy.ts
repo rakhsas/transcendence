@@ -33,9 +33,9 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
             const lastName = profile?.name?.familyName;
             const picture = profile?._json.image?.link;
             const username = profile?.username;
-            const id = profile.id;
+            const id = Number(profile.id);
             const provider = profile.provider;
-            var Object = await this.userService.findOne({ email, firstName, lastName, picture, username, id, provider });
+            var Object = await this.userService.findOne(id);
             if (!Object) {
                 const coalitionObject = await this.userService.getCoalition(id, accessToken);
                 console.log(coalitionObject[0]);
@@ -43,9 +43,10 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
                 const coalitionPic = coalitionObject[0].image_url;
                 const coalitionCover = coalitionObject[0].cover_url;
                 const coalitionColor = coalitionObject[0].color;
-                const newUser = await this.userService.createUser({ email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic, coalitionCover, coalitionColor });
+                const newUser = await this.userService.createUser({ email, firstName, lastName, picture, username, id, coalition, coalitionPic, coalitionCover, coalitionColor });
                 Object = newUser;
             }
+            console.log(Object);
             const shortLivedAccessToken = await this.authService.generateAccessToken(Object.user);
             return {
                 user: Object.user,

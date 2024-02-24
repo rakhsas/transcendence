@@ -187,32 +187,32 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/woumecht/Desktop/transcendence/auth/node_modules
+      device: ./auth/node_modules
   node_modules_front:
     name: node_modules_front
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/woumecht/Desktop/transcendence/frontend/node_modules
+      device: ./frontend/node_modules
   node_modules_chat:
     name: node_modules_chat
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/woumecht/Desktop/transcendence/chat/node_modules
+      device: ./chat/node_modules
   node_modules_game:
     name: node_modules_game
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/woumecht/Desktop/transcendence/game/node_modules
+      device: ./game/node_modules
   node_modules_profile:
     name: node_modules_profile
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/woumecht/Desktop/transcendence/profile/node_modules
+      device: ./profile/node_modules
