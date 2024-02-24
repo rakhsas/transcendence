@@ -13,27 +13,31 @@ import AnalyticsComponent from './Components/main/analytics/analytics';
 import HomeComponent from './Components/main/home/Home';
 import ProfileComponent from './Components/main/profile/profile';
 import Cookies from 'js-cookie';
+import Game from './Components/Game/Game.tsx';
+import HeadToHead from './Components/Game/headToHead.tsx';
 
 const isAuthenticated = Cookies.get('isAuthenticated');
 function App() {
   return (
-    <>
-      {/* <BrowserRouter> */}
+      <>
+        {/* <BrowserRouter> */}
         <Routes>
           <Route path="/" element={<HomePageComponent/>}/>
           <Route
-              path="/dashboard/*"
-              element={((isAuthenticated) && ( isAuthenticated.length > 0 ) && (isAuthenticated === 'true')) ? (<DashboardComponent />) : (<Navigate to="/" replace />)}
-            >
-              <Route index element={<HomeComponent />} />
-              <Route path="profile" element={<ProfileComponent />} />
-              <Route path="analytics" element={<AnalyticsComponent />} />
-            </Route>
-          {/* <Route path="/SignIn" element={<FunctionSignUpForm/>} /> */}
-          <Route path="/login"  element={<ValidInformation/>}/>
+            path="/dashboard/*"
+            element={
+                      ((isAuthenticated) && ( isAuthenticated.length > 0 ) && (isAuthenticated === 'true')) ?
+                      (<DashboardComponent />) : (<Navigate to="/" replace />)
+                    }
+                                                                      />
+          <Route index              element={<HomeComponent />}       />
+          <Route path="profile"     element={<ProfileComponent />}    />
+          <Route path="analytics"   element={<AnalyticsComponent />}  />
+          <Route path="/login"      element={<ValidInformation/>}     />
+          <Route path="/game"       element={<Game/>}                 />
+          <Route path="/HeadToHead" element={<HeadToHead/>}           />
         </Routes>
-    {/* </BrowserRouter> */}
-    </>
-  )
+      </>
+      );
 }
 export  default App;
