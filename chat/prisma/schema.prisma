@@ -70,8 +70,9 @@ model Msg {
   senderId    Int // sender id
   receiver  User1    @relation("receiver", fields: [rec_id], references: [id])
   rec_id    Int
-  channel   Channel  @relation(fields: [cid], references: [id])
-  cid       Int // recipient userid as channelId
+  channel   Channel[]
+  // channel   Channel  @relation(fields: [cid], references: [id])
+  // cid       Int // recipient userid as channelId
 }
 
 model Mute {
