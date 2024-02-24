@@ -48,6 +48,7 @@ export class PrismaService
         msg: content,
         rec_id: receiverId,
         senderId,
+        cid: 1
       },
     });
   }

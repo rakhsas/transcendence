@@ -1,24 +1,15 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Message` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `User1` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE "Message" DROP CONSTRAINT "Message_senderId_fkey";
-
--- DropTable
-DROP TABLE "Message";
-
--- DropTable
-DROP TABLE "User1";
-
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "picture" TEXT NOT NULL,
+    "coalition" TEXT NOT NULL,
+    "coalitionPic" TEXT NOT NULL,
+    "coalitionCover" TEXT NOT NULL,
+    "coalitionColor" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "username" TEXT,
     "friends" INTEGER[],
@@ -26,7 +17,6 @@ CREATE TABLE "users" (
     "added" INTEGER[],
     "blocks" INTEGER[],
     "blocking" INTEGER[],
-    "blocked" INTEGER[],
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -35,7 +25,6 @@ CREATE TABLE "users" (
 CREATE TABLE "Channel" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "picture" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "dm" BOOLEAN NOT NULL DEFAULT false,
@@ -50,11 +39,10 @@ CREATE TABLE "Channel" (
 CREATE TABLE "Msg" (
     "id" SERIAL NOT NULL,
     "msg" TEXT NOT NULL,
-    "history" TEXT[],
-    "unsent" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "senderId" INTEGER NOT NULL,
+    "rec_id" INTEGER NOT NULL,
     "cid" INTEGER NOT NULL,
 
     CONSTRAINT "Msg_pkey" PRIMARY KEY ("id")
@@ -64,7 +52,6 @@ CREATE TABLE "Msg" (
 CREATE TABLE "Mute" (
     "id" SERIAL NOT NULL,
     "finishAt" TIMESTAMP(3) NOT NULL,
-    "checkAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "finished" BOOLEAN NOT NULL DEFAULT false,
     "userId" INTEGER NOT NULL,
     "cid" INTEGER NOT NULL,
@@ -145,7 +132,10 @@ CREATE UNIQUE INDEX "_blocked_AB_unique" ON "_blocked"("A", "B");
 CREATE INDEX "_blocked_B_index" ON "_blocked"("B");
 
 -- AddForeignKey
-ALTER TABLE "Msg" ADD CONSTRAINT "Msg_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Msg" ADD CONSTRAINT "Msg_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Msg" ADD CONSTRAINT "Msg_rec_id_fkey" FOREIGN KEY ("rec_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Msg" ADD CONSTRAINT "Msg_cid_fkey" FOREIGN KEY ("cid") REFERENCES "Channel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
