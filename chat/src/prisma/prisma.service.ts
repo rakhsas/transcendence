@@ -46,7 +46,6 @@ export class PrismaService
     return this.msg.create({
       data: {
         msg: content,
-        cid: 0, 
         rec_id: receiverId,
         senderId,
       },
