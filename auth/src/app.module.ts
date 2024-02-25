@@ -10,26 +10,20 @@ import { UserController } from './user/user.controller';
 import { AuthService } from './auth/auth.service';
 // import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
+import { PrismaModule } from './prisma/prisma.module';
+import { ChatModule } from './chat/chat.module';
 
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: 'config/.env',
-      isGlobal: true,
-    }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST,
-      port: parseInt(process.env.DB_PORT,10),
-      username: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DATABASE,
-      synchronize: true,
-      autoLoadEntities: true,
-    }),
+    // ConfigModule.forRoot({
+    //   envFilePath: 'config/.env',
+    //   isGlobal: true,
+    // }),
     UserModule,
-    AuthModule
+    AuthModule,
+    PrismaModule,
+    ChatModule
   ],
   controllers: [AppController],
   providers: [AppService],

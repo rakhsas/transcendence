@@ -51,7 +51,6 @@ export class AuthController {
     @UseGuards(AuthGuard('github'))
     async handleGithubRedirect(@Req() req, @Res() res) {
         const user = req.user;
-        // console.log("user :", user);
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;

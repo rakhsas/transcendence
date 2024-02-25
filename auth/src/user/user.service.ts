@@ -5,15 +5,18 @@ import { Injectable } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
 import { map } from 'rxjs';
 import { AxiosResponse } from 'axios';
-import User from "./model/user.model"
+import { User1 } from "@prisma/client"
+// import {User} from "./model/user.model"
+import { PrismaService } from "src/prisma/prisma.service";
+import { UpdateUserDto } from "./dto/update.user";
+import { User } from "./model/user.model";
 @Injectable()
 
 export class UserService {
-	// CHAT_URL = process.env.CHAT_URL;
-	CHAT_URL = process.env.CHAT_HOST;
 	constructor (
 		// @InjectRepository(User) private readonly userRepository: Repository<User>,
-		private readonly http: HttpService
+		private readonly http: HttpService,
+		private readonly prisma: PrismaService
 	) {
 	}
 
@@ -24,7 +27,7 @@ export class UserService {
 	 * we have defined what are the keys we are expecting from body
 	 * @returns promise of user
 	*/
-   	async createUser(createUser: Partial<User>): Promise<any> {
+   	async createUser(createUser: Partial<User1>): Promise<any> {
 		const user: User = new User();
 		user.firstName = createUser.firstName;
 		user.lastName = createUser.lastName;
@@ -37,39 +40,60 @@ export class UserService {
 		user.coalitionCover = createUser.coalitionCover;
 		user.coalitionColor = createUser.coalitionColor;
 		user.id = createUser.id;
-		// const object = await this.userRepository.save(user);
-		const object = await this.http.post(this.CHAT_URL + 'users', user).toPromise();
+		const object = await this.prisma.user1.create({data: {
+			firstName: user.firstName,
+			lastName: user.lastName,
+			username: user.username,
+			email: user.email,
+			picture: user.picture,
+			// provider: user.provider,
+			coalition: user.coalition,
+			coalitionPic: user.coalitionPic,
+			coalitionCover: user.coalitionCover,
+			coalitionColor: user.coalitionColor,
+			id: user.id
+		}});
+		// const object = await this.http.post(this.CHAT_URL + 'users', user).toPromise();
 		return { user: object, firstLogin: true };
 	}
 	
 	/**
 	 * this functions is used to find all users from User Entity.
 	*/
-	findAllUsers(): Promise<User[]> {
-		// return this.userRepository.find();
-		return this.http.get(this.CHAT_URL + 'users').pipe(map(response => response.data)).toPromise();
+	async findAllUsers(): Promise<User1[]> {
+		const users = await this.prisma.user1.findMany();
+		return users;
 	}
 
 	/**
 	 * this function is used to find user by id from User Entity.
 	*/
-	async viewUser(id: Number): Promise<any> {
-		// return await this.userRepository.findOne({ where: {id: id} });
-		return await this.http.get(this.CHAT_URL + 'users/' + id).pipe(map(response => response.data)).toPromise();
+	async viewUser(id: number): Promise<User1> {
+		return await this.prisma.user1.findUnique({ where:{
+			id: Number(id)
+		} });
 	}
 
 	/**
 	 * this function is used to update user by id from User Entity.
 	*/
-	// updateUser(
-	// 	id: string,
-	// 	updateUser: CreateUserDto
-	// ): Promise<User> {
-	// 	return this.userRepository.save({
-	// 		id: id,
-	// 		...updateUser
-	// 	});
-	// }
+	updateUser( id: number, updateUser: UpdateUserDto ): Promise<User1> {
+		return this.prisma.user1.update({
+			where: { id: id },
+			data: {
+				firstName: updateUser.firstName,
+				lastName: updateUser.lastName,
+				username: updateUser.username,
+				email: updateUser.email,
+				picture: updateUser.picture,
+				coalition: updateUser.coalition,
+				coalitionPic: updateUser.coalitionPic,
+				coalitionCover: updateUser.coalitionCover,
+				coalitionColor: updateUser.coalitionColor,
+				id: updateUser.id
+			}
+		});
+	}
 
 	/**
 	 * this function is used to delete user by id from User Entity.
@@ -94,10 +118,9 @@ export class UserService {
 	// }
 
 	// async findOne(userData: Partial<User>): Promise<any> {
-	async findOne(id: Number): Promise<any> {
-		// const { email, firstName, lastName, picture, username, id, coalition, coalitionPic, coalitionCover, coalitionColor } = userData;
-		let user = await this.http.get(this.CHAT_URL + 'users/' + id).pipe(map(response => response.data)).toPromise();
-		//  this.userRepository.findOne({ where: { email, firstName, lastName, picture, username, id, coalition, coalitionPic, coalitionCover, coalitionColor } });
+	async findOne(userData: Partial<User1>): Promise<any> {
+		const { email, firstName, lastName, picture, username, id, coalition, coalitionPic, coalitionCover, coalitionColor } = userData;
+		 let user = await this.prisma.user1.findUnique({ where: { email, firstName, lastName, picture, username, id, coalition, coalitionPic, coalitionCover, coalitionColor } });
 		return (user) ? { user: user, firstLogin: true } : null;
 	}
 

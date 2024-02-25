@@ -44,32 +44,32 @@ services:
       - 'traefik.http.routers.frontend.entrypoints=web'
       - "traefik.http.routers.frontend.middlewares=frontend-prefix"
       - "traefik.http.middlewares.frontend-prefix.stripprefix.prefixes=/front"
-  chat:
-    container_name: chat
-    image: chat                                           
-    hostname: rakhsas.com
-    build:
-      context: ./chat
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3001"
-    depends_on:
-      - auth
-    networks:
-      - backend
-    dns:
-      - 8.8.8.8
-    env_file: ./.env
-    volumes:
-      - ./chat:/app
-      - node_modules_chat:/app/node_modules
-    labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.chat.rule=Host(`rakhsas.com`) && PathPrefix(`/chat`)'
-      - 'traefik.http.services.chat.loadbalancer.server.port=3001'
-      - 'traefik.http.routers.chat.entrypoints=web'
-      - "traefik.http.routers.chat.middlewares=chat-prefix"
-      - "traefik.http.middlewares.chat-prefix.stripprefix.prefixes=/chat"
+  # chat:
+  #   container_name: chat
+  #   image: chat                                           
+  #   hostname: rakhsas.com
+  #   build:
+  #     context: ./chat
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     - auth
+  #   networks:
+  #     - backend
+  #   dns:
+  #     - 8.8.8.8
+  #   env_file: ./.env
+  #   volumes:
+  #     - ./chat:/app
+  #     - node_modules_chat:/app/node_modules
+  #   labels:
+  #     - 'traefik.enable=true'
+  #     - 'traefik.http.routers.chat.rule=Host(`rakhsas.com`) && PathPrefix(`/chat`)'
+  #     - 'traefik.http.services.chat.loadbalancer.server.port=3001'
+  #     - 'traefik.http.routers.chat.entrypoints=web'
+  #     - "traefik.http.routers.chat.middlewares=chat-prefix"
+  #     - "traefik.http.middlewares.chat-prefix.stripprefix.prefixes=/chat"
   # profile:
   #   container_name: profile
   #   image: profile

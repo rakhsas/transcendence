@@ -1,4 +1,4 @@
-import messageUser from "../model/messageUser.model";
+import { messageUser, messageUser1} from "../model/messageUser.model";
 
 const latestMessages: messageUser[] = [
     {
@@ -48,16 +48,14 @@ const latestGroupMessages: messageUser[] = [
         status: "",
     },
 ];
-const messages = [
+const messages: messageUser1[][] = [
     [
         {
-            type: 'sender',
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
-            date: "Message seen 1.22pm",
             username: "Madison Jones",
+            date: "Message seen 1.22pm",
             message: "Message 1 in conversation 1",
             img: 'https://media.wired.com/photos/598e35994ab8482c0d6946e0/master/w_1920,c_limit/phonepicutres-TA.jpg',
-            createdAt: ''
         },
         {
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
@@ -114,9 +112,7 @@ const messages = [
             message: "Message 2 in conversation 3",
             img: ''
         },
-        // Add more messages for conversation 2 if needed
     ],
-    // Add more arrays for other conversations
 ];
 
 export { latestMessages, latestGroupMessages, messages };

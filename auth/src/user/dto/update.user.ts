@@ -1,17 +1,18 @@
-import { IsAlphanumeric, IsEmail, IsEnum, IsNotEmpty, IsString, Matches, MinLength } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { IsAlphanumeric, IsEmail, IsEnum, IsNotEmpty, IsNumber, IsString, Matches, MinLength } from "class-validator";
+import { ApiProperty, PartialType } from "@nestjs/swagger";
+import { Channel, Mute, Msg } from "../model/user.model";
 
 
 const passwordRegEx =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,20}$/;
 export class UpdateUserDto {
-    @IsString()
+    @IsNumber()
     @MinLength(3, {
         message: 'ID must have at least 4 charactes.'
     })
     @IsNotEmpty()
     @ApiProperty()
-    id: string;
+    id: number;
 
     @IsString()
     @MinLength(4, {
@@ -83,4 +84,18 @@ export class UpdateUserDto {
         message: 'Coalition Color must be Set'
     })
     coalitionColor: string;
+
+    friends: number[];
+    adding: number[];
+    added: number[];
+    blocks: number[];
+    blocking: number[];
+    owner: Channel[];
+    admin: Channel[];
+    member: Channel[];
+    invited: Channel[];
+    chanBlocked: Channel[];
+    Muted: Mute[];
+    sendmessages: Msg[];
+    receivedMessages: Msg[];
 }

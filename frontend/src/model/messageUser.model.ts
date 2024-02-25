@@ -5,5 +5,12 @@ interface messageUser {
     date: string;
     status: string;
 }
+interface messageUser1 {
+    profile: string;
+    username: string;
+    message: string;
+    date: string;
+    img: string;
+}
 
-export default messageUser;
+export type { messageUser, messageUser1}

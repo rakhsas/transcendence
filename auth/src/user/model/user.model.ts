@@ -40,4 +40,9 @@ interface Msg {
   // Define properties for Msg
 }
 
-export default User;
+export {
+  User,
+  Channel,
+  Mute,
+  Msg
+}

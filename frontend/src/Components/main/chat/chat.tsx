@@ -8,19 +8,36 @@ import ConversationArea from "./conversation";
 import { latestGroupMessages, latestMessages, messages } from "../../../utils/data";
 import DetailsArea from "./details";
 import ModalComponent from "../../../utils/modal.component";
+import { messageUser1 } from "../../../model/messageUser.model";
 
 function chatComponent(): JSX.Element {
+    const [MESSAGES, setMESSAGES] = useState<messageUser1[][]>(messages);
     const [selectedColor, setSelectedColor] = useState("black");
     const [selectedMessageIndex, setSelectedMessageIndex] = useState(0);
+    const [message, setMessage] = useState('');
     const userData = useContext(DataContext);
     const [modalPicPath, setModalPicPath] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     if (!userData) {
-    return <LoadingComponent />;
+        return <LoadingComponent />;
     }
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const newMessage: messageUser1[] = [{
+            profile: userData.picture,
+            date: new Date().toDateString(),
+            username: userData.username,
+            message: message,
+            img: ''
+        }];
+        setMESSAGES(prevMessages => [...prevMessages, newMessage]);
+        setMessage('');
+    };
+
     const handleSelectMessage = (index: number) => {
         setSelectedMessageIndex(index);
     };
+
     const handleSelectedColor = (color: string) => {
         setSelectedColor(color);
     }
@@ -58,7 +75,7 @@ function chatComponent(): JSX.Element {
                             </div>
                         </div>
                         <div className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
-                            {messages[selectedMessageIndex].map((message, index) => (
+                            {MESSAGES[selectedMessageIndex].map((message, index) => (
                                 <div className="chat-msg" key={index}>
                                     <div className="chat-msg-profile ">
                                         <img
@@ -94,7 +111,8 @@ function chatComponent(): JSX.Element {
                                 <div className="chat-msg-profile">
                                     <img
                                         className="chat-msg-img object-cover bg-contain h-full bg-no-repeat bg-center"
-                                        src={userData.picture}
+                                        // src={userData.picture}
+                                        src='https://www.trustedreviews.com/wp-content/uploads/sites/54/2021/07/Gemma-Ryles-e1626273059396-96x96.jpg'
                                         alt=""
                                     />
                                 </div>
@@ -110,42 +128,20 @@ function chatComponent(): JSX.Element {
                             </div>
                         </div>
                     </div>
-                    <div
-                        className="footer flex bg-zinc-900 border-t-2   border-t-gray-500 flex-row items-center w-full overflow-hidden"
-                        style={{ padding: "10px 20px" }}
-                    >
-                        <TextInput
-                            className="p-2 w-full"
-                            type="text"
-                            theme={inputTheme}
-                            color={"primary"}
-                            placeholder="Type something here..."
-                        />
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 48 48"
-                            width="32px"
-                            height="32px"
-                        >
-                            <path
-                                d="M 5.4453125 4.0019531 A 1.50015 1.50015 0 0 0 4.109375 6.0644531 L 11.380859 24 L 4.109375 41.935547 A 1.50015 1.50015 0 0 0 6.1699219 43.841797 L 43.169922 25.341797 A 1.50015 1.50015 0 0 0 43.169922 22.658203 L 6.1699219 4.1582031 A 1.50015 1.50015 0 0 0 5.4453125 4.0019531 z M 8.3828125 8.6191406 L 39.146484 24 L 8.3828125 39.380859 L 14.011719 25.5 L 27.5 25.5 A 1.50015 1.50015 0 1 0 27.5 22.5 L 14.011719 22.5 L 8.3828125 8.6191406 z"
-                                fill="white"
-                            />
-                        </svg>
-                    </div>
+                    <form onSubmit={handleSubmit}>
+                        <div className="footer flex bg-zinc-900 border-t-2   border-t-gray-500 flex-row items-center w-full overflow-hidden" style={{ padding: "10px 20px" }} >
+                            <TextInput className="p-2 w-full" name="message" type="text" theme={inputTheme} value={message} onChange={(e) => setMessage(e.target.value)} color={"primary"} placeholder="Type something here..." />
+                            <button type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32px" height="32px" >
+                                    <path d="M 5.4453125 4.0019531 A 1.50015 1.50015 0 0 0 4.109375 6.0644531 L 11.380859 24 L 4.109375 41.935547 A 1.50015 1.50015 0 0 0 6.1699219 43.841797 L 43.169922 25.341797 A 1.50015 1.50015 0 0 0 43.169922 22.658203 L 6.1699219 4.1582031 A 1.50015 1.50015 0 0 0 5.4453125 4.0019531 z M 8.3828125 8.6191406 L 39.146484 24 L 8.3828125 39.380859 L 14.011719 25.5 L 27.5 25.5 A 1.50015 1.50015 0 1 0 27.5 22.5 L 14.011719 22.5 L 8.3828125 8.6191406 z" fill="white" />
+                                </svg>
+                            </button>
+                                
+                        </div>
+                    </form>
                 </div>
                 <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
-                    {/* {detailsArea({ latestMessages, selectedMessageIndex, handleSelectedColor, selectedColor })} */}
-                    {DetailsArea({
-                        latestMessages,
-                        selectedMessageIndex,
-                        handleSelectedColor,
-                        selectedColor,
-                        modalPicPath,
-                        isModalOpen,
-                        onCloseModal,
-                        onOpenModal
-                    })}
+                    {DetailsArea({ latestMessages, selectedMessageIndex, handleSelectedColor, selectedColor, modalPicPath, isModalOpen, onCloseModal, onOpenModal })}
                 </div>
             </div>
         </>

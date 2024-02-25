@@ -30,19 +30,19 @@ export class UserController {
 
 	@Get(':id')
 	@UseGuards(UserGuard)
-	async findUser(@Param('id') id: string) {
+	async findUser(@Param('id') id: number) {
 		return await this.userService.viewUser(id);
 	}
 	
 	@Patch(':id')
 	@UseGuards(UserGuard)
-	UpdateUser(@Param('id') id: string, @Body() updatedUser: UpdateUserDto) {
+	UpdateUser(@Param('id') id: number, @Body() updatedUser: UpdateUserDto) {
 		return this.userService.updateUser(id, updatedUser);
 	}
 	
-	@Delete(':id')
-	@UseGuards(UserGuard)
-	deleteUser(@Param('id') id: string) {
-		return this.userService.deleteUser(+id);
-	}
+	// @Delete(':id')
+	// @UseGuards(UserGuard)
+	// deleteUser(@Param('id') id: number) {
+	// 	return this.userService.deleteUser(+id);
+	// }
 }
