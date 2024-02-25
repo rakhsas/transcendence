@@ -28,14 +28,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
-    const areBlocked = await this.chatService.areUsersBlocked(payload.from, payload.to);
-    if (areBlocked)
-    {
-      // users are blocked, the message should not be send.
+    // const areBlocked = await this.chatService.areUsersBlocked(payload.from, payload.to);
+    // if (areBlocked)
+    // {
+    //   // users are blocked, the message should not be send.
 
-      return;
-    }
-    if (payload.to)
+    //   return;
+    // }
+    if (payload.hasOwnProperty('to'))
     {
       // userName is equale to the target user (receiver user).
       const userName = String(client.handshake.query.userName);
@@ -43,7 +43,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (toUserSocket)
       {
         // you can put here the logic of blocked users and send Error message
-        // in the socker arguments. 
+        // in the socket arguments. 
 
         // The code goes here ...
 
@@ -51,7 +51,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           "to": payload.to,
           "from": payload.from,
           "content": payload.content,
-          "isOwner": false
+          // "isOwner": false
         });
         await this.chatService.addDirectMessage(payload.from, payload.to, payload.content)
       }

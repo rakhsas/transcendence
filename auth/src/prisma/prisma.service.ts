@@ -10,7 +10,7 @@ export class PrismaService
     super({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || 'postgresql://postgres:root@localhost:5432/db1',
+          url: process.env.DATABASE_URL || 'postgresql://postgres:root@postgres:5432/db1',
         },
       },
     });
@@ -47,8 +47,7 @@ export class PrismaService
       data: {
         msg: content,
         rec_id: receiverId,
-        senderId,
-        cid: 1
+        senderId
       },
     });
   }

@@ -20,7 +20,7 @@ model User1 {
   coalitionColor  String
   email       String    @unique
   username    String?   @unique
-  friends     Int[]
+  // friends     Int[]
   adding      Int[] // what the user add
   added       Int[] // who add this user
   blocks      Int[] // what the user block
@@ -34,9 +34,21 @@ model User1 {
   Muted       Mute[]
   sendmessages    Msg[]     @relation("sender")
   receivedMessages Msg[]   @relation("receiver")
+  friendsUser   Freindship[]   @relation("friend")
+  userFriends   Freindship[]   @relation("user")
 
   @@unique([id, email])
   @@map("users") //mapped to another name ( from user1 to users :)
+}
+
+model Freindship{
+  // id  Int @id @default(autoincrement())
+  userId    Int @id
+  freindId  Int
+  friend    User1 @relation("friend", fields: [freindId], references: [id])
+  user    User1 @relation("user", fields: [userId], references: [id])
+
+  @@unique([userId, friend])
 }
 
 model Channel {
@@ -71,8 +83,8 @@ model Msg {
   receiver  User1    @relation("receiver", fields: [rec_id], references: [id])
   rec_id    Int
   // channel   Channel[]
-  channel   Channel  @relation(fields: [cid], references: [id])
-  cid       Int // recipient userid as channelId
+  channel   Channel?  @relation(fields: [cid], references: [id])
+  cid       Int? // recipient userid as channelId
 }
 
 model Mute {

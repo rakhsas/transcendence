@@ -120,7 +120,7 @@ export class UserService {
 	// async findOne(userData: Partial<User>): Promise<any> {
 	async findOne(userData: Partial<User1>): Promise<any> {
 		const { email, firstName, lastName, picture, username, id, coalition, coalitionPic, coalitionCover, coalitionColor } = userData;
-		 let user = await this.prisma.user1.findUnique({ where: { email, firstName, lastName, picture, username, id, coalition, coalitionPic, coalitionCover, coalitionColor } });
+		 let user = await this.prisma.user1.findUnique({ where: { id, email, firstName, lastName, picture, username, coalition, coalitionPic, coalitionCover, coalitionColor } });
 		return (user) ? { user: user, firstLogin: true } : null;
 	}
 
