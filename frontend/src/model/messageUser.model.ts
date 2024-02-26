@@ -6,6 +6,7 @@ interface messageUser {
     status: string;
 }
 interface messageUser1 {
+    sender: number;
     profile: string;
     username: string;
     message: string;

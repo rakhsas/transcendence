@@ -15,23 +15,40 @@ function chatComponent(): JSX.Element {
     const [selectedColor, setSelectedColor] = useState("black");
     const [selectedMessageIndex, setSelectedMessageIndex] = useState(0);
     const [message, setMessage] = useState('');
-    const userData = useContext(DataContext);
     const [modalPicPath, setModalPicPath] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [lastMessageIndex, setLastMessageIndex] = useState(-1);
+    const userData = useContext(DataContext);
     if (!userData) {
         return <LoadingComponent />;
     }
+    function userLastMessageIndex(): number
+    {
+        return MESSAGES[selectedMessageIndex].findLastIndex(
+        (message) => message.sender === userData.id);
+    }
+    const lastUserMessageIndex = MESSAGES[selectedMessageIndex].findLastIndex(
+        (message) => message.sender === userData.id
+    );
+    console.log("lastUserMessageIndex", lastUserMessageIndex)
+    // setLastMessageIndex(userLastMessageIndex())
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const newMessage: messageUser1[] = [{
+        const newMessage: messageUser1 = {
+            sender: userData.id,
             profile: userData.picture,
             date: new Date().toDateString(),
             username: userData.username,
             message: message,
             img: ''
-        }];
-        setMESSAGES(prevMessages => [...prevMessages, newMessage]);
-        setMessage('');
+        };
+        // MESSAGES[selectedMessageIndex].push(newMessage); // This is not a good practice, but it's a quick fix
+        const updatedMessages = [...MESSAGES]; // create a copy of the MESSAGES
+        updatedMessages[selectedMessageIndex].push(newMessage); // add the new message to the copy
+        setMESSAGES(updatedMessages); // update the state with the new messages
+        setMessage(''); // clear the message input
+        setLastMessageIndex(userLastMessageIndex());
+        console.log("lastMessageIndex", lastMessageIndex)
     };
 
     const handleSelectMessage = (index: number) => {
@@ -76,56 +93,26 @@ function chatComponent(): JSX.Element {
                         </div>
                         <div className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
                             {MESSAGES[selectedMessageIndex].map((message, index) => (
-                                <div className="chat-msg" key={index}>
-                                    <div className="chat-msg-profile ">
-                                        <img
-                                            className="chat-msg-img"
-                                            src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%283%29+%281%29.png"
-                                            alt=""
-                                        />
+                                <div className={`chat-msg ${message.sender === userData.id ? 'owner' : null}`} key={index}>
+                                    <div className="chat-msg-profile">
+                                        <img className="chat-msg-img" src={message.sender === userData.id ? userData.picture : message.profile} alt="" />
                                     </div>
-                                    <div className="chat-msg-content ">
-                                        {
-                                            (message.img! && message.img != "") ?
-                                                (
-                                                    <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                        <img src={message.img} alt="" onDoubleClick={() => onOpenModal(message.img)}/>
-                                                    </div>
-                                                ) : ''
-                                        }
-                                        {
-                                            (message.message! && message.message != "") ?
-                                                (
-                                                    <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                        {message.message}
-                                                    </div>
-                                                ) : (
-                                                    ''
-                                                )
-                                        }
+                                    <div className="chat-msg-content">
+                                        {message.img ? (
+                                            <div className="chat-msg-text bg-main-light-FERN text-white">
+                                                <img src={message.img} alt="" onDoubleClick={() => onOpenModal(message.img)} />
+                                            </div>
+                                        ) : null}
+                                        {message.message ? (
+                                            <div className="chat-msg-text bg-main-light-FERN text-white">
+                                                {message.message}
+                                            </div>
+                                        ) : null}
                                         {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
+                                        <div className={`chat-msg-date text-main-light-FERN ${(message.sender === userData.id && index === lastUserMessageIndex) ? 'block' : 'hidden'}}`}>{message.date}</div>
                                     </div>
                                 </div>
                             ))}
-                            <div className="chat-msg owner">
-                                <div className="chat-msg-profile">
-                                    <img
-                                        className="chat-msg-img object-cover bg-contain h-full bg-no-repeat bg-center"
-                                        // src={userData.picture}
-                                        src='https://www.trustedreviews.com/wp-content/uploads/sites/54/2021/07/Gemma-Ryles-e1626273059396-96x96.jpg'
-                                        alt=""
-                                    />
-                                </div>
-                                <div className="chat-msg-content">
-                                    <div className="chat-msg-text bg-main-light-FERN text-white">
-                                        LA LA MABGHITCH 😂😂😂
-                                    </div>
-                                    <div className="chat-msg-text bg-main-light-FERN text-white">
-                                        Cras mollis nec arcu malesuada tincidunt.
-                                    </div>
-                                    <div className="chat-msg-date text-main-light-FERN">Message seen 1.22pm</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <form onSubmit={handleSubmit}>

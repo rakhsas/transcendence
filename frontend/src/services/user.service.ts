@@ -8,7 +8,6 @@ class UserService {
                 method: 'GET',
                 credentials: "include"
             });
-            console.log('Response:', response.status);
             if (response.ok) {
                 const userData = await response.json();
                 return userData;

@@ -51,6 +51,15 @@ const latestGroupMessages: messageUser[] = [
 const messages: messageUser1[][] = [
     [
         {
+            sender: 95248,
+            profile: "",
+            date: "Message seen 1.22pm",
+            username: "Madison Jones",
+            message: "Message 1 in conversation 1",
+            img: ''
+        },
+        {
+            sender: 1,
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
             username: "Madison Jones",
             date: "Message seen 1.22pm",
@@ -58,6 +67,7 @@ const messages: messageUser1[][] = [
             img: 'https://media.wired.com/photos/598e35994ab8482c0d6946e0/master/w_1920,c_limit/phonepicutres-TA.jpg',
         },
         {
+            sender: 1,
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
             date: "Message seen 1.22pm",
             username: "Madison Jones",
@@ -65,6 +75,7 @@ const messages: messageUser1[][] = [
             img: ''
         },
         {
+            sender: 1,
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
             date: "Message seen 1.22pm",
             username: "Madison Jones",
@@ -72,16 +83,33 @@ const messages: messageUser1[][] = [
             img: 'https://media.wired.com/photos/598e35994ab8482c0d6946e0/master/w_1920,c_limit/phonepicutres-TA.jpg'
         },
         {
+            sender: 1,
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 2 in conversation 1",
             img: ''
         },
-        // Add more messages for conversation 1 if needed
+        {
+            sender: 95248,
+            profile: "",
+            date: "Message seen 1.22pm",
+            username: "Madison Jones",
+            message: "Message 1 in conversation 1",
+            img: ''
+        },
+        {
+            sender: 95248,
+            profile: "",
+            date: "Message seen 1.22pm",
+            username: "Madison Jones",
+            message: "Message 1 in conversation 1",
+            img: ''
+        }
     ],
     [
         {
+            sender: 1,
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
             date: "Message seen 1.22pm",
             username: "Madison Jones",
@@ -89,6 +117,7 @@ const messages: messageUser1[][] = [
             img: ''
         },
         {
+            sender: 1,
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
             date: "Message seen 1.22pm",
             username: "Madison Jones",
@@ -99,6 +128,7 @@ const messages: messageUser1[][] = [
     ],
     [
         {
+            sender: 1,
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
             date: "Message seen 1.22pm",
             username: "Madison Jones",
@@ -106,6 +136,7 @@ const messages: messageUser1[][] = [
             img: ''
         },
         {
+            sender: 1,
             profile: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%281%29.png",
             date: "Message seen 1.22pm",
             username: "Madison Jones",
