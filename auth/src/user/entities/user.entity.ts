@@ -9,9 +9,9 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { Channel } from './Channel'; // Assuming you have a Channel entity
-import { Mute } from './Mute'; // Assuming you have a Mute entity
-import { Msg } from './Msg'; // Assuming you have a Msg entity
+import { Channel } from './channel.entity'; // Assuming you have a Channel entity
+import { Mute } from './mute.entity'; // Assuming you have a Mute entity
+import { Msg } from './msg.entitiy'; // Assuming you have a Msg entity
 import { Friendship } from './freindship.entity'; // Assuming you have a Friendship entity
 
 @Entity('users') // Table name mapping
@@ -68,29 +68,29 @@ export class User1 {
 
   // blocked     Int[] // ...
 
-  @OneToMany(() => Channel, (channel) => channel.owner)
+  @OneToMany(() => Channel, (channel) => channel.owners)
   owner: Channel[];
 
-  @ManyToMany(() => Channel, (channel) => channel.admin)
+  @ManyToMany(() => Channel, (channel) => channel.admins)
   @JoinTable()
   admin: Channel[];
 
-  @ManyToMany(() => Channel, (channel) => channel.member)
+  @ManyToMany(() => Channel, (channel) => channel.members)
   @JoinTable()
   member: Channel[];
 
-  @ManyToMany(() => Channel, (channel) => channel.invited)
+  @ManyToMany(() => Channel, (channel) => channel.inviteds)
   @JoinTable()
   invited: Channel[];
 
-  @ManyToMany(() => Channel, (channel) => channel.chanBlocked)
+  @ManyToMany(() => Channel, (channel) => channel.blocked)
   @JoinTable()
   chanBlocked: Channel[];
 
-  @OneToMany(() => Mute, (mute) => mute.user)
+  @OneToMany(() => Mute, (mute) => mute.userId)
   Muted: Mute[];
 
-  @OneToMany(() => Msg, (msg) => msg.sender)
+  @OneToMany(() => Msg, (msg) => msg.senderId)
   sendmessages: Msg[];
 
   @OneToMany(() => Msg, (msg) => msg.receiver)
