@@ -48,7 +48,7 @@ model Freindship{
   friend    User1 @relation("friend", fields: [freindId], references: [id])
   user    User1 @relation("user", fields: [userId], references: [id])
 
-  @@unique([userId, friend])
+  @@unique([userId, freindId])
 }
 
 model Channel {
