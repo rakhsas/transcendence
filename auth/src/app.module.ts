@@ -13,17 +13,17 @@ import { HttpModule } from '@nestjs/axios';
 import { PrismaModule } from './prisma/prisma.module';
 import { ChatModule } from './chat/chat.module';
 
-
 @Module({
   imports: [
     // ConfigModule.forRoot({
     //   envFilePath: 'config/.env',
     //   isGlobal: true,
     // }),
+
     UserModule,
     AuthModule,
     PrismaModule,
-    ChatModule
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
