@@ -22,6 +22,18 @@ services:
   #     - 'traefik.http.routers.auth.entrypoints=web'
   #     - "traefik.http.routers.auth.middlewares=auth-prefix"
   #     - "traefik.http.middlewares.auth-prefix.stripprefix.prefixes=/auth"
+  nginx:
+    image: nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - "443:443"
+    networks:
+      backend:
+    depends_on:
+      - frontend
 
   frontend:
     container_name: frontend
