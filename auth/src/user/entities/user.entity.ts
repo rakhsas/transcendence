@@ -9,10 +9,11 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
+
 import { Channel } from './channel.entity'; // Assuming you have a Channel entity
-import { Mute } from './mute.entity'; // Assuming you have a Mute entity
-import { Msg } from './msg.entitiy'; // Assuming you have a Msg entity
 import { Friendship } from './freindship.entity'; // Assuming you have a Friendship entity
+import { Msg } from './msg.entitiy'; // Assuming you have a Msg entity
+import { Mute } from './mute.entity'; // Assuming you have a Mute entity
 
 @Entity('users') // Table name mapping
 @Unique(['id', 'email'])
@@ -68,37 +69,38 @@ export class User1 {
 
   // blocked     Int[] // ...
 
-  @OneToMany(() => Channel, (channel) => channel.owners)
-  owner: Channel[];
+  @OneToMany(() => Channel, (channel) => channel.owners, { lazy: true })
+  owner: Promise<Channel[]>;
 
-  @ManyToMany(() => Channel, (channel) => channel.admins)
+  @ManyToMany(() => Channel, (channel) => channel.admins, { lazy: true })
   @JoinTable()
-  admin: Channel[];
+  admin: Promise<Channel[]>;
 
-  @ManyToMany(() => Channel, (channel) => channel.members)
+  @ManyToMany(() => Channel, (channel) => channel.members, { lazy: true })
   @JoinTable()
-  member: Channel[];
+  member: Promise<Channel[]>;
 
-  @ManyToMany(() => Channel, (channel) => channel.inviteds)
+  @ManyToMany(() => Channel, (channel) => channel.inviteds, { lazy: true })
   @JoinTable()
-  invited: Channel[];
+  invited: Promise<Channel[]>;
 
-  @ManyToMany(() => Channel, (channel) => channel.blocked)
+  @ManyToMany(() => Channel, (channel) => channel.blocked, { lazy: true })
   @JoinTable()
-  chanBlocked: Channel[];
+  chanBlocked: Promise<Channel[]>;
 
-  @OneToMany(() => Mute, (mute) => mute.userId)
-  Muted: Mute[];
+  
+  @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true })
+  Muted: Promise<Mute[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.senderId)
-  sendmessages: Msg[];
+  @OneToMany(() => Msg, (msg) => msg.senderId, { lazy: true })
+  sendmessages: Promise<Msg[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.receiver)
-  receivedMessages: Msg[];
+  @OneToMany(() => Msg, (msg) => msg.receiver, { lazy: true })
+  receivedMessages: Promise<Msg[]>;
 
-  @OneToMany(() => Friendship, (friendship) => friendship.user)
-  friendsUser: Friendship[];
+  @OneToMany(() => Friendship, (friendship) => friendship.user, { lazy: true })
+  friendsUser: Promise<Friendship[]>;
 
-  @OneToMany(() => Friendship, (friendship) => friendship.friend)
-  userFriends: Friendship[];
+  @OneToMany(() => Friendship, (friendship) => friendship.friend, { lazy: true })
+  userFriends: Promise<Friendship[]>;
 }

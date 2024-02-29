@@ -22,16 +22,16 @@ export class Mute {
   @Column({ default: false })
   finished: boolean;
 
-  @ManyToOne(() => User1, (user) => user.Muted)
+  @ManyToOne(() => User1, (user) => user.Muted, {lazy: true})
   @JoinColumn({ name: 'userId' })
-  muted: User1;
+  muted: Promise<User1>;
 
   @Column()
   userId: number;
 
-  @ManyToOne(() => Channel, (channel) => channel.muted)
+  @ManyToOne(() => Channel, (channel) => channel.muted, {lazy: true})
   @JoinColumn({ name: 'cid' })
-  channel: Channel;
+  channel: Promise<Channel>;
 
   @Column()
   cid: number;

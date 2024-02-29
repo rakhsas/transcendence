@@ -31,7 +31,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // const areBlocked = await this.chatService.areUsersBlocked(payload.from, payload.to);
     // if (areBlocked)
     // {
-    //   // users are blocked, the message should not be send.
+        // users are blocked, the message should not be send.
 
     //   return;
     // }

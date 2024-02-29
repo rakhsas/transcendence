@@ -18,7 +18,7 @@ export class Channel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: () => 'uuid_generate_v4()', unique: true })
+  @Column({ default: 'uuid_generate_v4()', unique: true })
   name: string;
 
   @CreateDateColumn()
@@ -39,29 +39,29 @@ export class Channel {
   @Column({ nullable: true })
   password: string;
 
-  @ManyToMany(() => User1, (user) => user.owner)
+  @ManyToMany(() => User1, (user) => user.owner, { lazy: true })
   @JoinTable()
-  owners: User1[];
+  owners: Promise<User1[]>;
 
-  @ManyToMany(() => User1, (user) => user.admin)
+  @ManyToMany(() => User1, (user) => user.admin, { lazy: true })
   @JoinTable()
-  admins: User1[];
+  admins: Promise<User1[]>;
 
-  @ManyToMany(() => User1, (user) => user.member)
+  @ManyToMany(() => User1, (user) => user.member, { lazy: true })
   @JoinTable()
-  members: User1[];
+  members: Promise<User1[]>;
 
-  @ManyToMany(() => User1, (user) => user.invited)
+  @ManyToMany(() => User1, (user) => user.invited, { lazy: true })
   @JoinTable()
-  inviteds: User1[];
+  inviteds: Promise<User1[]>;
 
-  @ManyToMany(() => User1, (user) => user.chanBlocked)
+  @ManyToMany(() => User1, (user) => user.chanBlocked, { lazy: true })
   @JoinTable()
-  blocked: User1[];
+  blocked: Promise<User1[]>;
 
-  @OneToMany(() => Mute, (mute) => mute.channel)
-  muted: Mute[];
+  @OneToMany(() => Mute, (mute) => mute.channel, { lazy: true })
+  muted: Promise<Mute[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.channel)
-  messages: Msg[];
+  @OneToMany(() => Msg, (msg) => msg.channel, { lazy: true })
+  messages: Promise<Msg[]>;
 }

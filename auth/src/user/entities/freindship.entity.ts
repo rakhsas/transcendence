@@ -9,9 +9,9 @@ export class Friendship {
   @PrimaryColumn()
   freindId: number;
 
-  @ManyToOne(() => User1, (user) => user.friendsUser)
-  user: User1;
+  @ManyToOne(() => User1, (user) => user.friendsUser, {lazy: true})
+  user: Promise<User1>;
 
-  @ManyToOne(() => User1, (user) => user.userFriends)
-  friend: User1;
+  @ManyToOne(() => User1, (user) => user.userFriends, {lazy: true})
+  friend: Promise<User1>;
 }
