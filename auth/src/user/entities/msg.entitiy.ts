@@ -40,7 +40,7 @@ export class Msg {
   @JoinColumn({ name: 'rec_id' })
   receiver: Promise<User1>;
 
-  @Column()
+  @Column({nullable: true})
   rec_id: number;
 
   @ManyToOne(() => Channel, (channel) => channel.messages, {lazy: true})

@@ -54,4 +54,19 @@ export class ChatService {
     });
     await this.msgRepository.save(directMessage);
   }
+
+  /**
+   * saveMessageRoom - function that add msg entitie to the database with channel ID included.
+   * @param senderId the sender of the message
+   * @param channelId the channel where the message will broadcasted.
+   * @param content the content of the message
+   */
+  async saveMessageRoom(senderId: number, channelId: number, content: string): Promise <void> {
+    const newMessageRoom = this.msgRepository.create({
+      msg: content,
+      senderId,
+      cid: channelId
+    });
+    await this.msgRepository.save(newMessageRoom);
+  }
 }
