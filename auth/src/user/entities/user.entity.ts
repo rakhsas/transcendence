@@ -8,18 +8,24 @@ import {
   OneToMany,
   ManyToMany,
   JoinTable,
+  BeforeInsert,
 } from 'typeorm';
 
 import { Channel } from './channel.entity'; // Assuming you have a Channel entity
 import { Friendship } from './freindship.entity'; // Assuming you have a Friendship entity
 import { Msg } from './msg.entitiy'; // Assuming you have a Msg entity
 import { Mute } from './mute.entity'; // Assuming you have a Mute entity
+import { v4 as uuidv4 } from 'uuid'
 
 @Entity('users') // Table name mapping
 @Unique(['id', 'email'])
 export class User1 {
-  @PrimaryGeneratedColumn()
-  id: number;
+
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({unique: true})
+  providerId: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -103,4 +109,9 @@ export class User1 {
 
   @OneToMany(() => Friendship, (friendship) => friendship.friend, { lazy: true })
   userFriends: Promise<Friendship[]>;
+
+  @BeforeInsert()
+  generateUUID() {
+    this.id = uuidv4();
+  }
 }
