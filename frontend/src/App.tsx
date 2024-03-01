@@ -16,11 +16,13 @@ import Cookies from 'js-cookie';
 import Game from './Components/Game/Game';
 import chatComponent from './Components/main/chat/chat';
 import call from './Components/call/call';
+import { useState } from 'react';
 
 function App() {
   const isAuthenticated = 'true'
   // Cookies.get('isAuthenticated');
 
+  // localStorage.setItem('theme', 'light');
   return (
     <>
       {/* <BrowserRouter> */}

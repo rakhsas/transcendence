@@ -101,7 +101,7 @@
 
 
 body {
-  background-color: theme('colors.main.light.SPRUCE');
+  background-color: theme('colors.main.dark.SPRUCE');
   font-family: theme('fontFamily.poppins');
   color: #fff
 }

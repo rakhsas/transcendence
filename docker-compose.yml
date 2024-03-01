@@ -50,10 +50,13 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     container_name: nginx
+    # volumes:
+    #   - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
     ports:
       - "443:443"
+      - "80:80"
     networks:
-      backend:
+      - backend
     depends_on:
       - frontend
   # chat:
