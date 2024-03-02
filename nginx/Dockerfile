@@ -13,7 +13,7 @@ RUN mkdir -p /run/openrc && \
       rc-update add nginx default
 
 
-COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+COPY ./conf/nginx.conf /etc/nginx/http.d/default.conf
 COPY ./tools/script.sh .
 RUN chmod +x script.sh
 

@@ -2,7 +2,7 @@ import { Tabs } from "flowbite-react";
 import { tabsTheme } from "../../../utils/themes";
 import { LiaUserFriendsSolid } from "react-icons/lia";
 import { RiWechatChannelsFill } from "react-icons/ri";
-import messageUser from "../../../model/messageUser.model";
+import {messageUser} from "../../../model/messageUser.model";
 
 type data = {
     latestMessages: messageUser[];
@@ -41,7 +41,7 @@ const ConversationArea = ({ latestMessages, latestGroupMessages, selectedMessage
                                         )}
                                     </div>
                                     <div className="msg-detail overflow-hidden">
-                                        <div className="msg-username font-poppins mb-1 font-semibold text-base">
+                                        <div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base">
                                             {message.username}
                                         </div>
                                         <div className="msg-content font-medium text-xs">
@@ -83,7 +83,7 @@ const ConversationArea = ({ latestMessages, latestGroupMessages, selectedMessage
                                         )}
                                     </div>
                                     <div className="msg-detail overflow-hidden">
-                                        <div className="msg-username font-poppins mb-1 font-semibold text-base">
+                                        <div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base">
                                             {message.username}
                                         </div>
                                         <div className="msg-content font-medium text-xs">

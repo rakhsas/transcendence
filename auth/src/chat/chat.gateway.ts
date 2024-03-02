@@ -4,13 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 
 // @WebSocketGateway()
-@WebSocketGateway({
-  cors: {
-    origin: '*', // specify your frontend's origin
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-})
+@WebSocketGateway({cors: true, path: '/chat'})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   usersArray = [];

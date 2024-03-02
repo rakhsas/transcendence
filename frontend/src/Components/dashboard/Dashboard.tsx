@@ -11,27 +11,27 @@ import DataContext from '../../services/data.context';
 function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
 
-	useEffect(() => {
-		const fetchData = async () => {
-		  try {
-			const authService = new AuthService();
-			const fetchedPayloadData = await authService.getPayload();
-			const userService = new UserService();
-			const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
-			setUserData(fetchedUserData);
-		} catch (error) {
-			console.error('Error fetching user ', error);
-		  }
-		};
-		fetchData();
-	}, []);
+	// useEffect(() => {
+	// 	const fetchData = async () => {
+	// 	  try {
+	// 		const authService = new AuthService();
+	// 		const fetchedPayloadData = await authService.getPayload();
+	// 		const userService = new UserService();
+	// 		const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
+	// 		setUserData(fetchedUserData);
+	// 	} catch (error) {
+	// 		console.error('Error fetching user ', error);
+	// 	  }
+	// 	};
+	// 	fetchData();
+	// }, []);
   return (
 	<DataContext.Provider value={userData}>
 		<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 			<SidebarComponent />
 			<div className="overflow-auto  flex flex-col w-full">
 				<NavbarComponent />
-				<div className="m-2 flex flex-1  ">
+				<div className="flex flex-1">
 					<Outlet />
 				</div>
 			</div>

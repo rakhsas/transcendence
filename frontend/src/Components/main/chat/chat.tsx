@@ -18,9 +18,14 @@ function chatComponent(): JSX.Element {
     const [modalPicPath, setModalPicPath] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [lastMessageIndex, setLastMessageIndex] = useState(-1);
-    const userData = useContext(DataContext);
-    if (!userData) {
-        return <LoadingComponent />;
+    // const userData = useContext(DataContext);
+    // if (!userData) {
+    //     return <LoadingComponent />;
+    // }
+    const userData = {
+        id: 1,
+        username: "John Doe",
+        picture: "https://randomuser"
     }
     function userLastMessageIndex(): number
     {
@@ -40,7 +45,9 @@ function chatComponent(): JSX.Element {
             date: new Date().toDateString(),
             username: userData.username,
             message: message,
-            img: ''
+            img: '',
+            recieverId: 0,
+            recieverUserName: ''
         };
         // MESSAGES[selectedMessageIndex].push(newMessage); // This is not a good practice, but it's a quick fix
         const updatedMessages = [...MESSAGES]; // create a copy of the MESSAGES
@@ -67,12 +74,10 @@ function chatComponent(): JSX.Element {
     const onCloseModal = () => {
         setIsModalOpen(false);
     };
-    console.log("lastMessageIndex", lastUserMessageIndex)
-    console.log("user.id", userData.id);
     return (
         <>
-            <div className="flex w-full border-t-[1px] border-gray-700">
-                <div className="conversation-area">
+            <div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
+                <div className="conversation-area border-r-[1px] dark:border-gray-700 border-black">
                     {ConversationArea({ latestMessages, latestGroupMessages, selectedMessageIndex, handleSelectMessage })}
                 </div>
                 <div className="chat-area  flex flex-col overflow-hidden flex-1">

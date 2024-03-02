@@ -3,7 +3,9 @@ import { io } from "socket.io-client";
 
 function call() {
     let selectedUser: string;
-    const socket = io("http://localhost:3000/");
+    const socket = io("https://10.32.117.18",{
+        path: '/chat',
+    }); // or specify the port if it's different from the default port
     // const userTrackMap: { [userId: string]: MediaStreamTrack } = {};
     const userTrackMap = new Map<string, MediaStreamTrack>();
     const onUpdateUserList = ({ userIds }: any) => {
@@ -121,7 +123,7 @@ function call() {
     };
     peer.addEventListener("track", gotRemoteStream);
     socket.on('user-disconnected', (data: any) => {
-        console.log('User disconnected:', data.userId)
+        // console.log('User disconnected:', data.userId)
         const disconnectedUserId = data.userId;
     
         // const disconnectTrack = userTrackMap[disconnectedUserId];
