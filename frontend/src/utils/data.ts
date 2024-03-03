@@ -56,7 +56,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 1 in conversation 1",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         {
             sender: 1,
@@ -65,6 +67,8 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             message: "Message 1 in conversation 1",
             img: 'https://media.wired.com/photos/598e35994ab8482c0d6946e0/master/w_1920,c_limit/phonepicutres-TA.jpg',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         {
             sender: 1,
@@ -72,7 +76,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 2 in conversation 1",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         {
             sender: 1,
@@ -80,7 +86,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 1 in conversation 1",
-            img: 'https://media.wired.com/photos/598e35994ab8482c0d6946e0/master/w_1920,c_limit/phonepicutres-TA.jpg'
+            img: 'https://media.wired.com/photos/598e35994ab8482c0d6946e0/master/w_1920,c_limit/phonepicutres-TA.jpg',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         {
             sender: 1,
@@ -88,7 +96,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 2 in conversation 1",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         {
             sender: 95248,
@@ -96,7 +106,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 1 in conversation 1",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         {
             sender: 95248,
@@ -104,7 +116,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 1 in conversation 1",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         }
     ],
     [
@@ -114,7 +128,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 1 in conversation 2",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         {
             sender: 1,
@@ -122,7 +138,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 2 in conversation 2",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         // Add more messages for conversation 2 if needed
     ],
@@ -133,7 +151,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 1 in conversation 3",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
         {
             sender: 1,
@@ -141,7 +161,9 @@ const messages: messageUser1[][] = [
             date: "Message seen 1.22pm",
             username: "Madison Jones",
             message: "Message 2 in conversation 3",
-            img: ''
+            img: '',
+            recieverId: 1,
+            recieverUserName: 'woumechtak'
         },
     ],
 ];
