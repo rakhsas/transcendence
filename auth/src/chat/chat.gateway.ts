@@ -14,12 +14,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
   handleConnection(client: Socket) {
-    // const userName = String(client.handshake.query.userName);
-    // // throw new Error('Method not implemented.');
-    // this.connectedUsers.set(userName, client);
-    // console.log("socket id: " + client.id);
-    // console.log("client: " + client);
-    // console.log("map: " + this.connectedUsers.size);
+    const userName = String(client.handshake.query.userName);
+    // throw new Error('Method not implemented.');
+    this.connectedUsers.set(userName, client);
+    console.log("socket id: " + client.id);
+    console.log("client: " + client);
+    console.log("map: " + this.connectedUsers.size);
     // added lines
     // console.log('A user connected');
     // console.log('client id: ' + client.id);
@@ -29,10 +29,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   handleDisconnect(client: Socket) {
     // throw new Error('Method not implemented.');
-    // const userName = String(client.handshake.query.userName);
-    // this.connectedUsers.delete(userName);
-    // console.log('A user disconnected');
-    // console.log('client id: ' + client.id);
+    const userName = String(client.handshake.query.userName);
+    this.connectedUsers.delete(userName);
+    console.log('A user disconnected');
+    console.log('client id: ' + client.id);
     if (this.peerConnections[client.id]) {
       this.peerConnections[client.id].close();
       delete this.peerConnections[client.id];

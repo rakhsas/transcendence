@@ -23,7 +23,6 @@ export class CustomAuthStrategy extends PassportStrategy(Strategy, 'custom') {
 
     private extractTokenFromRequest(req: Request): string {
         const header = req.headers['authorization'];
-        console.log (header);
         return header?.split(' ')[1];
     }
 }

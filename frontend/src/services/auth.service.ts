@@ -5,7 +5,7 @@ class AuthService {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
             const response = await fetch(APIURL + 'auth/decodeToken', {
                 method: 'GET',
-                credentials: "include"
+                credentials: 'include'
             });
             if (response.ok) {
                 const userData = await response.json();

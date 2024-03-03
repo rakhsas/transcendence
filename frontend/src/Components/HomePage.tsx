@@ -6,7 +6,6 @@ function HomePageComponent(): JSX.Element {
 	async function loginWithIntra() {
 		window.location.href = APIURL + "auth/42/login";
 	}
-	console.log(APIURL + "auth/42/login");
 	return (
 		<>
 			<div className="dashboardContainer bg-auto sm:bg-center md:bg-center h-full">
