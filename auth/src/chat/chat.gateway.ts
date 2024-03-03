@@ -14,9 +14,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
   handleConnection(client: Socket) {
-    const userName = String(client.handshake.query.userName);
-    // throw new Error('Method not implemented.');
-    this.connectedUsers.set(userName, client);
+    const recieverName = String(client.handshake.query.recieverName);
+    this.connectedUsers.set(recieverName, client);
     console.log("socket id: " + client.id);
     console.log("client: " + client);
     console.log("map: " + this.connectedUsers.size);
@@ -26,7 +25,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.usersArray.push(client.id);
     console.log(this.usersArray.length);
     client.broadcast.emit('update-user-list', { userIds: this.usersArray });
+    // Handle initial connection (e.g., send list of available rooms)
   }
+  
   handleDisconnect(client: Socket) {
     // throw new Error('Method not implemented.');
     const userName = String(client.handshake.query.userName);
@@ -41,43 +42,48 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.usersArray = this.usersArray.filter(id => id !== client.id);
     client.broadcast.emit('update-user-list', { userIds: this.usersArray});
     client.broadcast.emit('user-disconnected', { userId: client.id });
+    const recieverName = String(client.handshake.query.recieverName);
+    this.connectedUsers.delete(recieverName);
+
+    // Handle disconnection (e.g., remove user from room)
   }
   
   
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
-    const areBlocked = await this.chatService.areUsersBlocked(payload.from, payload.to);
-    if (areBlocked)
+   // you can put the blocked code here {if they are blocked they can't send messages}.
+    if (payload.hasOwnProperty('to'))
     {
-      // users are blocked, the message should not be send.
-      
-      return;
-    }
-    if (payload.to)
-    {
-      // userName is equale to the target user (receiver user).
-      const userName = String(client.handshake.query.userName);
-      const toUserSocket = this.connectedUsers.get(userName);
+      const recieverName = String(client.handshake.query.recieverName);
+      const toUserSocket = this.connectedUsers.get(recieverName);
       if (toUserSocket)
       {
-        // you can put here the logic of blocked users and send Error message
-        // in the socker arguments. 
-        
+        // you can put here the logic of blocked users and send Error message in the socket arguments. 
         // The code goes here ...
         
         toUserSocket.emit('message', {
           "to": payload.to,
           "from": payload.from,
           "content": payload.content,
-          "isOwner": false
+          // "isOwner": false
         });
+
         await this.chatService.addDirectMessage(payload.from, payload.to, payload.content)
       }
       client.emit('message', payload);
     }
-    else
-    this.server.emit('message', payload);
+    // else
+    //   this.server.emit('message', payload);
+  }
+
+
+  @SubscribeMessage('createChannel')
+  async handleEventCreateChannel(client: Socket, payload: any): Promise<void>{
+    // here the payload must containe the id of the user who create the channel so it can be set as owner
+    // create a new entity in the database (new channel)
+    // add new entity in user channel relation the user must set as owner
+    
   }
   @SubscribeMessage('mediaOffer')
   async handleOnMediaOffer( client: Socket,payload: any ) {
@@ -107,3 +113,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
 }
+
+
