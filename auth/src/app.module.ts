@@ -18,8 +18,7 @@ import { Channel } from './user/entities/channel.entity';
 import { Mute } from './user/entities/mute.entity';
 import { Friendship } from './user/entities/freindship.entity';
 import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
-import { MsgControllerController } from './chat/msg/msg.controller';
-
+import { ChatService } from './chat/chat.service';
 
 @Module({
   imports: [
@@ -38,12 +37,13 @@ import { MsgControllerController } from './chat/msg/msg.controller';
     //   envFilePath: 'config/.env',
     //   isGlobal: true,
     // }),
+
+    ChatModule,
     UserModule,
     AuthModule,
     PrismaModule,
-    ChatModule
   ],
-  controllers: [AppController, MsgControllerController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}

@@ -41,7 +41,7 @@ function SidebarComponent(): JSX.Element {
 
   return (
 	<>
-		<div className="w-[100px] bg-zinc-900 shadow overflow-y-auto flex flex-col justify-between h-screen">
+		<div className="w-[100px] dark:bg-zinc-900 bg-main-light-WHITE shadow overflow-y-auto flex flex-col justify-between h-screen">
 			<img src={logo} alt="Logo" className="mx-auto pt-10" />
 			<div className="flex flex-col justify-center flex-grow mx-auto">
 				{icons.map((icon, index) => (

@@ -15,11 +15,14 @@ import ProfileComponent from './Components/main/profile/profile';
 import Cookies from 'js-cookie';
 import Game from './Components/Game/Game';
 import chatComponent from './Components/main/chat/chat';
+import call from './Components/call/call';
+import { useState } from 'react';
 
 function App() {
   const isAuthenticated = 'true'
   // Cookies.get('isAuthenticated');
 
+  // localStorage.setItem('theme', 'light');
   return (
     <>
       {/* <BrowserRouter> */}
@@ -33,6 +36,7 @@ function App() {
               <Route path="profile" element={<ProfileComponent />} />
               <Route path="analytics" element={<AnalyticsComponent />} />
               <Route path="chat" Component={ chatComponent} />
+              <Route path="call" Component={call} />
               {/* <Route path="settings" element={<settings />} /> */}
             </Route>
           {/* <Route path="/SignIn" element={<FunctionSignUpForm/>} /> */}

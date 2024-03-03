@@ -1,17 +1,17 @@
 // src/chat/chat.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Msg } from './../user/entities/msg.entitiy';
-import { User } from 'src/user/model/user.model';
-
+import { MsgRepository } from 'src/repo/msg.repository';
+import { UserRepository } from 'src/repo/user.repository';
 
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectRepository(Msg)
-    private readonly msgRepository: Repository<Msg>,
-    private readonly userRepository: Repository<User>
+    @InjectRepository(MsgRepository)
+    private readonly msgRepository: MsgRepository,
+    @InjectRepository(UserRepository)
+    private readonly userRepository: UserRepository,
   ) {}
 
   /**
@@ -31,8 +31,8 @@ export class ChatService {
    */
 
   async areUsersBlocked(IdSender: number, idReceiver: number): Promise<boolean> {
-    const sender = await this.userRepository.findOne({where: {id: IdSender}, select: { blocks: true }});
-    const receiver = await this.userRepository.findOne({where: {id: idReceiver}, select: {blocks: true}});
+    const sender = await this.userRepository.findOne({where: {providerId: IdSender}, select: { blocks: true }});
+    const receiver = await this.userRepository.findOne({where: {providerId: idReceiver}, select: {blocks: true}});
 
     const isReceiverBlocked = sender?.blocks.includes(idReceiver) ?? false;
     const isSenderBlocker = receiver?.blocks.includes(IdSender) ?? false;

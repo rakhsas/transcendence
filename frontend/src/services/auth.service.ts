@@ -2,7 +2,8 @@
 class AuthService {
     async getPayload(): Promise<any> {
         try {
-            const response = await fetch('http://localhost:3000/api/auth/decodeToken', {
+        	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
+            const response = await fetch(APIURL + 'auth/decodeToken', {
                 method: 'GET',
                 credentials: "include"
             });

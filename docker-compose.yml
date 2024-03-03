@@ -44,6 +44,21 @@ services:
       - 'traefik.http.routers.frontend.entrypoints=web'
       - "traefik.http.routers.frontend.middlewares=frontend-prefix"
       - "traefik.http.middlewares.frontend-prefix.stripprefix.prefixes=/front"
+  nginx:
+    image: nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    # volumes:
+    #   - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "443:443"
+      - "80:80"
+    networks:
+      - backend
+    depends_on:
+      - frontend
   # chat:
   #   container_name: chat
   #   image: chat                                           

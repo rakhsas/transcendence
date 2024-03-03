@@ -5,12 +5,12 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 
 async function bootstrap() {
-  
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.enableCors({
-    // origin: 'http://localhost:4200',
-    // credentials: true
+    // origin: 'https://192.168.8.112',
+    origin: '*',
+    credentials: true
   })
   const config = new DocumentBuilder()
   .setTitle('NestJS API')
@@ -19,6 +19,6 @@ async function bootstrap() {
   .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger-ui', app, document);
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
 }
 bootstrap();

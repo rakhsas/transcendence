@@ -12,6 +12,8 @@ interface messageUser1 {
     message: string;
     date: string;
     img: string;
+    recieverId: number;
+    recieverUserName: string;
 }
 
 export type { messageUser, messageUser1}

@@ -15,7 +15,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
         private readonly authService: AuthService
     ) {
         super({
-            callbackURL: 'http://localhost:3000/api/auth/42/callback',
+            callbackURL: process.env.FORTYTWO_CLIENT_CALLBACK_URL,
             clientID: process.env.FORTYTWO_CLIENT_ID,
             clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
         });

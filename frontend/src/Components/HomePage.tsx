@@ -1,14 +1,12 @@
 import "./HomePage.css";
 import Logo from "./../assets/Frame 1.png";
 import Google from "./../assets/icons8-google.svg";
-import Intra from "./../assets/favicon.ico"
 function HomePageComponent(): JSX.Element {
 	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 	async function loginWithIntra() {
 		window.location.href = APIURL + "auth/42/login";
 	}
-
-
+	console.log(APIURL + "auth/42/login");
 	return (
 		<>
 			<div className="dashboardContainer bg-auto sm:bg-center md:bg-center h-full">
@@ -37,7 +35,7 @@ function HomePageComponent(): JSX.Element {
 						<div className="ContinueWith text-white text-base font-semibold font-['Inter'] leading-snug">Continue with</div>
 						<div className="Plus w-6 h-6 p-1 justify-center items-center flex">
 							<div className="Group w-4 h-4 relative">
-								<img src={Intra} alt="" />
+								<img src="https://profile.intra.42.fr/assets/42_logo_black-684989d43d629b3c0ff6fd7e1157ee04db9bb7a73fba8ec4e01543d650a1c607.png" alt="" />
 							</div>
 						</div>
 					</div>

@@ -2,10 +2,14 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect  } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
+// import { Paths } from '../../../frontend/src/utils/types';
 
-@WebSocketGateway()
+// @WebSocketGateway()
+@WebSocketGateway({cors: true, path: '/chat'})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() server: Server;
+  // @WebSocketServer() server: Server;
+  usersArray = [];
+  peerConnections: { [userId: string]: RTCPeerConnection } = {};
   
   private connectedUsers: Map<string, Socket> = new Map();
   constructor(private readonly chatService: ChatService) {}
@@ -25,8 +29,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // Handle disconnection (e.g., remove user from room)
   }
-
-
+  
+  
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
@@ -39,12 +43,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       {
         // you can put here the logic of blocked users and send Error message in the socket arguments. 
         // The code goes here ...
-
+        
         toUserSocket.emit('message', {
           "to": payload.to,
           "from": payload.from,
           "content": payload.content,
-          // "isOwner": false
+          "isOwner": false
         });
 
         await this.chatService.addDirectMessage(payload.from, payload.to, payload.content)
@@ -63,6 +67,34 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // add new entity in user channel relation the user must set as owner
     
   }
+
+  @SubscribeMessage('mediaOffer')
+  async handleOnMediaOffer( client: Socket, payload: any ) {
+    console.log(payload)
+    client.to(payload.to).emit('mediaOffer', {
+      from: payload.from,
+      offer: payload.offer
+    });
+  };
+  
+  @SubscribeMessage('mediaAnswer')
+  async handleOnMediaAnswer(client: Socket, payload: any) {
+    client.to(payload.to).emit('mediaAnswer', {
+      answer: payload.answer,
+      from: payload.from
+    });
+
+  }
+
+  @SubscribeMessage('iceCandidate')
+  async handleIceCandidate(client: Socket, payload: any)
+  {
+    client.to(payload.to).emit('remotePeerIceCandidate', {
+      candidate: payload.candidate,
+      client: client.id
+    });
+  }
+
 }
 
 
