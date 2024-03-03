@@ -17,6 +17,8 @@ import { User1 } from './user/entities/user.entity';
 import { Channel } from './user/entities/channel.entity';
 import { Mute } from './user/entities/mute.entity';
 import { Friendship } from './user/entities/freindship.entity';
+import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
+import { MsgControllerController } from './chat/msg/msg.controller';
 
 
 @Module({
@@ -30,7 +32,7 @@ import { Friendship } from './user/entities/freindship.entity';
       database: 'db1',
       synchronize: true, // Set to true for development, but not recommended for production
       logging: true, // Enable to see SQL logs
-      entities: [Msg, User1, Channel, Mute, Friendship], // Specify the entities (models) you want to include in the database
+      entities: [Msg, User1, Channel, Mute, Friendship, UserChannelRelationship], // Specify the entities (models) you want to include in the database
     }),
     // ConfigModule.forRoot({
     //   envFilePath: 'config/.env',
@@ -41,7 +43,7 @@ import { Friendship } from './user/entities/freindship.entity';
     PrismaModule,
     ChatModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, MsgControllerController],
   providers: [AppService],
 })
 export class AppModule {}

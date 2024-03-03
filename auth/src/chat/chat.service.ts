@@ -69,4 +69,17 @@ export class ChatService {
     });
     await this.msgRepository.save(newMessageRoom);
   }
+
+  /**
+   * @returns all messages from database
+   */
+  async findAllMsg()
+  {
+    return await this.msgRepository.find();
+  }
+
+  async findOneMessage(id: number): Promise<Msg>
+  {
+    return await this.msgRepository.findOne({where: {id}});
+  }
 }

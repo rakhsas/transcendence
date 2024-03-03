@@ -18,14 +18,15 @@ import { Mute } from './mute.entity'; // Assuming you have a Mute entity
 import { v4 as uuidv4 } from 'uuid'
 
 @Entity('users') // Table name mapping
-@Unique(['id', 'email'])
+@Unique(['id', 'email', 'providerId'])
 export class User1 {
 
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: 'id', comment: 'User ID' })
   id: string;
 
-  @Column({unique: true})
+  @Column({default: 0})
   providerId: number;
+
 
   @CreateDateColumn()
   createdAt: Date;
@@ -75,24 +76,24 @@ export class User1 {
 
   // blocked     Int[] // ...
 
-  @OneToMany(() => Channel, (channel) => channel.owners, { lazy: true })
-  owner: Promise<Channel[]>;
+  // @OneToMany(() => Channel, (channel) => channel.owners, { lazy: true })
+  // owner: Promise<Channel[]>;
 
-  @ManyToMany(() => Channel, (channel) => channel.admins, { lazy: true })
-  @JoinTable()
-  admin: Promise<Channel[]>;
+  // @ManyToMany(() => Channel, (channel) => channel.admins, { lazy: true })
+  // @JoinTable()
+  // admin: Promise<Channel[]>;
 
-  @ManyToMany(() => Channel, (channel) => channel.members, { lazy: true })
-  @JoinTable()
-  member: Promise<Channel[]>;
+  // @ManyToMany(() => Channel, (channel) => channel.members, { lazy: true })
+  // @JoinTable()
+  // member: Promise<Channel[]>;
 
-  @ManyToMany(() => Channel, (channel) => channel.inviteds, { lazy: true })
-  @JoinTable()
-  invited: Promise<Channel[]>;
+  // @ManyToMany(() => Channel, (channel) => channel.inviteds, { lazy: true })
+  // @JoinTable()
+  // invited: Promise<Channel[]>;
 
-  @ManyToMany(() => Channel, (channel) => channel.blocked, { lazy: true })
-  @JoinTable()
-  chanBlocked: Promise<Channel[]>;
+  // @ManyToMany(() => Channel, (channel) => channel.blocked, { lazy: true })
+  // @JoinTable()
+  // chanBlocked: Promise<Channel[]>;
 
   
   @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true })

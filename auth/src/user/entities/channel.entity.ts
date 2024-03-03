@@ -39,25 +39,25 @@ export class Channel {
   @Column({ nullable: true })
   password: string;
 
-  @ManyToMany(() => User1, (user) => user.owner, { lazy: true })
-  @JoinTable()
-  owners: Promise<User1[]>;
+  // @ManyToMany(() => User1, (user) => user.owner, { lazy: true })
+  // @JoinTable()
+  // owners: Promise<User1[]>;
 
-  @ManyToMany(() => User1, (user) => user.admin, { lazy: true })
-  @JoinTable()
-  admins: Promise<User1[]>;
+  // @ManyToMany(() => User1, (user) => user.admin, { lazy: true })
+  // @JoinTable()
+  // admins: Promise<User1[]>;
 
-  @ManyToMany(() => User1, (user) => user.member, { lazy: true })
-  @JoinTable()
-  members: Promise<User1[]>;
+  // @ManyToMany(() => User1, (user) => user.member, { lazy: true })
+  // @JoinTable()
+  // members: Promise<User1[]>;
 
-  @ManyToMany(() => User1, (user) => user.invited, { lazy: true })
-  @JoinTable()
-  inviteds: Promise<User1[]>;
+  // @ManyToMany(() => User1, (user) => user.invited, { lazy: true })
+  // @JoinTable()
+  // inviteds: Promise<User1[]>;
 
-  @ManyToMany(() => User1, (user) => user.chanBlocked, { lazy: true })
-  @JoinTable()
-  blocked: Promise<User1[]>;
+  // @ManyToMany(() => User1, (user) => user.chanBlocked, { lazy: true })
+  // @JoinTable()
+  // blocked: Promise<User1[]>;
 
   @OneToMany(() => Mute, (mute) => mute.channel, { lazy: true })
   muted: Promise<Mute[]>;

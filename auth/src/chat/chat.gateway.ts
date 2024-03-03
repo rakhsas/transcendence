@@ -22,6 +22,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleDisconnect(client: Socket) {
     const recieverName = String(client.handshake.query.recieverName);
     this.connectedUsers.delete(recieverName);
+
     // Handle disconnection (e.g., remove user from room)
   }
 
@@ -50,12 +51,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       client.emit('message', payload);
     }
-    else
-      this.server.emit('message', payload);
+    // else
+    //   this.server.emit('message', payload);
+  }
+
+
+  @SubscribeMessage('createChannel')
+  async handleEventCreateChannel(client: Socket, payload: any): Promise<void>{
+    // here the payload must containe the id of the user who create the channel so it can be set as owner
+    // create a new entity in the database (new channel)
+    // add new entity in user channel relation the user must set as owner
+    
   }
 }
 
 
-/*
-
-*/
