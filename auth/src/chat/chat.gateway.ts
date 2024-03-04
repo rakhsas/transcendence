@@ -17,9 +17,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleConnection(client: Socket) {
     const recieverName = String(client.handshake.query.recieverName);
     this.connectedUsers.set(recieverName, client);
-    console.log("socket id: " + client.id);
-    console.log("client: " + client);
-    console.log("map: " + this.connectedUsers.size);
+    // console.log("socket id: " + client.id);
+    // console.log("client: " + client);
+    // console.log("map: " + this.connectedUsers.size);
     // added lines
     // console.log('A user connected');
     // console.log('client id: ' + client.id);
@@ -33,8 +33,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // throw new Error('Method not implemented.');
     const userName = String(client.handshake.query.userName);
     this.connectedUsers.delete(userName);
-    console.log('A user disconnected');
-    console.log('client id: ' + client.id);
+    // console.log('A user disconnected');
+    // console.log('client id: ' + client.id);
     if (this.peerConnections[client.id]) {
       this.peerConnections[client.id].close();
       delete this.peerConnections[client.id];
@@ -88,8 +88,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('mediaOffer')
-  async handleOnMediaOffer( client: Socket, payload: any ) {
-    console.log(payload)
+  async handleOnMediaOffer( client: Socket,payload: any ) {
+    // console.log(payload)
     client.to(payload.to).emit('mediaOffer', {
       from: payload.from,
       offer: payload.offer

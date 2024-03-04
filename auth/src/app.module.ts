@@ -31,7 +31,6 @@ import { ConfigModule } from '@nestjs/config';
       entities: [User, Msg, Channel, Mute, Friendship, UserChannelRelationship],
 
     }),
-
     UserModule,
     AuthModule,
     ChatModule,

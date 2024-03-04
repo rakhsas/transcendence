@@ -1,11 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { io } from "socket.io-client";
+const socket = io("https://10.13.249.229",{
+    path: '/chat',
+});
 
 function call() {
     let selectedUser: string;
-    const socket = io("https://192.168.8.108",{
-        path: '/chat',
-    }); // or specify the port if it's different from the default port
+    
     // const userTrackMap: { [userId: string]: MediaStreamTrack } = {};
     const userTrackMap = new Map<string, MediaStreamTrack>();
     const onUpdateUserList = ({ userIds }: any) => {
@@ -46,6 +47,7 @@ function call() {
             audio: true,
             video: true,
         };
+        console.log("Getting user media with constraints", constraints);    
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         const localVideo = document.getElementById(
             "localVideo"
