@@ -9,7 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 
-import { User1 } from './user.entity'; // Import the User1 entity
+import { User } from './user.entity'; // Import the User1 entity
 import { Mute } from './mute.entity'; // Import the Mute entity
 import { Msg } from './msg.entitiy'; // Import the Msg entity
 

@@ -1,6 +1,6 @@
 // msg.repository.ts
 import { Repository } from 'typeorm';
-import { Msg } from 'src/user/entities/msg.entitiy'; // Adjust the path as needed
+import { Msg } from 'src/user/entities/msg.entitiy';
 
 
 export class MsgRepository extends Repository<Msg> {

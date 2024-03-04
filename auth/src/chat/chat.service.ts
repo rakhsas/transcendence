@@ -4,14 +4,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Msg } from './../user/entities/msg.entitiy';
 import { MsgRepository } from 'src/repo/msg.repository';
 import { UserRepository } from 'src/repo/user.repository';
+import { UUID } from 'crypto';
+import { Repository } from 'typeorm';
+import { User} from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectRepository(MsgRepository)
-    private readonly msgRepository: MsgRepository,
-    @InjectRepository(UserRepository)
-    private readonly userRepository: UserRepository,
+    @InjectRepository(Msg)
+    private readonly msgRepository: Repository<Msg>,
+    // private readonly msgRepository: MsgRepository,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    // private readonly userRepository: UserRepository,
   ) {}
 
   /**
@@ -19,7 +24,7 @@ export class ChatService {
    * @param userId
    * @returns array of message with the user id provided
    */
-  async getDirectMessages(userId: number): Promise<Msg[]> {
+  async getDirectMessages(userId: UUID): Promise<Msg[]> {
     return this.msgRepository.find({ where: { senderId: userId } });
   }
 
@@ -30,7 +35,7 @@ export class ChatService {
    * @returns true if the sender or the receiver is blocked, flase otherwise.act class t
    */
 
-  async areUsersBlocked(IdSender: number, idReceiver: number): Promise<boolean> {
+  async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
     const sender = await this.userRepository.findOne({where: {providerId: IdSender}, select: { blocks: true }});
     const receiver = await this.userRepository.findOne({where: {providerId: idReceiver}, select: {blocks: true}});
 
@@ -46,7 +51,7 @@ export class ChatService {
    * @param receiverId the receiver
    * @param content the content of the message
    */
-  async addDirectMessage(senderId: number, receiverId: number, content: string): Promise<void> {
+  async addDirectMessage(senderId: UUID, receiverId: UUID, content: string): Promise<void> {
     const directMessage = this.msgRepository.create({
       msg: content,
       rec_id: receiverId,
@@ -61,7 +66,7 @@ export class ChatService {
    * @param channelId the channel where the message will broadcasted.
    * @param content the content of the message
    */
-  async saveMessageRoom(senderId: number, channelId: number, content: string): Promise <void> {
+  async saveMessageRoom(senderId: UUID, channelId: number, content: string): Promise <void> {
     const newMessageRoom = this.msgRepository.create({
       msg: content,
       senderId,

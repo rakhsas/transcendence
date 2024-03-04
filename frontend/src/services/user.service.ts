@@ -7,7 +7,7 @@ class UserService {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
             const response = await fetch(APIURL + `user/${userId}`, {
                 method: 'GET',
-                credentials: "same-origin"
+                credentials: 'include'
             });
             if (response.ok) {
                 const userData = await response.json();

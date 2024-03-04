@@ -35,6 +35,7 @@ export class AuthService {
         const authToken = this.getCookie('access_token', cookie);
         try {
             const authTokenPayload = await this.jwtService.verifyAsync(authToken, { secret: process.env.JWTSECRET });
+            console.log(authTokenPayload)
             return authTokenPayload;
         } catch (error) {
             console.error('Error decoding token:', error);

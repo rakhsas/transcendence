@@ -20,10 +20,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log("socket id: " + client.id);
     console.log("client: " + client);
     console.log("map: " + this.connectedUsers.size);
+    // added lines
+    // console.log('A user connected');
+    // console.log('client id: ' + client.id);
+    this.usersArray.push(client.id);
+    console.log(this.usersArray.length);
+    client.broadcast.emit('update-user-list', { userIds: this.usersArray });
     // Handle initial connection (e.g., send list of available rooms)
   }
   
   handleDisconnect(client: Socket) {
+    // throw new Error('Method not implemented.');
+    const userName = String(client.handshake.query.userName);
+    this.connectedUsers.delete(userName);
+    console.log('A user disconnected');
+    console.log('client id: ' + client.id);
+    if (this.peerConnections[client.id]) {
+      this.peerConnections[client.id].close();
+      delete this.peerConnections[client.id];
+    }
+    console.log('A user disconnected');
+    this.usersArray = this.usersArray.filter(id => id !== client.id);
+    client.broadcast.emit('update-user-list', { userIds: this.usersArray});
+    client.broadcast.emit('user-disconnected', { userId: client.id });
     const recieverName = String(client.handshake.query.recieverName);
     this.connectedUsers.delete(recieverName);
 

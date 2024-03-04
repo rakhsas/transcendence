@@ -1,5 +1,5 @@
 import { Entity, JoinColumn, PrimaryGeneratedColumn, Column, ManyToOne,  } from "typeorm";
-import { User1 } from "./user.entity";
+import { User } from "./user.entity";
 import { Channel } from "./channel.entity";
 
 
@@ -8,9 +8,9 @@ export class UserChannelRelationship {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User1)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
-  user: User1;
+  user: User;
 
   @ManyToOne(() => Channel)
   @JoinColumn({ name: 'channel_id' })

@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { User1 } from './user.entity'; // Import the User1 entity
+import { User } from './user.entity'; // Import the User1 entity
 import { Channel } from './channel.entity'; // Import the Channel entity
 
 
@@ -29,19 +29,19 @@ export class Msg {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => User1, (user) => user.sendmessages, {lazy: true})
+  @ManyToOne(() => User, (user) => user.sendmessages, {lazy: true})
   @JoinColumn({ name: 'senderId' })
-  owner: Promise<User1>;
+  owner: Promise<User>;
 
   @Column()
-  senderId: number;
+  senderId: string;
 
-  @ManyToOne(() => User1, (user) => user.receivedMessages, {lazy: true})
+  @ManyToOne(() => User, (user) => user.receivedMessages, {lazy: true})
   @JoinColumn({ name: 'rec_id' })
-  receiver: Promise<User1>;
+  receiver: Promise<User>;
 
   @Column({nullable: true})
-  rec_id: number;
+  rec_id: string;
 
   @ManyToOne(() => Channel, (channel) => channel.messages, {lazy: true})
   @JoinColumn({ name: 'cid' })

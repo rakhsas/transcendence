@@ -18,14 +18,14 @@ import { Mute } from './mute.entity'; // Assuming you have a Mute entity
 import { v4 as uuidv4 } from 'uuid'
 
 @Entity('users') // Table name mapping
-@Unique(['id', 'email', 'providerId'])
-export class User1 {
+@Unique(['id', 'email', 'providerId', 'username'])
+export class User {
 
   @PrimaryGeneratedColumn('uuid', { name: 'id', comment: 'User ID' })
   id: string;
 
-  @Column({default: 0})
-  providerId: number;
+  @Column()
+  providerId: string;
 
 
   @CreateDateColumn()
@@ -43,6 +43,9 @@ export class User1 {
   @Column()
   picture: string;
 
+  @Column({nullable: false})
+  provider: string;
+
   @Column()
   coalition: string;
 
@@ -58,21 +61,21 @@ export class User1 {
   @Column({ unique: true })
   email: string;
 
-  @Column({ nullable: true, unique: true })
+  @Column({ nullable: false, unique: true })
   username: string;
 
   // friends     Int[]
-  @Column('int', { array: true, default: [] })
-  adding: number[];
+  @Column('uuid', { array: true, default: [] })
+  adding: string[];
 
-  @Column('int', { array: true, default: [] })
-  added: number[];
+  @Column('uuid', { array: true, default: [] })
+  added: string[];
 
-  @Column('int', { array: true, default: [] })
-  blocks: number[];
+  @Column('uuid', { array: true, default: [] })
+  blocks: string[];
 
-  @Column('int', { array: true, default: [] })
-  blocking: number[];
+  @Column('uuid', { array: true, default: [] })
+  blocking: string[];
 
   // blocked     Int[] // ...
 
@@ -105,11 +108,17 @@ export class User1 {
   @OneToMany(() => Msg, (msg) => msg.receiver, { lazy: true })
   receivedMessages: Promise<Msg[]>;
 
-  @OneToMany(() => Friendship, (friendship) => friendship.user, { lazy: true })
-  friendsUser: Promise<Friendship[]>;
+  @OneToMany(() => Friendship, friend => friend.user, {lazy: true})
+  friends: Promise<Friendship[]>;
 
-  @OneToMany(() => Friendship, (friendship) => friendship.friend, { lazy: true })
-  userFriends: Promise<Friendship[]>;
+  @OneToMany(() => Friendship, friend => friend.friend, { lazy: true})
+  friendOf: Promise<Friendship[]>;
+
+  // @OneToMany(() => Friendship, (friendship) => friendship.user, { lazy: true })
+  // friendsUser: Promise<Friendship[]>;
+
+  // @OneToMany(() => Friendship, (friendship) => friendship.friend, { lazy: true })
+  // userFriends: Promise<Friendship[]>;
 
   @BeforeInsert()
   generateUUID() {
