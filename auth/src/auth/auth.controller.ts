@@ -36,7 +36,7 @@ export class AuthController {
         //     providerAccessToken,
         //     firstLogin
         // }
-        res.redirect(`https://localhost/dashboard`)
+        res.redirect(`http://localhost/dashboard`)
     }
 
     @Get('github/login')

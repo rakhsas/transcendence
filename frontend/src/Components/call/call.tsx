@@ -3,8 +3,9 @@ import { io } from "socket.io-client";
 
 function call() {
     let selectedUser: string;
-    const socket = io("https://192.168.8.108",{
+    const socket = io("http://10.13.249.229",{
         path: '/chat',
+        cert: 'cert.pem',
     }); // or specify the port if it's different from the default port
     // const userTrackMap: { [userId: string]: MediaStreamTrack } = {};
     const userTrackMap = new Map<string, MediaStreamTrack>();

@@ -11,9 +11,14 @@ import { Msg } from './user/entities/msg.entitiy';
 import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
 import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: 'config/.env',
+      isGlobal: true
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'postgres',
@@ -22,14 +27,10 @@ import { UserChannelRelationship } from './user/entities/user_channel_relation.e
       password: 'root',
       database: 'db1',
       synchronize: true,
-      logging: true,
+      // logging: true,
       entities: [User, Msg, Channel, Mute, Friendship, UserChannelRelationship],
 
     }),
-    // ConfigModule.forRoot({
-    //   envFilePath: 'config/.env',
-    //   isGlobal: trueri
-    // }),
     UserModule,
     AuthModule,
     ChatModule,

@@ -1,9 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import fs from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // const httpsOptions = {
+  //   key: fs.readFileSync('src/private-key.key'),
+  //   cert: fs.readFileSync('src/certificate.crt'),
+  // };
+  const app = await NestFactory.create(AppModule, 
+    // {httpsOptions}
+  );
   app.setGlobalPrefix('api');
   app.enableCors({
     // origin: 'https://192.168.8.112',
