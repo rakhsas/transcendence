@@ -10,7 +10,9 @@ import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: [
+      'http://10.13.248.70:4200'
+    ],
   },
 })
 export class GameGetwayService {
@@ -21,6 +23,7 @@ export class GameGetwayService {
   @SubscribeMessage('ready')
   handleReady(client: Socket, payload: any){
     this.i++;
+    this.logger.log('ready');
     if (this.i % 2 == 0)
       this.server.emit('start');
 
@@ -34,7 +37,8 @@ export class GameGetwayService {
     // Emit the received message to the specified recipient
     //
     const { user,ball, id } = payload;
-    this.server.emit('catch', user,ball, id);
+    // this.server.emit('catch', user,ball, id);
+    client.broadcast.emit('catch', user,ball, id);
 //     this.sendMessageToSocket(recipient, 'catch', message);
   }
 

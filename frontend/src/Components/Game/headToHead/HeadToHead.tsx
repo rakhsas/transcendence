@@ -2,7 +2,7 @@ import Game from './Game';
 import io, { Socket } from 'socket.io-client';
 import { useRef, useEffect } from 'react';
 
-const socket: Socket = io('http://localhost:3002'); // URL of your backend
+const url: string = 'http://10.13.248.70:3002'; // URL of your backend
 
 const CanvasHeadToHead = (props: any) =>{
   const ref = useRef(null)
@@ -12,16 +12,17 @@ const CanvasHeadToHead = (props: any) =>{
     if(!canvas)
       return;
 
-   new Game(canvas, socket);
+    const socket: Socket = io(url);
+    new Game(canvas, socket);
 
     socket.on('connect', () => {
       console.log('Connected to server');
       socket.emit('ready', socket.id)
     });
-
     socket.on('disconnect', () => {
       console.log('Disconnected from server');
       socket.emit('stop')
+      socket.disconnect();
     });
 
     return () => {

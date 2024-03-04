@@ -68,7 +68,7 @@ class Ball {
     this.y = canvas.height / 2;
     this.r = 10;
     this.color = 'blue';
-    this.speed = 5;
+    this.speed = 2;
     this.vx = 5;
     this.vy = 5;
   }
@@ -94,12 +94,14 @@ class Game {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     socket.on('catch', (comp,ball, id) => {
-      if(socket.id !== id)
+      this.computer.y = comp.y;
+      this.computer.score = comp.score;
+      if (ball.x > this.canvas.width/2)
       {
-        this.computer.y = comp.y;
-        this.computer.score = comp.score;
+        this.ball = ball;
+        this.ball.x = this.canvas.width / 2 - (ball.x - this.canvas.width / 2);
+        this.ball.vx = -ball.vx;
       }
-      this.ball = ball;
     });
     this.canvas.addEventListener("mousemove", (evt) => {
       let rect = canvas.getBoundingClientRect();
@@ -160,7 +162,7 @@ class Game {
     this.ball.x = this.canvas.width/2
     this.ball.y = this.canvas.height/2
     this.ball.vx = -this.ball.vx;
-    this.ball.speed = 7;
+    this.ball.speed = 2;
   }
 
 
