@@ -4,7 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 
 // @WebSocketGateway()
-@WebSocketGateway({cors: true, path: '/chat'})
+@WebSocketGateway({cors: true, path: '/chat', methods: ['GET', 'POST']})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   usersArray = [];
@@ -16,16 +16,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleConnection(client: Socket) {
     const recieverName = String(client.handshake.query.recieverName);
     this.connectedUsers.set(recieverName, client);
-    // console.log("socket id: " + client.id);
-    // console.log("client: " + client);
-    // console.log("map: " + this.connectedUsers.size);
-    // added lines
-    // console.log('A user connected');
-    // console.log('client id: ' + client.id);
     this.usersArray.push(client.id);
-    // console.log(this.usersArray.length);
-    client.broadcast.emit('update-user-list', { userIds: this.usersArray });
-    // Handle initial connection (e.g., send list of available rooms)
+    // client.emit('update-user-list', { userIds: this.usersArray });
+    client.emit('update-user-list', { userIds: this.usersArray });
+    // const users = this.usersArray.filter(id => id !== client.id);
+    // client.broadcast.emit('update-user-list', { userIds: users });
+    this.server.emit('update-user-list', { userIds: this.usersArray });
+    // console.log(this.usersArray);
   }
   
   handleDisconnect(client: Socket) {
@@ -110,6 +107,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  @SubscribeMessage('callUser')
+  async handleCallUser(client: Socket, payload: any)
+  {
+    console.log('callUser');
+    client.to(payload.to).emit('RequestCall', {
+      from: payload.from,
+      offer: payload.offer
+    });
+  }
+
+  @SubscribeMessage('acceptCall')
+  async handleAcceptCall(client: Socket, payload: any)
+  {
+    console.log('acceptCall');
+    client.to(payload.to).emit('AcceptCall', {
+      answer: payload.answer,
+      from: payload.from
+    });
+  }
 }
 
 

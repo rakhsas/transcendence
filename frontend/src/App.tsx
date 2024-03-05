@@ -1,10 +1,4 @@
-// import React, { useState } from 'react';
 import './list.css';
-// import Google from './assets/google.png';
-// import Github from './assets/github.jpeg';
-// import Intra from './assets/42.jpeg';
-// import backgroundImage2 from './assets/intra42.jpej.jpeg';
-// import bgm from './assets/Leonardo_Diffusion_XL_images_display_a_man_wears_a_jacket_and_0.jpg';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import HomePageComponent from './Components/HomePage';
 import ValidInformation from './Components/Info/Information';
@@ -15,12 +9,14 @@ import ProfileComponent from './Components/main/profile/profile';
 import Cookies from 'js-cookie';
 import Game from './Components/Game/Game';
 import chatComponent from './Components/main/chat/chat';
-import call from './Components/call/call';
+import CallComponent from './Components/call/call';
 import { useState } from 'react';
+import prof from './Components/main/profile/Sprofile';
 
 function App() {
-  const isAuthenticated = 'true'
-  // Cookies.get('isAuthenticated');
+  const isAuthenticated = 
+  // 'true'
+  Cookies.get('isAuthenticated');
 
   // localStorage.setItem('theme', 'light');
   return (
@@ -33,10 +29,11 @@ function App() {
               element={((isAuthenticated) && ( isAuthenticated.length > 0 ) && (isAuthenticated === 'true')) ? (<DashboardComponent />) : (<Navigate to="/" replace />)}
             >
               <Route index element={<HomeComponent />} />
-              <Route path="profile" element={<ProfileComponent />} />
+              {/* <Route path="profile" element={<ProfileComponent />} /> */}
+              {/* <Route path="profile" element={<prof />} /> */}
               <Route path="analytics" element={<AnalyticsComponent />} />
               <Route path="chat" Component={ chatComponent} />
-              <Route path="call" Component={call} />
+              <Route path="call" element={<CallComponent />} />
               {/* <Route path="settings" element={<settings />} /> */}
             </Route>
           {/* <Route path="/SignIn" element={<FunctionSignUpForm/>} /> */}
