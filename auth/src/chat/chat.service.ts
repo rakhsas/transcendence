@@ -2,21 +2,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Msg } from './../user/entities/msg.entitiy';
-import { MsgRepository } from 'src/repo/msg.repository';
-import { UserRepository } from 'src/repo/user.repository';
-import { UUID } from 'crypto';
+import { UUID, privateDecrypt } from 'crypto';
 import { Repository } from 'typeorm';
 import { User} from 'src/user/entities/user.entity';
+import { Channel } from 'src/user/entities/channel.entity';
+import { UserChannelRelationship, UserRole } from 'src/user/entities/user_channel_relation.entity';
+import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class ChatService {
   constructor(
     @InjectRepository(Msg)
     private readonly msgRepository: Repository<Msg>,
-    // private readonly msgRepository: MsgRepository,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    // private readonly userRepository: UserRepository,
+    @InjectRepository(Channel)
+    private readonly channelRepository: Repository<Channel>,
+    @InjectRepository(UserChannelRelationship)
+    private readonly UserChannelRelation: Repository<UserChannelRelationship>,
   ) {}
 
   /**
@@ -87,4 +90,53 @@ export class ChatService {
   {
     return await this.msgRepository.findOne({where: {id}});
   }
+
+  /**
+   * addNewChannelEntity - function that add a new entity to channel
+   * @payload the data attribute of channel entity
+   */
+
+  async addNewChannelEntity(payload: any)
+  {
+    const newEntityChannel =  this.channelRepository.create({
+      name: payload.channelName,
+      private: payload.isPrivate,
+      password: payload.password !== undefined ? payload.password : null,
+      type: payload.channelType,
+    });
+
+    await this.channelRepository.save(newEntityChannel);
+  }
+
+  async addNewUserChannelEntity(payload: any)
+  {
+    const newEntitiyUChannel = this.UserChannelRelation.create({
+      user: payload.userId,
+      channel: payload.channelId,
+      role: UserRole.OWNER,
+      isAllowed: true
+    });
+    await this.UserChannelRelation.save(newEntitiyUChannel);
+  }
+
+  /**
+   * kickUserFromChannel - kick a user from the channel.
+   * @param payload userId and channelId from where the user will be kicked
+   * in the channel-user entity.
+   */
+  async kickUserFromChannel(payload: any)
+  {
+    const targetedEntity = await this.UserChannelRelation.findOne({
+      where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
+    });
+
+    if (targetedEntity)
+    {
+      await this.UserChannelRelation.delete(targetedEntity);
+    }
+    else
+      console.log("the user in channel-user relation is not found");
+  }
 }
+
+

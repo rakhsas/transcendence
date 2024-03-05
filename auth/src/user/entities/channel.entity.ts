@@ -13,6 +13,12 @@ import { User } from './user.entity'; // Import the User1 entity
 import { Mute } from './mute.entity'; // Import the Mute entity
 import { Msg } from './msg.entitiy'; // Import the Msg entity
 
+export enum ChannelTypes {
+  PUBLIC = 'public',
+  PROTECTED = 'protected',
+  PRIVATE = 'private',
+}
+
 @Entity()
 export class Channel {
   @PrimaryGeneratedColumn()
@@ -28,16 +34,20 @@ export class Channel {
   updatedAt: Date;
 
   @Column({ default: false })
-  dm: boolean;
-
-  @Column({ default: false })
   private: boolean;
-
-  @Column({ default: false })
-  isPassword: boolean;
 
   @Column({ nullable: true })
   password: string;
+
+  // @Column()
+  // type: string
+
+  @Column({
+    type: 'enum',
+    enum: ChannelTypes,
+    default: ChannelTypes.PUBLIC, // Set a default role if needed
+  })
+  type: ChannelTypes;
 
   // @ManyToMany(() => User1, (user) => user.owner, { lazy: true })
   // @JoinTable()
@@ -65,3 +75,5 @@ export class Channel {
   @OneToMany(() => Msg, (msg) => msg.channel, { lazy: true })
   messages: Promise<Msg[]>;
 }
+
+

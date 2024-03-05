@@ -47,14 +47,14 @@ export class AuthController {
         };
     }
 
-    @Get('github/callback')
+    @Get('github/callback') 
     @UseGuards(AuthGuard('github'))
     async handleGithubRedirect(@Req() req, @Res() res) {
         const user = req.user;
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
-        res.redirect(`http://localhost:4200/dashboard?firstLogin=${firstLogin}&accessToken=${accessToken}&provider=${providerAccessToken}`);
+        res.redirect(`https://localhost:4200/dashboard?firstLogin=${firstLogin}&accessToken=${accessToken}&provider=${providerAccessToken}`);
     }
 
     @Get('decodeToken')
