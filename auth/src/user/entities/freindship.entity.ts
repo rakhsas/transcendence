@@ -1,17 +1,19 @@
-import { Entity, PrimaryColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { User } from './user.entity'; // Import the User1 entity
 
 @Entity()
 export class Friendship {
-  @PrimaryColumn()
-  userId: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @PrimaryColumn()
-  freindId: number;
-
-  @ManyToOne(() => User, (user) => user.friendsUser, {lazy: true})
+  @ManyToOne(() => User, user => user.friends, {lazy: true})
+  @JoinColumn({ name: 'user_id' })
   user: Promise<User>;
 
-  @ManyToOne(() => User, (user) => user.userFriends, {lazy: true})
+  @ManyToOne(() => User, {lazy: true})
+  @JoinColumn({ name: 'friend_id' })
   friend: Promise<User>;
+
+  // @Column({ default: false })
+  // accepted: boolean;
 }

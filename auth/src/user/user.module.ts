@@ -12,14 +12,16 @@ import { Mute } from './entities/mute.entity';
 import { Channel } from './entities/channel.entity';
 import { Msg } from './entities/msg.entitiy';
 import { Friendship } from './entities/freindship.entity';
+import { MessageService } from './message.service';
+import { MessageController } from './message.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Msg, Channel, Mute, Friendship, UserChannelRelationship]),
     HttpModule,
   ],
-  providers: [UserService, UserGuard, AuthService, Repository],
-  controllers: [UserController],
-  exports: [UserService]
+  providers: [UserService, UserGuard, AuthService, Repository, MessageService],
+  controllers: [UserController, MessageController],
+  exports: [UserService, MessageService]
 })
 export class UserModule {}

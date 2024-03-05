@@ -27,7 +27,7 @@ export class Mute {
   muted: Promise<User>;
 
   @Column()
-  userId: number;
+  userId: string;
 
   @ManyToOne(() => Channel, (channel) => channel.muted, {lazy: true})
   @JoinColumn({ name: 'cid' })

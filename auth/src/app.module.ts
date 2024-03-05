@@ -12,6 +12,9 @@ import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
 import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
 import { ConfigModule } from '@nestjs/config';
+import { MessageController } from './user/message.controller';
+import { MessageService } from './user/message.service';
+import { Repository } from 'typeorm';
 
 @Module({
   imports: [

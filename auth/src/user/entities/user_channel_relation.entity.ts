@@ -2,6 +2,13 @@ import { Entity, JoinColumn, PrimaryGeneratedColumn, Column, ManyToOne,  } from 
 import { User } from "./user.entity";
 import { Channel } from "./channel.entity";
 
+export enum UserRole {
+  ADMIN = 'admin',
+  MEMBER = 'member',
+  OWNER = 'owner',
+  INVITED = 'invited',
+  BLOCKED = 'blocked',
+}
 
 @Entity('user_channel_relationships')
 export class UserChannelRelationship {
@@ -16,15 +23,18 @@ export class UserChannelRelationship {
   @JoinColumn({ name: 'channel_id' })
   channel: Channel;
 
-  @Column()
-  role: string; // Admin, Member, Invited, Blocked, etc.
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.MEMBER, // Set a default role if needed
+  })
+  role: UserRole;
+
+  // @Column()
+  // role: string; // Admin, Member, Invited, Blocked, etc.
+
+  @Column({default: false})
+  isAllowed: boolean // true if the user allowed to send message false if not.
 }
 
 
-export enum UserRole {
-  ADMIN = 'admin',
-  MEMBER = 'member',
-  OWNER = 'owner',
-  INVITED = 'invited',
-  BLOCKED = 'blocked',
-}

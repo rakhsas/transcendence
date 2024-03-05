@@ -2,6 +2,7 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect  } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
+// import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
 @WebSocketGateway({cors: true, path: '/chat', methods: ['GET', 'POST']})
@@ -61,7 +62,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           "to": payload.to,
           "from": payload.from,
           "content": payload.content,
-          // "isOwner": false
+          "isOwner": false
         });
 
         await this.chatService.addDirectMessage(payload.from, payload.to, payload.content)
@@ -74,12 +75,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 
   @SubscribeMessage('createChannel')
-  async handleEventCreateChannel(client: Socket, payload: any): Promise<void>{
+  async handleEventCreateChannel(socket: Socket, payload: any): Promise<void>{
     // here the payload must containe the id of the user who create the channel so it can be set as owner
     // create a new entity in the database (new channel)
     // add new entity in user channel relation the user must set as owner
-    
+    socket.join(payload.channelId);
+    await this.chatService.addNewChannelEntity(payload);
+    await this.chatService.addNewUserChannelEntity(payload);
   }
+
   @SubscribeMessage('mediaOffer')
   async handleOnMediaOffer( client: Socket,payload: any ) {
     // console.log(payload)
@@ -125,6 +129,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       answer: payload.answer,
       from: payload.from
     });
+  }
+  @SubscribeMessage('kickTheUser')
+  async handleEvent(socket: Socket, payload: any): Promise<void> {
+    // in this event handler i am excpected to get the id of the user to 
+    // kick and the id of the channe from where the user will be kicked.
+    socket.leave(payload.channelId);
+    await this.chatService.kickUserFromChannel(payload);
   }
 }
 

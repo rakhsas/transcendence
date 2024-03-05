@@ -43,7 +43,7 @@ export class User {
   @Column()
   picture: string;
 
-  @Column()
+  @Column({nullable: false})
   provider: string;
 
   @Column()
@@ -65,17 +65,17 @@ export class User {
   username: string;
 
   // friends     Int[]
-  @Column('int', { array: true, default: [] })
-  adding: number[];
+  @Column('uuid', { array: true, default: [] })
+  adding: string[];
 
-  @Column('int', { array: true, default: [] })
-  added: number[];
+  @Column('uuid', { array: true, default: [] })
+  added: string[];
 
-  @Column('int', { array: true, default: [] })
-  blocks: number[];
+  @Column('uuid', { array: true, default: [] })
+  blocks: string[];
 
-  @Column('int', { array: true, default: [] })
-  blocking: number[];
+  @Column('uuid', { array: true, default: [] })
+  blocking: string[];
 
   // blocked     Int[] // ...
 
@@ -108,11 +108,17 @@ export class User {
   @OneToMany(() => Msg, (msg) => msg.receiver, { lazy: true })
   receivedMessages: Promise<Msg[]>;
 
-  @OneToMany(() => Friendship, (friendship) => friendship.user, { lazy: true })
-  friendsUser: Promise<Friendship[]>;
+  @OneToMany(() => Friendship, friend => friend.user, {lazy: true})
+  friends: Promise<Friendship[]>;
 
-  @OneToMany(() => Friendship, (friendship) => friendship.friend, { lazy: true })
-  userFriends: Promise<Friendship[]>;
+  @OneToMany(() => Friendship, friend => friend.friend, { lazy: true})
+  friendOf: Promise<Friendship[]>;
+
+  // @OneToMany(() => Friendship, (friendship) => friendship.user, { lazy: true })
+  // friendsUser: Promise<Friendship[]>;
+
+  // @OneToMany(() => Friendship, (friendship) => friendship.friend, { lazy: true })
+  // userFriends: Promise<Friendship[]>;
 
   @BeforeInsert()
   generateUUID() {

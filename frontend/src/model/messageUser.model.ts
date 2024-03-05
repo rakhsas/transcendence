@@ -6,13 +6,13 @@ interface messageUser {
     status: string;
 }
 interface messageUser1 {
-    sender: number;
-    profile: string;
-    username: string;
+    sender: string;
     message: string;
     date: string;
-    img: string;
     recieverId: number;
+    img: string;
+    profile: string;
+    username: string;
     recieverUserName: string;
 }
 

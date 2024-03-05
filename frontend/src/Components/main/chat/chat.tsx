@@ -1,14 +1,15 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import "./chat.css";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
 import { TextInput } from "flowbite-react";
 import { inputTheme } from "../../../utils/themes";
 import ConversationArea from "./conversation";
-import { latestGroupMessages, latestMessages, messages } from "../../../utils/data";
+import { latestGroupMessages, messages } from "../../../utils/data";
 import DetailsArea from "./details";
 import ModalComponent from "../../../utils/modal.component";
 import { messageUser1 } from "../../../model/messageUser.model";
+import MessageService from "../../../services/message.service";
 
 function chatComponent(): JSX.Element {
     const [MESSAGES, setMESSAGES] = useState<messageUser1[][]>(messages);
@@ -18,6 +19,25 @@ function chatComponent(): JSX.Element {
     const [modalPicPath, setModalPicPath] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [lastMessageIndex, setLastMessageIndex] = useState(-1);
+    const [latestMessages, setLatestMessages] = useState<any[]>([]);
+    useEffect(() => {
+		const fetchData = async () => {
+		  try {
+            const messageService = new MessageService();
+			const fetchedUserData = await messageService.latestMessages();
+			setLatestMessages(fetchedUserData);
+		} catch (error) {
+			console.error('Error fetching user ', error);
+		  }
+		};
+		fetchData();
+	}, []);
+    console.warn("latestMessages", latestMessages)
+    // return(
+    //     <>
+    //         <LoadingComponent />;
+    //     </>
+    //     );
     // const userData = useContext(DataContext);
     // if (!userData) {
     //     return <LoadingComponent />;
@@ -30,17 +50,18 @@ function chatComponent(): JSX.Element {
     function userLastMessageIndex(): number
     {
         return MESSAGES[selectedMessageIndex].findLastIndex(
-        (message) => message.sender === userData.id);
+        (message) => Number(message.sender) === userData.id);
     }
-    const lastUserMessageIndex = MESSAGES[selectedMessageIndex].findLastIndex(
-        (message) => message.sender === userData.id
-    );
+    // const lastUserMessageIndex = MESSAGES[selectedMessageIndex].findLastIndex(
+    //     (message) => Number(message.sender) === userData.id
+    // );
+    const lastUserMessageIndex = 0;
     console.log("lastUserMessageIndex", lastUserMessageIndex)
     // setLastMessageIndex(userLastMessageIndex())
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const newMessage: messageUser1 = {
-            sender: userData.id,
+            sender: userData.id.toString(),
             profile: userData.picture,
             date: new Date().toDateString(),
             username: userData.username,
@@ -80,7 +101,7 @@ function chatComponent(): JSX.Element {
                 <div className="conversation-area border-r-[1px] dark:border-gray-700 border-black">
                     {ConversationArea({ latestMessages, latestGroupMessages, selectedMessageIndex, handleSelectMessage })}
                 </div>
-                <div className="chat-area  flex flex-col overflow-hidden flex-1">
+                {/* <div className="chat-area  flex flex-col overflow-hidden flex-1">
                     <div className="flex-1 overflow-hidden">
                         <div className="chat-area-header flex sticky top-0 left-0 z-10 overflow-hidden w-full items-center justify-between p-5 bg-zinc-800">
                             <div className="flex flex-row items-center space-x-2">
@@ -100,9 +121,9 @@ function chatComponent(): JSX.Element {
                         </div>
                         <div className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
                             {MESSAGES[selectedMessageIndex].map((message, index) => (
-                                <div className={`chat-msg ${message.sender === userData.id ? 'owner' : null}`} key={index}>
+                                <div className={`chat-msg ${message.sender === userData.id.toString() ? 'owner' : null}`} key={index}>
                                     <div className="chat-msg-profile">
-                                        <img className="chat-msg-img" src={message.sender === userData.id ? userData.picture : message.profile} alt="" />
+                                        <img className="chat-msg-img" src={message.sender === userData.id.toString() ? userData.picture : message.profile} alt="" />
                                     </div>
                                     <div className="chat-msg-content">
                                         {message.img ? (
@@ -117,7 +138,7 @@ function chatComponent(): JSX.Element {
                                         ) : null}
                                         {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
                                         { 
-                                            (message.sender === userData.id && index === lastUserMessageIndex)
+                                            (message.sender === userData.id.toString() && index === lastUserMessageIndex)
                                                 ? 
                                                     <div className='chat-msg-date text-main-light-FERN'> {message.date} </div>
                                                 :
@@ -138,13 +159,14 @@ function chatComponent(): JSX.Element {
                             </button>
                         </div>
                     </form>
-                </div>
-                <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
+                </div> */}
+                {/* <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
                     {DetailsArea({ latestMessages, selectedMessageIndex, handleSelectedColor, selectedColor, modalPicPath, isModalOpen, onCloseModal, onOpenModal })}
-                </div>
+                </div> */}
             </div>
         </>
     );
 }
 
 export default chatComponent;
+

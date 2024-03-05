@@ -21,32 +21,50 @@ export class Msg {
   id: number;
 
   @Column()
-  msg: string;
+  message: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
-
+  
+  // updatedAt: Date;
+  
   @ManyToOne(() => User, (user) => user.sendmessages, {lazy: true})
   @JoinColumn({ name: 'senderId' })
   owner: Promise<User>;
-
+  
   @Column()
-  senderId: number;
-
+  senderId: string;
+  
   @ManyToOne(() => User, (user) => user.receivedMessages, {lazy: true})
   @JoinColumn({ name: 'rec_id' })
   receiver: Promise<User>;
-
-  @Column({nullable: true})
-  rec_id: number;
-
+  
+  
   @ManyToOne(() => Channel, (channel) => channel.messages, {lazy: true})
   @JoinColumn({ name: 'cid' })
   channel: Promise<Channel>;
-
+  
   @Column({ nullable: true })
   cid: number;
+
+  @UpdateDateColumn()
+  date: string;
+  
+  @Column({nullable: true})
+  recieverId: string;
+
+  @Column({ nullable: true })
+  img: string;
+
+  @Column({ nullable: true })
+  profile: string;
+
+  @Column({ nullable: true })
+  username: string;
+
+  @Column({ nullable: true })
+  recieverUserName: string;
+
+
 }
