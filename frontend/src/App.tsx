@@ -21,22 +21,24 @@ function App() {
     <>
       {/* <BrowserRouter> */}
       <Routes>
-        <Route path="/" element={<HomePageComponent />} />
-        <Route
-          path="/dashboard/*"
-          element={
-            ((isAuthenticated) && (isAuthenticated.length > 0) && (isAuthenticated === 'true')) ?
-              (<DashboardComponent />) : (<Navigate to="/" replace />)
-          }
-        />
-        <Route index                element={<HomeComponent />} />
-        <Route path="analytics"     element={<AnalyticsComponent />} />
-        <Route path="chat"          Component={chatComponent} />
-        <Route path="call"          element={<CallComponent />} />
-        <Route path="/login"        element={<ValidInformation />} />
-        <Route path="/game"         element={<Game />} />
-        <Route path="/HeadToHead"   element={<HeadToHead />} />
-      </Routes>
+          <Route path="/" element={<HomePageComponent/>}/>
+          <Route
+              path="/dashboard/*"
+              element={((isAuthenticated) && ( isAuthenticated.length > 0 ) && (isAuthenticated === 'true')) ? (<DashboardComponent />) : (<Navigate to="/" replace />)}
+            >
+              <Route index element={<HomeComponent />} />
+              {/* <Route path="profile" element={<ProfileComponent />} /> */}
+              {/* <Route path="profile" element={<prof />} /> */}
+              <Route path="analytics" element={<AnalyticsComponent />} />
+              <Route path="chat" Component={ chatComponent} />
+              <Route path="call" element={<CallComponent />} />
+              {/* <Route path="settings" element={<settings />} /> */}
+            </Route>
+          {/* <Route path="/SignIn" element={<FunctionSignUpForm/>} /> */}
+          <Route path="/login"  element={<ValidInformation/>}/>
+          <Route path="/game" element={<Game />} />
+          <Route path='/HeadToHead' element={<HeadToHead/>} />
+        </Routes>
     </>
   );
 }
