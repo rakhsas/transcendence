@@ -65,11 +65,7 @@ services:
 networks:
   backend:
     name: backend
-    # external: true
 
-# entryPoints:
-#   web:
-#     address: ":80"
 volumes:
   node_modules_auth:
     name: node_modules_auth
