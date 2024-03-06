@@ -9,9 +9,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        main: {
-          1: '#2C2729',
-          2: '#47302E'
+        main : {
+          dark: {
+            SIDEMESSAGE: '#969eaa',
+            MSGDATE: '#c0c7d2',
+          },
+          light: {
+            SPRUCE: '#1D1E22',
+            FERN: '#3DBDA7',
+            EGGSHELL: '#00453F',
+            PUMPKIN: '#E86931'
+          }
         }
       }
     },
@@ -21,6 +29,10 @@ export default {
       'md': '768px',
       'xs': '320px'
     },
+    fontFamily: {
+      'poppins': ['Poppins'],
+      'onest': ['Onest']
+   }
   },
   plugins: [
     require('flowbite/plugin'),

@@ -22,8 +22,8 @@ export class UserGuard implements CanActivate {
 		try {
 			const request = context.switchToHttp().getRequest();
 			const { cookie } : any = request.headers;
-			const authToken = this.getCookie('access_token', cookie);
-			const providerToken = this.getCookie('provider_access_token', cookie);
+			const authToken = this.authService.getCookie('access_token', cookie);
+			const providerToken = this.authService.getCookie('provider_access_token', cookie);
 			if ( !authToken || authToken.length == 0 || !providerToken || providerToken.length == 0 ) {
 				throw new UnauthorizedException('Please provide a token');
 			}
@@ -71,17 +71,4 @@ export class UserGuard implements CanActivate {
 		  throw error;
 		}
 	  }
-
-	getCookie( cookieName:string, cookies: string ): string {
-		const array = cookies.split(";");
-
-		for (let index = 0; index < array.length; index++) {
-			const cookie = array[index].trim();
-			if (cookie.startsWith(cookieName + '='))
-			{
-				return cookie.substring(cookieName.length + 1);
-			}
-		}
-		return null;
-	}
 }

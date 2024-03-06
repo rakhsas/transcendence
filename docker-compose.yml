@@ -1,28 +1,27 @@
 version: "3.8"
 
 services:
-  # auth:
-  #   container_name: auth
-  #   image: auth
-  #   hostname: rakhsas.com
-  #   build:
-  #     context: ./auth
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./auth:/app
-  #     - node_modules_auth:/app/node_modules
-  #   networks:
-  #     - backend
-  #   labels:
-  #     - 'traefik.enable=true'
-  #     - 'traefik.http.services.auth.loadbalancer.server.port=3000'
-  #     - 'traefik.http.routers.auth.rule=Host(`rakhsas.com`) && PathPrefix(`/auth`)'
-  #     - 'traefik.http.routers.auth.entrypoints=web'
-  #     - "traefik.http.routers.auth.middlewares=auth-prefix"
-  #     - "traefik.http.middlewares.auth-prefix.stripprefix.prefixes=/auth"
-
+  auth:
+    container_name: auth
+    image: auth
+    hostname: rakhsas.com
+    build:
+      context: ./auth
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./auth:/app
+      - node_modules_auth:/app/node_modules
+    networks:
+      - backend
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.services.auth.loadbalancer.server.port=3000'
+      - 'traefik.http.routers.auth.rule=Host(`rakhsas.com`) && PathPrefix(`/auth`)'
+      - 'traefik.http.routers.auth.entrypoints=web'
+      - "traefik.http.routers.auth.middlewares=auth-prefix"
+      - "traefik.http.middlewares.auth-prefix.stripprefix.prefixes=/auth"
   frontend:
     container_name: frontend
     image: frontend
@@ -31,8 +30,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4200:4200"
-        #depends_on:
-      #  - auth
+    depends_on:
+      - auth
     networks:
       - backend
     volumes:
@@ -45,173 +44,85 @@ services:
       - 'traefik.http.routers.frontend.entrypoints=web'
       - "traefik.http.routers.frontend.middlewares=frontend-prefix"
       - "traefik.http.middlewares.frontend-prefix.stripprefix.prefixes=/front"
-  # chat:
-  #   container_name: chat
-  #   image: chat                                           
-  #   hostname: rakhsas.com
-  #   build:
-  #     context: ./chat
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3001:3001"
-  #   depends_on:
-  #     - auth
-  #   networks:
-  #     - backend
-  #   dns:
-  #     - 8.8.8.8
-  #   env_file: ./.env
-  #   volumes:
-  #     - ./chat:/app
-  #     - node_modules_chat:/app/node_modules
-  #   labels:
-  #     - 'traefik.enable=true'
-  #     - 'traefik.http.routers.chat.rule=Host(`rakhsas.com`) && PathPrefix(`/chat`)'
-  #     - 'traefik.http.services.chat.loadbalancer.server.port=3001'
-  #     - 'traefik.http.routers.chat.entrypoints=web'
-  #     - "traefik.http.routers.chat.middlewares=chat-prefix"
-  #     - "traefik.http.middlewares.chat-prefix.stripprefix.prefixes=/chat"
-  # profile:
-  #   container_name: profile
-  #   image: profile
-  #   build:
-  #     context: ./profile
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "3003:3003"
-  #   depends_on:
-  #     - auth
-  #   networks:
-  #     - backend
-  #   volumes:
-  #     - ./profile:/app
-  #     - node_modules_profile:/app/node_modules
-  #   env_file: ./.env
-  #   labels:
-  #     - 'traefik.enable=true'
-  #     - 'traefik.http.routers.profile.rule=Host(`rakhsas.com`) && PathPrefix(`/profile`)'
-  #     - 'traefik.http.services.profile.loadbalancer.server.port=3003'
-  #     - 'traefik.http.routers.profile.entrypoints=web'
-  #     - "traefik.http.routers.profile.middlewares=profile-prefix"
-  #     - "traefik.http.middlewares.profile-prefix.stripprefix.prefixes=/profile"
 
-  game:
-    container_name: game
-    image: game
+  chat:
+    container_name: chat
+    image: chat                                           
+    hostname: rakhsas.com
     build:
-      context: ./game
+      context: ./chat
       dockerfile: Dockerfile
     ports:
-      - "3002:3002"
-    # depends_on:
-#       - auth
+      - "3001:3001"
+    depends_on:
+      - auth
     networks:
       - backend
-    volumes:
-      - ./game:/app
-      - node_modules_game:/app/node_modules
+    dns:
+      - 8.8.8.8
     env_file: ./.env
+    volumes:
+      - ./chat:/app
+      - node_modules_chat:/app/node_modules
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.game.rule=Host(`rakhsas.com`) && PathPrefix(`/game`)'
-      - 'traefik.http.services.game.loadbalancer.server.port=3002'
-      - 'traefik.http.routers.game.entrypoints=web'
-      - "traefik.http.routers.game.middlewares=game-prefix"
-      - "traefik.http.middlewares.game-prefix.stripprefix.prefixes=/game"
+      - 'traefik.http.routers.chat.rule=Host(`rakhsas.com`) && PathPrefix(`/chat`)'
+      - 'traefik.http.services.chat.loadbalancer.server.port=3001'
+      - 'traefik.http.routers.chat.entrypoints=web'
+      - "traefik.http.routers.chat.middlewares=chat-prefix"
+      - "traefik.http.middlewares.chat-prefix.stripprefix.prefixes=/chat"
 
-  # postgres:
-  #   container_name: postgres
-  #   image: postgres:latest
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - ./postgres:/app
-  #   networks:
-  #     - backend
-  #   env_file: ./.env
-  #   restart: always
-  # adminer:
-  #   container_name: adminer
-  #   image: adminer
-  #   ports:
-  #     - "8081:8080"
-  #   networks:
-  #     - backend
-  #   restart: always
-  # traefik:
-  #   image: "traefik:v2.10"
-  #   container_name: "traefik"
-  #   command:
-  #     - "--log.level=DEBUG"
-  #     - "--api.insecure=true"
-  #     - "--providers.docker=true"
-  #     - "--providers.docker.exposedbydefault=false"
-  #     - "--entrypoints.web.address=:80"
-  #     - "--entrypoints.websecure.address=:443" 
-  #   ports:
-  #     - "80:80"
-  #     - "8080:8080"
-  #   depends_on:
-  #     - auth
-  #     - frontend
-  #     - chat
-  #     - profile
-  #     - game
-  #   volumes:
-  #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
-  #   networks:
-  #     - backend
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.traefik.rule=Host(`rakhsas.com`) && PathPrefix(`/traefik/`)"
-  #     - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-  # whoami:
-  #   image: "traefik/whoami"
-  #   container_name: "simple-service"
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.whoami.rule=Host(`rakhsas.com`)"
-  #     - "traefik.http.routers.whoami.entrypoints=web"
-  #   networks:
-  #     - backend
+    postgres:
+      container_name: postgres
+      image: postgres:latest
+      ports:
+        - "5432:5432"
+      volumes:
+        - ./postgres:/app
+      networks:
+        - backend
+      env_file: ./.env
+      restart: always
+
+    adminer:
+      container_name: adminer
+      image: adminer
+      ports:
+        - "8081:8080"
+      networks:
+        - backend
+      restart: always
 
 networks:
   backend:
     name: backend
 
 volumes:
-  # node_modules_auth:
-  #   name: node_modules_auth
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: ${PWD}/auth/node_modules
+  node_modules_auth:
+    name: node_modules_auth
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/woumecht/Desktop/transcendence/auth/node_modules
   node_modules_front:
     name: node_modules_front
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${PWD}/frontend/node_modules
-  # node_modules_chat:
-  #   name: node_modules_chat
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: ${PWD}/chat/node_modules
-  node_modules_game:
-    name: node_modules_game
+      device: /home/woumecht/Desktop/transcendence/frontend/node_modules
+  node_modules_chat:
+    name: node_modules_chat
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ${PWD}/game/node_modules
-  # node_modules_profile:
-  #   name: node_modules_profile
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: ${PWD}/profile/node_modules
+      device: /home/woumecht/Desktop/transcendence/chat/node_modules
+  node_modules_profile:
+    name: node_modules_profile
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/woumecht/Desktop/transcendence/profile/node_modules

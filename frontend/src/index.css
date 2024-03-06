@@ -1,7 +1,8 @@
 /* @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities'; */
-
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,7 +19,9 @@ body {
   height: 100vh;
 }
 .custom-shadow {
-  box-shadow: 0 0 20px rgb(234, 144, 144);
+  /* box-shadow: 0 0 10px rgb(234, 144, 144); */
+  /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
+  /* box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px; */
 }
 
 code {
@@ -27,10 +30,15 @@ code {
 }
 :root 
 {
-    --main-color: #161A30;
-    --second-color: #31304D;
+    /* --main-color: #161A30; */
+    /* --second-color: #31304D;
     --third-color: #B6BBC4;
-    --fourth-color: #F0ECE5;
+    --fourth-color: #F0ECE5; */
+    
+    --Pandora: #b61282;
+    --Freax: #f5bc39;
+    --Commodore: #235a16;
+    --Bios: #02cdd1;
     /* --main-color: #2C2729; */
 }
 
