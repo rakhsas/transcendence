@@ -6,6 +6,7 @@ export default {
     "node_modules/flowbite-react/lib/esm/**/*.js",
     // "./node_modules/flowbite/**/*.js"
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -13,9 +14,13 @@ export default {
           dark: {
             SIDEMESSAGE: '#969eaa',
             MSGDATE: '#c0c7d2',
+            SPRUCE: '#1D1E22',
           },
           light: {
-            SPRUCE: '#1D1E22',
+            CLOUDWISP: '#E7F6FF',
+            COLDSTEEL: '#E3EDF8',
+            WHITE: '#FFFFFF',
+            WHITEBLUE: '#F5F6FA',
             FERN: '#3DBDA7',
             EGGSHELL: '#00453F',
             PUMPKIN: '#E86931'
@@ -26,6 +31,7 @@ export default {
     screens: {
       'lg': '1700px',
       'sm': '640px',
+      'new': '1200px',
       'md': '768px',
       'xs': '320px'
     },

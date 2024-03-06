@@ -4,3 +4,4 @@
 backend/config/.env
 .env
 TODO
+Makefile

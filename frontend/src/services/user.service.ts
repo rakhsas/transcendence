@@ -1,12 +1,13 @@
-import User from "../model/user.model";
+// import User from "../model/user.model";
 
 
 class UserService {
-    async getUser(userId: number): Promise<any> {
+    async getUser(userId: string): Promise<any> {
         try {
-            const response = await fetch(`http://localhost:3000/api/user/${userId}`, {
+        	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
+            const response = await fetch(APIURL + `user/${userId}`, {
                 method: 'GET',
-                credentials: "include"
+                credentials: 'include'
             });
             if (response.ok) {
                 const userData = await response.json();

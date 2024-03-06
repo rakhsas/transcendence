@@ -27,11 +27,11 @@ function DashboardComponent() {
 	}, []);
   return (
 	<DataContext.Provider value={userData}>
-		<div className="flex bg-main-light-SPRUCE h-lvh ">
+		<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 			<SidebarComponent />
 			<div className="overflow-auto  flex flex-col w-full">
 				<NavbarComponent />
-				<div className="m-2 flex flex-1  ">
+				<div className="flex flex-1">
 					<Outlet />
 				</div>
 			</div>

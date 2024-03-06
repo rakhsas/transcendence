@@ -1,14 +1,12 @@
 import "./HomePage.css";
 import Logo from "./../assets/Frame 1.png";
 import Google from "./../assets/icons8-google.svg";
-import Intra from "./../assets/favicon.ico"
+
 function HomePageComponent(): JSX.Element {
 	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 	async function loginWithIntra() {
 		window.location.href = APIURL + "auth/42/login";
 	}
-
-
 	return (
 		<>
 			<div className="dashboardContainer bg-auto sm:bg-center md:bg-center h-full">
@@ -37,7 +35,7 @@ function HomePageComponent(): JSX.Element {
 						<div className="ContinueWith text-white text-base font-semibold font-['Inter'] leading-snug">Continue with</div>
 						<div className="Plus w-6 h-6 p-1 justify-center items-center flex">
 							<div className="Group w-4 h-4 relative">
-								<img src={Intra} alt="" />
+								<img src="https://profile.intra.42.fr/assets/42_logo_black-684989d43d629b3c0ff6fd7e1157ee04db9bb7a73fba8ec4e01543d650a1c607.png" alt="" />
 							</div>
 						</div>
 					</div>
@@ -52,4 +50,70 @@ function HomePageComponent(): JSX.Element {
 	);
 }
 
-export default HomePageComponent;
+// import Logo from "./../assets/Frame 1.png";
+// import Google from "./../assets/icons8-google.svg";
+
+// const socket = io("http://localhost:3000/chat", {
+// 	query: {
+// 		recieverName: 'medo',
+// 	  },
+// });
+
+
+// interface Message {
+// 	from: number;
+// 	to: number;
+// 	content: string;
+//   }
+  
+//   const ChatComponent = () => {
+// 	const [messages, setMessages] = useState<Message[]>([]);
+// 	const [newMessage, setNewMessage] = useState({ from: 0, to: 1, content: '' });
+  
+// 	useEffect(() => {
+// 	  // Event handler for incoming messages
+// 	  socket.on('message', (message: Message) => {
+// 		setMessages((prevMessages) => [...prevMessages, message]);
+// 	  });
+  
+// 	  // Clean up the socket connection when the component unmounts
+// 	  return () => {
+// 		socket.disconnect();
+// 	  };
+// 	}, []);
+  
+// 	const sendMessage = () => {
+// 	  if (newMessage.content.trim() !== '') {
+// 		socket.emit('message', newMessage);
+// 		setNewMessage({ ...newMessage, content: '' }); // Clear the content after sending
+// 	  }
+// 	};
+  
+// 	return (
+// 	  <div>
+// 		<div>
+// 		  <h1>Real-time Chat</h1>
+// 		  <div style={{ height: '300px', overflowY: 'scroll', border: '1px solid #ccc', marginBottom: '10px' }}>
+// 			{messages.map((message, index) => (
+// 			  <div key={index}>
+// 				<p>From: {message.from}</p>
+// 				<p>To: {message.to}</p>
+// 				<p>Content: {message.content}</p>
+// 			  </div>
+// 			))}
+// 		  </div>
+// 		</div>
+// 		<div>
+// 		  <input
+// 			type="text"
+// 			value={newMessage.content}
+// 			onChange={(e) => setNewMessage({ ...newMessage, content: e.target.value })}
+// 			placeholder="Type your message..."
+// 		  />
+// 		  <button onClick={sendMessage}>Send</button>
+// 		</div>
+// 	  </div>
+// 	);
+//   };
+  
+  export default HomePageComponent;

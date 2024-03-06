@@ -1,35 +1,42 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config/dist';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-import { UserService } from './user/user.service';
 import { AuthModule } from './auth/auth.module'; 
-import { UserController } from './user/user.controller';
-import { AuthService } from './auth/auth.service';
-// import { ConfigModule } from '@nestjs/config';
-import { HttpModule } from '@nestjs/axios';
-
+import { ChatModule } from './chat/chat.module';
+import { Channel } from './user/entities/channel.entity';
+import { Friendship } from './user/entities/freindship.entity';
+import { Msg } from './user/entities/msg.entitiy';
+import { Mute } from './user/entities/mute.entity';
+import { User } from './user/entities/user.entity';
+import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
+import { ConfigModule } from '@nestjs/config';
+import { MessageController } from './user/message.controller';
+import { MessageService } from './user/message.service';
+import { Repository } from 'typeorm';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: 'config/.env',
-      isGlobal: true,
+      isGlobal: true
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.POSTGRES_HOST,
-      port: parseInt(process.env.DB_PORT,10),
-      username: process.env.POSTGRES_USER,
-      password: process.env.POSTGRES_PASSWORD,
-      database: process.env.POSTGRES_DATABASE,
+      host: 'postgres',
+      port: 5432,
+      username: 'postgres',
+      password: 'root',
+      database: 'db1',
       synchronize: true,
-      autoLoadEntities: true,
+      // logging: true,
+      entities: [User, Msg, Channel, Mute, Friendship, UserChannelRelationship],
+
     }),
     UserModule,
-    AuthModule
+    AuthModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
