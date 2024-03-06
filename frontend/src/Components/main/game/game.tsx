@@ -52,7 +52,7 @@ const GameModesCarousel: React.FC = () => {
                 nav={false}
                 dots={false}
                 className="owl-theme"
-                autoplay={false}
+                autoplay={true}
                 center
                 responsive={
                     {

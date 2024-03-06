@@ -2,7 +2,7 @@ import Game from './Game';
 import io, { Socket } from 'socket.io-client';
 import { useRef, useEffect } from 'react';
 
-const url: string = 'http://10.13.248.70:3002'; // URL of your backend
+const url: string = 'wss://10.14.51.220'; // URL of your backend
 
 const CanvasHeadToHead = (props: any) =>{
   const ref = useRef(null)
@@ -12,7 +12,23 @@ const CanvasHeadToHead = (props: any) =>{
     if(!canvas)
       return;
 
-    const socket: Socket = io(url);
+    
+	// useEffect(() => {
+	// 	const fetchData = async () => {
+	// 	  try {
+	// 		const authService = new AuthService();
+	// 		const fetchedPayloadData = await authService.getPayload();
+	// 		const userService = new UserService();
+	// 		const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
+	// 		setUserData(fetchedUserData);
+	// 	} catch (error) {
+	// 		console.error('Error fetching user ', error);
+	// 	  }
+	// 	};
+	// 	fetchData();
+	// }, []);const socket: Socket = io(url, {
+      path: "/sogame"
+    });
     new Game(canvas, socket);
 
     socket.on('connect', () => {

@@ -1,9 +1,0 @@
-
-# Custom hosts for Docker services
-127.0.0.1       traefik.localhost
-127.0.0.1       kong.localhost
-127.0.0.1       auth.localhost
-127.0.0.1       frontend.localhost
-127.0.0.1       chat.localhost
-127.0.0.1       profile.localhost
-127.0.0.1       game.localhost

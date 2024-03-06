@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt/dist";
-import { User } from "src/user/entities/user";
 
 @Injectable()
 
@@ -20,7 +19,7 @@ export class AuthService {
             return true;
         }
 
-    async generateAccessToken(user: User): Promise<string> {
+    async generateAccessToken(user: any): Promise<string> {
         const payload = {
             id: user.id,
             username: user.username,
@@ -36,6 +35,7 @@ export class AuthService {
         const authToken = this.getCookie('access_token', cookie);
         try {
             const authTokenPayload = await this.jwtService.verifyAsync(authToken, { secret: process.env.JWTSECRET });
+            console.log(authTokenPayload)
             return authTokenPayload;
         } catch (error) {
             console.error('Error decoding token:', error);

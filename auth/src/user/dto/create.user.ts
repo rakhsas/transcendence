@@ -1,96 +1,88 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsAlphanumeric, IsEmail, IsEnum, IsNotEmpty, IsString, Matches, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsString, MinLength, IsArray } from 'class-validator';
+import { Channel, Msg, Mute } from '../model/user.model';
 
 
-const passwordRegEx =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
 export class CreateUserDto {
-    @IsString()
-    @MinLength(3, {
-        message: 'ID must have at least 4 charactes.'
-    })
-    @IsNotEmpty()
-    @ApiProperty()
-    id: string;
 
     @IsString()
-    @MinLength(4, {
-        message: 'First name must have at least 4 charactes.'
-    })
+    @MinLength(4)
     @IsNotEmpty()
-    @ApiProperty()
     firstName: string;
-    
+
     @IsString()
-    @MinLength(4, {
-        message: 'Last name must have at least 4 charactes.'
-    })
+    @MinLength(4)
     @IsNotEmpty()
-    @ApiProperty()
     lastName: string;
-    
+
+    @IsNumber()
+    providerId: number;
+
     @IsString()
-    @MinLength(1, {
-        message: 'provider must have at least 4 charactes.'
-    })
+    @MinLength(1)
     @IsNotEmpty()
-    @ApiProperty()
     provider: string;
 
+    @IsString()
+    @MinLength(4)
     @IsNotEmpty()
-    @ApiProperty()
-    @MinLength(4, {
-        message: 'Username must have at least 4 characters.'
-    })
     username: string;
-    
+
+    @IsEmail()
     @IsNotEmpty()
-    @ApiProperty()
-    @IsEmail({ allow_display_name: true }, { message: 'Please provide valid Email.' })
     email: string;
-    
+
+    @IsString()
+    @MinLength(4)
     @IsNotEmpty()
-    @ApiProperty()
-    @MinLength(4, {
-        message: 'Picture must be Set'
-    })
     picture: string;
 
+    @IsString()
+    @MinLength(4)
     @IsNotEmpty()
-    @ApiProperty()
-    @MinLength(4, {
-        message: 'Coalition must be Set'
-    })
     coalition: string;
 
+    @IsString()
+    @MinLength(4)
     @IsNotEmpty()
-    @ApiProperty()
-    @MinLength(4, {
-        message: 'Coalition Picture must be Set'
-    })
     coalitionPic: string;
 
+    @IsString()
+    @MinLength(4)
     @IsNotEmpty()
-    @ApiProperty()
-    @MinLength(4, {
-        message: 'Coalition Cover must be Set'
-    })
     coalitionCover: string;
 
+    @IsString()
+    @MinLength(4)
     @IsNotEmpty()
-    @ApiProperty()
-    @MinLength(4, {
-        message: 'Coalition Color must be Set'
-    })
     coalitionColor: string;
-    // @IsNotEmpty()
-    // @ApiProperty()
-    // @Matches(passwordRegEx, { message: `Password too weak` })
-    // password: string;
-    
-    
-    // @IsString()
-    // @ApiProperty()
-    // @IsEnum(['f', 'm', 'u'])
-    // gender: string;
+
+    friends: number[];
+
+    adding: number[];
+
+    added: number[];
+
+    blocks: number[];
+
+    blocking: number[];
+
+    owner: Channel[];
+
+    admin: Channel[];
+
+    member: Channel[];
+
+    invited: Channel[];
+
+    chanBlocked: Channel[];
+
+    Muted: Mute[];
+
+    sendmessages: Msg[];
+
+    receivedMessages: Msg[];
+
+    // Add any missing properties here
+
 }
+

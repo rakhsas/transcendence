@@ -15,7 +15,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
         private readonly authService: AuthService
     ) {
         super({
-            callbackURL: 'http://localhost:3000/api/auth/42/callback',
+            callbackURL: process.env.FORTYTWO_CLIENT_CALLBACK_URL,
             clientID: process.env.FORTYTWO_CLIENT_ID,
             clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
         });
@@ -33,17 +33,16 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
             const lastName = profile?.name?.familyName;
             const picture = profile?._json.image?.link;
             const username = profile?.username;
-            const id = profile.id;
+            const providerId = profile.id;
             const provider = profile.provider;
-            var Object = await this.userService.findOne({ email, firstName, lastName, picture, username, id, provider });
+            var Object = await this.userService.findOne({ email, firstName, lastName, picture, username, providerId, provider});
             if (!Object) {
-                const coalitionObject = await this.userService.getCoalition(id, accessToken);
-                console.log(coalitionObject[0]);
+                const coalitionObject = await this.userService.getCoalition(providerId, accessToken);
                 const coalition = coalitionObject[0].name;
                 const coalitionPic = coalitionObject[0].image_url;
                 const coalitionCover = coalitionObject[0].cover_url;
                 const coalitionColor = coalitionObject[0].color;
-                const newUser = await this.userService.createUser({ email, firstName, lastName, picture, username, id, provider, coalition, coalitionPic, coalitionCover, coalitionColor });
+                const newUser = await this.userService.createUser({ email, firstName, lastName, picture, username, providerId, coalition, coalitionPic, coalitionCover, coalitionColor, provider });
                 Object = newUser;
             }
             const shortLivedAccessToken = await this.authService.generateAccessToken(Object.user);

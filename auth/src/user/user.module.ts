@@ -1,23 +1,27 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config/dist';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { Repository } from 'typeorm';
-import { HttpModule } from '@nestjs/axios';
+import { HttpModule, HttpService } from '@nestjs/axios';
 import { UserGuard } from './user.guard';
-import { AuthModule } from 'src/auth/auth.module';
 import { AuthService } from 'src/auth/auth.service';
-
+import { Repository } from 'typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { UserChannelRelationship } from './entities/user_channel_relation.entity';
+import { Mute } from './entities/mute.entity';
+import { Channel } from './entities/channel.entity';
+import { Msg } from './entities/msg.entitiy';
+import { Friendship } from './entities/freindship.entity';
+import { MessageService } from './message.service';
+import { MessageController } from './message.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Msg, Channel, Mute, Friendship, UserChannelRelationship]),
     HttpModule,
   ],
-  providers: [UserService, UserGuard, AuthService],
-  controllers: [UserController],
-  exports: [UserService]
+  providers: [UserService, UserGuard, AuthService, Repository, MessageService],
+  controllers: [UserController, MessageController],
+  exports: [UserService, MessageService]
 })
 export class UserModule {}

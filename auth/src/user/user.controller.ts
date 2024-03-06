@@ -34,15 +34,15 @@ export class UserController {
 		return await this.userService.viewUser(id);
 	}
 	
-	@Patch(':id')
-	@UseGuards(UserGuard)
-	UpdateUser(@Param('id') id: string, @Body() updatedUser: UpdateUserDto) {
-		return this.userService.updateUser(id, updatedUser);
-	}
+	// @Patch(':id')
+	// @UseGuards(UserGuard)
+	// UpdateUser(@Param('id') id: string, @Body() updatedUser: UpdateUserDto) {
+	// 	return this.userService.update(id, updatedUser);
+	// }
 	
-	@Delete(':id')
-	@UseGuards(UserGuard)
-	deleteUser(@Param('id') id: string) {
-		return this.userService.deleteUser(+id);
-	}
+	// @Delete(':id')
+	// @UseGuards(UserGuard)
+	// deleteUser(@Param('id') id: number) {
+	// 	return this.userService.deleteUser(+id);
+	// }
 }

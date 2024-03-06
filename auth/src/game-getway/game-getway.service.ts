@@ -9,11 +9,8 @@ import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({
-  cors: {
-    origin: [
-      'http://10.13.248.70:4200'
-    ],
-  },
+  cors: true,
+  path: '/sogame'
 })
 export class GameGetwayService {
   @WebSocketServer() server: Server = new Server();
