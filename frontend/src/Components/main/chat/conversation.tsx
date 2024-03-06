@@ -21,36 +21,37 @@ interface LatestMesg {
 }
 
 const ConversationArea: React.FC<data> = ({ latestMessages, latestGroupMessages, userData }) => {
+    console.log(latestMessages)
     // const friendsMap = new Map<string, LatestMesg>();
-    const [friendsData, setFriendsData] = useState<any[]>([]);
+    // const [friendsData, setFriendsData] = useState<any[]>([]);
     
-    useEffect(() => {
-        async function processFriendsData(): Promise<any[]> {
-            const userService = new UserService();
-            const friendsPromises = latestMessages.map(async (object) => {
-                try {
-                    let friend: User;
-                    if (object.recieverId === userData.id)
-                        friend = await userService.getUser(object.senderId);
-                    else
-                        friend = await userService.getUser(object.recieverId);
-                    return { friend: friend, latestMessage: object };
-                } catch (error) {
-                    console.error('Error Fetching friend data: ', error);
-                }
-            });
-            const friendsMap = await Promise.all(friendsPromises);
-            return friendsMap.filter(Boolean); // Remove any undefined values caused by errors
-        }
+    // useEffect(() => {
+    //     async function processFriendsData(): Promise<any[]> {
+    //         const userService = new UserService();
+    //         const friendsPromises = latestMessages.map(async (object) => {
+    //             try {
+    //                 let friend: User;
+    //                 if (object.recieverId === userData.id)
+    //                     friend = await userService.getUser(object.senderId);
+    //                 else
+    //                     friend = await userService.getUser(object.recieverId);
+    //                 return { friend: friend, latestMessage: object };
+    //             } catch (error) {
+    //                 console.error('Error Fetching friend data: ', error);
+    //             }
+    //         });
+    //         const friendsMap = await Promise.all(friendsPromises);
+    //         return friendsMap.filter(Boolean); // Remove any undefined values caused by errors
+    //     }
     
-        async function fetchDataAndProcessFriends() {
-            const data = await processFriendsData();
-            console.log('data: ', data);
-            setFriendsData(data);
-        }
+    //     async function fetchDataAndProcessFriends() {
+    //         const data = await processFriendsData();
+    //         console.log('data: ', data);
+    //         setFriendsData(data);
+    //     }
     
-        fetchDataAndProcessFriends();
-    }, [latestMessages, userData]);
+    //     fetchDataAndProcessFriends();
+    // }, [latestMessages, userData]);
     // console.log('friendsData: ', friendsData);
     // fetchDataAndProcessFriends();
     return (

@@ -29,13 +29,13 @@ function App() {
               (<DashboardComponent />) : (<Navigate to="/" replace />)
           }
         />
-        <Route index element={<HomeComponent />} />
-        {/* <Route path="analytics" element={<AnalyticsComponent />} />
-        <Route path="chat" Component={chatComponent} />
-        <Route path="call" element={<CallComponent />} />
-        <Route path="/login" element={<ValidInformation />} />
-        <Route path="/game" element={<Game />} />
-        <Route path="/HeadToHead" element={<HeadToHead />} /> */}
+        <Route index                element={<HomeComponent />} />
+        <Route path="analytics"     element={<AnalyticsComponent />} />
+        <Route path="chat"          Component={chatComponent} />
+        <Route path="call"          element={<CallComponent />} />
+        <Route path="/login"        element={<ValidInformation />} />
+        <Route path="/game"         element={<Game />} />
+        <Route path="/HeadToHead"   element={<HeadToHead />} />
       </Routes>
     </>
   );

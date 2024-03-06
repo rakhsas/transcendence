@@ -11,22 +11,8 @@ const CanvasHeadToHead = (props: any) =>{
     const canvas = ref.current;
     if(!canvas)
       return;
-
     
-	// useEffect(() => {
-	// 	const fetchData = async () => {
-	// 	  try {
-	// 		const authService = new AuthService();
-	// 		const fetchedPayloadData = await authService.getPayload();
-	// 		const userService = new UserService();
-	// 		const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
-	// 		setUserData(fetchedUserData);
-	// 	} catch (error) {
-	// 		console.error('Error fetching user ', error);
-	// 	  }
-	// 	};
-	// 	fetchData();
-	// }, []);const socket: Socket = io(url, {
+  const socket: Socket = io(url, {
       path: "/sogame"
     });
     new Game(canvas, socket);
