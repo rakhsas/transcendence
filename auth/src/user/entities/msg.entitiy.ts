@@ -23,8 +23,8 @@ export class Msg {
   @Column()
   message: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  // @CreateDateColumn()
+  // createdAt: Date;
 
   
   // updatedAt: Date;
@@ -37,7 +37,7 @@ export class Msg {
   senderId: string;
   
   @ManyToOne(() => User, (user) => user.receivedMessages, {lazy: true})
-  @JoinColumn({ name: 'rec_id' })
+  @JoinColumn({ name: 'recieverId' })
   receiver: Promise<User>;
   
   
@@ -57,14 +57,14 @@ export class Msg {
   @Column({ nullable: true })
   img: string;
 
-  @Column({ nullable: true })
-  profile: string;
+  // @Column({ nullable: true })
+  // profile: string;
 
-  @Column({ nullable: true })
-  username: string;
+  // @Column({ nullable: true })
+  // username: string;
 
-  @Column({ nullable: true })
-  recieverUserName: string;
+  // @Column({ nullable: true })
+  // recieverUserName: string;
 
 
 }

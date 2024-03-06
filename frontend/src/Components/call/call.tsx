@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import io, { Socket } from 'socket.io-client';
 
-const url: string = "wss://10.13.249.229";
+const url: string = "wss://10.14.58.42";
 function CallComponent() {
     // const [socket, setSocket] = useState<Socket | null>(null);
     // const [selectedUser, setSelectedUser] = useState<string | null>(null);

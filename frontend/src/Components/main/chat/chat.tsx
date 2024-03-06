@@ -14,7 +14,8 @@ import MessageService from "../../../services/message.service";
 function chatComponent(): JSX.Element {
     const [MESSAGES, setMESSAGES] = useState<messageUser1[][]>(messages);
     const [selectedColor, setSelectedColor] = useState("black");
-    const [selectedMessageIndex, setSelectedMessageIndex] = useState(0);
+    const [selectedMessageIndex, setSelectedMessageIndex] = useState('');
+    // const [selectedMessageIndex, setSelectedMessageIndex] = useState(0);
     const [message, setMessage] = useState('');
     const [modalPicPath, setModalPicPath] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,56 +33,56 @@ function chatComponent(): JSX.Element {
 		};
 		fetchData();
 	}, []);
-    console.warn("latestMessages", latestMessages)
+    // console.warn("latestMessages", latestMessages)
     // return(
     //     <>
     //         <LoadingComponent />;
     //     </>
     //     );
-    // const userData = useContext(DataContext);
-    // if (!userData) {
-    //     return <LoadingComponent />;
+    const userData = useContext(DataContext);
+    if (!userData) {
+        return <LoadingComponent />;
+    }
+    // const userData = {
+    //     id: 1,
+    //     username: "John Doe",
+    //     picture: "https://randomuser"
     // }
-    const userData = {
-        id: 1,
-        username: "John Doe",
-        picture: "https://randomuser"
-    }
-    function userLastMessageIndex(): number
-    {
-        return MESSAGES[selectedMessageIndex].findLastIndex(
-        (message) => Number(message.sender) === userData.id);
-    }
+    // function userLastMessageIndex(): string
+    // {
+    //     return latestMessages.find(selectedMessageIndex).findLastIndex(
+    //     (message) => Number(message.sender) === userData.id);
+    // }
     // const lastUserMessageIndex = MESSAGES[selectedMessageIndex].findLastIndex(
     //     (message) => Number(message.sender) === userData.id
     // );
     const lastUserMessageIndex = 0;
     console.log("lastUserMessageIndex", lastUserMessageIndex)
     // setLastMessageIndex(userLastMessageIndex())
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const newMessage: messageUser1 = {
-            sender: userData.id.toString(),
-            profile: userData.picture,
-            date: new Date().toDateString(),
-            username: userData.username,
-            message: message,
-            img: '',
-            recieverId: 0,
-            recieverUserName: ''
-        };
-        // MESSAGES[selectedMessageIndex].push(newMessage); // This is not a good practice, but it's a quick fix
-        const updatedMessages = [...MESSAGES]; // create a copy of the MESSAGES
-        updatedMessages[selectedMessageIndex].push(newMessage); // add the new message to the copy
-        setMESSAGES(updatedMessages); // update the state with the new messages
-        setMessage(''); // clear the message input
-        setLastMessageIndex(userLastMessageIndex());
-        console.log("lastMessageIndex", lastMessageIndex)
-    };
+    // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    //     event.preventDefault();
+    //     const newMessage: messageUser1 = {
+    //         sender: userData.id.toString(),
+    //         profile: userData.picture,
+    //         date: new Date().toDateString(),
+    //         username: userData.username,
+    //         message: message,
+    //         img: '',
+    //         recieverId: 0,
+    //         recieverUserName: ''
+    //     };
+    //     // MESSAGES[selectedMessageIndex].push(newMessage); // This is not a good practice, but it's a quick fix
+    //     const updatedMessages = [...MESSAGES]; // create a copy of the MESSAGES
+    //     updatedMessages[selectedMessageIndex].push(newMessage); // add the new message to the copy
+    //     setMESSAGES(updatedMessages); // update the state with the new messages
+    //     setMessage(''); // clear the message input
+    //     setLastMessageIndex(userLastMessageIndex());
+    //     console.log("lastMessageIndex", lastMessageIndex)
+    // };
 
-    const handleSelectMessage = (index: number) => {
-        setSelectedMessageIndex(index);
-    };
+    // const handleSelectMessage = (index: number) => {
+    //     setSelectedMessageIndex(index);
+    // };
 
     const handleSelectedColor = (color: string) => {
         setSelectedColor(color);
@@ -99,7 +100,7 @@ function chatComponent(): JSX.Element {
         <>
             <div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
                 <div className="conversation-area border-r-[1px] dark:border-gray-700 border-black">
-                    {ConversationArea({ latestMessages, latestGroupMessages, selectedMessageIndex, handleSelectMessage })}
+                    {ConversationArea({ latestMessages, latestGroupMessages, userData })}
                 </div>
                 {/* <div className="chat-area  flex flex-col overflow-hidden flex-1">
                     <div className="flex-1 overflow-hidden">

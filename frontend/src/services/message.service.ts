@@ -3,14 +3,14 @@ class MessageService {
         try {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
             console.log(APIURL);
-            const response = await fetch("https://10.13.249.229/api/messages", 
-            // const response = await fetch(APIURL + `messages`, 
+            // const response = await fetch("https://10.13.249.229/api/messages", 
+            const response = await fetch(APIURL + `messages`, 
             // {
             //     method: 'GET',
             //     credentials: 'include'
             // }
             );
-            console.log(response);
+            // console.log(response);
             if (response.ok) {
                 const messages = await response.json();
                 return messages;
@@ -31,6 +31,7 @@ class MessageService {
             throw error;
         }
     }
+    
 }
 
 export default MessageService;

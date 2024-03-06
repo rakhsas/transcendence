@@ -1,10 +1,18 @@
 interface messageUser {
-    profile: string;
-    username: string;
+    // profile: string;
+    // username: string;
+    // message: string;
+    // date: string;
+    // status: string;
+    recieverId: string;
+    senderId: string;
+    img: string;
     message: string;
+    cid: number;
     date: string;
-    status: string;
+    id: number;
 }
+
 interface messageUser1 {
     sender: string;
     message: string;
