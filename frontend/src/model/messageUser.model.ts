@@ -1,7 +1,7 @@
 import User from "./user.model";
 
 interface messageUser {
-    // profile: string;
+    profile: string;
     // username: string;
     // message: string;
     // date: string;

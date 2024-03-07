@@ -2,7 +2,7 @@ import Game from './Game';
 import io, { Socket } from 'socket.io-client';
 import { useRef, useEffect } from 'react';
 
-const url: string = 'wss://10.14.51.220'; // URL of your backend
+const url: string = 'wss://' + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
 const CanvasHeadToHead = (props: any) =>{
   const ref = useRef(null)

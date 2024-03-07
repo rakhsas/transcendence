@@ -1,5 +1,5 @@
 import { useState } from "react";
-import messageUser from "../../../model/messageUser.model";
+import {messageUser} from "../../../model/messageUser.model";
 import { Dropdown } from "flowbite-react";
 import ModalComponent from "../../../utils/modal.component";
 import { messages } from "../../../utils/data";

@@ -5,7 +5,7 @@ import LoadingComponent from "../../shared/loading/loading";
 import { TextInput } from "flowbite-react";
 import { inputTheme } from "../../../utils/themes";
 import ConversationArea from "./conversation";
-import { latestGroupMessages, messages } from "../../../utils/data";
+// import { latestGroupMessages, messages } from "../../../utils/data";
 import DetailsArea from "./details";
 import ModalComponent from "../../../utils/modal.component";
 import { messageUser, messageUser1 } from "../../../model/messageUser.model";
@@ -37,6 +37,7 @@ function chatComponent(): JSX.Element {
     if (!userData) {
         return <LoadingComponent />;
     }
+    const latestGroupMessages: any = [];
     // const userData = {
     //     id: 1,
     //     username: "John Doe",
