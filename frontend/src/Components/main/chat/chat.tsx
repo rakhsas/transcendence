@@ -9,6 +9,7 @@ import { latestGroupMessages, latestMessages, messages } from "../../../utils/da
 import DetailsArea from "./details";
 import ModalComponent from "../../../utils/modal.component";
 import { messageUser1 } from "../../../model/messageUser.model";
+import { io } from "socket.io-client";
 
 function chatComponent(): JSX.Element {
     const [MESSAGES, setMESSAGES] = useState<messageUser1[][]>(messages);
@@ -37,6 +38,16 @@ function chatComponent(): JSX.Element {
     );
     console.log("lastUserMessageIndex", lastUserMessageIndex)
     // setLastMessageIndex(userLastMessageIndex())
+
+    // create new socket from socket client ------
+
+    const socket = io("http://localhost:3000", {
+        query: {
+            recieverName: 'woumecht'
+        },
+        path: '/chat',
+    });
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const newMessage: messageUser1 = {
@@ -56,6 +67,12 @@ function chatComponent(): JSX.Element {
         setMessage(''); // clear the message input
         setLastMessageIndex(userLastMessageIndex());
         console.log("lastMessageIndex", lastMessageIndex)
+
+        socket.emit('message', {
+            to: "496472ba-d430-44de-9824-fa033f61fb01",
+            from: "496472ba-d430-44de-9824-fa033f61fb03",
+            content: "hello from fronend",
+        });
     };
 
     const handleSelectMessage = (index: number) => {
@@ -74,6 +91,7 @@ function chatComponent(): JSX.Element {
     const onCloseModal = () => {
         setIsModalOpen(false);
     };
+    socket.on("message", )
     return (
         <>
             <div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">

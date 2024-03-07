@@ -135,7 +135,7 @@ export class ChatService {
       await this.UserChannelRelation.delete(targetedEntity);
     }
     else
-      console.log("the user in channel-user relation is not found");
+      console.log("the user in channel-user relation is not found!!!");
   }
 }
 

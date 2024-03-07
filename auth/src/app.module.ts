@@ -12,6 +12,7 @@ import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
 import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
 import { ConfigModule } from '@nestjs/config';
+import { FreindsModule } from './friends/friends.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ConfigModule } from '@nestjs/config';
     UserModule,
     AuthModule,
     ChatModule,
+    FreindsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

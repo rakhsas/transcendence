@@ -15,11 +15,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
   handleConnection(client: Socket) {
-    const recieverName = String(client.handshake.query.recieverName);
-    this.connectedUsers.set(recieverName, client);
-    console.log("socket id: " + client.id);
-    console.log("client: " + client);
-    console.log("map size: " + this.connectedUsers.size);
+    const userName = String(client.handshake.query.userName);
+    this.connectedUsers.set(userName, client);
+    // console.log("socket id: " + client.id);
+    // console.log("client: " + client);
+    // console.log("map size: " + this.connectedUsers.size);
     // added lines
     // console.log('A user connected');
     // console.log('client id: ' + client.id);
@@ -56,7 +56,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
    // you can put the blocked code here {if they are blocked they can't send messages}.
     if (payload.hasOwnProperty('to'))
     {
-      const recieverName = String(client.handshake.query.recieverName);
+      const recieverName = String(payload.recieverName);
       const toUserSocket = this.connectedUsers.get(recieverName);
       if (toUserSocket)
       {
@@ -124,5 +124,4 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.chatService.kickUserFromChannel(payload);
   }
 }
-
 

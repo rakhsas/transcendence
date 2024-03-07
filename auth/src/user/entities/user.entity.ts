@@ -27,7 +27,6 @@ export class User {
   @Column()
   providerId: string;
 
-
   @CreateDateColumn()
   createdAt: Date;
 
@@ -64,7 +63,6 @@ export class User {
   @Column({ nullable: false, unique: true })
   username: string;
 
-  // friends     Int[]
   @Column('uuid', { array: true, default: [] })
   adding: string[];
 
@@ -76,28 +74,6 @@ export class User {
 
   @Column('uuid', { array: true, default: [] })
   blocking: string[];
-
-  // blocked     Int[] // ...
-
-  // @OneToMany(() => Channel, (channel) => channel.owners, { lazy: true })
-  // owner: Promise<Channel[]>;
-
-  // @ManyToMany(() => Channel, (channel) => channel.admins, { lazy: true })
-  // @JoinTable()
-  // admin: Promise<Channel[]>;
-
-  // @ManyToMany(() => Channel, (channel) => channel.members, { lazy: true })
-  // @JoinTable()
-  // member: Promise<Channel[]>;
-
-  // @ManyToMany(() => Channel, (channel) => channel.inviteds, { lazy: true })
-  // @JoinTable()
-  // invited: Promise<Channel[]>;
-
-  // @ManyToMany(() => Channel, (channel) => channel.blocked, { lazy: true })
-  // @JoinTable()
-  // chanBlocked: Promise<Channel[]>;
-
   
   @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true })
   Muted: Promise<Mute[]>;
@@ -108,17 +84,12 @@ export class User {
   @OneToMany(() => Msg, (msg) => msg.receiver, { lazy: true })
   receivedMessages: Promise<Msg[]>;
 
-  @OneToMany(() => Friendship, friend => friend.user, {lazy: true})
-  friends: Promise<Friendship[]>;
-
-  @OneToMany(() => Friendship, friend => friend.friend, { lazy: true})
-  friendOf: Promise<Friendship[]>;
-
-  // @OneToMany(() => Friendship, (friendship) => friendship.user, { lazy: true })
-  // friendsUser: Promise<Friendship[]>;
-
-  // @OneToMany(() => Friendship, (friendship) => friendship.friend, { lazy: true })
-  // userFriends: Promise<Friendship[]>;
+  @ManyToMany(() => Friendship, friendship => friendship.friends)
+  @JoinTable()
+  friends: Friendship[];
+  
+  @ManyToMany(() => Friendship, (friendship) => friendship.friendOf) // New relationship
+  friendOf: User[]; // Array of User objects representing users who befriended this user
 
   @BeforeInsert()
   generateUUID() {
