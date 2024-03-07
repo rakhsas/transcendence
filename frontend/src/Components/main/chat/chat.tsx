@@ -5,14 +5,14 @@ import LoadingComponent from "../../shared/loading/loading";
 import { TextInput } from "flowbite-react";
 import { inputTheme } from "../../../utils/themes";
 import ConversationArea from "./conversation";
-import { latestGroupMessages, messages } from "../../../utils/data";
+// import { latestGroupMessages, messages } from "../../../utils/data";
 import DetailsArea from "./details";
 import ModalComponent from "../../../utils/modal.component";
-import { messageUser1 } from "../../../model/messageUser.model";
+import { messageUser, messageUser1 } from "../../../model/messageUser.model";
 import MessageService from "../../../services/message.service";
 
 function chatComponent(): JSX.Element {
-    const [MESSAGES, setMESSAGES] = useState<messageUser1[][]>(messages);
+    // const [MESSAGES, setMESSAGES] = useState<messageUser1[][]>(messages);
     const [selectedColor, setSelectedColor] = useState("black");
     const [selectedMessageIndex, setSelectedMessageIndex] = useState('');
     // const [selectedMessageIndex, setSelectedMessageIndex] = useState(0);
@@ -21,10 +21,10 @@ function chatComponent(): JSX.Element {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [lastMessageIndex, setLastMessageIndex] = useState(-1);
     const [latestMessages, setLatestMessages] = useState<any[]>([]);
+    const messageService = new MessageService();
     useEffect(() => {
 		const fetchData = async () => {
 		  try {
-            const messageService = new MessageService();
 			const fetchedUserData = await messageService.latestMessages();
 			setLatestMessages(fetchedUserData);
 		} catch (error) {
@@ -33,16 +33,11 @@ function chatComponent(): JSX.Element {
 		};
 		fetchData();
 	}, []);
-    // console.warn("latestMessages", latestMessages)
-    // return(
-    //     <>
-    //         <LoadingComponent />;
-    //     </>
-    //     );
     const userData = useContext(DataContext);
     if (!userData) {
         return <LoadingComponent />;
     }
+    const latestGroupMessages: any = [];
     // const userData = {
     //     id: 1,
     //     username: "John Doe",
@@ -56,8 +51,8 @@ function chatComponent(): JSX.Element {
     // const lastUserMessageIndex = MESSAGES[selectedMessageIndex].findLastIndex(
     //     (message) => Number(message.sender) === userData.id
     // );
-    const lastUserMessageIndex = 0;
-    console.log("lastUserMessageIndex", lastUserMessageIndex)
+    // const lastUserMessageIndex = 0;
+    // console.log("lastUserMessageIndex", lastUserMessageIndex)
     // setLastMessageIndex(userLastMessageIndex())
     // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     //     event.preventDefault();
@@ -79,10 +74,12 @@ function chatComponent(): JSX.Element {
     //     setLastMessageIndex(userLastMessageIndex());
     //     console.log("lastMessageIndex", lastMessageIndex)
     // };
-
-    // const handleSelectMessage = (index: number) => {
-    //     setSelectedMessageIndex(index);
-    // };
+    var messages: messageUser[] = [];
+    const handleSelectMessage = async (index: string, friendId: string) => {
+        setSelectedMessageIndex(index);
+        messages = await messageService.getMessages(friendId);
+        console.log("messages", messages);
+    };
 
     const handleSelectedColor = (color: string) => {
         setSelectedColor(color);
@@ -100,14 +97,14 @@ function chatComponent(): JSX.Element {
         <>
             <div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
                 <div className="conversation-area border-r-[1px] dark:border-gray-700 border-black">
-                    {ConversationArea({ latestMessages, latestGroupMessages, userData })}
+                    {ConversationArea({ latestMessages, selectedMessageIndex, latestGroupMessages, handleSelectMessage, userData })}
                 </div>
                 {/* <div className="chat-area  flex flex-col overflow-hidden flex-1">
                     <div className="flex-1 overflow-hidden">
                         <div className="chat-area-header flex sticky top-0 left-0 z-10 overflow-hidden w-full items-center justify-between p-5 bg-zinc-800">
                             <div className="flex flex-row items-center space-x-2">
                                 <div className="msg-profile group">
-                                    <img src={latestMessages[selectedMessageIndex].profile} alt="" />
+                                    <img src={latestMessages[].profile} alt="" />
                                 </div>
                                 <div className="font-onest text-xl capitalize">{latestMessages[selectedMessageIndex].username}</div>
                             </div>
