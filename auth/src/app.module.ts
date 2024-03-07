@@ -15,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MessageController } from './user/message.controller';
 import { MessageService } from './user/message.service';
 import { Repository } from 'typeorm';
+import { GameGetwayModule } from './game-getway/game-getway.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { Repository } from 'typeorm';
     UserModule,
     AuthModule,
     ChatModule,
+    GameGetwayModule
   ],
   controllers: [AppController],
   providers: [AppService],
