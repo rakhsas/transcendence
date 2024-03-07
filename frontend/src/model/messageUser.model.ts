@@ -1,5 +1,7 @@
+import User from "./user.model";
+
 interface messageUser {
-    // profile: string;
+    profile: string;
     // username: string;
     // message: string;
     // date: string;
@@ -11,6 +13,8 @@ interface messageUser {
     cid: number;
     date: string;
     id: number;
+    __receiver__: User;
+    __owner__: User;
 }
 
 interface messageUser1 {
