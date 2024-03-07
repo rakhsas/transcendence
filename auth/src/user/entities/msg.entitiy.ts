@@ -22,12 +22,6 @@ export class Msg {
 
   @Column()
   message: string;
-
-  // @CreateDateColumn()
-  // createdAt: Date;
-
-  
-  // updatedAt: Date;
   
   @ManyToOne(() => User, (user) => user.sendmessages, {lazy: true})
   @JoinColumn({ name: 'senderId' })
@@ -38,7 +32,7 @@ export class Msg {
   
   @ManyToOne(() => User, (user) => user.receivedMessages, {lazy: true})
   @JoinColumn({ name: 'recieverId' })
-  receiver: Promise<User>;
+  reciever: Promise<User>;
   
   
   @ManyToOne(() => Channel, (channel) => channel.messages, {lazy: true})
@@ -56,15 +50,5 @@ export class Msg {
 
   @Column({ nullable: true })
   img: string;
-
-  // @Column({ nullable: true })
-  // profile: string;
-
-  // @Column({ nullable: true })
-  // username: string;
-
-  // @Column({ nullable: true })
-  // recieverUserName: string;
-
 
 }

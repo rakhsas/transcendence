@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import io, { Socket } from 'socket.io-client';
 
-const url: string = "wss://10.14.58.42";
+const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL;
 function CallComponent() {
     // const [socket, setSocket] = useState<Socket | null>(null);
     // const [selectedUser, setSelectedUser] = useState<string | null>(null);
