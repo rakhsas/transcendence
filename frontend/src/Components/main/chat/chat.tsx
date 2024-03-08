@@ -63,12 +63,12 @@ function chatComponent(): JSX.Element {
 
     // create new socket from socket client ------
 
-    const socket = io("http://localhost:3000", {
-        query: {
-            recieverName: 'woumecht'
-        },
-        path: '/chat',
-    });
+    // const socket = io("http://localhost:3000", {
+    //     query: {
+    //         recieverName: 'woumecht'
+    //     },
+    //     path: '/chat',
+    // });
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
