@@ -43,6 +43,9 @@ export class Msg {
   @Column({nullable: true})
   rec_id: string;
 
+  @Column({default: false})
+  isDM: boolean
+
   @ManyToOne(() => Channel, (channel) => channel.messages, {lazy: true})
   @JoinColumn({ name: 'cid' })
   channel: Promise<Channel>;

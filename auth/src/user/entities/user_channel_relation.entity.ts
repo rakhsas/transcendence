@@ -30,9 +30,6 @@ export class UserChannelRelationship {
   })
   role: UserRole;
 
-  // @Column()
-  // role: string; // Admin, Member, Invited, Blocked, etc.
-
   @Column({default: false})
   isAllowed: boolean // true if the user allowed to send message false if not.
 }

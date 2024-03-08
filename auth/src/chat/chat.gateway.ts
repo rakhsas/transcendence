@@ -48,13 +48,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // Handle disconnection (e.g., remove user from room)
   }
-  
-  
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
    // you can put the blocked code here {if they are blocked they can't send messages}.
-    if (payload.hasOwnProperty('to'))
+    if (payload.hasOwnProperty('recieverName'))
     {
       const recieverName = String(payload.recieverName);
       const toUserSocket = this.connectedUsers.get(recieverName);
@@ -62,7 +60,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       {
         // you can put here the logic of blocked users and send Error message in the socket arguments. 
         // The code goes here ...
-        
+
+
         toUserSocket.emit('message', {
           "to": payload.to,
           "from": payload.from,
@@ -97,7 +96,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       offer: payload.offer
     });
   };
-  
+
   @SubscribeMessage('mediaAnswer')
   async handleOnMediaAnswer(client: Socket, payload: any) {
     client.to(payload.to).emit('mediaAnswer', {
@@ -118,7 +117,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('kickTheUser')
   async handleEvent(socket: Socket, payload: any): Promise<void> {
-    // in this event handler i am excpected to get the id of the user to 
+    // in this event handler i am excpected to get the id of the user to
     // kick and the id of the channe from where the user will be kicked.
     socket.leave(payload.channelId);
     await this.chatService.kickUserFromChannel(payload);
