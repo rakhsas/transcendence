@@ -13,7 +13,7 @@ interface messageUser {
     cid: number;
     date: string;
     id: number;
-    __receiver__: User;
+    __reciever__: User;
     __owner__: User;
 }
 

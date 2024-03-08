@@ -3,18 +3,22 @@ import { Msg } from "./entities/msg.entitiy";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { HttpService } from "@nestjs/axios";
+import { Friendship } from "./entities/freindship.entity";
+import { User } from "./model/user.model";
 
 @Injectable()
 
 export class MessageService {
     constructor(
         @InjectRepository(Msg) private readonly messageRepository: Repository<Msg>,
-		// private readonly http: HttpService,
-    ) {}
+        @InjectRepository(Friendship) private readonly friendShipRepository: Repository<Friendship>,
+        @InjectRepository(User) private readonly userRepository: Repository<User>,
+        // private readonly http: HttpService,
+    ) { }
 
     async latestMessages(): Promise<Msg[]> {
         return await this.messageRepository.find({
-            relations: ['owner', 'receiver', 'channel'],
+            relations: ['owner', 'reciever', 'channel'],
         });
     }
 
@@ -22,17 +26,37 @@ export class MessageService {
         return await this.messageRepository.find({
             where: [
                 { senderId: senderId, recieverId: recieverId },
-                { senderId: recieverId, recieverId: senderId}
+                { senderId: recieverId, recieverId: senderId }
             ],
-            // relations: ['owner', 'receiver', 'channel'],
+            relations: ['owner', 'reciever', 'channel'],
         });
     }
 
-    async getLastMessagesOfUsers(): Promise<Msg[]> {
-        return this.messageRepository
-        .createQueryBuilder('msg')
-        .select('DISTINCT ON (msg.owner, msg.receiver) msg.*')
-        .orderBy('msg.owner, msg.receiver, msg.date', 'DESC')
-        .getMany();
+    async getLastMessagesOfUsers(userid: string): Promise<Msg[]> {
+        const friendships = await this.friendShipRepository.find({ where: [
+            { user: { id: userid }},
+            { friend: {id: userid }}
+        ], relations: ['friend'] });
+        const lastMessagesPromises = friendships.map(async (friendship) => {
+            const friend = await friendship.friend;
+            const user = await friendship.user;
+            console.log("friend: ", friend);
+            console.log("user: ", await friendship.user);
+            const lastMessage = await this.messageRepository.findOne({
+                where: [
+                    { senderId: user.id, recieverId: friend.id },
+                    { senderId: friend.id, recieverId: user.id}
+                ],
+                order: { date: 'DESC' },
+                relations: ['owner', 'reciever', 'channel']
+            });
+            return lastMessage;
+        });
+    
+        return Promise.all(lastMessagesPromises);
     }
+
+    // async getMessa   ges(userId: string, friendId: string): Promise<Msg[]> {
+
+    // }
 }
