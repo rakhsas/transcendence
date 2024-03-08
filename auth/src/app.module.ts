@@ -13,6 +13,10 @@ import { User } from './user/entities/user.entity';
 import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
 import { ConfigModule } from '@nestjs/config';
 import { FreindsModule } from './friends/friends.module';
+import { MessageController } from './user/message.controller';
+import { MessageService } from './user/message.service';
+import { Repository } from 'typeorm';
+import { GameGetwayModule } from './game-getway/game-getway.module';
 
 @Module({
   imports: [
@@ -36,6 +40,7 @@ import { FreindsModule } from './friends/friends.module';
     AuthModule,
     ChatModule,
     FreindsModule,
+    GameGetwayModule
   ],
   controllers: [AppController],
   providers: [AppService],

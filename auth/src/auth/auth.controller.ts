@@ -36,7 +36,7 @@ export class AuthController {
         //     providerAccessToken,
         //     firstLogin
         // }
-        res.redirect(`https://127.0.0.1/dashboard`)
+        res.redirect(process.env.FRONT_URL);
     }
 
     @Get('github/login')

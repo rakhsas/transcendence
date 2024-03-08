@@ -5,9 +5,9 @@ import { ChatService } from './chat.service';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
-@WebSocketGateway({cors: true, path: '/chat'})
+@WebSocketGateway({cors: true, path: '/chat', methods: ['GET', 'POST']})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  // @WebSocketServer() server: Server;
+  @WebSocketServer() server: Server;
   usersArray = [];
   peerConnections: { [userId: string]: RTCPeerConnection } = {};
   
@@ -24,29 +24,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // console.log('A user connected');
     // console.log('client id: ' + client.id);
     this.usersArray.push(client.id);
-    console.log(this.usersArray.length);
-    client.broadcast.emit('update-user-list', { userIds: this.usersArray });
-    // Handle initial connection (e.g., send list of available rooms)
+    // client.emit('update-user-list', { userIds: this.usersArray });
+    client.emit('update-user-list', { userIds: this.usersArray });
+    // const users = this.usersArray.filter(id => id !== client.id);
+    // client.broadcast.emit('update-user-list', { userIds: users });
+    this.server.emit('update-user-list', { userIds: this.usersArray });
+    // console.log(this.usersArray);
   }
   
   handleDisconnect(client: Socket) {
     // throw new Error('Method not implemented.');
-    const userName = String(client.handshake.query.userName);
-    this.connectedUsers.delete(userName);
+    // const userName = String(client.handshake.query.userName);
+    // this.connectedUsers.delete(userName);
     // console.log('A user disconnected');
     // console.log('client id: ' + client.id);
     if (this.peerConnections[client.id]) {
       this.peerConnections[client.id].close();
       delete this.peerConnections[client.id];
     }
-    console.log('A user disconnected');
+    // console.log('A user disconnected');
     this.usersArray = this.usersArray.filter(id => id !== client.id);
     client.broadcast.emit('update-user-list', { userIds: this.usersArray});
     client.broadcast.emit('user-disconnected', { userId: client.id });
     const recieverName = String(client.handshake.query.recieverName);
     this.connectedUsers.delete(recieverName);
-
-    // Handle disconnection (e.g., remove user from room)
   }
 
   @SubscribeMessage('message')
@@ -115,6 +116,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+  @SubscribeMessage('callUser')
+  async handleCallUser(client: Socket, payload: any)
+  {
+    console.log('callUser');
+    client.to(payload.to).emit('RequestCall', {
+      from: payload.from,
+      offer: payload.offer
+    });
+  }
+
+  @SubscribeMessage('acceptCall')
+  async handleAcceptCall(client: Socket, payload: any)
+  {
+    console.log('acceptCall');
+    client.to(payload.to).emit('AcceptCall', {
+      answer: payload.answer,
+      from: payload.from
+    });
+  }
   @SubscribeMessage('kickTheUser')
   async handleEvent(socket: Socket, payload: any): Promise<void> {
     // in this event handler i am excpected to get the id of the user to

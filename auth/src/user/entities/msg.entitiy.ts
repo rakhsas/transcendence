@@ -21,24 +21,18 @@ export class Msg {
   id: number;
 
   @Column()
-  msg: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
+  message: string;
+  
   @ManyToOne(() => User, (user) => user.sendmessages, {lazy: true})
   @JoinColumn({ name: 'senderId' })
   owner: Promise<User>;
-
+  
   @Column()
   senderId: string;
-
+  
   @ManyToOne(() => User, (user) => user.receivedMessages, {lazy: true})
-  @JoinColumn({ name: 'rec_id' })
-  receiver: Promise<User>;
+  @JoinColumn({ name: 'recieverId' })
+  reciever: Promise<User>;
 
   @Column({nullable: true})
   rec_id: string;
@@ -46,10 +40,22 @@ export class Msg {
   @Column({default: false})
   isDM: boolean
 
+  
+  
   @ManyToOne(() => Channel, (channel) => channel.messages, {lazy: true})
   @JoinColumn({ name: 'cid' })
   channel: Promise<Channel>;
-
+  
   @Column({ nullable: true })
   cid: number;
+
+  @UpdateDateColumn()
+  date: string;
+  
+  @Column({nullable: true})
+  recieverId: string;
+
+  @Column({ nullable: true })
+  img: string;
+
 }

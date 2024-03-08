@@ -2,7 +2,7 @@
 
 
 class UserService {
-    async getUser(userId: number): Promise<any> {
+    async getUser(userId: string): Promise<any> {
         try {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
             const response = await fetch(APIURL + `user/${userId}`, {

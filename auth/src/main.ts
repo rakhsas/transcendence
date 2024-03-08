@@ -15,7 +15,8 @@ async function bootstrap() {
   app.enableCors({
     // origin: 'https://192.168.8.112',
     origin: '*',
-    credentials: true
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   })
   const config = new DocumentBuilder()
   .setTitle('NestJS API')
