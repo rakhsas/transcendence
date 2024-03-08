@@ -8,9 +8,14 @@ import { useEffect, useState } from 'react';
 import UserService from '../../services/user.service';
 import AuthService from './../../services/auth.service';
 import DataContext from '../../services/data.context';
+import { Socket, io } from 'socket.io-client';
+// const url: string = "wss://10.12.249.229";
+const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
-
+	const socket: Socket = io(url, {
+        path: "/chat",
+    });
 	useEffect(() => {
 		const fetchData = async () => {
 		  try {
@@ -26,7 +31,7 @@ function DashboardComponent() {
 		fetchData();
 	}, []);
   return (
-	<DataContext.Provider value={userData}>
+	<DataContext.Provider value={[userData, socket]}>
 		<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 			<SidebarComponent />
 			<div className="overflow-auto  flex flex-col w-full">

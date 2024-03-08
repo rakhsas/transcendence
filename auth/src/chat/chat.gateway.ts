@@ -15,15 +15,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
   handleConnection(client: Socket) {
-    const recieverName = String(client.handshake.query.recieverName);
-    this.connectedUsers.set(recieverName, client);
+    const userName = String(client.handshake.query.userName);
+    this.connectedUsers.set(userName, client);
     this.usersArray.push(client.id);
-    // client.emit('update-user-list', { userIds: this.usersArray });
     client.emit('update-user-list', { userIds: this.usersArray });
-    // const users = this.usersArray.filter(id => id !== client.id);
-    // client.broadcast.emit('update-user-list', { userIds: users });
     this.server.emit('update-user-list', { userIds: this.usersArray });
-    // console.log(this.usersArray);
   }
   
   handleDisconnect(client: Socket) {
@@ -40,8 +36,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.usersArray = this.usersArray.filter(id => id !== client.id);
     client.broadcast.emit('update-user-list', { userIds: this.usersArray});
     client.broadcast.emit('user-disconnected', { userId: client.id });
-    const recieverName = String(client.handshake.query.recieverName);
-    this.connectedUsers.delete(recieverName);
+    const userName = String(client.handshake.query.userName);
+    this.connectedUsers.delete(userName);
   }
   
   
@@ -65,7 +61,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           "isOwner": false
         });
 
-        await this.chatService.addDirectMessage(payload.from, payload.to, payload.content)
+        await this.chatService.addDirectMessage(payload)
       }
       client.emit('message', payload);
     }

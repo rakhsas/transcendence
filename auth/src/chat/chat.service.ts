@@ -54,11 +54,11 @@ export class ChatService {
    * @param receiverId the receiver
    * @param content the content of the message
    */
-  async addDirectMessage(senderId: UUID, receiverId: UUID, content: string): Promise<void> {
+  async addDirectMessage(payload: any): Promise<void> {
     const directMessage = this.msgRepository.create({
-      msg: content,
-      rec_id: receiverId,
-      senderId
+      message: payload.content,
+      recieverId: payload.receiverId,
+      senderId: payload.senderId
     });
     await this.msgRepository.save(directMessage);
   }
@@ -71,7 +71,7 @@ export class ChatService {
    */
   async saveMessageRoom(senderId: UUID, channelId: number, content: string): Promise <void> {
     const newMessageRoom = this.msgRepository.create({
-      msg: content,
+      message: content,
       senderId,
       cid: channelId
     });
