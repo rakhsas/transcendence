@@ -32,10 +32,8 @@ function App() {
           <Route path="call" element={<CallComponent />} />
           <Route path="settings" element={<SettingsComponent />} />
         </Route>
-        {/* <Route path="/SignIn" element={<FunctionSignUpForm/>} /> */}
-        {/* <Route path="/login" element={<ValidInformation />} />
         <Route path="/game" element={<Game />} />
-        <Route path='/HeadToHead' element={<HeadToHead />} /> */}
+        <Route path='/HeadToHead' element={<HeadToHead />} /> 
       </Routes>
     </>
   );

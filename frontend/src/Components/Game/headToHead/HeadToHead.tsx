@@ -11,7 +11,7 @@ const CanvasHeadToHead = (props: any) =>{
     const canvas = ref.current;
     if(!canvas)
       return;
-
+    
   const socket: Socket = io(url, {
       path: "/sogame"
     });
