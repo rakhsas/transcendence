@@ -13,27 +13,30 @@ import { Socket, io } from 'socket.io-client';
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
-	const socket: Socket = io(url, {
+	const socketCHAT: Socket = io(url, {
         path: "/chat",
-    });	
-	// useEffect(() => {
-	// 	const fetchData = async () => {
-	// 		try {
-	// 			const authService = new AuthService();
-	// 			const fetchedPayloadData = await authService.getPayload();
-	// 			const userService = new UserService();
-	// 			const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
-	// 			setUserData(fetchedUserData);
-	// 		} catch (error) {
-	// 			console.error('Error fetching user ', error);
-	// 		}
-	// 	};
-	// 	fetchData();
-	// }, []);
+    });
+	const socketGame: Socket = io(url, {
+        path: "/sogame",
+    });
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const authService = new AuthService();
+				const fetchedPayloadData = await authService.getPayload();
+				const userService = new UserService();
+				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
+				setUserData(fetchedUserData);
+			} catch (error) {
+				console.error('Error fetching user ', error);
+			}
+		};
+		fetchData();
+	}, []);
 	// console.log("userData: ", userData)
-	// console.log("socket: ", socket)
+	console.log("socket: ", socketGame);
 	return (
-	<DataContext.Provider value={[userData, socket]}>
+	<DataContext.Provider value={[userData, socketCHAT, socketGame]}>
 		<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 			<SidebarComponent />
 			<div className="overflow-auto  flex flex-col w-full">

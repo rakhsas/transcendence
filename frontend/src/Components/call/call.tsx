@@ -7,7 +7,7 @@ import LoadingComponent from "../shared/loading/loading";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL;
 function CallComponent() {
     const userData = useContext(DataContext);
-    if (!userData)
+    if (!userData[1])
         return <LoadingComponent />;
     // const [socket, setSocket] = useState<Socket | null>(null);
     // const [selectedUser, setSelectedUser] = useState<string | null>(null);
