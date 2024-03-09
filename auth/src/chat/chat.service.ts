@@ -57,9 +57,8 @@ export class ChatService {
   async addDirectMessage(payload: any): Promise<void> {
     const directMessage = this.msgRepository.create({
       message: payload.content,
-      rec_id: payload.receiverId,
-      senderId: payload.senderId,
-      isDM: true,
+      recieverId: payload.receiverId,
+      senderId: payload.senderId
     });
     await this.msgRepository.save(directMessage);
   }

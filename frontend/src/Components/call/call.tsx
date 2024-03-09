@@ -1,15 +1,20 @@
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import io, { Socket } from 'socket.io-client';
+import DataContext from "../../services/data.context";
+import LoadingComponent from "../shared/loading/loading";
 
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL;
 function CallComponent() {
+    const userData = useContext(DataContext);
+    if (!userData)
+        return <LoadingComponent />;
     // const [socket, setSocket] = useState<Socket | null>(null);
     // const [selectedUser, setSelectedUser] = useState<string | null>(null);
     // useEffect(() => {
-    const socket: Socket = io(url, {
-        path: "/chat",
-    });
+    // const socket: Socket = io(url, {
+    //     path: "/chat",
+    // });
     // setSocket(socketInstance);
     // console.log(socketInstance);
     // console.log(url);
@@ -18,7 +23,7 @@ function CallComponent() {
     //     socket?.disconnect();
     // };
     // }, []);
-
+    const socket = userData[1]
     let selectedUser: string;
     const onUpdateUserList = ({ userIds }: any) => {
         // console.log(userIds);
@@ -41,14 +46,14 @@ function CallComponent() {
     };
     socket?.on("update-user-list", onUpdateUserList);
     const onUserCall = (data: any) => {
-        const incomingCalls = document.getElementById("Incoming Call");
-        const callButton = document.createElement("button");
-        callButton.innerHTML = `Incoming call from ${data.from}`;
-        callButton.addEventListener("click", () => {
-            selectedUser = data.from;
-            call();
-        });
-        incomingCalls?.appendChild(callButton);
+        // const incomingCalls = document.getElementById("Incoming Call");
+        // const callButton = document.createElement("button");
+        // callButton.innerHTML = `Incoming call from ${data.from}`;
+        // callButton.addEventListener("click", () => {
+        //     selectedUser = data.from;
+        //     call();
+        // });
+        // incomingCalls?.appendChild(callButton);
     }
     socket?.on("RequestCall", onUserCall)
     const createPeerConnection = () => {
@@ -164,7 +169,7 @@ function CallComponent() {
                             <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity opacity-100">
                                 <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">Enlarge</button>
                             </div>
-                            <div id="userId" className="absolute bottom-0 right-0 p-2 bg-gray-800 text-white font-semibold rounded-lg">User ID</div>
+                            {/* <div id="userId" className="absolute bottom-0 right-0 p-2 bg-gray-800 text-white font-semibold rounded-lg">User ID</div> */}
                         </div>
                         <div className="relative overflow-hidden rounded-lg">
                             <video id="localVideo" className="w-full h-auto" playsInline autoPlay muted></video>
@@ -174,7 +179,7 @@ function CallComponent() {
                             <div id="userId" className="absolute bottom-0 right-0 p-2 bg-gray-800 text-white font-semibold rounded-lg">User ID</div>
                         </div>
                     </div>
-                    <div id="usersList" className="mt-4 p-4 bg-gray-200 rounded-lg">
+                    <div id="usersList" className="mt-4 p-4 bg-gray-700 rounded-lg">
                         <h2 className="text-lg font-semibold mb-2">Connected Users</h2>
                         <ul>
                             <li className="mb-1">User 1</li>
@@ -182,7 +187,7 @@ function CallComponent() {
                             {/* <!-- Add more users dynamically --> */}
                         </ul>
                     </div>
-                    <div id="IncomingCall" className="mt-4 p-4 bg-red-500 text-white font-semibold rounded-lg text-center hidden">
+                    <div id="IncomingCall" className="mt-4 p-4 bg-red-500 text-white font-semibold rounded-lg text-center">
                         Incoming Call...
                     </div>
                     <div className="mt-6 flex justify-center space-x-4">

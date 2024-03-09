@@ -1,7 +1,7 @@
 import User from "./user.model";
 
 interface messageUser {
-    profile: string;
+    // profile: string;
     // username: string;
     // message: string;
     // date: string;
@@ -23,7 +23,7 @@ interface messageUser1 {
     date: string;
     recieverId: number;
     img: string;
-    profile: string;
+    // profile: string;
     username: string;
     recieverUserName: string;
 }

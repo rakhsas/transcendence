@@ -40,8 +40,6 @@ export class MessageService {
         const lastMessagesPromises = friendships.map(async (friendship) => {
             const friend = await friendship.friend;
             const user = await friendship.user;
-            console.log("friend: ", friend);
-            console.log("user: ", await friendship.user);
             const lastMessage = await this.messageRepository.findOne({
                 where: [
                     { senderId: user.id, recieverId: friend.id },

@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from "react";
 import "./chat.css";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
@@ -23,23 +23,24 @@ function chatComponent(): JSX.Element {
     const [latestMessages, setLatestMessages] = useState<any[]>([]);
     const messageService = new MessageService();
     const userData = useContext(DataContext);
-    // if (!userData) {
-    //     return <LoadingComponent />;
-    // }
+    if (!userData) {
+            return <LoadingComponent />;
+        }
     useEffect(() => {
         if (!userData) return;
+        console.log(userData)
         const fetchData = async () => {
-		  try {
-            // console.log(userData.id)
-			const fetchedUserData = await messageService.latestMessages(userData.id);
-			setLatestMessages(fetchedUserData);
-            // console.log(fetchedUserData)
-		} catch (error) {
-			console.error('Error fetching user ', error);
-		  }
-		};
-		fetchData();
-	}, [userData]);
+            try {
+                // console.log(userData[0].id)
+                const fetchedUserData = await messageService.latestMessages(userData[0].id);
+                setLatestMessages(fetchedUserData);
+                // console.log(fetchedUserData)
+            } catch (error) {
+                console.error('Error fetching user ', error);
+            }
+        };
+        fetchData();
+    }, [userData]);
     if (!userData) {
         return <LoadingComponent />;
     }
@@ -52,10 +53,10 @@ function chatComponent(): JSX.Element {
     function userLastMessageIndex(): string
     {
         return MESSAGES.find(selectedMessageIndex).findLastIndex(
-        (message) => Number(message.senderId) === userData.id);
+        (message: { senderId: any; }) => Number(message.senderId) === userData[0].id);
     }
     // const lastUserMessageIndex = MESSAGES[selectedMessageIndex].findLastIndex(
-    //     (message) => Number(message.sender) === userData.id
+    //     (message) => Number(message.sender) === userData[0].id
     // );
     // const lastUserMessageIndex = 0;
     // console.log("lastUserMessageIndex", lastUserMessageIndex)
@@ -73,10 +74,9 @@ function chatComponent(): JSX.Element {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const newMessage: messageUser1 = {
-            sender: userData.id,
-            picture: userData.picture,
+            sender: userData[0].id,
             date: new Date().toDateString(),
-            username: userData.username,
+            username: userData[0].username,
             message: message,
             img: '',
             recieverId: 0,
@@ -95,7 +95,8 @@ function chatComponent(): JSX.Element {
     const handleSelectMessage = async (index: string, friendId: string) => {
         setSelectedMessageIndex(index);
         // console.log(selectedMessageIndex)
-        await setMESSAGES(await messageService.getMessages(userData.id, friendId));
+        await setMESSAGES(await messageService.getMessages(userData[0].id, friendId));
+        console.log("latestMessages", MESSAGES)
         // console.log("messages", MESSAGES[index]);
     };
 
@@ -113,7 +114,7 @@ function chatComponent(): JSX.Element {
     };
     const getMessageFriend = (message: messageUser) => {
         const { __owner__, __reciever__ } = message;
-        return __owner__.id === userData.id ? __reciever__ : __owner__;
+        return __owner__.id === userData[0].id ? __reciever__ : __owner__;
     };
     return (
         <>
@@ -147,16 +148,16 @@ function chatComponent(): JSX.Element {
                                 </div>
                             </div>
                             <div className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
-                                {MESSAGES.map((message, index) => (
+                                {MESSAGES.map((message: { senderId: any; __owner__: { picture: string | undefined; }; img: string | undefined; message: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; date: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: Key | null | undefined) => (
                                     console.log(lastMessageIndex),
-                                    <div className={`chat-msg ${message.senderId === userData.id ? 'owner' : null}`} key={index}>
+                                    <div className={`chat-msg ${message.senderId === userData[0].id ? 'owner' : null}`} key={index}>
                                         <div className="chat-msg-profile">
-                                            <img className="chat-msg-img" src={message.senderId === userData.id ? userData.picture : message.__owner__.picture } alt="" />
+                                            <img className="chat-msg-img" src={message.senderId === userData[0].id ? userData[0].picture : message.__owner__.picture } alt="" />
                                         </div>
                                         <div className="chat-msg-content">
                                             {message.img ? (
                                                 <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                    <img src={message.img} alt="" onDoubleClick={() => onOpenModal(message.img)} />
+                                                    <img src={message.img} alt="" onDoubleClick={() => onOpenModal(message.img || '')} />
                                                 </div>
                                             ) : null}
                                             {message.message ? (
@@ -166,7 +167,7 @@ function chatComponent(): JSX.Element {
                                             ) : null}
                                             {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
                                             {
-                                                (message.senderId === userData.id
+                                                (message.senderId === userData[0].id
                                                     //    && index === lastMessageIndex
                                                        )
                                                     ? 
@@ -192,9 +193,9 @@ function chatComponent(): JSX.Element {
                         </div>
                     </form>
                 </div>
-                {/* <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
-                    {DetailsArea({ latestMessages, selectedMessageIndex, handleSelectedColor, selectedColor, modalPicPath, isModalOpen, onCloseModal, onOpenModal })}
-                </div> */}
+                <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
+                    {DetailsArea({ MESSAGES, selectedMessageIndex, handleSelectedColor, selectedColor, modalPicPath, isModalOpen, onCloseModal, onOpenModal, getMessageFriend })}
+                </div>
             </div>
         </>
     );

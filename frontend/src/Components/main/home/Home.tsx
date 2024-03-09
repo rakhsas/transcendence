@@ -117,9 +117,9 @@ const HomeComponent: React.FC = () => {
     }
     // const customProgressTheme: CustomFlowbiteTheme['progress'] = {
     //     base: `w-64 overflow-hidden rounded-full bg-white dark:bg-gray-700`,
-    //     bar: ` rounded-full text-center font-medium bg-[var(--${userData.coalition})] leading-auto text-white dark:text-cyan-100 space-x-2; `,
+    //     bar: ` rounded-full text-center font-medium bg-[var(--${userData[0].coalition})] leading-auto text-white dark:text-cyan-100 space-x-2; `,
     //     color: {
-    //         "red": `bg-${userData.coalition}`,
+    //         "red": `bg-${userData[0].coalition}`,
     //     },
     // };
     return (
@@ -218,7 +218,7 @@ const HomeComponent: React.FC = () => {
             <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit dark:bg-zinc-900 bg-[#F1F2FD]">
                 <div className="contain flex flex-col justify-between items-center mx-auto">
                     <div className="profile mt-2 w-12 h-12 bg-white">
-                        <img src={userData.picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData.username} />
+                        <img src={userData[0].picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData[0].username} />
                     </div>
                     <div className="groupslogo mt-8">
                         {/* <img src={group} alt='Groups' /> */}
