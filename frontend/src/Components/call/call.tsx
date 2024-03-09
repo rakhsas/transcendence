@@ -6,25 +6,12 @@ import LoadingComponent from "../shared/loading/loading";
 
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL;
 function CallComponent() {
+    const [selectedUser, setSelectedUser] = useState<string | null>('')
     const userData = useContext(DataContext);
-    if (!userData[1])
+    if (!userData)
         return <LoadingComponent />;
-    // const [socket, setSocket] = useState<Socket | null>(null);
-    // const [selectedUser, setSelectedUser] = useState<string | null>(null);
-    // useEffect(() => {
-    // const socket: Socket = io(url, {
-    //     path: "/chat",
-    // });
-    // setSocket(socketInstance);
-    // console.log(socketInstance);
-    // console.log(url);
-
-    // return () => {
-    //     socket?.disconnect();
-    // };
-    // }, []);
-    const socket = userData[1]
-    let selectedUser: string;
+    const socket = userData[1];
+    // var selectedUser: string;
     const onUpdateUserList = ({ userIds }: any) => {
         // console.log(userIds);
         const usersList = document.getElementById("usersList");
@@ -34,19 +21,22 @@ function CallComponent() {
         usersList!.innerHTML = "";
 
         usersToDisplay.forEach((user: string) => {
-            const userItem = document.createElement("div", { is: "user-item" });
-            userItem.innerHTML = user;
-            userItem.className = "user-item";
-
+            const userItem = document.createElement("button", { is: "user-button" });
+            userItem.textContent = user;
+            // console.log(user)
+            userItem.className = "user-button mb-1 bg-red-900";
             userItem.addEventListener("click", () => {
-                selectedUser = user;
+                setSelectedUser(user);
+                // console.log("selectedUser: ", selectedUser)
             });
             usersList?.appendChild(userItem);
         });
     };
     socket?.on("update-user-list", onUpdateUserList);
     const onUserCall = (data: any) => {
-        // const incomingCalls = document.getElementById("Incoming Call");
+        console.log("data.from", data.from)
+        console.log("data.to", data.to)
+        // const incomingCalls = document.getElementById("IncomingCall");
         // const callButton = document.createElement("button");
         // callButton.innerHTML = `Incoming call from ${data.from}`;
         // callButton.addEventListener("click", () => {
@@ -54,6 +44,19 @@ function CallComponent() {
         //     call();
         // });
         // incomingCalls?.appendChild(callButton);
+        const dropdown = document.querySelector('#dropdown');
+        // console.log(dropdown);
+        const notifli = document.createElement('li');
+        notifli.className = "flex items-center px-4 py-2";
+        const notifliImg = document.createElement('img');
+        notifliImg.src = userData[0].picture;
+        notifliImg.className = "w-8 h-8 rounded-full mr-2";
+        const notifliSpan = document.createElement('span');
+        notifliSpan.innerText = `you have a call from ${data.from}`;
+        notifli.appendChild(notifliImg);
+        console.log(dropdown)
+        notifli.appendChild(notifliSpan);
+        dropdown?.appendChild(notifli);
     }
     socket?.on("RequestCall", onUserCall)
     const createPeerConnection = () => {
@@ -80,16 +83,17 @@ function CallComponent() {
         localVideo.srcObject = stream;
         stream.getTracks().forEach((track) => peer.addTrack(track, stream));
     };
-    const EndCall = useCallback(() => {
+    const EndCall = () => {
         // const localVideo = document.getElementById("localVideo") as HTMLVideoElement;
         const remoteVideo = document.getElementById("remoteVideo") as HTMLVideoElement;
         // localVideo.srcObject = null;
         remoteVideo.srcObject = null;
         peer.close();
-        socket?.disconnect();
-    }, []);
+        // socket?.disconnect();
+    };
     socket?.on("connect", onSocketConnect);
     const call = async () => {
+        console.log("selectedUser: 1111", selectedUser)
         socket?.emit("callUser", {
             from: socket?.id,
             to: selectedUser,
@@ -179,11 +183,9 @@ function CallComponent() {
                             <div id="userId" className="absolute bottom-0 right-0 p-2 bg-gray-800 text-white font-semibold rounded-lg">User ID</div>
                         </div>
                     </div>
-                    <div id="usersList" className="mt-4 p-4 bg-gray-700 rounded-lg">
+                    <div className="mt-4 p-4 bg-gray-700 rounded-lg">
                         <h2 className="text-lg font-semibold mb-2">Connected Users</h2>
-                        <ul>
-                            <li className="mb-1">User 1</li>
-                            <li className="mb-1">User 2</li>
+                        <ul id="usersList">
                             {/* <!-- Add more users dynamically --> */}
                         </ul>
                     </div>

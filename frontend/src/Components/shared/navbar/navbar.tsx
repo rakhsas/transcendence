@@ -112,18 +112,20 @@ function NavbarComponent(): JSX.Element {
                     ))}
                 </Dropdown> */}
                 <div className="relative h-10 flex items-center">
-                    <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" onClick={() => {toggleDropdown()}}>
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 128 128">
-                            <path className='fill-black dark:fill-white' d="M12.81 46.31c.24.06.49.09.73.09 1.34 0 2.57-.91 2.91-2.27 2.78-11.12 9.4-20.97 18.63-27.71 1.34-.98 1.63-2.85.65-4.19-.98-1.34-2.85-1.63-4.19-.65-10.36 7.57-17.79 18.61-20.91 31.1C10.22 44.28 11.2 45.91 12.81 46.31zM92.93 16.42c9.23 6.74 15.84 16.58 18.63 27.71.34 1.36 1.56 2.27 2.91 2.27.24 0 .49-.03.73-.09 1.61-.4 2.58-2.03 2.18-3.64-3.12-12.48-10.55-23.53-20.91-31.1-1.34-.98-3.21-.69-4.19.65C91.3 13.57 91.59 15.44 92.93 16.42zM19.2 90.85c-.98 3.91-.12 7.98 2.37 11.15 2.48 3.18 6.22 5 10.25 5h14.46c1.43 8.5 8.83 15 17.73 15s16.29-6.5 17.73-15h14.46c4.03 0 7.77-1.82 10.25-5 2.48-3.18 3.34-7.24 2.37-11.15L97.97 47.53C94.07 31.91 80.1 21 64 21S33.93 31.91 30.03 47.53L19.2 90.85zM64 116c-5.58 0-10.27-3.83-11.61-9h23.21C74.27 112.17 69.58 116 64 116zM64 27c13.34 0 24.92 9.04 28.15 21.98l10.83 43.32c.53 2.11.06 4.29-1.27 6.01-1.34 1.71-3.35 2.69-5.52 2.69H31.81c-2.17 0-4.18-.98-5.52-2.69-1.34-1.71-1.8-3.9-1.27-6.01l10.83-43.32C39.08 36.04 50.66 27 64 27z"></path>
-                        </svg>
-                    </button>
+                <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" onClick={() => {toggleDropdown()}}>
+                <svg className='fill-black dark:fill-white' xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="26" height="26" viewBox="0 0 24 24">
+                    <path d="M16.5,3C13.605,3,12,5.09,12,5.09S10.395,3,7.5,3C4.462,3,2,5.462,2,8.5C2,14,12,21,12,21s10-7,10-12.5 C22,5.462,19.538,3,16.5,3z M12,18.518C8.517,15.845,4,11.406,4,8.5C4,6.57,5.57,5,7.5,5C9.902,5,12,7.907,12,7.907S14.14,5,16.5,5 C18.43,5,20,6.57,20,8.5C20,11.406,15.483,15.845,12,18.518z"></path>
+                    <circle cx="20" cy="6" r="4" fill="#FF0000" />
+                </svg>
+    </button>
+
                     <div className={`fixed z-10 top-14 w-auto mt-2  bg-white divide-y divide-gray-500 rounded-lg shadow dark:bg-main-light-EGGSHELL ${isOpen ? 'block' : 'hidden'}`}>
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" id="dropdown">
                             <li className="flex items-center px-4 py-2">
                                 <img src={userData[0].picture} alt="Action Owner" className="w-8 h-8 rounded-full mr-2" />
                                 <span>Notification description 1</span>
                             </li>
-                            <li>
+                            {/* <li>
                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
                             </li>
                             <li>
@@ -131,7 +133,7 @@ function NavbarComponent(): JSX.Element {
                             </li>
                             <li>
                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Sign out</a>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                 </div>
