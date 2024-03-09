@@ -16,22 +16,22 @@ function DashboardComponent() {
 	const socket: Socket = io(url, {
         path: "/chat",
     });	
-	// useEffect(() => {
-	// 	const fetchData = async () => {
-	// 		try {
-	// 			const authService = new AuthService();
-	// 			const fetchedPayloadData = await authService.getPayload();
-	// 			const userService = new UserService();
-	// 			const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
-	// 			setUserData(fetchedUserData);
-	// 		} catch (error) {
-	// 			console.error('Error fetching user ', error);
-	// 		}
-	// 	};
-	// 	fetchData();
-	// }, []);
-	// console.log("userData: ", userData)
-	// console.log("socket: ", socket)
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const authService = new AuthService();
+				const fetchedPayloadData = await authService.getPayload();
+				const userService = new UserService();
+				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
+				setUserData(fetchedUserData);
+			} catch (error) {
+				console.error('Error fetching user ', error);
+			}
+		};
+		fetchData();
+	}, []);
+	console.log("userData: ", userData)
+	console.log("socket: ", socket)
 	return (
 	<DataContext.Provider value={[userData, socket]}>
 		<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">

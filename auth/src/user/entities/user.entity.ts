@@ -84,12 +84,19 @@ export class User {
   @OneToMany(() => Msg, (msg) => msg.reciever, { lazy: true })
   receivedMessages: Promise<Msg[]>;
 
-  @ManyToMany(() => Friendship, friendship => friendship.friends)
-  @JoinTable()
-  friends: Friendship[];
+
+  @OneToMany(() => Friendship, friend => friend.user, {lazy: true})
+  friends: Promise<Friendship[]>;
+
+  @OneToMany(() => Friendship, friend => friend.friend, { lazy: true})
+  friendOf: Promise<Friendship[]>;
+
+  // @ManyToMany(() => Friendship, friendship => friendship.friends)
+  // @JoinTable()
+  // friends: Friendship[];
   
-  @ManyToMany(() => Friendship, (friendship) => friendship.friendOf) // New relationship
-  friendOf: User[]; // Array of User objects representing users who befriended this user
+  //@ManyToMany(() => Friendship, (friendship) => friendship.friendOf) // New relationship
+ // friendOf: User[]; // Array of User objects representing users who befriended this user
 
   @BeforeInsert()
   generateUUID() {
