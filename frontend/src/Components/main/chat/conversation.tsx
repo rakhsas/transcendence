@@ -31,7 +31,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                     <div key={index} className={`msg ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
                             handleSelectMessage(
                             index.toString(),
-                            message.__reciever__.id === userData.id ? message.__owner__.id : message.__reciever__.id
+                            message.__reciever__.id === userData[0].id ? message.__owner__.id : message.__reciever__.id
                             )
                         }}>
                         <div className="msg-profile rounded-full mr-4 bg-rose-400 ">
@@ -51,7 +51,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                                 </svg>
                             ) : (
                                 <img
-                                    src={userData.id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture}
+                                    src={userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture}
                                     className="object-cover bg-contain h-full bg-no-repeat bg-center"
                                     alt=""
                                 />
@@ -59,7 +59,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                         </div>
                         <div className="msg-detail overflow-hidden">
                             <div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base">
-                                {message.__reciever__.id === userData.id ? message.__owner__.firstName + ' ' + message.__owner__.lastName : message.__reciever__.firstName + ' ' + message.__reciever__.lastName}
+                                {message.__reciever__.id === userData[0].id ? message.__owner__.firstName + ' ' + message.__owner__.lastName : message.__reciever__.firstName + ' ' + message.__reciever__.lastName}
                             </div>
                             <div className="msg-content font-medium text-xs">
                                 <span className="msg-message whitespace-nowrap overflow-hidden overflow-ellipsis text-main-dark-SIDEMESSAGE">
