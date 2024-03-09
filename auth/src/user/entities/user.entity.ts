@@ -81,7 +81,7 @@ export class User {
   @OneToMany(() => Msg, (msg) => msg.senderId, { lazy: true })
   sendmessages: Promise<Msg[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.receiver, { lazy: true })
+  @OneToMany(() => Msg, (msg) => msg.reciever, { lazy: true })
   receivedMessages: Promise<Msg[]>;
 
   @ManyToMany(() => Friendship, friendship => friendship.friends)

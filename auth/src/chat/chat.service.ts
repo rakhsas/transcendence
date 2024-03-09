@@ -54,11 +54,11 @@ export class ChatService {
    * @param receiverId the receiver
    * @param content the content of the message
    */
-  async addDirectMessage(senderId: UUID, receiverId: UUID, content: string): Promise<void> {
+  async addDirectMessage(payload: any): Promise<void> {
     const directMessage = this.msgRepository.create({
-      message: content,
-      rec_id: receiverId,
-      senderId,
+      message: payload.content,
+      rec_id: payload.receiverId,
+      senderId: payload.senderId,
       isDM: true,
     });
     await this.msgRepository.save(directMessage);

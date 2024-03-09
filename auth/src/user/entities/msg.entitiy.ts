@@ -33,13 +33,6 @@ export class Msg {
   @ManyToOne(() => User, (user) => user.receivedMessages, {lazy: true})
   @JoinColumn({ name: 'recieverId' })
   reciever: Promise<User>;
-
-  @Column({nullable: true})
-  rec_id: string;
-
-  @Column({default: false})
-  isDM: boolean
-
   
   
   @ManyToOne(() => Channel, (channel) => channel.messages, {lazy: true})
@@ -55,7 +48,7 @@ export class Msg {
   @Column({nullable: true})
   recieverId: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true})
   img: string;
 
 }
