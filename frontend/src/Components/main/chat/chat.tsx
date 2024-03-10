@@ -27,7 +27,7 @@ function chatComponent(): JSX.Element {
             return <LoadingComponent />;
         }
     useEffect(() => {
-        if (!userData) return;
+        if (!userData[0]) return;
         console.log(userData)
         const fetchData = async () => {
             try {
@@ -41,7 +41,7 @@ function chatComponent(): JSX.Element {
         };
         fetchData();
     }, [userData]);
-    if (!userData) {
+    if (!userData[0]) {
         return <LoadingComponent />;
     }
     const latestGroupMessages: any = [];

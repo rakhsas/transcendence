@@ -36,10 +36,11 @@ const HomeComponent: React.FC = () => {
     const userData = useContext(DataContext);
     
     let chartInstance: Chart | null = null;
-    
+    // if (!userData[0])
+    //     return <LoadingComponent />;
     useEffect(() => {
 
-        if (!userData) {
+        if (!userData[0]) {
             return ;
         }
         if (chartRef.current) {
@@ -102,7 +103,7 @@ const HomeComponent: React.FC = () => {
         };
     }, [chartRef, userData]);
 
-    if (!userData)
+    if (!userData[0])
         return <LoadingComponent />;
     const friendData = {
         colors: ['#FFBEB8', '#FFDCB9', '#FF8A8A', '#F7C5BF'],

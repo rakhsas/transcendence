@@ -31,9 +31,11 @@ function App() {
           <Route path="chat" Component={chatComponent} />
           <Route path="call" element={<CallComponent />} />
           <Route path="settings" element={<SettingsComponent />} />
+          <Route path="game" element={<Game />} />
+          <Route path='HeadToHead' element={<HeadToHead />} /> 
         </Route>
-        <Route path="/game" element={<Game />} />
-        <Route path='/HeadToHead' element={<HeadToHead />} /> 
+        {/* <Route path="/SignIn" element={<FunctionSignUpForm/>} /> */}
+        {/* <Route path="/login" element={<ValidInformation />} />*/}
       </Routes>
     </>
   );
