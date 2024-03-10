@@ -9,6 +9,7 @@ import UserService from '../../services/user.service';
 import AuthService from './../../services/auth.service';
 import DataContext from '../../services/data.context';
 import { Socket, io } from 'socket.io-client';
+import LoadingComponent from '../shared/loading/loading';
 // const url: string = "wss://10.12.249.229";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
@@ -42,6 +43,15 @@ function DashboardComponent() {
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
 				setUserData(fetchedUserData);
+				// console.log('fetchedUserData', fetchedUserData);
+				// console.log('userData', userData);
+				const socketCHAT: Socket = io(url, {
+					path: "/chat",
+					query: {
+						userName: fetchedUserData?.username
+					}
+				});
+				setSocket(socketCHAT);
 			} catch (error) {
 				console.error('Error fetching user ', error);
 			}
@@ -50,16 +60,15 @@ function DashboardComponent() {
 		fetchData();
 		// setUserData(user);
 	
-		const socketCHAT: Socket = io(url, {
-			path: "/chat",
-		});
-	
-		setSocket(socketCHAT);
+		
 	
 		return () => {
-			socketCHAT.disconnect();
+			socket?.disconnect();
 		};
 	}, []);
+	if (!userData || !socket) {
+		return <LoadingComponent />;
+	}
 	return (
 		<DataContext.Provider value={[userData, socket]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">

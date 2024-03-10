@@ -17,6 +17,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleConnection(client: Socket) {
     const userName = String(client.handshake.query.userName);
     this.connectedUsers.set(userName, client);
+    console.log('username: ' + userName, 'client id: ' + client.id);
     this.usersArray.push(client.id);
     client.emit('update-user-list', { userIds: this.usersArray });
     this.server.emit('update-user-list', { userIds: this.usersArray });
@@ -43,21 +44,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
    // you can put the blocked code here {if they are blocked they can't send messages}.
-    if (payload.hasOwnProperty('recieverName'))
-    {
-      const recieverName = String(payload.recieverName);
-      const toUserSocket = this.connectedUsers.get(recieverName);
-      if (toUserSocket)
-      {
-        // you can put here the logic of blocked users and send Error message in the socket arguments. 
-        // The code goes here ...
-
-
+   if (payload.hasOwnProperty('recieverName'))
+   {
+     const recieverName = String(payload.recieverName);
+     const toUserSocket = this.connectedUsers.get(recieverName);
+     console.log('toUserSocket: ', recieverName);
+     if (toUserSocket)
+     {
+       // you can put here the logic of blocked users and send Error message in the socket arguments. 
+       // The code goes here ...
         toUserSocket.emit('message', {
           "to": payload.to,
           "from": payload.from,
           "content": payload.content,
-          "isOwner": false
+          "image": payload.image,
+
+          // "isOwner": false
         });
 
         await this.chatService.addDirectMessage(payload)

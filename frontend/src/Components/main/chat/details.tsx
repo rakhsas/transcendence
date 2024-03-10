@@ -31,7 +31,7 @@ function DetailsArea({
         return null;
     }
     const messageData = getMessageFriend(MESSAGES[selectedMessageIndex]);
-    console.log("messageData222: ", MESSAGES[selectedMessageIndex]);
+    // console.log("messageData222: ", MESSAGES[selectedMessageIndex]);
     // console.log(isModalOpen, modalPicPath, selectedMessageIndex, latestMessages[selectedMessageIndex])
     return (
         <>

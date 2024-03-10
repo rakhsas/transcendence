@@ -10,11 +10,13 @@ import DetailsArea from "./details";
 import ModalComponent from "../../../utils/modal.component";
 import { messageUser, messageUser1 } from "../../../model/messageUser.model";
 import MessageService from "../../../services/message.service";
+import { Socket } from "socket.io-client";
 
 function chatComponent(): JSX.Element {
     const [MESSAGES, setMESSAGES] = useState<any>(null);
     const [selectedColor, setSelectedColor] = useState("black");
     const [selectedMessageIndex, setSelectedMessageIndex] = useState('0');
+    const [socketChat, setSocketChat] = useState<Socket>();
     // const [selectedMessageIndex, setSelectedMessageIndex] = useState(0);
     const [message, setMessage] = useState('');
     const [modalPicPath, setModalPicPath] = useState('');
@@ -25,9 +27,9 @@ function chatComponent(): JSX.Element {
     const userData = useContext(DataContext);
     if (!userData) {
             return <LoadingComponent />;
-        }
+    }
     useEffect(() => {
-        if (!userData[0]) return;
+        if (!userData[0] || !userData[1]) return;
         console.log(userData)
         const fetchData = async () => {
             try {
@@ -40,56 +42,36 @@ function chatComponent(): JSX.Element {
             }
         };
         fetchData();
+        console.log("----> " + userData[1])
+        setSocketChat(userData[1]);
     }, [userData]);
-    if (!userData[0]) {
+    if (!userData[0] || !userData[1]) {
         return <LoadingComponent />;
     }
     const latestGroupMessages: any = [];
-    // const userData = {
-    //     id: 1,
-    //     username: "John Doe",
-    //     picture: "https://randomuser"
-    // }
     function userLastMessageIndex(): string
     {
         return MESSAGES.find(selectedMessageIndex).findLastIndex(
         (message: { senderId: any; }) => Number(message.senderId) === userData[0].id);
     }
-    // const lastUserMessageIndex = MESSAGES[selectedMessageIndex].findLastIndex(
-    //     (message) => Number(message.sender) === userData[0].id
-    // );
-    // const lastUserMessageIndex = 0;
-    // console.log("lastUserMessageIndex", lastUserMessageIndex)
-    // setLastMessageIndex(userLastMessageIndex())
-
-    // create new socket from socket client ------
-
-    // const socket = io("http://localhost:3000", {
-    //     query: {
-    //         recieverName: 'woumecht'
-    //     },
-    //     path: '/chat',
-    // });
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        console.log("ldak khouna: ", getMessageFriend(MESSAGES[selectedMessageIndex]))
         event.preventDefault();
         const newMessage: messageUser1 = {
-            sender: userData[0].id,
-            date: new Date().toDateString(),
-            username: userData[0].username,
-            message: message,
-            img: '',
-            recieverId: 0,
-            recieverUserName: '',
+            to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+            from: userData[0].id,
+            content: event.currentTarget.message.value,
+            image: '',
+            senderId: userData[0].id,
+            recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+            recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username
         };
-        // MESSAGES[selectedMessageIndex].push(newMessage); // This is not a good practice, but it's a quick fix
-        const updatedMessages: any = [...MESSAGES]; // create a copy of the MESSAGES
-        console.log(updatedMessages)
-        updatedMessages.push(newMessage); // add the new message to the copy
-        setMESSAGES(updatedMessages); // update the state with the new messages
-        setMessage(''); // clear the message input
-        setLastMessageIndex(userLastMessageIndex());
-        // console.log("lastMessageIndex", lastMessageIndex)
+        // MESSAGES.push(newMessage);
+        const newMessages = [...MESSAGES, newMessage];
+        setMESSAGES(newMessages);
+        setMessage('');
+        socketChat?.emit('message', newMessage);
     };
     var messages: messageUser[] = [];
     const handleSelectMessage = async (index: string, friendId: string) => {
@@ -98,6 +80,7 @@ function chatComponent(): JSX.Element {
         await setMESSAGES(await messageService.getMessages(userData[0].id, friendId));
         console.log("latestMessages", MESSAGES)
         // console.log("messages", MESSAGES[index]);
+
     };
 
     const handleSelectedColor = (color: string) => {
@@ -148,11 +131,11 @@ function chatComponent(): JSX.Element {
                                 </div>
                             </div>
                             <div className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
-                                {MESSAGES.map((message: { senderId: any; __owner__: { picture: string | undefined; }; img: string | undefined; message: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; date: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: Key | null | undefined) => (
+                                {MESSAGES.map((message: { senderId: any; __owner__: { picture: string | undefined; }; img: string | undefined; content: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; date: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: Key | null | undefined) => (
                                     console.log(lastMessageIndex),
                                     <div className={`chat-msg ${message.senderId === userData[0].id ? 'owner' : null}`} key={index}>
                                         <div className="chat-msg-profile">
-                                            <img className="chat-msg-img" src={message.senderId === userData[0].id ? userData[0].picture : message.__owner__.picture } alt="" />
+                                            <img className="chat-msg-img" src={message.senderId === userData[0].id ? userData[0].picture : getMessageFriend(MESSAGES[selectedMessageIndex]).picture } alt="" />
                                         </div>
                                         <div className="chat-msg-content">
                                             {message.img ? (
@@ -160,9 +143,9 @@ function chatComponent(): JSX.Element {
                                                     <img src={message.img} alt="" onDoubleClick={() => onOpenModal(message.img || '')} />
                                                 </div>
                                             ) : null}
-                                            {message.message ? (
+                                            {message.content ? (
                                                 <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                    {message.message}
+                                                    {message.content}
                                                 </div>
                                             ) : null}
                                             {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
