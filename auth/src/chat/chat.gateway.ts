@@ -64,16 +64,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       client.emit('message', payload);
     }
-    // else
-    //   this.server.emit('message', payload);
   }
 
-  // =============================== Handle Muted users from a channel ============================
+  // =============================== Mute events =========================================================================
 
   @SubscribeMessage('muteUser')
   async handleMuteEvent(payload: any): Promise<void> {
     await this.chatService.muteUser(payload);
   }
+
+  // ================================ Channel hevents ====================================================================
 
   @SubscribeMessage('createChannel')
   async handleEventCreateChannel(socket: Socket, payload: any): Promise<void>{
@@ -95,7 +95,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   
-  // ===========> The call end points for socket.io events. ===================================================================
+  // ============================== Vedio call events ===================================================================
   @SubscribeMessage('mediaOffer')
   async handleOnMediaOffer( client: Socket,payload: any ) {
     client.to(payload.to).emit('mediaOffer', {

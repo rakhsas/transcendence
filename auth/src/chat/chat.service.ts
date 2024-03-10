@@ -110,7 +110,8 @@ export class ChatService {
     const newEntityChannel =  this.channelRepository.create({
       name: payload.channelName,
       private: payload.isPrivate,
-      password: payload.password !== undefined ? payload.password : null,
+      password: "password" in payload ? payload.password : null,
+      // password: payload.password !== undefined ? payload.password : null,
       type: payload.channelType,
     });
 
