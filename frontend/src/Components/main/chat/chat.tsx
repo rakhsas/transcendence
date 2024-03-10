@@ -61,6 +61,16 @@ function chatComponent(): JSX.Element {
     // const lastUserMessageIndex = 0;
     // console.log("lastUserMessageIndex", lastUserMessageIndex)
     // setLastMessageIndex(userLastMessageIndex())
+
+    // create new socket from socket client ------
+
+    // const socket = io("http://localhost:3000", {
+    //     query: {
+    //         recieverName: 'woumecht'
+    //     },
+    //     path: '/chat',
+    // });
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const newMessage: messageUser1 = {

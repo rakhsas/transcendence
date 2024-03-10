@@ -31,8 +31,8 @@ export class MessageService {
             relations: ['owner', 'reciever', 'channel'],
         });
     }
-
-    async getLastMessagesOfUsers(userid: string): Promise<Msg[]> {
+    
+     async getLastMessagesOfUsers(userid: string): Promise<Msg[]> {
         const friendships = await this.friendShipRepository.find({ where: [
             { user: { id: userid }},
             { friend: {id: userid }}
@@ -54,7 +54,7 @@ export class MessageService {
         return Promise.all(lastMessagesPromises);
     }
 
-    // async getMessa   ges(userId: string, friendId: string): Promise<Msg[]> {
+    // async getMessages(userId: string, friendId: string): Promise<Msg[]> {
 
     // }
 }

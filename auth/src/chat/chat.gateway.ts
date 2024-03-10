@@ -39,21 +39,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const userName = String(client.handshake.query.userName);
     this.connectedUsers.delete(userName);
   }
-  
-  
 
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
    // you can put the blocked code here {if they are blocked they can't send messages}.
-    if (payload.hasOwnProperty('to'))
+    if (payload.hasOwnProperty('recieverName'))
     {
-      const recieverName = String(client.handshake.query.recieverName);
+      const recieverName = String(payload.recieverName);
       const toUserSocket = this.connectedUsers.get(recieverName);
       if (toUserSocket)
       {
         // you can put here the logic of blocked users and send Error message in the socket arguments. 
         // The code goes here ...
-        
+
+
         toUserSocket.emit('message', {
           "to": payload.to,
           "from": payload.from,
@@ -69,6 +68,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //   this.server.emit('message', payload);
   }
 
+  // =============================== Handle Muted users from a channel ============================
+
+  @SubscribeMessage('muteUser')
+  async handleMuteEvent(payload: any): Promise<void> {
+    await this.chatService.muteUser(payload);
+  }
 
   @SubscribeMessage('createChannel')
   async handleEventCreateChannel(socket: Socket, payload: any): Promise<void>{
@@ -80,15 +85,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.chatService.addNewUserChannelEntity(payload);
   }
 
+
+  @SubscribeMessage('kickTheUser')
+  async handleEvent(socket: Socket, payload: any): Promise<void> {
+    // in this event handler i am excpected to get the id of the user to
+    // kick and the id of the channe from where the user will be kicked.
+    socket.leave(payload.channelId);
+    await this.chatService.kickUserFromChannel(payload);
+  }
+
+  
+  // ===========> The call end points for socket.io events. ===================================================================
   @SubscribeMessage('mediaOffer')
   async handleOnMediaOffer( client: Socket,payload: any ) {
-    // console.log(payload)
     client.to(payload.to).emit('mediaOffer', {
       from: payload.from,
       offer: payload.offer
     });
   };
-  
+
   @SubscribeMessage('mediaAnswer')
   async handleOnMediaAnswer(client: Socket, payload: any) {
     client.to(payload.to).emit('mediaAnswer', {
@@ -126,13 +141,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       from: payload.from
     });
   }
-  @SubscribeMessage('kickTheUser')
-  async handleEvent(socket: Socket, payload: any): Promise<void> {
-    // in this event handler i am excpected to get the id of the user to 
-    // kick and the id of the channe from where the user will be kicked.
-    socket.leave(payload.channelId);
-    await this.chatService.kickUserFromChannel(payload);
-  }
+  
 }
-
 
