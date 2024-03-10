@@ -54,9 +54,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           "from": payload.from,
           "message": payload.message,
           "image": payload.image,
-
           // "isOwner": false
         });
+        toUserSocket.emit('directMessageNotif', {
+          to: payload.to,
+          from: payload.from,
+          senderId: payload.senderId,
+          recieverId: payload.recieverId
+        })
         await this.chatService.addDirectMessage(payload)
       }
       else
@@ -64,6 +69,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       client.emit('message', payload);
     }
     //   this.server.emit('message', payload);
+  }
+
+  @SubscribeMessage('callUser')
+  async handleCallUser(client: Socket, payload: any) {
+    console.log('callUser');
+    client.to(payload.to).emit('RequestCall', {
+      from: payload.from,
+      offer: payload.offer,
+      senderId: payload.senderId,
+      recieverId: payload.recieverId
+    });
   }
 
   // =============================== Handle Muted users from a channel ============================
@@ -119,14 +135,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  @SubscribeMessage('callUser')
-  async handleCallUser(client: Socket, payload: any) {
-    console.log('callUser');
-    client.to(payload.to).emit('RequestCall', {
-      from: payload.from,
-      offer: payload.offer
-    });
-  }
+ 
 
   @SubscribeMessage('acceptCall')
   async handleAcceptCall(client: Socket, payload: any) {

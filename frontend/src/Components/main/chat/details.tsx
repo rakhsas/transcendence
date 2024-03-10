@@ -15,6 +15,7 @@ type DetailsAreaProps = {
     onCloseModal: () => void;
     onOpenModal: (picPath: string) => void;
     getMessageFriend: (message: messageUser) => User;
+    handleOpenDetails: () => void
 }
 function DetailsArea({
     MESSAGES,
@@ -25,7 +26,8 @@ function DetailsArea({
     isModalOpen,
     onCloseModal,
     onOpenModal,
-    getMessageFriend
+    getMessageFriend,
+    handleOpenDetails
 }: DetailsAreaProps) {
     if (!MESSAGES) {
         return null;
@@ -35,11 +37,11 @@ function DetailsArea({
     // console.log(isModalOpen, modalPicPath, selectedMessageIndex, latestMessages[selectedMessageIndex])
     return (
         <>
-                {
-                    !MESSAGES ? null :
-                    <div>
+            {
+                !MESSAGES ? null :
+                <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
                         <div className="detail-area-header">
-                            <div className="msg-profile group">
+                            <div className="msg-profile group" onClick={handleOpenDetails}>
                                 <img src={messageData.picture} alt="" />
                             </div>
                             <div className="font-onest text-xl capitalize text-black dark:text-white">{messageData.username}</div>
@@ -170,7 +172,104 @@ function DetailsArea({
                             {/* <div className="view-more">View More</div> */}
                         </div>
                     </div>
+                    // <div id="options" className="options">
+                    //     <div className="head">
+                    //         <div className="close icon">
+                    //             <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg">
+                    //                 <line x1="19" y1="12" x2="5" y2="12"></line>
+                    //                 <polyline points="12 19 5 12 12 5"></polyline>
+                    //             </svg>
+                    //         </div>
+                    //     </div>
+
+                    //     <div className="info">
+                    //         <div className="person photo">
+                    //             <div className="online"></div>
+                    //         </div>
+                    //         <h2 className="name">Millie</h2>
+                    //         <div className="buttons">
+                    //             <div className="button">
+                    //                 <div className="icon">
+                    //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    //                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    //                     </svg>
+                    //                 </div>
+                    //                 <p className="title">Audio</p>
+                    //             </div>
+                    //             <div className="button">
+                    //                 <div className="icon">
+                    //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    //                         <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                    //                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                    //                     </svg>
+                    //                 </div>
+                    //                 <p className="title">Video</p>
+                    //             </div>
+                    //             <div className="button">
+                    //                 <div className="icon">
+                    //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    //                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    //                         <circle cx="12" cy="7" r="4"></circle>
+                    //                     </svg>
+                    //                 </div>
+                    //                 <p className="title">Profile</p>
+                    //             </div>
+                    //             <div className="button">
+                    //                 <div className="icon">
+                    //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    //                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    //                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    //                     </svg>
+                    //                 </div>
+                    //                 <p className="title">Mute</p>
+                    //             </div>
+                    //         </div>
+                    //         <hr />
+                    //         <div className="details">
+                    //             <label className="search-field">
+                    //                 <div className="icon">
+                    //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    //                         <circle cx="11" cy="11" r="8"></circle>
+                    //                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    //                     </svg>
+                    //                 </div>
+                    //                 <input id="search" className="search" type="text" placeholder="Search" />
+                    //             </label>
+                    //             <label className="dark-mode">
+                    //                 <span className="label">Dark Mode</span>
+                    //                 <input id="input-dark" className="input-dark" type="checkbox" />
+                    //                 <div className="toggle">
+                    //                     <div className="circle"></div>
+                    //                 </div>
+                    //             </label>
+                    //             <div className="theme">
+                    //                 <span className="label">Theme</span>
+                    //                 <div className="colors">
+                    //                     <div id="color-blue" className="color blue"></div>
+                    //                     <div id="color-red" className="color red"></div>
+                    //                     <div id="color-green" className="color green"></div>
+                    //                     <div id="color-purple" className="color purple"></div>
+                    //                 </div>
+                    //             </div>
+                    //             <div className="media">
+                    //                 <span className="label">
+                    //                     <svg stroke="currentColor" fill="none" strokeWidth="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                    //                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    //                     </svg>
+                    //                     <span>Shared photos</span>
+                    //                 </span>
+                    //                 <div className="photos">
+                    //                     <img className="img" src="https://i.imgur.com/8jqYvFL.jpeg" />
+                    //                     <img className="img" src="https://i.imgur.com/jlFgGpe.jpeg" />
+                    //                     <img className="img" src="https://i.imgur.com/BfyXuwR.gif" />
+                    //                 </div>
+                    //                 <span className="view-more">View more</span>
+                    //             </div>
+                    //         </div>
+                    //     </div>
+                    // </div>
                 }
+
         </>
     );
 }

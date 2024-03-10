@@ -681,15 +681,15 @@ body {
 }
 
 @media (max-width: 1120px) {
-  .detail-area {
+  /* .detail-area {
     display: none;
-  }
+  } */
 }
 
 @media (max-width: 780px) {
-  .conversation-area {
+  /* .conversation-area {
     display: none;
-  }
+  } */
 
   .search-bar {
     margin-left: 0;
