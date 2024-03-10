@@ -68,6 +68,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //   this.server.emit('message', payload);
   }
 
+  // =============================== Handle Muted users from a channel ============================
+
+  @SubscribeMessage('muteUser')
+  async handleMuteEvent(payload: any): Promise<void> {
+    await this.chatService.muteUser(payload);
+  }
 
   @SubscribeMessage('createChannel')
   async handleEventCreateChannel(socket: Socket, payload: any): Promise<void>{
@@ -79,9 +85,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.chatService.addNewUserChannelEntity(payload);
   }
 
+
+  @SubscribeMessage('kickTheUser')
+  async handleEvent(socket: Socket, payload: any): Promise<void> {
+    // in this event handler i am excpected to get the id of the user to
+    // kick and the id of the channe from where the user will be kicked.
+    socket.leave(payload.channelId);
+    await this.chatService.kickUserFromChannel(payload);
+  }
+
+  
+  // ===========> The call end points for socket.io events. ===================================================================
   @SubscribeMessage('mediaOffer')
   async handleOnMediaOffer( client: Socket,payload: any ) {
-    // console.log(payload)
     client.to(payload.to).emit('mediaOffer', {
       from: payload.from,
       offer: payload.offer
@@ -125,12 +141,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       from: payload.from
     });
   }
-  @SubscribeMessage('kickTheUser')
-  async handleEvent(socket: Socket, payload: any): Promise<void> {
-    // in this event handler i am excpected to get the id of the user to
-    // kick and the id of the channe from where the user will be kicked.
-    socket.leave(payload.channelId);
-    await this.chatService.kickUserFromChannel(payload);
-  }
+  
 }
 

@@ -8,6 +8,7 @@ import { User} from 'src/user/entities/user.entity';
 import { Channel } from 'src/user/entities/channel.entity';
 import { UserChannelRelationship, UserRole } from 'src/user/entities/user_channel_relation.entity';
 import { channel } from 'diagnostics_channel';
+import { Mute } from 'src/user/entities/mute.entity';
 
 @Injectable()
 export class ChatService {
@@ -20,6 +21,8 @@ export class ChatService {
     private readonly channelRepository: Repository<Channel>,
     @InjectRepository(UserChannelRelationship)
     private readonly UserChannelRelation: Repository<UserChannelRelationship>,
+    @InjectRepository(Mute)
+    private readonly muteRepository: Repository<Mute>
   ) {}
 
   /**
@@ -47,6 +50,9 @@ export class ChatService {
 
     return isReceiverBlocked || isSenderBlocker;
   }
+
+
+  // ====================================== Messages function ==========================================================================
 
   /**
    * addDirectMessage - add the messge to database.
@@ -90,6 +96,9 @@ export class ChatService {
   {
     return await this.msgRepository.findOne({where: {id}});
   }
+
+
+  // ============================= Channel function =================================================================
 
   /**
    * addNewChannelEntity - function that add a new entity to channel
@@ -136,6 +145,18 @@ export class ChatService {
     }
     else
       console.log("the user in channel-user relation is not found!!!");
+  }
+
+  // =============================== Mute functions ================================================
+  async muteUser(payload: any)
+  {
+    const newEntity = this.muteRepository.create({
+      finishAt: payload.endOfMute,
+      userId: payload.userId,
+      cid: payload.channelId
+    })
+    
+    await this.muteRepository.save(newEntity);
   }
 }
 
