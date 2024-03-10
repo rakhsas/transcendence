@@ -28,7 +28,7 @@ interface messageUser1 {
     // recieverUserName: string;
     to: string;
     from: string;
-    content: string;
+    message: string;
     image: string;
     senderId: string;
     recieverId: string;

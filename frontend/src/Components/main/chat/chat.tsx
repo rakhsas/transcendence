@@ -42,7 +42,6 @@ function chatComponent(): JSX.Element {
             }
         };
         fetchData();
-        console.log("----> " + userData[1])
         setSocketChat(userData[1]);
     }, [userData]);
     if (!userData[0] || !userData[1]) {
@@ -56,18 +55,16 @@ function chatComponent(): JSX.Element {
     }
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        console.log("ldak khouna: ", getMessageFriend(MESSAGES[selectedMessageIndex]))
         event.preventDefault();
         const newMessage: messageUser1 = {
             to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
             from: userData[0].id,
-            content: event.currentTarget.message.value,
+            message: event.currentTarget.message.value,
             image: '',
             senderId: userData[0].id,
             recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
             recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username
         };
-        // MESSAGES.push(newMessage);
         const newMessages = [...MESSAGES, newMessage];
         setMESSAGES(newMessages);
         setMessage('');
@@ -119,7 +116,6 @@ function chatComponent(): JSX.Element {
                                             getMessageFriend(MESSAGES[selectedMessageIndex]).firstName + ' ' + getMessageFriend(MESSAGES[selectedMessageIndex]).lastName
                                         }
                                     </div>
-                                
                                 </div>
                                 <div className="flex flex-row justify-between w-20 h-8">
                                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 50 50">
@@ -131,8 +127,7 @@ function chatComponent(): JSX.Element {
                                 </div>
                             </div>
                             <div className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
-                                {MESSAGES.map((message: { senderId: any; __owner__: { picture: string | undefined; }; img: string | undefined; content: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; date: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: Key | null | undefined) => (
-                                    console.log(lastMessageIndex),
+                                {MESSAGES.map((message: { senderId: any; __owner__: { picture: string | undefined; }; img: string | undefined; message: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; date: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: Key | null | undefined) => (
                                     <div className={`chat-msg ${message.senderId === userData[0].id ? 'owner' : null}`} key={index}>
                                         <div className="chat-msg-profile">
                                             <img className="chat-msg-img" src={message.senderId === userData[0].id ? userData[0].picture : getMessageFriend(MESSAGES[selectedMessageIndex]).picture } alt="" />
@@ -143,11 +138,11 @@ function chatComponent(): JSX.Element {
                                                     <img src={message.img} alt="" onDoubleClick={() => onOpenModal(message.img || '')} />
                                                 </div>
                                             ) : null}
-                                            {message.content ? (
+                                            {message.message ? (
                                                 <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                    {message.content}
+                                                    {message.message}
                                                 </div>
-                                            ) : null}
+                                            ) : 'ffadsfa'}
                                             {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
                                             {
                                                 (message.senderId === userData[0].id

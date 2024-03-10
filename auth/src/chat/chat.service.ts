@@ -61,9 +61,9 @@ export class ChatService {
    * @param content the content of the message
    */
   async addDirectMessage(payload: any): Promise<void> {
-    console.log('payload.recieverId: ',payload.recieverId, 'payload.senderId: ', payload.senderId)
+    // console.log('payload.recieverId: ',payload.recieverId, 'payload.senderId: ', payload.senderId)
     const directMessage = this.msgRepository.create({
-      message: payload.content,
+      message: payload.message,
       recieverId: payload.recieverId,
       senderId: payload.senderId
     });
