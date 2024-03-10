@@ -5,43 +5,89 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
+
+interface Player {
+  socket: any;
+}
+
+interface Room {
+  id: string;
+  players: Player[];
+}
+
 
 @WebSocketGateway({
   cors: true,
   path: '/sogame'
 })
 export class GameGetwayService {
-  @WebSocketServer() server: Server = new Server();
+  @WebSocketServer()
+  server: Server;
+
+  rooms: Room[] = [];
+  waitingPlayers: Player[] = [];
   private logger = new Logger('ChatGateway');
-  i: number = 0;
 
-  @SubscribeMessage('ready')
-  handleReady(client: Socket, payload: any){
-    this.i++;
-    this.logger.log('ready');
-    if (this.i % 2 == 0)
-      this.server.emit('start');
 
-  }
-  @SubscribeMessage('stop')
-  handleStop(){
-    this.i--;
-  }
-  @SubscribeMessage('push')
-  handleMessage(client: Socket, payload: any) {
-    // Emit the received message to the specified recipient
-    //
-    const { user,ball, id } = payload;
-    // this.server.emit('catch', user,ball, id);
-    client.broadcast.emit('catch', user,ball, id);
-//     this.sendMessageToSocket(recipient, 'catch', message);
+  @SubscribeMessage("connection")
+  handleConnection(client: any): void {
+    this.logger.log('Client connected');
+    this.waitingPlayers.push({ socket: client });
+    this.matchPlayers();
   }
 
-  // Method to send a message to a specific socket
-  private sendMessageToSocket(socketId: string, event: string, message: any) {
-    this.server.to(socketId).emit(event, message);
+
+
+
+  matchPlayers(): void {
+    while (this.waitingPlayers.length >= 2) {
+      const players = this.waitingPlayers.splice(0, 2);
+      const room: Room = { id: Math.random().toString(36).substring(7), players };
+      this.rooms.push(room);
+      players.forEach((player) => {
+        player.socket.join(room.id);
+        this.server.to(player.socket.id).emit('roomJoined', room.id);
+      });
+      this.server.to(room.id).emit('start');
+    }
   }
+
+  @SubscribeMessage('message')
+  handleMessage(client: any, payload: any): void {
+    const {user, ball, id} = payload;
+    client.broadcast.to(id).emit('message', user, ball)
+  }
+
+
+
+  @SubscribeMessage('disconnected')
+  handleDisconnect(client: any): void {
+    console.log('Client disconnected');
+    this.removePlayer(client.id);
+    this.matchPlayers();
+  }
+
+
+  private removePlayer(playerId: string): void {
+    this.waitingPlayers = this.waitingPlayers.filter((p) => p.socket.id !== playerId);
+    this.rooms.forEach((room) => {
+      room.players = room.players.filter((p) => p.socket.id !== playerId);
+    });
+    this.rooms = this.rooms.filter((room) => room.players.length > 0);
+  }
+
+
+
+
+
+
+
+
+
+
+
 }
 

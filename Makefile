@@ -13,7 +13,7 @@ build:
 down:
 	docker compose -f docker-compose.yml down -v
 
-clean: down remove
-	docker compose -f docker-compose.yml down --rmi all
+clean: down 
+	docker compose -f docker-compose.yml --rmi all
 
 re: down up
