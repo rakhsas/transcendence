@@ -64,13 +64,13 @@ function NavbarComponent(): JSX.Element {
         const newItem : notifItems = {
             from: data.from,
             to: data.to,
-            message: 'Directs You ',
+            message: ' Directs You.',
             sender: sender
         }
         const updatedItems: notifItems[] = [...notifications, newItem];
         setNotifications(updatedItems);
     }
-    socket?.on("directMessageNotif", onDirectMessage)
+    socket?.on("directMessageNotif", onDirectMessage);
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
         setNotificationCount(false)

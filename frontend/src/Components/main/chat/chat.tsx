@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal } from "react";
+import { useContext, useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useRef } from "react";
 import "./chat.css";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
@@ -14,6 +14,7 @@ import { Socket } from "socket.io-client";
 
 function chatComponent(): JSX.Element {
     const [MESSAGES, setMESSAGES] = useState<any>(null);
+    const [friendId, setFriendId] = useState('');
     const [selectedColor, setSelectedColor] = useState("black");
     const [selectedMessageIndex, setSelectedMessageIndex] = useState('0');
     const [socketChat, setSocketChat] = useState<Socket>();
@@ -26,19 +27,25 @@ function chatComponent(): JSX.Element {
     const [onOpenDetails, setOnOpenDetails] = useState<boolean>(false);
     const [onOpenConversation, setOnOpenConversation] = useState<boolean>(false);
     const messageService = new MessageService();
+    const messagesRef = useRef<HTMLElement>(null);
     const userData = useContext(DataContext);
     if (!userData) {
         return <LoadingComponent />;
     }
     useEffect(() => {
+        if (messagesRef.current)
+            scrollToBottom(messagesRef.current!);
+    }, [MESSAGES]);
+    
+    const scrollToBottom = (element: HTMLElement) => {
+        element.scrollTop = element.scrollHeight;
+    };
+    useEffect(() => {
         if (!userData[0] || !userData[1]) return;
-        // console.log(userData)
         const fetchData = async () => {
             try {
-                // console.log(userData[0].id)
                 const fetchedUserData = await messageService.latestMessages(userData[0].id);
                 setLatestMessages(fetchedUserData);
-                // console.log(fetchedUserData)
             } catch (error) {
                 console.error('Error fetching user ', error);
             }
@@ -51,8 +58,8 @@ function chatComponent(): JSX.Element {
     }
     const latestGroupMessages: any = [];
     function userLastMessageIndex(): string {
-        return MESSAGES.find(selectedMessageIndex).findLastIndex(
-            (message: { senderId: any; }) => Number(message.senderId) === userData[0].id);
+        return MESSAGES.findLastIndex(
+            (message: { senderId: any; }) => message.senderId === userData[0].id);
     }
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -77,13 +84,17 @@ function chatComponent(): JSX.Element {
     var messages: messageUser[] = [];
     const handleSelectMessage = async (index: string, friendId: string) => {
         setSelectedMessageIndex(index);
+        setFriendId(friendId);
         // console.log(selectedMessageIndex)
-        await setMESSAGES(await messageService.getMessages(userData[0].id, friendId));
-        // console.log("latestMessages", MESSAGES)
-        // console.log("messages", MESSAGES[index]);
-
+        await setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
+        // await setLastMessageIndex(userLastMessageIndex())
     };
+    const onDirectMessage = async (data: any) => {
+        await setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
+        setLatestMessages(await messageService.latestMessages(userData[0].id))
 
+    }
+    socketChat?.on("directMessageNotif", onDirectMessage)
     const handleOpenDetails = () => {
         setOnOpenDetails(!onOpenDetails)
     }
@@ -104,6 +115,7 @@ function chatComponent(): JSX.Element {
         const { __owner__, __reciever__ } = message;
         return __owner__.id === userData[0].id ? __reciever__ : __owner__;
     };
+    
     return (
         <>
             <div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
@@ -144,7 +156,7 @@ function chatComponent(): JSX.Element {
                                         </svg>
                                     </div>
                                 </div>
-                                <div className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
+                                <div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
                                     {MESSAGES.map((message: any, index: any) => (
                                         <div className={`chat-msg ${message.senderId === userData[0].id ? 'owner' : null}`} key={index}>
                                             <div className="chat-msg-profile">
@@ -169,12 +181,13 @@ function chatComponent(): JSX.Element {
                                                 {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
                                                 {
                                                     (
-                                                        console.log("index: ", index, ' lastMessageIndex: ', lastMessageIndex),
                                                         message.senderId === userData[0].id
-                                                        //    && index === lastMessageIndex
+                                                           && index === (userLastMessageIndex())
                                                     )
                                                         ?
-                                                        <div className='chat-msg-date text-main-light-FERN'> {message.date} </div>
+                                                        <div className='chat-msg-date text-main-light-FERN'>
+                                                            {new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}
+                                                        </div>
                                                         :
                                                         null
                                                 }
