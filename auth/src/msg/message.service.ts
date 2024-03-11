@@ -1,10 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { Msg } from "./entities/msg.entitiy";
+import { Msg } from "../user/entities/msg.entitiy";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { HttpService } from "@nestjs/axios";
-import { Friendship } from "./entities/freindship.entity";
-import { User } from "./model/user.model";
+import { Friendship } from "../user/entities/freindship.entity";
+import { User } from "../user/model/user.model";
 
 @Injectable()
 

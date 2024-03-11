@@ -1,27 +1,28 @@
 // src/chat/chat.gateway.ts
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect  } from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
-@WebSocketGateway({cors: true, path: '/chat', methods: ['GET', 'POST']})
+@WebSocketGateway({ cors: true, path: '/chat', methods: ['GET', 'POST'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   usersArray = [];
   peerConnections: { [userId: string]: RTCPeerConnection } = {};
-  
+
   private connectedUsers: Map<string, Socket> = new Map();
-  constructor(private readonly chatService: ChatService) {}
+  constructor(private readonly chatService: ChatService) { }
 
   handleConnection(client: Socket) {
     const userName = String(client.handshake.query.userName);
     this.connectedUsers.set(userName, client);
+    console.log('username: ' + userName, 'client id: ' + client.id);
     this.usersArray.push(client.id);
     client.emit('update-user-list', { userIds: this.usersArray });
     this.server.emit('update-user-list', { userIds: this.usersArray });
   }
-  
+
   handleDisconnect(client: Socket) {
     if (this.peerConnections[client.id]) {
       this.peerConnections[client.id].close();
@@ -29,12 +30,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     // console.log('A user disconnected');
     this.usersArray = this.usersArray.filter(id => id !== client.id);
-    client.broadcast.emit('update-user-list', { userIds: this.usersArray});
+    client.broadcast.emit('update-user-list', { userIds: this.usersArray });
     client.broadcast.emit('user-disconnected', { userId: client.id });
     const userName = String(client.handshake.query.userName);
     this.connectedUsers.delete(userName);
   }
 
+  // ============================ messages functions ===============================================================
+  
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
    // you can put the blocked code here {if they are blocked they can't send messages}.
@@ -44,26 +47,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     {
       const recieverName = String(payload.recieverName);
       const toUserSocket = this.connectedUsers.get(recieverName);
-      if (toUserSocket)
-      {
-        // you can put here the logic of blocked users and send Error message in the socket arguments. 
-        // The code goes here ...
-
-
+      console.log('toUserSocket: ', payload.message);
+      if (toUserSocket) {
         toUserSocket.emit('message', {
           "to": payload.to,
           "from": payload.from,
-          "content": payload.content,
-          "isOwner": false
+          "message": payload.message,
+          "image": payload.image,
+          // "isOwner": false
         });
-
+        toUserSocket.emit('directMessageNotif', {
+          to: payload.to,
+          from: payload.from,
+          senderId: payload.senderId,
+          recieverId: payload.recieverId
+        })
         await this.chatService.addDirectMessage(payload)
       }
+      else
+        await this.chatService.addDirectMessage(payload)
       client.emit('message', payload);
     }
+    //   this.server.emit('message', payload);
   }
 
-  // =============================== Mute events =========================================================================
+ 
+
+  // =============================== Handle Muted users from a channel ============================
 
   @SubscribeMessage('muteUser')
   async handleMuteEvent(payload: any): Promise<void> {
@@ -73,7 +83,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // ================================ Channel hevents ====================================================================
 
   @SubscribeMessage('createChannel')
-  async handleEventCreateChannel(socket: Socket, payload: any): Promise<void>{
+  async handleEventCreateChannel(socket: Socket, payload: any): Promise<void> {
     // here the payload must containe the id of the user who create the channel so it can be set as owner
     // create a new entity in the database (new channel)
     // add new entity in user channel relation the user must set as owner
@@ -93,8 +103,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   
   // ============================== Vedio call events ===================================================================
+  
+  @SubscribeMessage('callUser')
+  async handleCallUser(client: Socket, payload: any) {
+    console.log('callUser');
+    client.to(payload.to).emit('RequestCall', {
+      from: payload.from,
+      offer: payload.offer,
+      senderId: payload.senderId,
+      recieverId: payload.recieverId
+    });
+  }
+  
   @SubscribeMessage('mediaOffer')
-  async handleOnMediaOffer( client: Socket,payload: any ) {
+  async handleOnMediaOffer(client: Socket, payload: any) {
     client.to(payload.to).emit('mediaOffer', {
       from: payload.from,
       offer: payload.offer
@@ -111,33 +133,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('iceCandidate')
-  async handleIceCandidate(client: Socket, payload: any)
-  {
+  async handleIceCandidate(client: Socket, payload: any) {
     client.to(payload.to).emit('remotePeerIceCandidate', {
       candidate: payload.candidate,
       client: client.id
     });
   }
 
-  @SubscribeMessage('callUser')
-  async handleCallUser(client: Socket, payload: any)
-  {
-    console.log('callUser');
-    client.to(payload.to).emit('RequestCall', {
-      from: payload.from,
-      offer: payload.offer
-    });
-  }
+ 
 
   @SubscribeMessage('acceptCall')
-  async handleAcceptCall(client: Socket, payload: any)
-  {
+  async handleAcceptCall(client: Socket, payload: any) {
     console.log('acceptCall');
     client.to(payload.to).emit('AcceptCall', {
       answer: payload.answer,
       from: payload.from
     });
   }
-  
+
 }
 

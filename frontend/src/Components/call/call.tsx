@@ -44,21 +44,21 @@ function CallComponent() {
         //     call();
         // });
         // incomingCalls?.appendChild(callButton);
-        const dropdown = document.querySelector('#dropdown');
-        // console.log(dropdown);
-        const notifli = document.createElement('li');
-        notifli.className = "flex items-center px-4 py-2";
-        const notifliImg = document.createElement('img');
-        notifliImg.src = userData[0].picture;
-        notifliImg.className = "w-8 h-8 rounded-full mr-2";
-        const notifliSpan = document.createElement('span');
-        notifliSpan.innerText = `you have a call from ${data.from}`;
-        notifli.appendChild(notifliImg);
-        console.log(dropdown)
-        notifli.appendChild(notifliSpan);
-        dropdown?.appendChild(notifli);
+        // const dropdown = document.querySelector('#dropdown');
+        // // console.log(dropdown);
+        // const notifli = document.createElement('li');
+        // notifli.className = "flex items-center px-4 py-2";
+        // const notifliImg = document.createElement('img');
+        // notifliImg.src = userData[0].picture;
+        // notifliImg.className = "w-8 h-8 rounded-full mr-2";
+        // const notifliSpan = document.createElement('span');
+        // notifliSpan.innerText = `you have a call from ${data.from}`;
+        // notifli.appendChild(notifliImg);
+        // console.log(dropdown)
+        // notifli.appendChild(notifliSpan);
+        // dropdown?.appendChild(notifli);
     }
-    socket?.on("RequestCall", onUserCall)
+    // socket?.on("RequestCall", onUserCall)
     const createPeerConnection = () => {
         return new RTCPeerConnection({
             iceServers: [

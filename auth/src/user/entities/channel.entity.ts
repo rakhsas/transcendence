@@ -24,7 +24,8 @@ export class Channel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: 'uuid_generate_v4()', unique: true })
+  @Column({unique: true})
+  // @Column({ default: 'uuid_generate_v4()', unique: true })
   name: string;
 
   @CreateDateColumn()
