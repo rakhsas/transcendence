@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Msg } from './../user/entities/msg.entitiy';
 import { UUID, privateDecrypt } from 'crypto';
-import { Repository } from 'typeorm';
+import { Repository, UnorderedBulkOperation } from 'typeorm';
 import { User} from 'src/user/entities/user.entity';
 import { Channel } from 'src/user/entities/channel.entity';
 import { UserChannelRelationship, UserRole } from 'src/user/entities/user_channel_relation.entity';
@@ -41,9 +41,12 @@ export class ChatService {
    * @returns true if the sender or the receiver is blocked, flase otherwise.act class t
    */
 
+
+  // ================================= Users functions ================================================================================
+
   async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
-    const sender = await this.userRepository.findOne({where: {providerId: IdSender}, select: { blocks: true }});
-    const receiver = await this.userRepository.findOne({where: {providerId: idReceiver}, select: {blocks: true}});
+    const sender = await this.userRepository.findOne({where: {id: IdSender}, select: { blocks: true }});
+    const receiver = await this.userRepository.findOne({where: {id: idReceiver}, select: {blocks: true}});
 
     const isReceiverBlocked = sender?.blocks.includes(idReceiver) ?? false;
     const isSenderBlocker = receiver?.blocks.includes(IdSender) ?? false;
@@ -51,6 +54,23 @@ export class ChatService {
     return isReceiverBlocked || isSenderBlocker;
   }
 
+
+  async BlockUser(userId: UUID, idOfBlockedUser: UUID): Promise <User>
+  {
+    const user = await this.userRepository.findOne({where: {id: userId}});
+    
+    if (!user)
+      throw new Error("User Not Found!");
+    if (!user.blocks.includes(idOfBlockedUser))
+    {
+      user.blocks = [...user.blocks, idOfBlockedUser];
+      return this.userRepository.save(user);
+    }
+    else
+    {
+      throw new Error("User already blocked!! :)");
+    }
+  }
 
   // ====================================== Messages function ==========================================================================
 
@@ -61,10 +81,11 @@ export class ChatService {
    * @param content the content of the message
    */
   async addDirectMessage(payload: any): Promise<void> {
-    const directMessage = this.msgRepository.create({
+    const directMessage = this.msgRepository.create({ 
       message: payload.content,
       recieverId: payload.receiverId,
-      senderId: payload.senderId
+      senderId: payload.senderId,
+      cid: (payload.cid !== undefined) ? payload.cid : null,
     });
     await this.msgRepository.save(directMessage);
   }

@@ -23,11 +23,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   
   handleDisconnect(client: Socket) {
-    // throw new Error('Method not implemented.');
-    // const userName = String(client.handshake.query.userName);
-    // this.connectedUsers.delete(userName);
-    // console.log('A user disconnected');
-    // console.log('client id: ' + client.id);
     if (this.peerConnections[client.id]) {
       this.peerConnections[client.id].close();
       delete this.peerConnections[client.id];
@@ -43,6 +38,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
    // you can put the blocked code here {if they are blocked they can't send messages}.
+   if (await this.chatService.areUsersBlocked(payload.to, payload.from) === true)
+      return;
     if (payload.hasOwnProperty('recieverName'))
     {
       const recieverName = String(payload.recieverName);
