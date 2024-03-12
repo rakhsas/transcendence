@@ -16,6 +16,8 @@ import { Friendship } from './freindship.entity'; // Assuming you have a Friends
 import { Msg } from './msg.entitiy'; // Assuming you have a Msg entity
 import { Mute } from './mute.entity'; // Assuming you have a Mute entity
 import { v4 as uuidv4 } from 'uuid'
+import { UserChannelRelationship } from './user_channel_relation.entity';
+import { forwardRef } from '@nestjs/common';
 
 @Entity('users') // Table name mapping
 @Unique(['id', 'email', 'providerId', 'username'])
@@ -63,8 +65,8 @@ export class User {
   @Column({ nullable: false, unique: true })
   username: string;
 
-  @Column('uuid', { array: true, default: [] })
-  adding: string[];
+  // @Column('uuid', { array: true, default: [] })
+  // adding: string[];
 
   @Column('uuid', { array: true, default: [] })
   added: string[];
@@ -72,8 +74,8 @@ export class User {
   @Column('uuid', { array: true, default: [] })
   blocks: string[];
 
-  @Column('uuid', { array: true, default: [] })
-  blocking: string[];
+  // @Column('uuid', { array: true, default: [] })
+  // blocking: string[];
   
   @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true })
   Muted: Promise<Mute[]>;
@@ -97,6 +99,22 @@ export class User {
   
   //@ManyToMany(() => Friendship, (friendship) => friendship.friendOf) // New relationship
  // friendOf: User[]; // Array of User objects representing users who befriended this user
+
+//  @OneToMany(() => ChannelMembership, membership => membership.user, {lazy: true})
+//   channelMemberships: Promise<ChannelMembership[]>; // Ensure this property is correctly defined
+
+//   @ManyToMany(() => Channel, channel => channel.members, {lazy: true})
+//   channels: Promise<Channel[]>;
+  
+
+// @OneToMany(() => Channel, channel => channel.owner, {lazy: true})
+// channelsOwned: Promise<Channel[]>;
+
+// @ManyToMany(() => Channel, channel => channel.members, {lazy: true})
+// channels: Promise<Channel[]>;
+
+
+
 
   @BeforeInsert()
   generateUUID() {

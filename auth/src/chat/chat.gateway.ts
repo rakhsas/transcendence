@@ -5,6 +5,8 @@ import { ChatService } from './chat.service';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
+
+// connectionStateRecovery();
 @WebSocketGateway({ cors: true, path: '/chat', methods: ['GET', 'POST'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -28,6 +30,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.peerConnections[client.id].close();
       delete this.peerConnections[client.id];
     }
+
     // console.log('A user disconnected');
     this.usersArray = this.usersArray.filter(id => id !== client.id);
     client.broadcast.emit('update-user-list', { userIds: this.usersArray });

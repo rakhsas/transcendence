@@ -10,6 +10,32 @@ export enum UserRole {
   BLOCKED = 'blocked',
 }
 
+// @Entity()
+// export class ChannelMembership {
+//   @PrimaryGeneratedColumn()
+//   id: number;
+
+  // @ManyToOne(() => User, user => user.channelMemberships, { eager: true , lazy: true})
+  // user: Promise<User>;
+
+  // @ManyToOne(() => Channel, channel => channel.channelMemberships, { eager: true, lazy: true})
+  // channel: Promise<Channel>;
+
+  // @Column({ type: 'enum', enum: ['admin', 'member', 'owner'], default: 'member' })
+  // role: 'admin' | 'member' | 'owner';
+
+  // @ManyToOne(() => User, user => user.channelMemberships)
+  // user: User;
+
+  // @ManyToOne(() => Channel, channel => channel.channelMemberships)
+  // channel: Channel;
+
+  // @Column({ type: 'enum', enum: ['admin', 'member', 'owner'], default: 'member' })
+  // role: 'admin' | 'member' | 'owner';
+
+// }
+
+
 @Entity('user_channel_relationships')
 export class UserChannelRelationship {
   @PrimaryGeneratedColumn()
