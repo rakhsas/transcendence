@@ -36,7 +36,7 @@ function chatComponent(): JSX.Element {
         if (messagesRef.current)
             scrollToBottom(messagesRef.current!);
     }, [MESSAGES]);
-    
+
     const scrollToBottom = (element: HTMLElement) => {
         element.scrollTop = element.scrollHeight;
     };
@@ -100,7 +100,7 @@ function chatComponent(): JSX.Element {
     }
 
     const handleSelectedColor = (color: string) => {
-        setSelectedColor(color);
+        // setSelectedColor(color);
     }
 
     const onOpenModal = (picPath: string) => {
@@ -115,22 +115,23 @@ function chatComponent(): JSX.Element {
         const { __owner__, __reciever__ } = message;
         return __owner__.id === userData[0].id ? __reciever__ : __owner__;
     };
-    
+
     return (
         <>
             <div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
-                <div className="conversation-area border-r-[1px] dark:border-gray-700 border-black">
+                <div className="flex flex-col relative overflow-y-auto overflow-x-hidden border-r-[1px] dark:border-gray-700 border-black">
                     {ConversationArea({ latestMessages, selectedMessageIndex, latestGroupMessages, handleSelectMessage, userData })}
                 </div>
                 {
                     !MESSAGES
-                    ?
+                        ?
                         <div className="defaul-chat-page">
 
                         </div>
-                    :
-                        <div className="chat-area  flex flex-col overflow-hidden flex-1">
-                            <div className="flex-1 overflow-hidden">
+                        :
+                        <div className="flex flex-col overflow-hidden flex-1 bg-rose-300 h-full border-4 border-yellow-200">
+                            {/* <div className="area  bg-slate-400"></div> */}
+                            <div className="flex-1 overflow-hidden border-2 border-red-700 h-[95%]">
                                 <div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-zinc-800">
                                     <div className="flex flex-row items-center space-x-2">
                                         <div className="msg-profile group">
@@ -149,14 +150,14 @@ function chatComponent(): JSX.Element {
                                         <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24">
                                             <path d="M 4 4.75 C 3.271 4.75 2.5706875 5.0396875 2.0546875 5.5546875 C 1.5396875 6.0706875 1.25 6.771 1.25 7.5 L 1.25 16.5 C 1.25 17.229 1.5396875 17.929313 2.0546875 18.445312 C 2.5706875 18.960313 3.271 19.25 4 19.25 L 14.5 19.25 C 15.229 19.25 15.929312 18.960313 16.445312 18.445312 C 16.960313 17.929313 17.25 17.229 17.25 16.5 L 17.25 16.166016 L 20.982422 17.861328 C 21.369422 18.037328 21.819734 18.004438 22.177734 17.773438 C 22.534734 17.543438 22.75 17.147656 22.75 16.722656 L 22.75 7.2773438 C 22.75 6.8523438 22.534734 6.4565625 22.177734 6.2265625 C 21.819734 5.9955625 21.369422 5.9626719 20.982422 6.1386719 L 17.25 7.8339844 L 17.25 7.5 C 17.25 6.771 16.960313 6.0706875 16.445312 5.5546875 C 15.929312 5.0396875 15.229 4.75 14.5 4.75 L 4 4.75 z M 4 6.25 L 14.5 6.25 C 14.832 6.25 15.149766 6.3812344 15.384766 6.6152344 C 15.618766 6.8502344 15.75 7.168 15.75 7.5 L 15.75 9 L 15.75 15 L 15.75 16.5 C 15.75 16.832 15.618766 17.149766 15.384766 17.384766 C 15.149766 17.618766 14.832 17.75 14.5 17.75 L 4 17.75 C 3.668 17.75 3.3502344 17.618766 3.1152344 17.384766 C 2.8812344 17.149766 2.75 16.832 2.75 16.5 L 2.75 7.5 C 2.75 7.168 2.8812344 6.8502344 3.1152344 6.6152344 C 3.3502344 6.3812344 3.668 6.25 4 6.25 z M 21.25 7.6640625 L 21.25 16.335938 L 17.25 14.517578 L 17.25 9.4824219 C 17.25 9.4824219 20.213 8.1350625 21.25 7.6640625 z" fill="white"></path>
                                         </svg>
-                                        <svg className="button-option icon"  stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="23" width="23" xmlns="http://www.w3.org/2000/svg" onClick={handleOpenDetails}>
+                                        <svg className="button-option icon" stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="23" width="23" xmlns="http://www.w3.org/2000/svg" onClick={handleOpenDetails}>
                                             <circle cx="12" cy="12" r="10"></circle>
                                             <line x1="12" y1="16" x2="12" y2="12"></line>
                                             <line x1="12" y1="8" x2="12.01" y2="8"></line>
                                         </svg>
                                     </div>
                                 </div>
-                                <div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-16 p-2 ${selectedColor}`}>
+                                <div ref={messagesRef} className={`chat-area-main h-full overflow-auto p-2 ${selectedColor}`}>
                                     {MESSAGES.map((message: any, index: any) => (
                                         <div className={`chat-msg ${message.senderId === userData[0].id ? 'owner' : null}`} key={index}>
                                             <div className="chat-msg-profile">
@@ -170,10 +171,10 @@ function chatComponent(): JSX.Element {
                                                 ) : null}
                                                 {
                                                     // message.message.length > 0 ? (
-                                                        <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                            {message.message}
-                                                        </div>
-                                                // ) :
+                                                    <div className="chat-msg-text bg-main-light-FERN text-white">
+                                                        {message.message}
+                                                    </div>
+                                                    // ) :
                                                     // <div className="chat-msg-text bg-main-light-FERN text-white">
                                                     //     {message.message}
                                                     // </div>
@@ -182,7 +183,7 @@ function chatComponent(): JSX.Element {
                                                 {
                                                     (
                                                         message.senderId === userData[0].id
-                                                           && index === (userLastMessageIndex())
+                                                        && index === (userLastMessageIndex())
                                                     )
                                                         ?
                                                         <div className='chat-msg-date text-main-light-FERN'>
@@ -196,21 +197,23 @@ function chatComponent(): JSX.Element {
                                     ))}
                                 </div>
                             </div>
-
-                            <form onSubmit={handleSubmit}>
-                                <div className="footer flex bg-zinc-900 border-t-2   border-t-gray-500 flex-row items-center w-full overflow-hidden" style={{ padding: "10px 20px" }} >
-                                    <TextInput className="p-2 w-full" name="message" type="text" theme={inputTheme} value={message} onChange={(e) => setMessage(e.target.value)} color={"primary"} placeholder="Type something here..." />
-                                    <button type="submit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32px" height="32px" >
-                                            <path d="M 5.4453125 4.0019531 A 1.50015 1.50015 0 0 0 4.109375 6.0644531 L 11.380859 24 L 4.109375 41.935547 A 1.50015 1.50015 0 0 0 6.1699219 43.841797 L 43.169922 25.341797 A 1.50015 1.50015 0 0 0 43.169922 22.658203 L 6.1699219 4.1582031 A 1.50015 1.50015 0 0 0 5.4453125 4.0019531 z M 8.3828125 8.6191406 L 39.146484 24 L 8.3828125 39.380859 L 14.011719 25.5 L 27.5 25.5 A 1.50015 1.50015 0 1 0 27.5 22.5 L 14.011719 22.5 L 8.3828125 8.6191406 z" fill="white" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </form>
+                            <div className="area h-[10%] bg-slate-700">
+                                {/* <div className="text h-full bg-red-400"></div> */}
+                                <form onSubmit={handleSubmit} className=" m-0 border-2 h-full border-white bg-green-400">
+                                    <div className=" border-t-2 border-t-gray-500 bg-zinc-900 flex flex-row h-full justify-center w-full overflow-hidden">
+                                            <TextInput className="p-4 w-full" name="message" type="text" theme={inputTheme} value={message} onChange={(e) => setMessage(e.target.value)} color={"primary"} placeholder="Type something here..." />
+                                            <button type="submit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32px" height="32px" >
+                                                    <path d="M 5.4453125 4.0019531 A 1.50015 1.50015 0 0 0 4.109375 6.0644531 L 11.380859 24 L 4.109375 41.935547 A 1.50015 1.50015 0 0 0 6.1699219 43.841797 L 43.169922 25.341797 A 1.50015 1.50015 0 0 0 43.169922 22.658203 L 6.1699219 4.1582031 A 1.50015 1.50015 0 0 0 5.4453125 4.0019531 z M 8.3828125 8.6191406 L 39.146484 24 L 8.3828125 39.380859 L 14.011719 25.5 L 27.5 25.5 A 1.50015 1.50015 0 1 0 27.5 22.5 L 14.011719 22.5 L 8.3828125 8.6191406 z" fill="white" />
+                                                </svg>
+                                            </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                 }
 
-                    {onOpenDetails ?  DetailsArea({ MESSAGES, selectedMessageIndex, handleSelectedColor, selectedColor, modalPicPath, isModalOpen, onCloseModal, onOpenModal, getMessageFriend, handleOpenDetails }) : null}
+                {onOpenDetails ? DetailsArea({ MESSAGES, selectedMessageIndex, handleSelectedColor, selectedColor, modalPicPath, isModalOpen, onCloseModal, onOpenModal, getMessageFriend, handleOpenDetails }) : null}
             </div>
         </>
     );

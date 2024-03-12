@@ -61,7 +61,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                             </div>
                             <div className="msg-content font-medium text-xs">
                                 <span className="msg-message whitespace-nowrap overflow-hidden overflow-ellipsis text-main-dark-SIDEMESSAGE">
-                                    {message.senderId === userData[0].id ? <span className="font-poppins font-bold text-gray-700">YOU:<span className="text-white"> {message.message} </span> </span>: message.message}
+                                    {message.senderId === userData[0].id ? <span className="font-poppins font-bold text-gray-700">YOU:<span className="text-black dark:text-white"> {message.message} </span> </span>: message.message}
                                 </span>
                                 <span className="msg-date text-main-light-FERN text-sm ml-4">
                                     {new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}
