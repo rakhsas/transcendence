@@ -15,9 +15,14 @@ export class ChannelController {
     }
 
     @Get(':userId/channels')
-    async getChannelsByUserId(@Param('userId') userId: string)
+    async getChannelsByUserId(@Param('userId') userId: UUID)
     {
         return this.channelService.getChannelsByUserId(userId);
     }
 
+    @Get(':id/lastmessage')
+    async getLastMessageOfChannel(@Param('id') channelId: number)
+    {
+        return this.channelService.getLastMessageOfChannel(channelId);
+    }
 }

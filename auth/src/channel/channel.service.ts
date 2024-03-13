@@ -6,6 +6,7 @@ import { Repository } from "typeorm/repository/Repository";
 import { UUID, privateDecrypt } from 'crypto';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { channel } from 'diagnostics_channel';
+import { Msg } from 'src/user/entities/msg.entitiy';
 
 @Injectable()
 export class ChannelService {
@@ -16,7 +17,9 @@ export class ChannelService {
         @InjectRepository(Channel)
         private channelRepository: Repository<Channel>,
         @InjectRepository(ChannelUser)
-        private channelUserRepository: Repository<ChannelUser>
+        private channelUserRepository: Repository<ChannelUser>,
+        @InjectRepository(Msg)
+        private msgRepository: Repository<Msg>
         // @InjectRepository(User)
         // private userRepository: Repository<User>
     ) {
@@ -46,7 +49,7 @@ export class ChannelService {
         return users;
     }
 
-    async getChannelsByUserId(userId: string): Promise<{}[]> {
+    async getChannelsByUserId(userId: UUID): Promise<{}[]> {
         const userChannels =  await this.channelUserRepository.find({
             where: {user: {id: userId}},
             relations: ['channel']
@@ -60,4 +63,13 @@ export class ChannelService {
 
         return channels;
     }
+
+    async getLastMessageOfChannel(channelId: number): Promise<{}>{
+        return this.msgRepository.createQueryBuilder('msg')
+      .where('msg.cid = :channelId', { channelId })
+      .orderBy('msg.date', 'DESC')
+      .limit(1)
+      .getOne();
+    }
+
 }
