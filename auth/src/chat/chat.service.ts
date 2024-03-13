@@ -6,9 +6,10 @@ import { UUID, privateDecrypt } from 'crypto';
 import { Repository, UnorderedBulkOperation } from 'typeorm';
 import { User} from 'src/user/entities/user.entity';
 import { Channel } from 'src/user/entities/channel.entity';
-import { UserChannelRelationship, UserRole } from 'src/user/entities/user_channel_relation.entity';
 import { channel } from 'diagnostics_channel';
 import { Mute } from 'src/user/entities/mute.entity';
+import { ChannelUser } from 'src/user/entities/channel_member.entity';
+import { UserRole } from '../user/entities/channel_member.entity';
 
 @Injectable()
 export class ChatService {
@@ -19,10 +20,10 @@ export class ChatService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Channel)
     private readonly channelRepository: Repository<Channel>,
-    @InjectRepository(UserChannelRelationship)
-    private readonly UserChannelRelation: Repository<UserChannelRelationship>,
     @InjectRepository(Mute)
-    private readonly muteRepository: Repository<Mute>
+    private readonly muteRepository: Repository<Mute>,
+    @InjectRepository(ChannelUser)
+    private readonly channelUserRepository: Repository<ChannelUser>
   ) {}
 
   /**
@@ -135,20 +136,30 @@ export class ChatService {
       password: "password" in payload ? payload.password : null,
       // password: payload.password !== undefined ? payload.password : null,
       type: payload.channelType,
+      ownerId: payload.ownerId
     });
 
     await this.channelRepository.save(newEntityChannel);
   }
 
-  async addNewUserChannelEntity(payload: any)
-  {
-    const newEntitiyUChannel = this.UserChannelRelation.create({
-      user: payload.userId,
-      channel: payload.channelId,
-      role: UserRole.OWNER,
-      isAllowed: true
+  async addNewMemberToChannel(payload: any) {
+    // Load user and channel entities
+    const user = await this.userRepository.findOne(payload.userId);
+    const channel = await this.channelRepository.findOne(payload.channelId);
+
+    if (!user || !channel) {
+      throw new Error('User or channel not found'); // Handle the case where user or channel is not found
+    }
+
+    // Create a new ChannelUser instance
+    const newEntity = this.channelUserRepository.create({
+      user,
+      channel,
+      role: payload.role,
     });
-    await this.UserChannelRelation.save(newEntitiyUChannel);
+
+    // Save the new ChannelUser record
+    await this.channelUserRepository.save(newEntity);
   }
 
   /**
@@ -156,19 +167,19 @@ export class ChatService {
    * @param payload userId and channelId from where the user will be kicked
    * in the channel-user entity.
    */
-  async kickUserFromChannel(payload: any)
-  {
-    const targetedEntity = await this.UserChannelRelation.findOne({
-      where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
-    });
+  // async kickUserFromChannel(payload: any)
+  // {
+  //   const targetedEntity = await this.UserChannelRelation.findOne({
+  //     where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
+  //   });
 
-    if (targetedEntity)
-    {
-      await this.UserChannelRelation.delete(targetedEntity);
-    }
-    else
-      console.log("the user in channel-user relation is not found!!!");
-  }
+  //   if (targetedEntity)
+  //   {
+  //     await this.UserChannelRelation.delete(targetedEntity);
+  //   }
+  //   else
+  //     console.log("the user in channel-user relation is not found!!!");
+  // }
 
   // =============================== Mute functions ================================================
   async muteUser(payload: any)

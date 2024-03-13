@@ -85,24 +85,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // ================================ Channel hevents ====================================================================
 
-  @SubscribeMessage('createChannel')
-  async handleEventCreateChannel(socket: Socket, payload: any): Promise<void> {
-    // here the payload must containe the id of the user who create the channel so it can be set as owner
-    // create a new entity in the database (new channel)
-    // add new entity in user channel relation the user must set as owner
-    socket.join(payload.channelId);
-    await this.chatService.addNewChannelEntity(payload);
-    await this.chatService.addNewUserChannelEntity(payload);
-  }
+  // @SubscribeMessage('createChannel')
+  // async handleEventCreateChannel(socket: Socket, payload: any): Promise<void> {
+  //   // here the payload must containe the id of the user who create the channel so it can be set as owner
+  //   // create a new entity in the database (new channel)
+  //   // add new entity in user channel relation the user must set as owner
+  //   socket.join(payload.channelId);
+  //   await this.chatService.addNewChannelEntity(payload);
+  //   await this.chatService.addNewUserChannelEntity(payload);
+  // }
 
 
-  @SubscribeMessage('kickTheUser')
-  async handleEvent(socket: Socket, payload: any): Promise<void> {
-    // in this event handler i am excpected to get the id of the user to
-    // kick and the id of the channe from where the user will be kicked.
-    socket.leave(payload.channelId);
-    await this.chatService.kickUserFromChannel(payload);
-  }
+  // @SubscribeMessage('kickTheUser')
+  // async handleEvent(socket: Socket, payload: any): Promise<void> {
+  //   // in this event handler i am excpected to get the id of the user to
+  //   // kick and the id of the channe from where the user will be kicked.
+  //   socket.leave(payload.channelId);
+  //   await this.chatService.kickUserFromChannel(payload);
+  // }
 
   
   // ============================== Vedio call events ===================================================================

@@ -15,7 +15,6 @@ export class Friendship {
   @JoinColumn({ name: 'friend_id' })
   friend: Promise<User>;
 
-
   // @PrimaryGeneratedColumn()
   // id: number;
 
@@ -25,7 +24,4 @@ export class Friendship {
 
   //@ManyToMany(() => User, (user) => user.friendOf) // Inverted relationship (optional)
   //friendOf: User[]; // user who consider user as friend
-  // bla matssawl 3la lfar9 binathom hit ta ana ma3raftch, mais t9dar tkon 3arf la la mohal.
-
-
 }

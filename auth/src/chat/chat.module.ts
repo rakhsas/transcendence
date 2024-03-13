@@ -7,13 +7,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MsgController } from '../msg/msg.controller';
 import { User } from 'src/user/entities/user.entity';
-import { UserChannelRelationship } from 'src/user/entities/user_channel_relation.entity';
 import { Channel } from 'src/user/entities/channel.entity';
 import { Mute } from 'src/user/entities/mute.entity';
+import { ChannelUser } from 'src/user/entities/channel_member.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Msg, User, Channel, UserChannelRelationship, Mute]),
+    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser]),
   ],
   providers: [ChatService, ChatGateway, Repository, MsgController],
   // providers: [ChatService, ChatGateway, Repository, MsgController, MsgRepository, UserRepository],

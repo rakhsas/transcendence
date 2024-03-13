@@ -11,10 +11,9 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { User } from './user.entity'; // Import the User1 entity
-import { Mute } from './mute.entity'; // Import the Mute entity
-import { Msg } from './msg.entitiy'; // Import the Msg entity
-import { UserChannelRelationship } from './user_channel_relation.entity';
+import { User } from './user.entity';
+import { Mute } from './mute.entity';
+import { Msg } from './msg.entitiy';
 import { forwardRef } from '@nestjs/common';
 
 export enum ChannelTypes {
@@ -54,18 +53,19 @@ export class Channel {
   @OneToMany(() => Mute, (mute) => mute.channel, { lazy: true })
   muted: Promise<Mute[]>;
 
-  // @OneToMany(() => Msg, (msg) => msg.channel, { lazy: true })
-  // messages: Promise<Msg[]>;
+  @Column()
+  ownerId: number;
 
-  // @ManyToOne(() => User, user => user.channelsOwned, { lazy: true })
-  // owner: Promise<User>;
+  @ManyToOne(() => User, (user) => user.channels, { lazy: true })
+  @JoinTable()
+  owner: Promise<User>;
 
-  // @ManyToMany(() => User, user => user.channels, { lazy: true })
+  // @ManyToMany(() => User, (user) => user.channels, { lazy: true })
+  // @JoinTable()
   // members: Promise<User[]>;
 
-  @ManyToMany(() => User)
-  @JoinTable()
-  members: User[];
+  @ManyToMany(() => User, (user) => user.channels)
+  users: User[];
 
 
 }
