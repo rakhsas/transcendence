@@ -5,6 +5,8 @@ import { ChatService } from './chat.service';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
+
+// connectionStateRecovery();
 @WebSocketGateway({ cors: true, path: '/chat', methods: ['GET', 'POST'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -24,15 +26,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    // throw new Error('Method not implemented.');
-    // const userName = String(client.handshake.query.userName);
-    // this.connectedUsers.delete(userName);
-    // console.log('A user disconnected');
-    // console.log('client id: ' + client.id);
     if (this.peerConnections[client.id]) {
       this.peerConnections[client.id].close();
       delete this.peerConnections[client.id];
     }
+
     // console.log('A user disconnected');
     this.usersArray = this.usersArray.filter(id => id !== client.id);
     client.broadcast.emit('update-user-list', { userIds: this.usersArray });
@@ -41,10 +39,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.connectedUsers.delete(userName);
   }
 
+  // ============================ messages functions ===============================================================
+  
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
-    // you can put the blocked code here {if they are blocked they can't send messages}.
-    if (payload.hasOwnProperty('recieverName')) {
+   // you can put the blocked code here {if they are blocked they can't send messages}.
+   if (await this.chatService.areUsersBlocked(payload.to, payload.from) === true)
+      return;
+    if (payload.hasOwnProperty('recieverName'))
+    {
       const recieverName = String(payload.recieverName);
       const toUserSocket = this.connectedUsers.get(recieverName);
       console.log('toUserSocket: ', payload.message);
@@ -71,6 +74,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //   this.server.emit('message', payload);
   }
 
+ 
+
+  // =============================== Handle Muted users from a channel ============================
+
+  @SubscribeMessage('muteUser')
+  async handleMuteEvent(payload: any): Promise<void> {
+    await this.chatService.muteUser(payload);
+  }
+
+  // ================================ Channel hevents ====================================================================
+
+  // @SubscribeMessage('createChannel')
+  // async handleEventCreateChannel(socket: Socket, payload: any): Promise<void> {
+  //   // here the payload must containe the id of the user who create the channel so it can be set as owner
+  //   // create a new entity in the database (new channel)
+  //   // add new entity in user channel relation the user must set as owner
+  //   socket.join(payload.channelId);
+  //   await this.chatService.addNewChannelEntity(payload);
+  //   await this.chatService.addNewUserChannelEntity(payload);
+  // }
+
+
+  // @SubscribeMessage('kickTheUser')
+  // async handleEvent(socket: Socket, payload: any): Promise<void> {
+  //   // in this event handler i am excpected to get the id of the user to
+  //   // kick and the id of the channe from where the user will be kicked.
+  //   socket.leave(payload.channelId);
+  //   await this.chatService.kickUserFromChannel(payload);
+  // }
+
+  
+  // ============================== Vedio call events ===================================================================
+  
   @SubscribeMessage('callUser')
   async handleCallUser(client: Socket, payload: any) {
     client.to(payload.to).emit('RequestCall', {
@@ -80,35 +116,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       recieverId: payload.recieverId
     });
   }
-
-  // =============================== Handle Muted users from a channel ============================
-
-  @SubscribeMessage('muteUser')
-  async handleMuteEvent(payload: any): Promise<void> {
-    await this.chatService.muteUser(payload);
-  }
-
-  @SubscribeMessage('createChannel')
-  async handleEventCreateChannel(socket: Socket, payload: any): Promise<void> {
-    // here the payload must containe the id of the user who create the channel so it can be set as owner
-    // create a new entity in the database (new channel)
-    // add new entity in user channel relation the user must set as owner
-    socket.join(payload.channelId);
-    await this.chatService.addNewChannelEntity(payload);
-    await this.chatService.addNewUserChannelEntity(payload);
-  }
-
-
-  @SubscribeMessage('kickTheUser')
-  async handleEvent(socket: Socket, payload: any): Promise<void> {
-    // in this event handler i am excpected to get the id of the user to
-    // kick and the id of the channe from where the user will be kicked.
-    socket.leave(payload.channelId);
-    await this.chatService.kickUserFromChannel(payload);
-  }
-
-
-  // ===========> The call end points for socket.io events. ===================================================================
+  
   @SubscribeMessage('mediaOffer')
   async handleOnMediaOffer(client: Socket, payload: any) {
     client.to(payload.to).emit('mediaOffer', {

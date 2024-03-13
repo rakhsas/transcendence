@@ -1,8 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import { User } from 'src/user/entities/user.entity';
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Channel } from "src/user/entities/channel.entity";
-import { User } from "src/user/model/user.model";
 import { Repository } from "typeorm/repository/Repository";
+import { UUID, privateDecrypt } from 'crypto';
+import { ChannelUser } from 'src/user/entities/channel_member.entity';
+import { channel } from 'diagnostics_channel';
+import { Msg } from 'src/user/entities/msg.entitiy';
 
 @Injectable()
 export class ChannelService {
@@ -11,7 +15,13 @@ export class ChannelService {
      */
     constructor(
         @InjectRepository(Channel)
-        private channelRepository: Repository<Channel>
+        private channelRepository: Repository<Channel>,
+        @InjectRepository(ChannelUser)
+        private channelUserRepository: Repository<ChannelUser>,
+        @InjectRepository(Msg)
+        private msgRepository: Repository<Msg>
+        // @InjectRepository(User)
+        // private userRepository: Repository<User>
     ) {
     }
 
@@ -24,11 +34,42 @@ export class ChannelService {
         return await this.channelRepository.findOne({where: {id: id}})
     }
 
-    // async getMemmbersOfChannel(id: number): Promise<User[]> {
-    //     return await this.channelRepository.findOne({where: {id: id}, relations: ['members']}).then(channel => channel);
-    // }
+    async getMembersOfChannel(channelId: number): Promise<{}[]> {
+        const channelUsers = await this.channelUserRepository.find({
+            where: {channel: {id: channelId}},
+            relations: ['user']
+        })
 
-    // async getChannelsByUserId(userId: number): Promise<Channel[]> {
-    //     return await this.channelRepository.find({where: { : userId}});
-    // }
+        // const users = channelUsers.map((channelUser) => channelUser.user);
+        const users = channelUsers.map((channelUser) => ({
+            user: channelUser.user,
+            role: channelUser.role, // 
+        }));
+
+        return users;
+    }
+
+    async getChannelsByUserId(userId: UUID): Promise<{}[]> {
+        const userChannels =  await this.channelUserRepository.find({
+            where: {user: {id: userId}},
+            relations: ['channel']
+        });
+
+        // const channels = userChannels.map((channelUser) => channelUser.channel);
+        const channels = userChannels.map((channelUser) => ({
+            channel: channelUser.channel,
+            role: channelUser.role,
+        }));
+
+        return channels;
+    }
+
+    async getLastMessageOfChannel(channelId: number): Promise<{}>{
+        return this.msgRepository.createQueryBuilder('msg')
+      .where('msg.cid = :channelId', { channelId })
+      .orderBy('msg.date', 'DESC')
+      .limit(1)
+      .getOne();
+    }
+
 }

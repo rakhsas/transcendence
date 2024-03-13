@@ -10,13 +10,14 @@ import { Friendship } from './user/entities/freindship.entity';
 import { Msg } from './user/entities/msg.entitiy';
 import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
-import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
 import { ConfigModule } from '@nestjs/config';
 import { FreindsModule } from './friends/friends.module';
 import { MessageController } from './msg/message.controller';
 import { MessageService } from './msg/message.service';
 import { Repository } from 'typeorm';
 import { GameGetwayModule } from './game-getway/game-getway.module';
+import { ChannelModule } from './channel/channel.module';
+import { ChannelUser } from './user/entities/channel_member.entity';
 
 @Module({
   imports: [
@@ -33,14 +34,15 @@ import { GameGetwayModule } from './game-getway/game-getway.module';
       database: 'db1',
       synchronize: true,
       // logging: true,
-      entities: [User, Msg, Channel, Mute, Friendship, UserChannelRelationship],
+      entities: [User, Msg, Channel, Mute, Friendship, ChannelUser],
 
     }),
     UserModule,
     AuthModule,
     ChatModule,
     FreindsModule,
-    GameGetwayModule
+    GameGetwayModule,
+    ChannelModule,
   ],
   controllers: [AppController],
   providers: [AppService],

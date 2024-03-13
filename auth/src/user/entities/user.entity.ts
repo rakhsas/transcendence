@@ -64,16 +64,10 @@ export class User {
   username: string;
 
   @Column('uuid', { array: true, default: [] })
-  adding: string[];
-
-  @Column('uuid', { array: true, default: [] })
   added: string[];
 
   @Column('uuid', { array: true, default: [] })
   blocks: string[];
-
-  @Column('uuid', { array: true, default: [] })
-  blocking: string[];
   
   @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true })
   Muted: Promise<Mute[]>;
@@ -91,12 +85,16 @@ export class User {
   @OneToMany(() => Friendship, friend => friend.friend, { lazy: true})
   friendOf: Promise<Friendship[]>;
 
-  // @ManyToMany(() => Friendship, friendship => friendship.friends)
+  // ======================
+
+  // @ManyToMany(() => Channel, (channel) => channel.members)
   // @JoinTable()
-  // friends: Friendship[];
-  
-  //@ManyToMany(() => Friendship, (friendship) => friendship.friendOf) // New relationship
- // friendOf: User[]; // Array of User objects representing users who befriended this user
+  // channels: Channel[];
+
+  @ManyToMany(() => Channel)
+  @JoinTable({ name: 'user_channels' }) // Specify the name for the join table
+  channels: Channel[];
+
 
   @BeforeInsert()
   generateUUID() {
