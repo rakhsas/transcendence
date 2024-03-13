@@ -5,6 +5,7 @@ import { Channel } from "src/user/entities/channel.entity";
 import { Repository } from "typeorm/repository/Repository";
 import { UUID, privateDecrypt } from 'crypto';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
+import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class ChannelService {
@@ -30,26 +31,32 @@ export class ChannelService {
         return await this.channelRepository.findOne({where: {id: id}})
     }
 
-    async getMembersOfChannel(channelId: number): Promise<User[]> {
-        console.log("channelId: " + channelId);
+    async getMembersOfChannel(channelId: number): Promise<{}[]> {
         const channelUsers = await this.channelUserRepository.find({
             where: {channel: {id: channelId}},
             relations: ['user']
         })
 
-        console.log("--->: " + channelUsers);
-        const users = channelUsers.map((channelUser) => channelUser.user);
+        // const users = channelUsers.map((channelUser) => channelUser.user);
+        const users = channelUsers.map((channelUser) => ({
+            user: channelUser.user,
+            role: channelUser.role, // 
+        }));
 
         return users;
     }
 
-    async getChannelsByUserId(userId: UUID): Promise<Channel[]> {
+    async getChannelsByUserId(userId: string): Promise<{}[]> {
         const userChannels =  await this.channelUserRepository.find({
             where: {user: {id: userId}},
             relations: ['channel']
         });
 
-        const channels = userChannels.map((channelUser) => channelUser.channel);
+        // const channels = userChannels.map((channelUser) => channelUser.channel);
+        const channels = userChannels.map((channelUser) => ({
+            channel: channelUser.channel,
+            role: channelUser.role,
+        }));
 
         return channels;
     }

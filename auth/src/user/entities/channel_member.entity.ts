@@ -14,7 +14,7 @@ export class ChannelUser {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.channels)
+  @ManyToOne(() => User, (user) => user.channels) 
   user: User;
 
   @ManyToOne(() => Channel, (channel) => channel.members)

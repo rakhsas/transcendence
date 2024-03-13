@@ -65,7 +65,7 @@ export class Channel {
   // members: Promise<User[]>;
 
   @ManyToMany(() => User, (user) => user.channels)
-  users: User[];
+  members: User[];
 
 
 }
