@@ -58,6 +58,8 @@ class Net {
 class Ball {
   x: number;
   y: number;
+  oldy: number;
+  oldx: number;
   r: number;
   color: string;
   speed: number;
@@ -85,14 +87,14 @@ class Game {
   intervalId: NodeJS.Timeout | any;
 
 
-  constructor(canvas: HTMLCanvasElement, socket: Socket) {
+  constructor(canvas: HTMLCanvasElement, socket: Socket, roomId: String) {
     this.user = new User(canvas)
     this.computer = new Computer(canvas)
     this.net = new Net(canvas)
     this.ball = new Ball(canvas)
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
-    socket.on('catch', (comp, ball, id) => {
+    socket.on('message', (comp, ball) => {
       this.computer.y = comp.y;
       this.computer.score = comp.score;
       if (ball.x >= this.canvas.width / 2) {
@@ -102,23 +104,19 @@ class Game {
       }
 
     });
-    socket.on('stop', () => {
-      this.ball.vx = 0;
-      this.ball.vy = 0;
-
-    });
 
     socket.on('start', () => {
+      console.log("starting");
       this.ball.vx = 5;
       this.ball.vy = 5;
+      this.render();
     });
 
     this.canvas.addEventListener("mousemove", (evt) => {
       let rect = canvas.getBoundingClientRect();
       this.user.y = evt.clientY - rect.top - this.user.height / 2;
-      socket.emit('push', { user: this.user, ball: this.ball, id: socket.id })
+      socket.emit('message', { user: this.user, ball: this.ball, id: roomId })
     });
-    socket.on('start', () => this.render());
   }
 
   drawRect(x: number, y: number, w: number, h: number, color: string) {
@@ -130,6 +128,15 @@ class Game {
   drawCirecle(x: number, y: number, r: number, color: string) {
     this.ctx.fillStyle = color;
 
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, r, 0, Math.PI * 2, false);
+    this.ctx.closePath();
+    this.ctx.fill();
+
+
+  }
+  clearCirecle(x: number, y: number, r: number, color: string) {
+    this.ctx.fillStyle = color;
     this.ctx.beginPath();
     this.ctx.arc(x, y, r, 0, Math.PI * 2, false);
     this.ctx.closePath();
@@ -206,6 +213,9 @@ class Game {
         this.resetBall();
       }
 
+      this.ball.oldy = this.ball.y;
+      this.ball.oldx = this.ball.x;
+
       this.ball.x += this.ball.vx;
       this.ball.y += this.ball.vy;
 
@@ -241,6 +251,10 @@ class Game {
       this.drawNet();
       this.drawRect(this.user.x, this.user.y, this.user.width, this.user.height, this.user.color)
       this.drawRect(this.computer.x, this.computer.y, this.computer.width, this.computer.height, this.computer.color);
+      this.clearCirecle(this.ball.oldx - this.ball.vx * 3.5 , this.ball.oldy - this.ball.vy * 3.5, this.ball.r, "rgba(0, 0, 0, 0.2)");
+      this.clearCirecle(this.ball.oldx - this.ball.vx * 2.5 , this.ball.oldy - this.ball.vy * 2.5, this.ball.r, "rgba(0, 0, 0, 0.3)");
+      this.clearCirecle(this.ball.oldx - this.ball.vx * 1.5 , this.ball.oldy - this.ball.vy * 1.5, this.ball.r, "rgba(0, 0, 0, 0.4)");
+      this.clearCirecle(this.ball.oldx , this.ball.oldy, this.ball.r, "rgba(0, 0, 0, 0.5)");
       this.drawCirecle(this.ball.x, this.ball.y, this.ball.r, this.ball.color);
     }
     this.intervalId =  setInterval(game, 1000 / 60);
