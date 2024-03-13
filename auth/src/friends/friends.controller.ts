@@ -15,12 +15,19 @@ export class friendController {
         return this.friendService.getFriends(userId);
     }
     
-    @Post(':userId/:friendId')
+    // @Post(':userId/:friendId')
+    // @ApiParam({ name: 'userId', description: 'ID of the user' })
+    // @ApiParam({ name: 'friendId', description: 'ID of the user' })
+    // async creeateFriendship(@Param('userId')userId: string, @Param('friendId')friendId: string,)
+    // {
+    //     this.friendService.createFriendship(friendId, userId);
+    //     return this.friendService.createFriendship(userId, friendId);
+    // }
+
+    @Get(':userId')
     @ApiParam({ name: 'userId', description: 'ID of the user' })
-    @ApiParam({ name: 'friendId', description: 'ID of the user' })
-    async creeateFriendship(@Param('userId')userId: string, @Param('friendId')friendId: string,)
+    async getFriendship(@Param('userId')userId: string)
     {
-        this.friendService.createFriendship(friendId, userId);
-        return this.friendService.createFriendship(userId, friendId);
+        return this.friendService.getFriendsOfUser(userId);
     }
 }

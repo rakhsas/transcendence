@@ -73,7 +73,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('callUser')
   async handleCallUser(client: Socket, payload: any) {
-    console.log('callUser');
     client.to(payload.to).emit('RequestCall', {
       from: payload.from,
       offer: payload.offer,
