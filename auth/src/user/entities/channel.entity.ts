@@ -24,7 +24,8 @@ export class Channel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: 'uuid_generate_v4()', unique: true })
+  @Column({unique: true})
+  // @Column({ default: 'uuid_generate_v4()', unique: true })
   name: string;
 
   @CreateDateColumn()
@@ -39,35 +40,12 @@ export class Channel {
   @Column({ nullable: true })
   password: string;
 
-  // @Column()
-  // type: string
-
   @Column({
     type: 'enum',
     enum: ChannelTypes,
     default: ChannelTypes.PUBLIC, // Set a default role if needed
   })
   type: ChannelTypes;
-
-  // @ManyToMany(() => User1, (user) => user.owner, { lazy: true })
-  // @JoinTable()
-  // owners: Promise<User1[]>;
-
-  // @ManyToMany(() => User1, (user) => user.admin, { lazy: true })
-  // @JoinTable()
-  // admins: Promise<User1[]>;
-
-  // @ManyToMany(() => User1, (user) => user.member, { lazy: true })
-  // @JoinTable()
-  // members: Promise<User1[]>;
-
-  // @ManyToMany(() => User1, (user) => user.invited, { lazy: true })
-  // @JoinTable()
-  // inviteds: Promise<User1[]>;
-
-  // @ManyToMany(() => User1, (user) => user.chanBlocked, { lazy: true })
-  // @JoinTable()
-  // blocked: Promise<User1[]>;
 
   @OneToMany(() => Mute, (mute) => mute.channel, { lazy: true })
   muted: Promise<Mute[]>;

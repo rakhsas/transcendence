@@ -1,10 +1,10 @@
 class MessageService {
-    async latestMessages(): Promise<any> {
+    async latestMessages(userId: string): Promise<any> {
         try {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
-            console.log(APIURL);
+            // console.log(APIURL + `messages/${userId}`);
             // const response = await fetch("https://10.13.249.229/api/messages", 
-            const response = await fetch(APIURL + `messages`, 
+            const response = await fetch(APIURL + `messages/${userId}`, 
             // {
             //     method: 'GET',
             //     credentials: 'include'
@@ -13,6 +13,7 @@ class MessageService {
             // console.log(response);
             if (response.ok) {
                 const messages = await response.json();
+                // console.log(response)
                 return messages;
             }
             else if (response.status === 401 || response.status === 403)
@@ -31,12 +32,11 @@ class MessageService {
             throw error;
         }
     }
-    async getMessages(friendId: string): Promise<any> {
+    async getMessages(userId: string, friendId: string): Promise<any> {
         try {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
-            console.log(APIURL);
             // const response = await fetch("https://10.13.249.229/api/messages", 
-            const response = await fetch(APIURL + `messages/${friendId}`, 
+            const response = await fetch(APIURL + `messages/${userId}/${friendId}`, 
             // {
             //     method: 'GET',
             //     credentials: 'include'

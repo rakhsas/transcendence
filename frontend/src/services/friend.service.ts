@@ -1,18 +1,16 @@
-// import User from "../model/user.model";
-
-
-class UserService {
-    async getUser(userId: string): Promise<any> {
+export class friendsService {
+    async getFriends(userId: string): Promise<any> {
         try {
-        	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
-            const response = await fetch(APIURL + `user/${userId}`, {
-                method: 'GET',
-                credentials: 'include'
-            });
+            const APIURL = import.meta.env.VITE_API_AUTH_KEY;
+            const response = await fetch(APIURL + 'friends/' + userId, 
+                // {
+                //     method: 'GET',
+                //     credentials: 'include'
+                // }
+            );
             if (response.ok) {
-                const userData = await response.json();
-			    // console.log("fetchedUserData: ", userData)
-                return userData;
+                const friends = await response.json();
+                return friends;
             }
             else if (response.status === 401 || response.status === 403)
             {
@@ -24,6 +22,7 @@ class UserService {
                 throw new Error('Request failed');
             }
         } catch (error) {
+            // console.log('APIURL: ', APIURL + 'friends/' + userId)
             console.error('Request error:', error);
             window.location.href = '/';
             document.cookie = 'provider_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -31,5 +30,3 @@ class UserService {
         }
     }
 }
-
-export default UserService;

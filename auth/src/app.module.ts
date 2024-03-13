@@ -12,8 +12,9 @@ import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
 import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
 import { ConfigModule } from '@nestjs/config';
-import { MessageController } from './user/message.controller';
-import { MessageService } from './user/message.service';
+import { FreindsModule } from './friends/friends.module';
+import { MessageController } from './msg/message.controller';
+import { MessageService } from './msg/message.service';
 import { Repository } from 'typeorm';
 import { GameGetwayModule } from './game-getway/game-getway.module';
 
@@ -38,6 +39,7 @@ import { GameGetwayModule } from './game-getway/game-getway.module';
     UserModule,
     AuthModule,
     ChatModule,
+    FreindsModule,
     GameGetwayModule
   ],
   controllers: [AppController],

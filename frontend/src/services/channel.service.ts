@@ -1,18 +1,20 @@
-// import User from "../model/user.model";
-
-
-class UserService {
-    async getUser(userId: string): Promise<any> {
+export class ChannelService {
+    async latestChannels(userId: string): Promise<any> {
         try {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
-            const response = await fetch(APIURL + `user/${userId}`, {
-                method: 'GET',
-                credentials: 'include'
-            });
+            // console.log(APIURL + `messages/${userId}`);
+            // const response = await fetch("https://10.13.249.229/api/messages", 
+            const response = await fetch(APIURL + `channels/${userId}`, 
+            // {
+            //     method: 'GET',
+            //     credentials: 'include'
+            // }
+            );
+            // console.log(response);
             if (response.ok) {
-                const userData = await response.json();
-			    // console.log("fetchedUserData: ", userData)
-                return userData;
+                const messages = await response.json();
+                // console.log(response)
+                return messages;
             }
             else if (response.status === 401 || response.status === 403)
             {
@@ -31,5 +33,3 @@ class UserService {
         }
     }
 }
-
-export default UserService;

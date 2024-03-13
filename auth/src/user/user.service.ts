@@ -59,6 +59,11 @@ export class UserService {
 		})
 	}
 
+	async getUserById(id: string): Promise<User> {
+		return this.userRepository.findOneBy({
+			id
+		})
+	}
 	/**
 	 * this function is used to update user by id from User Entity.
 	*/

@@ -9,7 +9,9 @@ const CanvasHeadToHead = (props: any) =>{
   const ref = useRef(null);
   const [roomId, setRoomId] = useState(null);
 
+  const userData = useContext(DataContext);
   useEffect(() => {
+    if (!userData) return;
     const canvas = ref.current;
     const socket: Socket = io(url, {
       path: "/sogame"
@@ -36,7 +38,6 @@ const CanvasHeadToHead = (props: any) =>{
     };
   },[]);
 
-
   return (
     <div>
       {roomId ? (
@@ -52,6 +53,6 @@ const CanvasHeadToHead = (props: any) =>{
         <canvas ref={ref} className='border-black border-2' {...props} />
     </div>
   )
-} 
+}
 
 export default CanvasHeadToHead;

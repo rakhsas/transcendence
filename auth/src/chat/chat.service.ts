@@ -8,6 +8,7 @@ import { User} from 'src/user/entities/user.entity';
 import { Channel } from 'src/user/entities/channel.entity';
 import { UserChannelRelationship, UserRole } from 'src/user/entities/user_channel_relation.entity';
 import { channel } from 'diagnostics_channel';
+import { Mute } from 'src/user/entities/mute.entity';
 
 @Injectable()
 export class ChatService {
@@ -20,6 +21,8 @@ export class ChatService {
     private readonly channelRepository: Repository<Channel>,
     @InjectRepository(UserChannelRelationship)
     private readonly UserChannelRelation: Repository<UserChannelRelationship>,
+    @InjectRepository(Mute)
+    private readonly muteRepository: Repository<Mute>
   ) {}
 
   /**
@@ -48,17 +51,21 @@ export class ChatService {
     return isReceiverBlocked || isSenderBlocker;
   }
 
+
+  // ====================================== Messages function ==========================================================================
+
   /**
    * addDirectMessage - add the messge to database.
    * @param senderId the sender
    * @param receiverId the receiver
    * @param content the content of the message
    */
-  async addDirectMessage(senderId: UUID, receiverId: UUID, content: string): Promise<void> {
+  async addDirectMessage(payload: any): Promise<void> {
+    // console.log('payload.recieverId: ',payload.recieverId, 'payload.senderId: ', payload.senderId)
     const directMessage = this.msgRepository.create({
-      msg: content,
-      rec_id: receiverId,
-      senderId
+      message: payload.message,
+      recieverId: payload.recieverId,
+      senderId: payload.senderId
     });
     await this.msgRepository.save(directMessage);
   }
@@ -71,7 +78,7 @@ export class ChatService {
    */
   async saveMessageRoom(senderId: UUID, channelId: number, content: string): Promise <void> {
     const newMessageRoom = this.msgRepository.create({
-      msg: content,
+      message: content,
       senderId,
       cid: channelId
     });
@@ -90,6 +97,9 @@ export class ChatService {
   {
     return await this.msgRepository.findOne({where: {id}});
   }
+
+
+  // ============================= Channel function =================================================================
 
   /**
    * addNewChannelEntity - function that add a new entity to channel
@@ -135,7 +145,19 @@ export class ChatService {
       await this.UserChannelRelation.delete(targetedEntity);
     }
     else
-      console.log("the user in channel-user relation is not found");
+      console.log("the user in channel-user relation is not found!!!");
+  }
+
+  // =============================== Mute functions ================================================
+  async muteUser(payload: any)
+  {
+    const newEntity = this.muteRepository.create({
+      finishAt: payload.endOfMute,
+      userId: payload.userId,
+      cid: payload.channelId
+    })
+    
+    await this.muteRepository.save(newEntity);
   }
 }
 

@@ -1,7 +1,7 @@
 import User from "./user.model";
 
 interface messageUser {
-    profile: string;
+    // profile: string;
     // username: string;
     // message: string;
     // date: string;
@@ -13,19 +13,26 @@ interface messageUser {
     cid: number;
     date: string;
     id: number;
-    __receiver__: User;
+    __reciever__: User;
     __owner__: User;
 }
 
 interface messageUser1 {
-    sender: string;
+    // sender: string;
+    // message: string;
+    // date: string;
+    // recieverId: number;
+    // img: string;
+    // // profile: string;
+    // username: string;
+    // recieverUserName: string;
+    to: string;
+    from: string;
     message: string;
-    date: string;
-    recieverId: number;
-    img: string;
-    profile: string;
-    username: string;
-    recieverUserName: string;
+    image: string;
+    senderId: string;
+    recieverId: string;
+    recieverName: string
 }
 
 export type { messageUser, messageUser1}

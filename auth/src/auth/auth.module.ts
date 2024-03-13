@@ -9,6 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { ConfigModule } from '@nestjs/config';
 import { GithubStrategy } from './utils/GithubStrategy';
 import { HttpService } from '@nestjs/axios';
+import { GlobalGateway } from './app.gateway';
 
 
 @Module({
@@ -26,7 +27,7 @@ import { HttpService } from '@nestjs/axios';
         })
     ],
     controllers: [AuthController],
-    providers: [ AuthService, FortyTwoStrategy, GithubStrategy, JwtService],
+    providers: [ AuthService, FortyTwoStrategy, GithubStrategy, JwtService, GlobalGateway],
     exports: [AuthService]
 })
 export class AuthModule {}

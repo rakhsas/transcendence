@@ -56,3 +56,9 @@
     background-position: 50% 50%;
     background-color: #f2f2f2;
 }
+
+@media screen and (min-width: 500px) {
+    .robot img{
+        z-index: -1;
+    }
+}

@@ -1,7 +1,7 @@
 
 
 class User {
-  id: number;
+  id: string;
   createdAt: Date;
   updatedAt: Date;
   firstName: string;

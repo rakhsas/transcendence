@@ -27,7 +27,7 @@ export class AuthController {
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
         res.cookie('access_token', accessToken, { httpOnly: true});
-        res.cookie('provider_access_token', providerAccessToken);
+        res.cookie('provider_access_token', providerAccessToken, { sameSite: 'strict'});
         res.cookie('isAuthenticated', true);
         res.cookie('firstLogin', firstLogin);
         // return {
@@ -36,6 +36,8 @@ export class AuthController {
         //     providerAccessToken,
         //     firstLogin
         // }
+        // console.log(accessToken)
+        // console.log(providerAccessToken)
         res.redirect(process.env.FRONT_URL);
     }
 
