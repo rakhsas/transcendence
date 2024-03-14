@@ -19,7 +19,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleConnection(client: Socket) {
     const userName = String(client.handshake.query.userName);
     this.connectedUsers.set(userName, client);
-    console.log('username: ' + userName, 'client id: ' + client.id);
     this.usersArray.push(client.id);
     client.emit('update-user-list', { userIds: this.usersArray });
     this.server.emit('update-user-list', { userIds: this.usersArray });

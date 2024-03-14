@@ -45,13 +45,6 @@ function DashboardComponent() {
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
 				setUserData(fetchedUserData);
-				const globalSocket: Socket = io(url, {
-					path: "/global",
-					query: {
-						name : fetchedUserData.username
-					},
-				});
-				setGlobalSocket(globalSocket);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",
 					query: {
@@ -59,6 +52,13 @@ function DashboardComponent() {
 					}
 				});
 				setSocket(socketCHAT);
+				const globalSocket: Socket = io(url, {
+					path: "/global",
+					query: {
+						name : fetchedUserData.username
+					},
+				});
+				setGlobalSocket(globalSocket);
 			} catch (error) {
 				console.error('Error fetching user ', error);
 			}
@@ -71,7 +71,7 @@ function DashboardComponent() {
 			globalSocket?.disconnect();
 		};
 	}, []);
-	if (!userData || !socket || !globalSocket) {
+	if (!userData || !socket) {
 		return <LoadingComponent />;
 	}
 	return (

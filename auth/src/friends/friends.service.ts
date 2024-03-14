@@ -30,7 +30,8 @@ export class FriendService {
               .getMany();
 
             if (friendships.length === 0) {
-              throw new NotFoundException(`User with ID ${userId} not found or has no friends`);
+              // throw new NotFoundException(`User with ID ${userId} not found or has no friends`);
+              return [];
             }
       
             const friends: User[] = await Promise.all(friendships.map(friendship => friendship.friend));

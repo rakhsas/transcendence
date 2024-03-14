@@ -10,7 +10,7 @@ import play from './../../../assets/img/Play.svg'
 import videoSource from './../../../assets/avatars/490488ec-2f13-402b-b203-951e4a4775cd.mp4';
 import Chart from 'chart.js/auto';
 import { friendsService } from '../../../services/friend.service';
-import { Socket } from "socket.io-client";
+import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
 import { Table } from 'flowbite-react';
 
@@ -28,8 +28,8 @@ const group = () => {
 }
 
 enum statusColor {
-    red = 'red',
     yellow = 'yellow',
+    red = 'red',
     green = 'green'
 
 }
@@ -40,12 +40,14 @@ type friend = {
     color: statusColor
     gameStatus?: string
 }
-
+const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const HomeComponent: React.FC = () => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const userData = useContext(DataContext);
     const [friends, setFriends] = useState<any[]>([]);
     const [friendData, setFriendData] = useState<friend[]>([]);
+    const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
+	const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
     let chartInstance: Chart | null = null;
     // if (!userData[0])
     //     return <LoadingComponent />;
@@ -56,13 +58,23 @@ const HomeComponent: React.FC = () => {
         const fetchFriends = async () => {
             const friendService = new friendsService();
             const friends = await friendService.getFriends(userData[0].id);
-            setFriends(friends);
-            setFriendData(friends.map((friend: User) => ({
-                user: friend,
-                status: 'offline',
-                color: statusColor.red,
-                gameStatus: 'offline'
-            })));
+            if (friends.length !== 0) {
+                setFriends(friends);
+                setFriendData(friends.map((friend: User) => ({
+                    user: friend,
+                    status: 'offline',
+                    color: statusColor.red,
+                    gameStatus: 'offline'
+                })));
+            }
+            setFriends(['No Friends']);
+            const globalSocket: Socket = io(url, {
+            	path: "/global",
+            	query: {
+            		name : userData[0].username
+            	},
+            });
+            setGlobalSocket(globalSocket);
         };
         fetchFriends();
         if (chartRef.current) {
@@ -121,13 +133,14 @@ const HomeComponent: React.FC = () => {
             if (chartInstance) {
                 chartInstance.destroy();
             }
+            globalSocket?.disconnect();
         };
     }, [chartRef, userData]);
-    if (!userData[0] || !friends.length || !userData[2])
+    if (!userData[0] || !friends.length)
         return <LoadingComponent />;
-    const socket: Socket = userData[2];
-    socket?.on('connectedUsers', (data: any) => {
-        console.warn('connectedUsers: ', data);
+    // const socket: Socket = userData[2];
+    // const socket: Socket = globalSocket;
+    globalSocket?.on('updateList', (data: any) => {
         const connectedUsers: string[] = data.userIds;
         setFriendData(prevFriendData =>
             prevFriendData.map(friend => {
@@ -139,7 +152,12 @@ const HomeComponent: React.FC = () => {
                         gameStatus: 'online'
                     };
                 } else {
-                    return friend;
+                    return {
+                        ...friend,
+                        status: 'offline',
+                        color: statusColor.red,
+                        gameStatus: 'offline'
+                    };
                 }
             })
         );
@@ -223,46 +241,24 @@ const HomeComponent: React.FC = () => {
                                             <Table.HeadCell>Price</Table.HeadCell>
                                         </Table.Head> */}
                                         <Table.Body className="divide-y p-4">
-                                            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                    {'Apple MacBook Pro 17"'}
-                                                </Table.Cell>
-                                                <Table.Cell>Sliver</Table.Cell>
-                                                <Table.Cell>Laptop</Table.Cell>
-                                                <Table.Cell>$2999</Table.Cell>
-                                            </Table.Row>
-                                            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                    Microsoft Surface Pro
-                                                </Table.Cell>
-                                                <Table.Cell>White</Table.Cell>
-                                                <Table.Cell>Laptop PC</Table.Cell>
-                                                <Table.Cell>$1999</Table.Cell>
-                                            </Table.Row>
-                                            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                    Microsoft Surface Pro
-                                                </Table.Cell>
-                                                <Table.Cell>White</Table.Cell>
-                                                <Table.Cell>Laptop PC</Table.Cell>
-                                                <Table.Cell>$1999</Table.Cell>
-                                            </Table.Row>
-                                            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                    Microsoft Surface Pro
-                                                </Table.Cell>
-                                                <Table.Cell>White</Table.Cell>
-                                                <Table.Cell>Laptop PC</Table.Cell>
-                                                <Table.Cell>$1999</Table.Cell>
-                                            </Table.Row>
-                                            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                    Microsoft Surface Pro
-                                                </Table.Cell>
-                                                <Table.Cell>White</Table.Cell>
-                                                <Table.Cell>Laptop PC</Table.Cell>
-                                                <Table.Cell>$1999</Table.Cell>
-                                            </Table.Row>
+                                            {
+                                                connectedUsers.length == 0 ?
+                                                    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+                                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                            No connected users
+                                                        </Table.Cell>
+                                                    </Table.Row>
+                                                :
+                                                connectedUsers.map((user, index) => {
+                                                    return (
+                                                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={index}>
+                                                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                                {user}
+                                                            </Table.Cell>
+                                                        </Table.Row>
+                                                    )
+                                                })
+                                            }
                                         </Table.Body>
                                     </Table>
                                 </div>
@@ -310,7 +306,7 @@ const HomeComponent: React.FC = () => {
                                     return (
                                         <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
                                             <div className="img p-2" key={index}>
-                                                <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full ring-2 ring-${friend.color}-400 p-1`} color="success" />
+                                                <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full ring-2 ${ friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
                                             </div>
                                             <div className="absolute top-0 right-2 mb-1 mr-[1px]">
                                                 <div className={`w-4 h-4 rounded-full ${friend.status === 'online' ? 'bg-green-500' : 'bg-[#A5BAA9]'}  border-2 border-main-dark-SPRUCE`}></div>

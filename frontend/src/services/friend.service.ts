@@ -12,6 +12,10 @@ export class friendsService {
                 const friends = await response.json();
                 return friends;
             }
+            else if (response.status === 404)
+            {
+                return [];
+            }
             else if (response.status === 401 || response.status === 403)
             {
                 window.location.href = '/';
