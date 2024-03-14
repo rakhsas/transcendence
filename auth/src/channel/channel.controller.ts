@@ -25,4 +25,10 @@ export class ChannelController {
     {
         return this.channelService.getLastMessageOfChannel(channelId);
     }
+
+    @Get(':id/allMessages')
+    async getAllMessages(@Param('id') channelId: number)
+    {
+        return this.channelService.getAllMessages(channelId);
+    }
 }
