@@ -34,31 +34,10 @@ function CallComponent() {
     };
     socket?.on("update-user-list", onUpdateUserList);
     const onUserCall = (data: any) => {
-        console.log("data.from", data.from)
-        console.log("data.to", data.to)
-        // const incomingCalls = document.getElementById("IncomingCall");
-        // const callButton = document.createElement("button");
-        // callButton.innerHTML = `Incoming call from ${data.from}`;
-        // callButton.addEventListener("click", () => {
-        //     selectedUser = data.from;
-        //     call();
-        // });
-        // incomingCalls?.appendChild(callButton);
-        // const dropdown = document.querySelector('#dropdown');
-        // // console.log(dropdown);
-        // const notifli = document.createElement('li');
-        // notifli.className = "flex items-center px-4 py-2";
-        // const notifliImg = document.createElement('img');
-        // notifliImg.src = userData[0].picture;
-        // notifliImg.className = "w-8 h-8 rounded-full mr-2";
-        // const notifliSpan = document.createElement('span');
-        // notifliSpan.innerText = `you have a call from ${data.from}`;
-        // notifli.appendChild(notifliImg);
-        // console.log(dropdown)
-        // notifli.appendChild(notifliSpan);
-        // dropdown?.appendChild(notifli);
+        console.log("data.from", data.from);
+        console.log("data.to", data.to);
     }
-    // socket?.on("RequestCall", onUserCall)
+    socket?.on("RequestCall", onUserCall)
     const createPeerConnection = () => {
         return new RTCPeerConnection({
             iceServers: [
@@ -97,65 +76,66 @@ function CallComponent() {
         socket?.emit("callUser", {
             from: socket?.id,
             to: selectedUser,
+            senderId: userData[0].id
         });
-        const localOfferPeer = await peer.createOffer();
-        await peer.setLocalDescription(new RTCSessionDescription(localOfferPeer));
-        socket?.emit("mediaOffer", {
-            offer: localOfferPeer,
-            from: socket?.id,
-            to: selectedUser,
-        });
-        console.log(`mediaOffer is emitted`);
-        const onMediaOffer = async (data: any) => {
-            try {
-                console.log("Received media offer:", data.offer);
-                await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
-                const peerAnswer = await peer.createAnswer();
-                await peer.setLocalDescription(new RTCSessionDescription(peerAnswer));
+        // const localOfferPeer = await peer.createOffer();
+        // await peer.setLocalDescription(new RTCSessionDescription(localOfferPeer));
+        // socket?.emit("mediaOffer", {
+        //     offer: localOfferPeer,
+        //     from: socket?.id,
+        //     to: selectedUser,
+        // });
+        // console.log(`mediaOffer is emitted`);
+        // const onMediaOffer = async (data: any) => {
+        //     try {
+        //         console.log("Received media offer:", data.offer);
+        //         await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
+        //         const peerAnswer = await peer.createAnswer();
+        //         await peer.setLocalDescription(new RTCSessionDescription(peerAnswer));
 
-                socket?.emit("mediaAnswer", {
-                    answer: peerAnswer,
-                    from: socket?.id,
-                    to: data.from,
-                });
-            } catch (error) {
-                console.error(error);
-            }
-        };
-        socket?.on("mediaOffer", onMediaOffer);
-        const onMediaAnswer = async (data: any) => {
-            try {
-                console.log("Received media answer:", data.answer);
-                await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
-            } catch (error) {
-                console.error("Error setting remote description:", error);
-            }
-        };
-        const onIceCandidateEvent = (event: any) => {
-            socket?.emit("iceCandidate", {
-                to: selectedUser,
-                candidate: event.candidate,
-            });
-        };
-        socket?.on("mediaAnswer", onMediaAnswer);
-        peer.onicecandidate = onIceCandidateEvent;
-        const onRemotePeerIceCandidate = async (data: any) => {
-            try {
-                const candidate = new RTCIceCandidate(data.candidate);
-                await peer.addIceCandidate(candidate);
-            } catch (error) {
-            }
-        };
-        socket?.on("remotePeerIceCandidate", onRemotePeerIceCandidate);
-        const gotRemoteStream = (event: any) => {
-            const [stream] = event.streams;
-            const remoteVideo =
-                document.querySelector<HTMLVideoElement>("#remoteVideo");
-            if (remoteVideo) {
-                remoteVideo.srcObject = stream;
-            }
-        };
-        peer.addEventListener("track", gotRemoteStream);
+        //         socket?.emit("mediaAnswer", {
+        //             answer: peerAnswer,
+        //             from: socket?.id,
+        //             to: data.from,
+        //         });
+        //     } catch (error) {
+        //         console.error(error);
+        //     }
+        // };
+        // socket?.on("mediaOffer", onMediaOffer);
+        // const onMediaAnswer = async (data: any) => {
+        //     try {
+        //         console.log("Received media answer:", data.answer);
+        //         await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
+        //     } catch (error) {
+        //         console.error("Error setting remote description:", error);
+        //     }
+        // };
+        // const onIceCandidateEvent = (event: any) => {
+        //     socket?.emit("iceCandidate", {
+        //         to: selectedUser,
+        //         candidate: event.candidate,
+        //     });
+        // };
+        // socket?.on("mediaAnswer", onMediaAnswer);
+        // peer.onicecandidate = onIceCandidateEvent;
+        // const onRemotePeerIceCandidate = async (data: any) => {
+        //     try {
+        //         const candidate = new RTCIceCandidate(data.candidate);
+        //         await peer.addIceCandidate(candidate);
+        //     } catch (error) {
+        //     }
+        // };
+        // socket?.on("remotePeerIceCandidate", onRemotePeerIceCandidate);
+        // const gotRemoteStream = (event: any) => {
+        //     const [stream] = event.streams;
+        //     const remoteVideo =
+        //         document.querySelector<HTMLVideoElement>("#remoteVideo");
+        //     if (remoteVideo) {
+        //         remoteVideo.srcObject = stream;
+        //     }
+        // };
+        // peer.addEventListener("track", gotRemoteStream);
         socket?.on('user-disconnected', (data: any) => {
             const disconnectedUserId = data.userId;
         });
