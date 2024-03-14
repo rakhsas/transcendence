@@ -1,5 +1,8 @@
-import { Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { FriendService } from "./friends.service";
+import { CreateFriendshipDto } from "./dto/create-friendship.dto";
+import { ApiBody, ApiExtraModels, ApiOkResponse, ApiResponse, getSchemaPath, refs } from '@nestjs/swagger';
+
 import { UUID } from "crypto";
 import { ApiParam } from "@nestjs/swagger";
 
@@ -20,7 +23,7 @@ export class friendController {
     @ApiParam({ name: 'friendId', description: 'ID of the user' })
     async creeateFriendship(@Param('userId')userId: string, @Param('friendId')friendId: string,)
     {
-        this.friendService.createFriendship(friendId, userId);
+        // this.friendService.createFriendship(friendId, userId);
         return this.friendService.createFriendship(userId, friendId);
     }
 }

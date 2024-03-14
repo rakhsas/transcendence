@@ -72,4 +72,10 @@ export class ChannelService {
       .getOne();
     }
 
+    async getAllMessages(channelId: number): Promise<Msg[]>{
+        return this.msgRepository.createQueryBuilder('msg')
+        .where('msg.cid = :channelId', {channelId})
+        .getMany()
+    }
+
 }
