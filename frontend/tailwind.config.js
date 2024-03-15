@@ -30,9 +30,9 @@ export default {
     },
     screens: {
       'lg': '1700px',
-      'sm': '640px',
       'new': '1200px',
       'md': '768px',
+      'sm': '640px',
       'xs': '320px'
     },
     fontFamily: {

@@ -11,10 +11,11 @@ import DataContext from '../../services/data.context';
 import { Socket, io } from 'socket.io-client';
 import LoadingComponent from '../shared/loading/loading';
 // const url: string = "wss://10.12.249.229";
-const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL;
+const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
 	const [socket, setSocket] = useState<Socket | null>(null);
+	const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
 	const user = {
 		"id": "92ec84f8-33aa-4134-9f26-36bb12d68576",
 		"providerId": "95248",
@@ -44,12 +45,16 @@ function DashboardComponent() {
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
 				setUserData(fetchedUserData);
-				// console.log('fetchedUserData', fetchedUserData);
-				// console.log('userData', userData);
+				const globalSocket: Socket = io(url, {
+					path: "/global",
+					query: {
+						name : fetchedUserData.username
+					},
+				});
+				setGlobalSocket(globalSocket);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",
 					query: {
-						// userName: userData?.username
 						userName: fetchedUserData?.username
 					}
 				});
@@ -61,17 +66,16 @@ function DashboardComponent() {
 	
 		fetchData();
 	
-		
-	
 		return () => {
 			socket?.disconnect();
+			globalSocket?.disconnect();
 		};
 	}, []);
-	if (!userData || !socket) {
+	if (!userData || !socket || !globalSocket) {
 		return <LoadingComponent />;
 	}
 	return (
-		<DataContext.Provider value={[userData, socket]}>
+		<DataContext.Provider value={[userData, socket, globalSocket]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full">

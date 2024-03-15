@@ -23,11 +23,16 @@ const colorSettings: CustomFlowbiteTheme['textInput'] = {
     }
 }
 
+enum NotificationType {
+    CallRequest = "CallRequest",
+    DirectMessage = "DirectMessage"
+}
 type notifItems = {
     from: string;
     to: string;
     message: string;
-    sender: User
+    sender: User;
+    type: NotificationType;
 }
 
 function NavbarComponent(): JSX.Element {
@@ -48,10 +53,14 @@ function NavbarComponent(): JSX.Element {
         return <LoadingComponent />
     const socket: Socket = userData[1];
     const onRequestCall = async (data: any) => {
+        console.log(data.senderId)
         const sender: User = await userService.getUser(data.senderId);
-        const newItem : any = {
-            from: `You Have a new Call From ${data.from}`,
-            to: data.to
+        const newItem: notifItems = {
+            from: data.from,
+            to: data.to,
+            message: ' Requested a Call.',
+            sender: sender,
+            type: NotificationType.CallRequest
         }
         const updatedItems: notifItems[] = [...notifications, newItem];
         setNotifications(updatedItems);
@@ -61,16 +70,17 @@ function NavbarComponent(): JSX.Element {
     const onDirectMessage = async (data: any) => {
         setNotificationCount(true);
         const sender: User = await userService.getUser(data.senderId);
-        const newItem : notifItems = {
+        const newItem: notifItems = {
             from: data.from,
             to: data.to,
             message: ' Directs You.',
-            sender: sender
+            sender: sender,
+            type: NotificationType.DirectMessage
         }
         const updatedItems: notifItems[] = [...notifications, newItem];
         setNotifications(updatedItems);
     }
-    socket?.on("directMessageNotif", onDirectMessage);
+    // socket?.on("directMessageNotif", onDirectMessage);
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
         setNotificationCount(false)
@@ -92,22 +102,35 @@ function NavbarComponent(): JSX.Element {
                     <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" onClick={() => { toggleDropdown() }}>
                         <svg className='fill-black dark:fill-white' xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="26" height="26" viewBox="0 0 24 24">
                             <path d="M16.5,3C13.605,3,12,5.09,12,5.09S10.395,3,7.5,3C4.462,3,2,5.462,2,8.5C2,14,12,21,12,21s10-7,10-12.5 C22,5.462,19.538,3,16.5,3z M12,18.518C8.517,15.845,4,11.406,4,8.5C4,6.57,5.57,5,7.5,5C9.902,5,12,7.907,12,7.907S14.14,5,16.5,5 C18.43,5,20,6.57,20,8.5C20,11.406,15.483,15.845,12,18.518z"></path>
-                            { notificationCount ?  <circle cx="20" cy="6" r="4" fill="#FF0000" /> : ''}
+                            {notificationCount ? <circle cx="20" cy="6" r="4" fill="#FF0000" /> : ''}
                         </svg>
                     </button>
 
-                    <div className={`fixed z-10 top-14 w-auto mt-2  bg-white divide-y divide-gray-500 rounded-lg shadow dark:bg-main-light-EGGSHELL ${isOpen ? 'block' : 'hidden'}`}>
+                    <div className={`fixed z-10 top-14 w-64 mt-2  bg-white divide-y divide-gray-500 rounded-lg shadow dark:bg-main-light-EGGSHELL ${isOpen ? 'block' : 'hidden'}`}>
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" id="dropdown">
                             {
                                 notifications.length > 0
-                                ?
-                                notifications.map((item, index) => (
-                                    <li className="flex items-center px-4 py-2" key={index}>
-                                        <img src={item.sender.picture} alt="Action Owner" className="w-8 h-8 rounded-full mr-2" />
-                                        <span><span className="font-poppins font-semibold">{item.sender.username}</span>{item.message}</span>
-                                    </li>
-                                ))
-                                :
+                                    ?
+                                    notifications.map((item, index) => (
+                                        item.type === NotificationType.DirectMessage ?
+                                            <li className="flex items-center px-4 py-2" key={index}>
+                                                <img src={item.sender.picture} alt="Action Owner" className="w-8 h-8 rounded-full mr-2" />
+                                                <span><span className="font-poppins font-semibold">{item.sender.username}</span>{item.message}</span>
+                                            </li>
+                                            :
+                                            <li className="flex items-center justify-between px-4 py-2" key={index}>
+                                                <div className="flex items-center">
+                                                    <img className="w-8 h-8 rounded-full mr-2" src={item.sender.picture} alt="User Avatar" />
+                                                    <span>{item.sender.firstName} {item.sender.lastName}</span>
+                                                </div>
+                                                <button className="bg-green-400 hover:bg-green-400 text-white font-semibold py-1 px-4 rounded-2xl focus:outline-none">
+                                                    Join
+                                                </button>
+                                            </li>
+
+
+                                    ))
+                                    :
                                     <li className="flex items-center px-4 py-2">
                                         {/* <img src={item.sender.picture} alt="Action Owner" className="w-8 h-8 rounded-full mr-2" /> */}
                                         <span className="font-poppins font-semibold">No Notification</span>
