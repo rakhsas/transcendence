@@ -34,9 +34,8 @@ type notifItems = {
     sender: User;
     type: NotificationType;
 }
-
 function NavbarComponent(): JSX.Element {
-    const [isNotifOpen, setIsOpen] = useState(false);
+    const [isNotifOpen, setNotifIsOpen] = useState<boolean>(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [theme, setTheme] = useState(localStorage.theme);
     const colorTheme = theme === 'dark' ? 'light' : 'dark';
@@ -83,8 +82,12 @@ function NavbarComponent(): JSX.Element {
     }
     // socket?.on("directMessageNotif", onDirectMessage);
     const toggleDropdown = () => {
-        setIsOpen(!isNotifOpen);
-        setNotificationCount(false)
+        console.log("isNotifOpen: ", isNotifOpen)
+        setNotifIsOpen(!isNotifOpen);
+        setNotificationCount(false);
+        console.log("isNotifOpen: ", isNotifOpen)
+        // setNotifIsOpen(prevIsNotifOpen => !prevIsNotifOpen);
+        // console.log(isNotifOpen)
     };
     const toogleSearchDropDown = () => {
         setIsSearchOpen(!isSearchOpen);
@@ -94,7 +97,7 @@ function NavbarComponent(): JSX.Element {
     document?.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
         if (target.id !== 'dropdownDefaultButton') {
-            setIsOpen(false);
+            setNotifIsOpen(false);
         }
     });
     return (
@@ -104,14 +107,14 @@ function NavbarComponent(): JSX.Element {
             </div>
             <div className="max-w-md pl-4 flex flex-col sm:flex-row sm:space-x-4">
                 <div className="relative h-10 flex items-center">
-                    <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" onClick={() => { toggleDropdown() }}>
+                    <button onClick={() => { toggleDropdown(), console.log("isNotifOpen: ", isNotifOpen) }}>
                         <svg className='fill-black dark:fill-white' xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="26" height="26" viewBox="0 0 24 24">
                             <path d="M16.5,3C13.605,3,12,5.09,12,5.09S10.395,3,7.5,3C4.462,3,2,5.462,2,8.5C2,14,12,21,12,21s10-7,10-12.5 C22,5.462,19.538,3,16.5,3z M12,18.518C8.517,15.845,4,11.406,4,8.5C4,6.57,5.57,5,7.5,5C9.902,5,12,7.907,12,7.907S14.14,5,16.5,5 C18.43,5,20,6.57,20,8.5C20,11.406,15.483,15.845,12,18.518z"></path>
                             {notificationCount ? <circle cx="20" cy="6" r="4" fill="#FF0000" /> : ''}
                         </svg>
                     </button>
-                    <div className={`fixed z-10 top-14 w-64 mt-2  bg-white divide-y divide-gray-500 rounded-lg shadow dark:bg-main-light-EGGSHELL ${isNotifOpen ? 'block' : 'hidden'}`}>
-                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" id="dropdown">
+                    <div className={`fixed z-100 top-14 w-64 mt-2  bg-white divide-y divide-gray-500 rounded-lg shadow dark:bg-main-light-EGGSHELL ${isNotifOpen ? 'block' : 'hidden'}`}>
+                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
                             {
                                 notifications.length > 0
                                     ?
@@ -122,25 +125,36 @@ function NavbarComponent(): JSX.Element {
                                                 <span><span className="font-poppins font-semibold">{item.sender.username}</span>{item.message}</span>
                                             </li>
                                             :
-                                            <li className="flex items-center justify-between px-4 py-2" key={index}>
-                                                <div className="flex items-center">
-                                                    <img className="w-8 h-8 rounded-full mr-2" src={item.sender.picture} alt="User Avatar" />
-                                                    <span>{item.sender.firstName} {item.sender.lastName}</span>
-                                                </div>
-                                                <button className="bg-green-400 hover:bg-green-400 text-white font-semibold py-1 px-4 rounded-2xl focus:outline-none">
-                                                    Join
-                                                </button>
+                                            // <li className="flex items-center justify-between px-4 py-2">
+                                            //     <div className="flex items-center">
+                                            //         <img className="w-8 h-8 rounded-full mr-2" src= alt="User Avatar" />
+                                            //         <span></span>
+                                            //     </div>
+                                            //     <button className="bg-green-400 hover:bg-green-400 text-white font-semibold py-1 px-4 rounded-2xl focus:outline-none">
+                                            //         Join
+                                            //     </button>
+                                            // </li>
+                                            <li>
+                                                <a href="#" className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"  key={index}>
+                                                <img className="w-6 h-6 me-2 rounded-full" src={item.sender.picture} alt="Jese image"/>
+                                                {item.sender.firstName} {item.sender.lastName}
+                                                </a>
                                             </li>
-
-
                                     ))
                                     :
                                     <li className="flex items-center px-4 py-2">
                                         {/* <img src={item.sender.picture} alt="Action Owner" className="w-8 h-8 rounded-full mr-2" /> */}
                                         <span className="font-poppins font-semibold">No Notification</span>
                                     </li>
+                                    
 
                             }
+                            <a href="#" className="flex items-center p-3 text-sm font-medium text-blue-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-blue-500 hover:underline">
+                                <svg className="w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                    <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z"/>
+                                </svg>
+                                Add new user
+                            </a>
                         </ul>
                     </div>
                 </div>
@@ -170,7 +184,4 @@ function NavbarComponent(): JSX.Element {
 }
 
 export default NavbarComponent;
-// notif
-// accept call
-
 

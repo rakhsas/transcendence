@@ -1,0 +1,136 @@
+
+/* margin: 5%; */
+/* .Sc2
+{
+    width: 97%;
+    height: 95vh;
+    display: flex;
+    margin: 1.25%;
+    background-color: var(--second-color);
+    position: relative;
+    padding: 5px;
+}
+
+.Sp1{
+    display: block;
+    position: relative;
+    padding: 30px;
+    width: auto;
+    height: 100%;
+    background-color: #18181b;
+    margin: 1.25%;
+} */
+/* background-color: #161A30; */
+/* flex-direction: row; */
+/* width: calc(24%);
+height: 90vh; */
+
+.bg-color {
+    background-color: theme('colors.zinc.900');
+}
+
+
+
+.log2Sing{
+    border-radius: 15px;
+    margin-top: -15px;
+    width: 180px;
+    height: 180px;
+    border: 3px   solid #454545;
+    display: flex;
+    /* left: 25%; */
+    transform: translate(15%, 15%);
+    margin-left: 35%;
+    
+    /* background: linear-gradient(to right, #059669, #93C5FD); */
+}
+
+.checkinfo{
+    /* margin-left: 5%; */
+    transform: translate(5%, 0%);
+}
+
+.par{
+    
+    /* border: 2px solid green; */
+    width: 180px;
+
+    margin-left: 35%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: auto;
+    margin-top: 5px;
+}
+
+.coalitionScore{
+    width: 65%;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    bottom: 0;
+    /* height: 65px; */
+    height: 40%;
+    transform: translate(-200%, 200%);
+    position: relative;
+}
+
+.success{
+    width: 275px;
+    /* left: 25%; */
+    height: 25px;
+    margin-top: 55px;
+    /* bottom: -25px; */
+}
+.form-content{
+    /* width: 75%; */
+    margin-left: -40%;
+    /* height: auto; */
+}
+
+
+.form--setting{
+    border: 2px solid var(--second-color);
+    border-radius: 15px;
+    background-color: var(--second-color);
+    width: 75%;
+}
+
+.header--info{
+    top: 0px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background-color: rgb(26 86 219 / var(--tw-bg-opacity));
+    width: 50%;
+    margin-left: 25%;
+    margin-bottom: 35px;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    border-radius: 10px;
+}
+
+@media screen and (max-width: 2125px) {
+    .log2Sing{
+        margin-left: 32%;
+    }
+}
+
+@media screen and (max-width: 1800px) {
+    .log2Sing{
+        margin-left: 25%;
+    }
+}
+@media screen and (max-width: 1200px) {
+    .log2Sing{
+        margin-left: 30%;
+    }
+}
+
+@media screen and (max-width: 745px) {
+    .log2Sing{
+        margin-left: 33%;
+    }
+}

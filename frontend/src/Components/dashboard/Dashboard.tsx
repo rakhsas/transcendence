@@ -65,7 +65,6 @@ function DashboardComponent() {
 		};
 	
 		fetchData();
-	
 		return () => {
 			socket?.disconnect();
 			globalSocket?.disconnect();

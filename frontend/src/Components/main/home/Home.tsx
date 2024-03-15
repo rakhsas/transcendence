@@ -169,7 +169,7 @@ const HomeComponent: React.FC = () => {
     }
     return (
         <>
-            <main className="flex-1 p-4 overflow-y-auto">
+            <main className="flex-1 p-4 overflow-y-auto relative">
                 <section className="min-h-2/3 flex items-center justify-center p-2 flex-wrap lg:flex-nowrap">
                     <div className="w-full relative overflow-hidden p-4">
                         <div className="relative flex justify-between flex-col mt-8">
