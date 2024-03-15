@@ -26,10 +26,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
         <Tabs aria-label="Tabs with icons" style="underline" theme={tabsTheme}>
             <Tabs.Item active title="Friends" icon={LiaUserFriendsSolid}>
                 {!latestMessages ? (
-                    console.log('i have no message'),
                     null) :
-                latestMessages.map((message, index) => (
-                    <div key={index} className={`msg ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
+                    latestMessages.map((message, index) => (
+                        <div key={index} className={`msg ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
                             handleSelectMessage(
                             index.toString(),
                             message.__reciever__.id === userData[0].id ? message.__owner__.id : message.__reciever__.id
