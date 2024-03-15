@@ -203,7 +203,7 @@ function chatComponent(): JSX.Element {
                                 {/* <div className="text h-full bg-red-400"></div> */}
                                 <form onSubmit={handleSubmit} className=" m-0 h-full bg-green-400">
                                     <div className=" border-t-2 border-t-gray-500 bg-zinc-900 flex flex-row h-full justify-center w-full overflow-hidden">
-                                            <TextInput className="p-4 mt-2 w-full" name="message" type="text" theme={inputTheme} value={message} onChange={(e) => setMessage(e.target.value)} color={"primary"} placeholder="Type something here..." />
+                                            <TextInput className="p-4 mt-2 w-full" name="message" type="text" theme={inputTheme} autoComplete="off" value={message} onChange={(e) => setMessage(e.target.value)} color={"primary"} placeholder="Type something here..." />
                                             <button type="submit">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32px" height="32px" >
                                                     <path d="M 5.4453125 4.0019531 A 1.50015 1.50015 0 0 0 4.109375 6.0644531 L 11.380859 24 L 4.109375 41.935547 A 1.50015 1.50015 0 0 0 6.1699219 43.841797 L 43.169922 25.341797 A 1.50015 1.50015 0 0 0 43.169922 22.658203 L 6.1699219 4.1582031 A 1.50015 1.50015 0 0 0 5.4453125 4.0019531 z M 8.3828125 8.6191406 L 39.146484 24 L 8.3828125 39.380859 L 14.011719 25.5 L 27.5 25.5 A 1.50015 1.50015 0 1 0 27.5 22.5 L 14.011719 22.5 L 8.3828125 8.6191406 z" fill="white" />

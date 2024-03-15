@@ -25,7 +25,10 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
     return (
         <Tabs aria-label="Tabs with icons" style="underline" theme={tabsTheme}>
             <Tabs.Item active title="Friends" icon={LiaUserFriendsSolid}>
-                {latestMessages.map((message, index) => (
+                {!latestMessages ? (
+                    console.log('i have no message'),
+                    null) :
+                latestMessages.map((message, index) => (
                     <div key={index} className={`msg ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
                             handleSelectMessage(
                             index.toString(),
@@ -33,8 +36,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                             )
                         }}>
                         <div className="msg-profile rounded-full mr-4 bg-rose-400 ">
-                            {message.cid === 1 ? (
-                                <svg
+                            {message?.cid ? 
+                                (
+                                    <svg
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
                                     fill="none"
@@ -42,12 +46,13 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     className="css-i6dzq1"
-                                >
+                                    >
                                     <path d="M12 2l10 6.5v7L12 22 2 15.5v-7L12 2zM12 22v-6.5" />
                                     <path d="M22 8.5l-10 7-10-7" />
                                     <path d="M2 15.5l10-7 10 7M12 2v6.5" />
                                 </svg>
                             ) : (
+                                console.log(message),
                                 <img
                                     src={userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture}
                                     className="object-cover bg-contain h-full bg-no-repeat bg-center"
