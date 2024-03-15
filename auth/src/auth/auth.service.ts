@@ -45,6 +45,7 @@ export class AuthService {
     
     
     getCookie( cookieName:string, cookies: string ): string {
+        console.log("============ " + cookies);
         const array = cookies.split(";");
 		for (let index = 0; index < array.length; index++) {
 			const cookie = array[index].trim();

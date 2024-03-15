@@ -26,14 +26,16 @@ export class AuthController {
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
-        res.cookie('access_token', accessToken, { httpOnly: true});
-        res.cookie('provider_access_token', providerAccessToken, { sameSite: 'strict'});
+        res.cookie('access_token', accessToken);
+        console.log("------------------->: " + providerAccessToken);
+        // res.cookie('provider_access_token', providerAccessToken, { sameSite: 'strict'});
+        res.cookie('provider_access_token', providerAccessToken);
         res.cookie('isAuthenticated', true);
         res.cookie('firstLogin', firstLogin);
         // return {
         //     user,
         //     accessToken,
-        //     providerAccessToken,
+        //     providerAccessToken, 
         //     firstLogin
         // }
         // console.log(accessToken) 
