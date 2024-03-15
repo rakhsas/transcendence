@@ -36,7 +36,7 @@ export class AuthController {
         //     providerAccessToken,
         //     firstLogin
         // }
-        // console.log(accessToken)
+        // console.log(accessToken) 
         // console.log(providerAccessToken)
         res.redirect(process.env.FRONT_URL);
     }

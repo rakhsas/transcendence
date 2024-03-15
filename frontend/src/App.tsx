@@ -11,7 +11,8 @@ import Cookies from 'js-cookie';
 import chatComponent from './Components/main/chat/chat';
 import CallComponent from './Components/call/call';
 import SettingsComponent from './Components/main/settings/settings.tsx';
-
+import ProfileComponent from './Components/main/profile/Sprofile.tsx';
+import NotFoundComponent from './Components/error/404.component.tsx';
 function App() {
   const isAuthenticated = 'true'
   // Cookies.get('isAuthenticated');
@@ -33,9 +34,9 @@ function App() {
           <Route path="settings" element={<SettingsComponent />} />
           <Route path="game" element={<Game />} />
           <Route path='HeadToHead' element={<HeadToHead />} /> 
+          <Route path="profile" element={<ProfileComponent />} />
+          <Route path="*" element={<NotFoundComponent />} />
         </Route>
-        {/* <Route path="/SignIn" element={<FunctionSignUpForm/>} /> */}
-        {/* <Route path="/login" element={<ValidInformation />} />*/}
       </Routes>
     </>
   );
