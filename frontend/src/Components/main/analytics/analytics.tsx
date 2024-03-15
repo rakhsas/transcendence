@@ -1,7 +1,11 @@
+import Chart from 'chart.js/auto';
+import './analytics.css';
+
+
 function AnalyticsComponent(): JSX.Element {
     return (
         <>
-            <h1>Analytics</h1>
+            <h1>ok the first step.</h1>
         </>
     )
 }

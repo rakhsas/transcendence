@@ -56,6 +56,9 @@ export class Channel {
   @Column()
   ownerId: number;
 
+  @OneToMany(() => Msg, (msg) => msg.channel, { lazy: true })
+  messages: Promise<Msg[]>;
+
   @ManyToOne(() => User, (user) => user.channels, { lazy: true })
   @JoinTable()
   owner: Promise<User>;
