@@ -34,7 +34,7 @@ function App() {
           <Route path="settings" element={<SettingsComponent />} />
           <Route path="game" element={<Game />} />
           <Route path='HeadToHead' element={<HeadToHead />} /> 
-          <Route path="profile" element={<ProfileComponent />} />
+          {/* <Route path="profile" element={<ProfileComponent />} /> */}
           <Route path="*" element={<NotFoundComponent />} />
         </Route>
       </Routes>

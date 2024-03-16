@@ -31,19 +31,22 @@ export class MessageService {
             relations: ['owner', 'reciever', 'channel'],
         });
     }
+
+    async getLastMessagesOfUsers(userid: string): Promise<Msg[]> {
+        const friendships = await this.friendShipRepository.find({
+            where: [
+                { user: { id: userid } },
+            ], 
+            relations: ['friend']
+        });
     
-     async getLastMessagesOfUsers(userid: string): Promise<Msg[]> {
-        const friendships = await this.friendShipRepository.find({ where: [
-            { user: { id: userid }},
-            { friend: {id: userid }}
-        ], relations: ['friend'] });
         const lastMessagesPromises = friendships.map(async (friendship) => {
             const friend = await friendship.friend;
             const user = await friendship.user;
             const lastMessage = await this.messageRepository.findOne({
                 where: [
                     { senderId: user.id, recieverId: friend.id },
-                    { senderId: friend.id, recieverId: user.id}
+                    { senderId: friend.id, recieverId: user.id }
                 ],
                 order: { date: 'DESC' },
                 relations: ['owner', 'reciever', 'channel']
@@ -51,8 +54,14 @@ export class MessageService {
             return lastMessage;
         });
     
-        return Promise.all(lastMessagesPromises);
+        const lastMessages = await Promise.all(lastMessagesPromises);
+        
+        // Filter out null values
+        const filteredLastMessages = lastMessages.filter(message => message !== null);
+    
+        return filteredLastMessages;
     }
+    
 
     // async getMessages(userId: string, friendId: string): Promise<Msg[]> {
 

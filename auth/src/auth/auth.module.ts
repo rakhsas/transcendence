@@ -9,7 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { ConfigModule } from '@nestjs/config';
 import { GithubStrategy } from './utils/GithubStrategy';
 import { HttpService } from '@nestjs/axios';
-import { GlobalGateway } from './app.gateway';
+import { GlobalGateway } from './global.gateway';
 
 
 @Module({
@@ -19,7 +19,7 @@ import { GlobalGateway } from './app.gateway';
             isGlobal: true,
         }),
         PassportModule.register({ defaultStrategy: '42' }),
-        UserModule,
+        UserModule,     
         JwtModule.register({
             global: true,
             secret: process.env.JWTSECRET,

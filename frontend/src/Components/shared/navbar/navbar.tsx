@@ -6,6 +6,7 @@ import LoadingComponent from "../loading/loading";
 import { Socket } from "socket.io-client";
 import UserService from "../../../services/user.service";
 import User from "../../../model/user.model";
+import AuthService from "../../../services/auth.service";
 
 const SearchIcon = () => (
     <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-black dark:stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -41,7 +42,10 @@ function NavbarComponent(): JSX.Element {
     const colorTheme = theme === 'dark' ? 'light' : 'dark';
     const [notifications, setNotifications] = useState<notifItems[]>([]);
     const [notificationCount, setNotificationCount] = useState<boolean>(false);
+    const [users, setUsers] = useState<User[]>([]);
+    const [searchInput, setSearchInput] = useState('');
     const userService = new UserService();
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove(colorTheme);
@@ -51,6 +55,23 @@ function NavbarComponent(): JSX.Element {
     const userData = useContext(DataContext);
     if (!userData[0] || !userData[1])
         return <LoadingComponent />
+    useEffect(() => {
+        const fetchData = async () => {
+            const authService = new AuthService();
+            await authService.getPayload();
+            const userService = new UserService();
+            const users = await userService.getAllUsersExcept(userData[0].id);
+            setUsers(users);
+        };
+        fetchData();
+    }, []);
+    useEffect(() => {
+        const filtered = users.filter(user => {
+            const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+            return fullName.includes(searchInput.toLowerCase()) || user.username.toLowerCase().includes(searchInput.toLowerCase());
+        });
+        setFilteredUsers(filtered);
+    }, [searchInput]);
     const socket: Socket = userData[1];
     const onRequestCall = async (data: any) => {
         console.log(data.senderId)
@@ -80,7 +101,7 @@ function NavbarComponent(): JSX.Element {
         const updatedItems: notifItems[] = [...notifications, newItem];
         setNotifications(updatedItems);
     }
-    // socket?.on("directMessageNotif", onDirectMessage);
+    socket?.on("directMessageNotif", onDirectMessage);
     const toggleDropdown = () => {
         console.log("isNotifOpen: ", isNotifOpen)
         setNotifIsOpen(!isNotifOpen);
@@ -90,8 +111,9 @@ function NavbarComponent(): JSX.Element {
         // console.log(isNotifOpen)
     };
     const toogleSearchDropDown = () => {
+        console.log("isSearchOpen: ", isSearchOpen)
         setIsSearchOpen(!isSearchOpen);
-        console.log(isSearchOpen)
+        console.log("isSearchOpen: ", isSearchOpen)
     };
     const document = window.document.querySelector('#nav');
     document?.addEventListener('click', (e) => {
@@ -166,17 +188,18 @@ function NavbarComponent(): JSX.Element {
                         <path className="fill-none dark:fill-white" d="M55.68,36.83c0.32,0.45,0.41,1.02,0.22,1.57C52.59,47.73,43.72,54,33.83,54c-12.9,0-23.4-10.5-23.4-23.41	c0-11.02,7.83-20.65,18.61-22.9c0.12-0.03,0.24-0.04,0.36-0.04c0.65,0,1.23,0.37,1.53,0.96c0.3,0.61,0.24,1.33-0.19,1.89	C28.25,13.62,27,17,27,23c0.44,5.97,3.66,11.21,9,14c2.42,1.23,5.62,1.82,8.38,1.82c3.14,0,6.24-0.86,8.96-2.48	c0.27-0.17,0.58-0.25,0.9-0.25C54.81,36.09,55.35,36.36,55.68,36.83z M33.83,50.68c7.04,0,13.51-3.7,17.13-9.61	c-2.11,0.71-4.31,1.07-6.58,1.07c-11.45,0-20.77-9.32-20.77-20.77c0-3.2,0.73-6.31,2.12-9.14c-7.17,3.17-11.98,10.38-11.98,18.36	C13.75,41.67,22.76,50.68,33.83,50.68z"></path>
                     </svg>
                 </div>
-                <div className="group">
-                    {/* <input id="search-input" className="block w-full px-4 py-2 text-gray-800 border rounded-md  border-gray-300 focus:outline-none" type="text" placeholder="Search items" autoComplete="off" onClick={() => { toogleSearchDropDown()}} /> */}
-                <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto"  onClick={() => { toogleSearchDropDown()}} />
-                <div className={`absolute mt-2 z-10 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
-                    {/* <div className={`` }> */}
-                        <a href="#" className="block px-4 py-2 text-neutral-700 dark:text-white hover:bg-gray-100 active:bg-blue-100 cursor-pointer rounded-md">UppercaseUppercase</a>
-                        <a href="#" className="block px-4 py-2 text-neutral-700 dark:text-white hover:bg-gray-100 active:bg-blue-100 cursor-pointer rounded-md">LowercaseLowercase</a>
-                        <a href="#" className="block px-4 py-2 text-neutral-700 dark:text-white hover:bg-gray-100 active:bg-blue-100 cursor-pointer rounded-md">Camel CaseCamel Case</a>
-                        <a href="#" className="block px-4 py-2 text-neutral-700 dark:text-white hover:bg-gray-100 active:bg-blue-100 cursor-pointer rounded-md">Kebab CaseKebab Case</a>
-                    {/* </div> */}
-                </div>
+                <div className="group" onClick={() => { toogleSearchDropDown()}}>
+                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => setSearchInput(e.target.value)} />
+                    <div className={`absolute mt-2 z-10 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
+                        {filteredUsers.slice(0, 3).map((user, index) => (
+                            <li>
+                                <a key={index} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
+                                {user.firstName} {user.lastName}
+                                </a>
+                            </li>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>

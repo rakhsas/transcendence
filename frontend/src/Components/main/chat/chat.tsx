@@ -11,6 +11,7 @@ import ModalComponent from "../../../utils/modal.component";
 import { messageUser, messageUser1 } from "../../../model/messageUser.model";
 import MessageService from "../../../services/message.service";
 import { Socket } from "socket.io-client";
+import AuthService from "../../../services/auth.service";
 
 function chatComponent(): JSX.Element {
     const [MESSAGES, setMESSAGES] = useState<any>(null);
@@ -44,6 +45,8 @@ function chatComponent(): JSX.Element {
         if (!userData[0] || !userData[1]) return;
         const fetchData = async () => {
             try {
+                const authService = new AuthService();
+                await authService.getPayload();
                 const fetchedUserData = await messageService.latestMessages(userData[0].id);
                 setLatestMessages(fetchedUserData);
             } catch (error) {

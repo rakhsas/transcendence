@@ -49,7 +49,8 @@ function DashboardComponent() {
 					path: "/chat",
 					query: {
 						userName: fetchedUserData?.username
-					}
+					},
+					withCredentials: true
 				});
 				setSocket(socketCHAT);
 				const globalSocket: Socket = io(url, {
@@ -57,6 +58,7 @@ function DashboardComponent() {
 					query: {
 						name : fetchedUserData.username
 					},
+					withCredentials: true
 				});
 				setGlobalSocket(globalSocket);
 			} catch (error) {

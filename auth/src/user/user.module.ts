@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { HttpModule, HttpService } from '@nestjs/axios';
-import { UserGuard } from './user.guard';
+import { UserGuard } from '../guards/user.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { Repository } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';

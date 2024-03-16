@@ -7,12 +7,17 @@ import { Repository } from "typeorm";
 import { User } from "src/user/entities/user.entity";
 import { ChannelUser } from "src/user/entities/channel_member.entity";
 import { Msg } from "src/user/entities/msg.entitiy";
+import { AuthModule } from "src/auth/auth.module";
+import { UserGuard } from "src/guards/user.guard";
+import { HttpModule } from "@nestjs/axios";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Channel, User, ChannelUser, Msg]),
+        AuthModule,
+        HttpModule
     ],
     controllers: [ChannelController],
-    providers: [ChannelService, Repository]
+    providers: [ChannelService, Repository, UserGuard]
 })
 export class ChannelModule {}

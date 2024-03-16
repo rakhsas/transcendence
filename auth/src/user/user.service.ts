@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { Not, Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
 import { map } from 'rxjs';
@@ -124,5 +124,13 @@ export class UserService {
 		} catch (error) {
 			console.error(error);
 		}
+	}
+
+	async findAllUsersExcept(id: string): Promise<User[]> {
+		return await this.userRepository.find({
+			where: {
+				id: Not(id)
+			}
+		});
 	}
 }

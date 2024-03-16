@@ -2,6 +2,7 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
+import { AuthService } from 'src/auth/auth.service';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
@@ -14,9 +15,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   peerConnections: { [userId: string]: RTCPeerConnection } = {};
 
   private connectedUsers: Map<string, Socket> = new Map();
-  constructor(private readonly chatService: ChatService) { }
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly authService: AuthService
+    ) { }
 
   handleConnection(client: Socket) {
+		this.GuardsConsumer(client);
     const userName = String(client.handshake.query.userName);
     this.connectedUsers.set(userName, client);
     this.usersArray.push(client.id);
@@ -152,5 +157,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
+
+  async GuardsConsumer(client: Socket) {
+		const cookies = client.handshake.headers.cookie?.split(';');
+		let access_token;
+		for (let index = 0; index < cookies.length; index++) {
+			const cookie = cookies[index].trim();
+			if (cookie.startsWith('access_token='))
+			{
+				access_token = cookie.substring(String('access_token=').length);
+			}
+		}
+		const payload = await this.authService.validateToken(access_token);
+		if (!payload)
+		{
+			client.disconnect();
+		}
+	}
 }
 

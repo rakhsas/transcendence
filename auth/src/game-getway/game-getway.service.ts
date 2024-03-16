@@ -8,6 +8,7 @@ import {
 
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
+import { AuthService } from 'src/auth/auth.service';
 
 interface Player {
   socket: any;
@@ -31,9 +32,17 @@ export class GameGetwayService {
   waitingPlayers: Player[] = [];
   private logger = new Logger('ChatGateway');
 
-
+  /**
+   *
+   */
+  constructor(
+    private readonly authService: AuthService
+  ) {
+    
+  }
   @SubscribeMessage("connection")
   handleConnection(client: any): void {
+		this.GuardsConsumer(client);
     this.logger.log('Client connected');
     this.waitingPlayers.push({ socket: client });
     this.matchPlayers();
@@ -79,15 +88,22 @@ export class GameGetwayService {
     this.rooms = this.rooms.filter((room) => room.players.length > 0);
   }
 
-
-
-
-
-
-
-
-
-
+  async GuardsConsumer(client: Socket) {
+		const cookies = client.handshake.headers.cookie?.split(';');
+		let access_token;
+		for (let index = 0; index < cookies.length; index++) {
+			const cookie = cookies[index].trim();
+			if (cookie.startsWith('access_token='))
+			{
+				access_token = cookie.substring(String('access_token=').length);
+			}
+		}
+		const payload = await this.authService.validateToken(access_token);
+		if (!payload)
+		{
+			client.disconnect();
+		}
+	}
 
 }
 

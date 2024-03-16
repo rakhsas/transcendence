@@ -12,9 +12,10 @@ export class AuthService {
 
         async validateToken(token: string) {
             try {
-                const payload = await this.jwtService.verifyAsync(token);
+                const payload = await this.jwtService.verifyAsync(token, { secret: process.env.JWTSECRET });
             } catch {
-                throw new UnauthorizedException();
+                // throw new UnauthorizedException();
+                return null;
             }
             return true;
         }
@@ -45,7 +46,6 @@ export class AuthService {
     
     
     getCookie( cookieName:string, cookies: string ): string {
-        console.log("============ " + cookies);
         const array = cookies.split(";");
 		for (let index = 0; index < array.length; index++) {
 			const cookie = array[index].trim();
