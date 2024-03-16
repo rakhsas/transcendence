@@ -15,6 +15,7 @@ import { User } from './user.entity';
 import { Mute } from './mute.entity';
 import { Msg } from './msg.entitiy';
 import { forwardRef } from '@nestjs/common';
+import { UUID } from 'crypto';
 
 export enum ChannelTypes {
   PUBLIC = 'public',
@@ -53,8 +54,8 @@ export class Channel {
   @OneToMany(() => Mute, (mute) => mute.channel, { lazy: true })
   muted: Promise<Mute[]>;
 
-  @Column()
-  ownerId: number;
+  // @Column({ default: ''})
+  // ownerId: string;
 
   @ManyToOne(() => User, (user) => user.channels, { lazy: true })
   @JoinTable()
@@ -69,5 +70,3 @@ export class Channel {
 
 
 }
-
-

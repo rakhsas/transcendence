@@ -27,13 +27,13 @@ export class AuthController {
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
         res.cookie('access_token', accessToken, { httpOnly: true});
-        res.cookie('provider_access_token', providerAccessToken, { sameSite: 'strict'});
+        res.cookie('provider_access_token', providerAccessToken, { httpOnly: true});
         res.cookie('isAuthenticated', true);
         res.cookie('firstLogin', firstLogin);
         // return {
         //     user,
         //     accessToken,
-        //     providerAccessToken,
+        //     providerAccessToken, 
         //     firstLogin
         // }
         // console.log(accessToken) 
@@ -62,6 +62,7 @@ export class AuthController {
     @Get('decodeToken')
     @UseGuards(UseGuards)
     async decodedToken(@Req() req) {
+        // console.log(req.cookies)
         return await this.authService.decodeToken(req);
     }
     

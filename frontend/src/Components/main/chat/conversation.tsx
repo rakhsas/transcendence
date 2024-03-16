@@ -25,11 +25,14 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
     return (
         <Tabs aria-label="Tabs with icons" style="underline" theme={tabsTheme}>
             <Tabs.Item active title="Friends" icon={LiaUserFriendsSolid}>
-                {!latestMessages ? (
-                    console.log('i have no message'),
-                    null) :
-                latestMessages.map((message, index) => (
-                    <div key={index} className={`msg ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
+                {latestMessages.length == 0 ? 
+                (
+                    <div className="flex items-center justify-center h-64 w-64 text-red-900 dark:text-red-500">
+                        You have no messages
+                    </div>
+                    ) :(
+                    latestMessages.map((message, index) => (
+                        <div key={index} className={`msg ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
                             handleSelectMessage(
                             index.toString(),
                             message.__reciever__.id === userData[0].id ? message.__owner__.id : message.__reciever__.id
@@ -74,7 +77,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                             </div>
                         </div>
                     </div>
-                ))}
+                )))}
             </Tabs.Item>
             <Tabs.Item title="Rooms" icon={RiWechatChannelsFill}>
                 {/* {latestGroupMessages.map((message, index) => (

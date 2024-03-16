@@ -5,21 +5,21 @@ import { Strategy } from 'passport-local';
 
 @Injectable()
 export class CustomAuthStrategy extends PassportStrategy(Strategy, 'custom') {
-  constructor(private readonly authService: AuthService) {
-    super();
-  }
+    constructor(private readonly authService: AuthService) {
+        super();
+    }
 
-  async validate(req: Request): Promise<any> {
-    const token = this.extractTokenFromRequest(req);
-    if (!token) {
-      throw new UnauthorizedException('Token not found');
+    async validate(req: Request): Promise<any> {
+        const token = this.extractTokenFromRequest(req);
+        if (!token) {
+            throw new UnauthorizedException('Token not found');
+        }
+        const user = await this.authService.validateToken(token);
+        if (!user) {
+            throw new UnauthorizedException('Invalid token');
+        }
+        return user;
     }
-    const user = await this.authService.validateToken(token);
-    if (!user) {
-      throw new UnauthorizedException('Invalid token');
-    }
-    return user;
-  }
 
     private extractTokenFromRequest(req: Request): string {
         const header = req.headers['authorization'];

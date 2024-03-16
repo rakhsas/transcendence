@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create.user';
 import { ApiBody, ApiExtraModels, ApiOkResponse, ApiResponse, getSchemaPath, refs } from '@nestjs/swagger';
 import { ValidationPipe } from './validators/validation.pipe';
 import { ValidationFilter } from './validators/validation.pipe';
-import { UserGuard } from './user.guard';
+import { UserGuard } from '../guards/user.guard';
 
 @Controller('user')
 export class UserController {
@@ -34,6 +34,12 @@ export class UserController {
 		return await this.userService.viewUser(id);
 	}
 	
+
+	@Get('all/:id')
+	@UseGuards(UserGuard)
+	async getAllUsersExcept(@Param('id') id: string) {
+		return await this.userService.findAllUsersExcept(id);
+	}
 	// @Patch(':id')
 	// @UseGuards(UserGuard)
 	// UpdateUser(@Param('id') id: string, @Body() updatedUser: UpdateUserDto) {

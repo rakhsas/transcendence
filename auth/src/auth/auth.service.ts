@@ -12,9 +12,10 @@ export class AuthService {
 
         async validateToken(token: string) {
             try {
-                const payload = await this.jwtService.verifyAsync(token);
+                const payload = await this.jwtService.verifyAsync(token, { secret: process.env.JWTSECRET });
             } catch {
-                throw new UnauthorizedException();
+                // throw new UnauthorizedException();
+                return null;
             }
             return true;
         }

@@ -8,15 +8,18 @@ import { Repository } from "typeorm";
 import { UserService } from "src/user/user.service";
 import { HttpModule, HttpService } from "@nestjs/axios";
 import { UserModule } from "src/user/user.module";
+import { UserGuard } from "src/guards/user.guard";
+import { AuthModule } from "src/auth/auth.module";
 
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Friendship, User]),
     HttpModule,
-    UserModule
+    UserModule,
+    AuthModule
   ],
-    providers: [FriendService, Repository, FriendService, UserService],
+    providers: [FriendService, Repository, FriendService, UserService, UserGuard],
     controllers: [friendController],
   })
   export class FreindsModule {}
