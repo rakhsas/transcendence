@@ -130,13 +130,14 @@ export class ChatService {
 
   async addNewChannelEntity(payload: any)
   {
+    const ownerPromise: Promise<User> = this.userRepository.findOne(payload.ownerId);
     const newEntityChannel =  this.channelRepository.create({
       name: payload.channelName,
       private: payload.isPrivate,
       password: "password" in payload ? payload.password : null,
       // password: payload.password !== undefined ? payload.password : null,
       type: payload.channelType,
-      ownerId: payload.ownerId
+      owner: ownerPromise,
     });
 
     await this.channelRepository.save(newEntityChannel);
@@ -167,19 +168,19 @@ export class ChatService {
    * @param payload userId and channelId from where the user will be kicked
    * in the channel-user entity.
    */
-  // async kickUserFromChannel(payload: any)
-  // {
-  //   const targetedEntity = await this.UserChannelRelation.findOne({
-  //     where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
-  //   });
+  async kickUserFromChannel(payload: any)
+  {
+    const targetedEntity = await this.channelUserRepository.findOne({
+      where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
+    });
 
-  //   if (targetedEntity)
-  //   {
-  //     await this.UserChannelRelation.delete(targetedEntity);
-  //   }
-  //   else
-  //     console.log("the user in channel-user relation is not found!!!");
-  // }
+    if (targetedEntity)
+    {
+      await this.channelUserRepository.delete(targetedEntity);
+    }
+    else
+      console.log("the user in channel-user relation is not found!!!");
+  }
 
   // =============================== Mute functions ================================================
   async muteUser(payload: any)
