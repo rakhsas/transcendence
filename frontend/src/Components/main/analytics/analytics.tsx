@@ -1,4 +1,5 @@
 import Chart from 'chart.js/auto';
+import { Bar } from 'react-chartjs-2';
 import './analytics.css';
 
 
@@ -125,7 +126,17 @@ function AnalyticsComponent(): JSX.Element {
                             <div className="score">Score <br /> 200 pts</div>
                         </div>
                     </div>
-                    <div className="statistics"></div>
+                    <div className="statistics">
+                        <Bar 
+                            data={{
+                                labels: ["Day 1", "Day2", "Day 3"],
+                                datasets: [{
+                                    label: "games played in each Day",
+                                    data: [5, 3, 7],
+                                    backgroundColor: '#00453F',
+                                }]
+                            }}/>
+                    </div>
                 </div>
             </div>
         </>
