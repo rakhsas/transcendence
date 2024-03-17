@@ -133,7 +133,7 @@ function AnalyticsComponent(): JSX.Element {
                                 datasets: [{
                                     label: "games played in each Day",
                                     data: [5, 3, 7],
-                                    backgroundColor: '#00453F',
+                                    backgroundColor: '#3DBDA7',
                                 }]
                             }}/>
                     </div>

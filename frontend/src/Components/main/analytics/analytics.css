@@ -1,9 +1,10 @@
 :root{
-    --green: #00453F;
+    --green: #3DBDA7;
 }
 
 
 .container {
+    width: 100%;
     margin-top: 20px;
     display: flex;
     flex-wrap: wrap-reverse;
@@ -32,11 +33,8 @@
 }
 
 @media only screen and (max-width: 600px) {
-    .container .leader-board .top3{
-        display: flex;
-        flex-direction: column;
-    }
-  }
+    
+}
 
 .container .leader-board .top3 .first-cards{
     /* width: 30%; */
@@ -129,7 +127,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 15px 0;
+    padding: 15px 10px;
     position: relative;
 }
 
@@ -139,6 +137,8 @@
     align-items: center;
     background-color: white;
     padding: 8px 10px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    
 }
 
 .container .leader-board .other-players .row-cards:not(:last-child)
@@ -148,7 +148,14 @@
 
 .container .leader-board .other-players .row-cards .image-wrappear{
     position: absolute;
-    left: 8%;
+    left: 9%;
+}
+
+@media only screen and (max-width: 1705px) {
+    .container .leader-board .other-players .row-cards .image-wrappear,
+    .container .leader-board .other-players .row-cards img{
+        display: none;
+    }
 }
 
 .container .leader-board .other-players .row-cards img{
@@ -349,6 +356,10 @@
     min-width: 300px;
     width: 500px;
     height: 300px;
+    background-color: white;
+    padding: 10px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    border-radius: 20px;
 }
 
 /*  ====================== End statistics ======================================= */
