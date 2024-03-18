@@ -3,30 +3,34 @@ import io, { Socket } from "socket.io-client";
 import { useRef, useEffect, useState } from "react";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
+const socket: Socket = io(url, {
+  path: "/sogame",
+});
 const CanvasHeadToHead = (props: any) => {
   const ref = useRef(null);
   const [roomId, setRoomId] = useState(null);
 
   useEffect(() => {
     const canvas = ref.current;
-    const socket: Socket = io(url, {
-      path: "/sogame",
-    });
+    let game: Game;
 
     // Event listener for receiving roomJoined event
-    socket.on("roomJoined", (roomId) => {
+    socket.on("roomJoined", (roomId, index) => {
       console.log("Joinded room");
       if (!canvas || !socket || !roomId) return () => socket.close();
-      new Game(canvas, socket, roomId);
+      game = new Game(canvas, socket, roomId, index);
       setRoomId(roomId);
     });
 
     socket.on("win", () => {
-      setRoomId(null);
+      setRoomId('win');
     });
 
+    socket.on("lose", () => {
+      setRoomId('win');
+    });
     socket.on("connect", () => console.log("Connected"));
-    socket.on("disconnect", () => console.log("Disconnected"));
+    socket.on("disconnect", () =>{ console.log("Disconnected"); });
 
     return () => {
       socket.off("roomJoined");
@@ -38,35 +42,16 @@ const CanvasHeadToHead = (props: any) => {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="font-kenia text-GREEN size-6 text-center w-auto h-auto">
       {roomId ? (
-        <div>
-          <p>You are in room: {roomId}</p>
-        </div>
+        roomId === 'win' ? (
+          <p className="font-kenia ">right click to go back to dashboard or left click to play again</p>
+        ) : (
+          <p className="font-kenia">start playing</p>
+        )
       ) : (
-        <>
-          <p>Waiting for another player to join...</p>
-        </>
+        <p>Waiting for another player to join...</p>
       )}
-      {/* Your game UI here */}
-      {/* <div  className="absolute gap-5 bg-white   text-black flex flex-col justify-around   items-center  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  text-center h-1/2 w-1/2" >
-        {" "}
-        <span>You win</span>
-        <div className="flex gap-20" >
-          <div className="bg-red-600 ">
-            <h2>hamza</h2>
-            <span>5</span>
-          </div>
-          <div className="inline">
-            <h2>walid</h2>
-            <span>3</span>
-          </div>
-        </div>
-        <div className="flex gap-20">
-          <button ><IoHomeOutline /></button>
-          <button onClick={() => window.location.reload()}><IoIosRefresh /></button>
-        </div>
-      </div> */}
       <canvas ref={ref} className="border-black border-2" {...props} />
     </div>
   );

@@ -37,7 +37,6 @@ export class GameGetwayService {
   }
 
   matchPlayers(): void {
-    console.log('waiting players =>', this.waitingPlayers);
     while (this.waitingPlayers.length >= 2) {
       const players = this.waitingPlayers.splice(0, 2);
       const room: Room = {
@@ -45,19 +44,33 @@ export class GameGetwayService {
         players,
       };
       this.rooms.push(room);
+      let index = -1;
       players.forEach((player) => {
         player.socket.join(room.id);
-        this.server.to(player.socket.id).emit('roomJoined', room.id);
+        this.server.to(player.socket.id).emit('roomJoined', room.id, index);
+        index += 2;
       });
-      console.log(room);
       this.server.to(room.id).emit('start');
     }
   }
 
+  @SubscribeMessage('lose')
+  handleLose(client: any, payload: any): void {
+    this.server.to(client.id).emit('lose');
+    // this.server.to(client.id).emit('lose');
+    const { id } = payload;
+    console.log('lose', id);
+    client.broadcast.to(id).emit('win');
+  }
+  @SubscribeMessage('ball')
+  handleBall(client: any, payload: any): void {
+    const { ball, id } = payload;
+    client.broadcast.to(id).emit('ball', ball);
+  }
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): void {
-    const { user, ball, id } = payload;
-    client.broadcast.to(id).emit('message', user, ball);
+    const { user, id } = payload;
+    client.broadcast.to(id).emit('message', user);
   }
 
   @SubscribeMessage('disconnected')
@@ -87,7 +100,6 @@ export class GameGetwayService {
 
     const room: Room = this.getRoom(playerId);
     if (room === undefined) return;
-    console.log(room);
     this.server.to(room.id).emit('win');
     // Remove object with id 2
     const indexToRemove = this.rooms.findIndex((obj) => obj.id === room.id);

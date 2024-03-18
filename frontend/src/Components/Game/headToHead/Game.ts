@@ -80,18 +80,34 @@ class Game {
   net: Net;
   ball: Ball;
   intervalId: NodeJS.Timeout | any;
+  socket: any;
+  roomId: String;
 
-  constructor(canvas: HTMLCanvasElement, socket: Socket, roomId: String) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    socket: Socket,
+    roomId: string,
+    index: number
+  ) {
+    this.socket = socket;
+    this.roomId = roomId;
     this.user = new User(canvas);
     this.computer = new Computer(canvas);
     this.net = new Net(canvas);
     this.ball = new Ball(canvas);
+    this.ball.vx *= index;
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-    socket.on("message", (comp, ball) => {
+    socket.on("message", (comp) => {
       this.computer.y = comp.y;
-      this.computer.score = comp.score;
-      if (ball.x >= this.canvas.width / 2) {
+      if(this.computer.score < comp.score)
+        this.computer.score = comp.score;
+      else
+        socket.emit("message", { user: this.user, id: roomId });
+    });
+
+    socket.on("ball", (ball) => {
+      if (ball.x > this.canvas.width / 2) {
         this.ball = ball;
         this.ball.x = this.canvas.width / 2 - (ball.x - this.canvas.width / 2);
         this.ball.vx = -ball.vx;
@@ -100,26 +116,67 @@ class Game {
 
     socket.on("start", () => {
       console.log("starting");
-      this.ball.vx = 5;
-      this.ball.vy = 5;
-      this.render();
+      setTimeout(() => this.render(), 2000);
     });
 
     socket.on("win", () => {
       clearTimeout(this.intervalId);
-      this.ball.vx = 0;
-      this.ball.vy = 0;
+      this.drawRect(
+        0,
+        0,
+        this.canvas.width,
+        this.canvas.height,
+        "rgba(0, 0, 0, 0.3)"
+      );
       this.drawText(
-        'you win',
-        this.canvas.width / 2.5,
+        "you_win",
+        this.canvas.width / 2.79,
         this.canvas.height / 2,
         "#BFFF3C"
       );
+      // right click to go back to dashboard
+      this.canvas.addEventListener("contextmenu", (evt) => {
+        evt.preventDefault();
+        window.location.reload();
+      });
+      // left click to restart game
+      this.canvas.addEventListener("click", () => {
+        window.location.replace("/dashboard");
+      });
     });
+
+    socket.on("lose", () => {
+      clearTimeout(this.intervalId);
+      this.drawRect(
+        0,
+        0,
+        this.canvas.width,
+        this.canvas.height,
+        "rgba(0, 0, 0, 0.3)"
+      );
+      this.drawText(
+        "you_lose",
+        this.canvas.width / 2.79,
+        this.canvas.height / 2,
+        "#BFFF3C"
+      );
+      // right click to go back to dashboard
+      this.canvas.addEventListener("contextmenu", (evt) => {
+        evt.preventDefault();
+        window.location.reload();
+      });
+      // left click to restart game
+      this.canvas.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        window.location.replace("/dashboard");
+      });
+    });
+
     this.canvas.addEventListener("mousemove", (evt) => {
       const rect = canvas.getBoundingClientRect();
       this.user.y = evt.clientY - rect.top - this.user.height / 2;
-      socket.emit("message", { user: this.user, ball: this.ball, id: roomId });
+      socket.emit("message", { user: this.user, id: roomId });
+      //socket.emit("ball", { ball: this.ball, id: this.roomId });
     });
   }
 
@@ -144,11 +201,10 @@ class Game {
     this.ctx.fill();
   }
 
-  drawText(text: number, x: number, y: number, color: string) {
+  drawText(text: number | string, x: number, y: number, color: string) {
     this.ctx.fillStyle = color;
     this.ctx.font = "50px kenia";
     this.ctx.fillText(text, x, y);
-
   }
 
   drawNet() {
@@ -201,30 +257,11 @@ class Game {
 
   update() {
     if (this.user.score === 5 || this.computer.score === 5) {
-      if (this.user.score == 5) {
-        this.ball.vx = 0;
-        this.ball.vy = 0;
-        this.drawRect(0, 0, this.canvas.width, this.canvas.height, "#0e9f6e");
-        this.drawText(
-          'you win',
-          this.canvas.width / 3,
-          this.canvas.height / 2,
-          "#BFFF3C"
-        );
-      } else
-      {
-        this.ball.vx = 0;
-        this.ball.vy = 0;
-        this.drawRect(0, 0, this.canvas.width, this.canvas.height, "#0e9f6e");
-        this.drawText(
-          'you lose',
-          this.canvas.width / 3,
-          this.canvas.height / 2,
-          "#BFFF3C"
-        );
-      }
-      this.user.score = 0;
-      this.computer.score = 0;
+      const state = this.user.score === 5 ? "win" : "lose";
+      console.log("state is:", state);
+      clearInterval(this.intervalId);
+      this.render();
+      if (state === "lose") this.socket.emit("lose", { id: this.roomId });
     } else {
       if (this.ball.x - this.ball.r < 0) {
         this.computer.score++;
@@ -233,13 +270,9 @@ class Game {
         this.user.score++;
         this.resetBall();
       }
-
-      this.ball.oldy = this.ball.y;
-      this.ball.oldx = this.ball.x;
-
       this.ball.x += this.ball.vx;
       this.ball.y += this.ball.vy;
-
+      //this.socket.emit("ball", { ball: this.ball , id: this.roomId });
       if (
         this.ball.y + this.ball.r > this.canvas.height ||
         this.ball.y - this.ball.r < 0
@@ -261,10 +294,10 @@ class Game {
         this.ball.vy = this.ball.speed * Math.sin(angle);
 
         this.ball.speed += 0.1;
+        this.socket.emit("ball", { ball: this.ball, id: this.roomId });
       }
     }
   }
-
   render() {
     const game = () => {
       this.update();
@@ -321,10 +354,6 @@ class Game {
         this.computer.width / 2,
         this.computer.color
       );
-      // this.clearCirecle(this.ball.oldx - this.ball.vx * 3.5 , this.ball.oldy - this.ball.vy * 3.5, this.ball.r, "rgba(0, 0, 0, 0.2)");
-      // this.clearCirecle(this.ball.oldx - this.ball.vx * 2.5 , this.ball.oldy - this.ball.vy * 2.5, this.ball.r, "rgba(0, 0, 0, 0.3)");
-      // this.clearCirecle(this.ball.oldx - this.ball.vx * 1.5 , this.ball.oldy - this.ball.vy * 1.5, this.ball.r, "rgba(0, 0, 0, 0.4)");
-      // this.clearCirecle(this.ball.oldx , this.ball.oldy, this.ball.r, "rgba(0, 0, 0, 0.5)");
       this.drawCirecle(this.ball.x, this.ball.y, this.ball.r, this.ball.color);
     };
     this.intervalId = setInterval(game, 1000 / 60);
