@@ -1,11 +1,11 @@
 // src/chat/chat.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Msg } from './../user/entities/msg.entitiy';
 import { UUID, privateDecrypt } from 'crypto';
 import { Repository, UnorderedBulkOperation } from 'typeorm';
 import { User} from 'src/user/entities/user.entity';
-import { Channel } from 'src/user/entities/channel.entity';
+import { Channel, ChannelTypes } from 'src/user/entities/channel.entity';
 import { channel } from 'diagnostics_channel';
 import { Mute } from 'src/user/entities/mute.entity';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
@@ -81,7 +81,7 @@ export class ChatService {
    * @param receiverId the receiver
    * @param content the content of the message
    */
-  async addDirectMessage(payload: any): Promise<void> {
+  async addMessage(payload: any): Promise<void> {
     // console.log('payload.recieverId: ',payload.recieverId, 'payload.senderId: ', payload.senderId)
     const directMessage = this.msgRepository.create({
       message: payload.message,
@@ -180,6 +180,21 @@ export class ChatService {
     }
     else
       console.log("the user in channel-user relation is not found!!!");
+  }
+
+  async changeChannelType(payload: any)
+  {
+    const channelRecord = await this.channelRepository.findOne({where: {id: payload.channelId}});
+
+    if (!channelRecord)
+      throw new NotFoundException("The channel not found !");
+
+    channelRecord.type = payload.channelType;
+    if (payload.channelType == ChannelTypes.PROTECTED)
+    {
+      channelRecord.password = payload.password;
+    }
+    await this.channelRepository.save(channelRecord);
   }
 
   // =============================== Mute functions ================================================

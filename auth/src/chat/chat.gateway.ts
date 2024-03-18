@@ -69,10 +69,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           senderId: payload.senderId,
           recieverId: payload.recieverId
         })
-        await this.chatService.addDirectMessage(payload)
+        await this.chatService.addMessage(payload)
       }
       else
-        await this.chatService.addDirectMessage(payload)
+        await this.chatService.addMessage(payload)
       client.emit('message', payload);
     }
     //   this.server.emit('message', payload);
@@ -89,28 +89,59 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // ================================ Channel hevents ====================================================================
 
-  // @SubscribeMessage('createChannel')
-  // async handleEventCreateChannel(socket: Socket, payload: any): Promise<void> {
-  //   // here the payload must containe the id of the user who create the channel so it can be set as owner
-  //   // create a new entity in the database (new channel)
-  //   // add new entity in user channel relation the user must set as owner
-  //   socket.join(payload.channelId);
-  //   await this.chatService.addNewChannelEntity(payload);
-  //   await this.chatService.addNewUserChannelEntity(payload);
-  // }
+  @SubscribeMessage('createChannel')
+  async handleCreateChannel(socket: Socket, payload: any): Promise<void> {
+    // here the payload must containe the id of the user who create the channel so it can be set as owner
+    // create a new entity in the database (new channel)
+    // add new entity in user channel relation the user must set as owner
 
+    // if the channel is protected we must first check for the password is correct or not.!
 
-  // @SubscribeMessage('kickTheUser')
-  // async handleEvent(socket: Socket, payload: any): Promise<void> {
-  //   // in this event handler i am excpected to get the id of the user to
-  //   // kick and the id of the channe from where the user will be kicked.
-  //   socket.leave(payload.channelId);
-  //   await this.chatService.kickUserFromChannel(payload);
-  // }
+    if ("password" in payload && payload.password != "")
+    {
+      console.log("password exist and its not empty :)");
 
-  
+    }
+
+    socket.join(payload.channelId);
+    await this.chatService.addNewChannelEntity(payload);
+
+    await this.chatService.addNewMemberToChannel(payload);
+  }
+
+  @SubscribeMessage('joinChannel')
+  async handleJoinChannel(payload: any): Promise<void> {
+    
+    // await this.chatService.joinChannel(payload);
+  }
+
+  @SubscribeMessage('channelMessages')
+  async handleEvent(socket: Socket, payload: any): Promise<void> {
+
+    this.server.to(payload.cid).emit('channelMessage', {
+      "cid": payload.cid,
+      "message": payload.message,
+      "from": payload.senderId,
+      "image": payload.image,
+    })
+    await this.chatService.addMessage(payload);
+  }
+
+  @SubscribeMessage('kickTheUser')
+  async handleKickUserFromChannel(socket: Socket, payload: any): Promise<void> {
+    // in this event handler i am excpected to get the id of the user to
+    // kick and the id of the channe from where the user will be kicked.
+    socket.leave(payload.channelId);
+    await this.chatService.kickUserFromChannel(payload);
+  }
+
+  @SubscribeMessage('changeChannelType')
+  async handleChangeChannelType(payload: any): Promise<void> {
+    await this.chatService.changeChannelType(payload);
+  }
+
   // ============================== Vedio call events ===================================================================
-  
+
   @SubscribeMessage('callUser')
   async handleCallUser(client: Socket, payload: any) {
     client.to(payload.to).emit('RequestCall', {
