@@ -13,9 +13,31 @@ import CallComponent from './Components/call/call';
 import SettingsComponent from './Components/main/settings/settings.tsx';
 import ProfileComponent from './Components/main/profile/Sprofile.tsx';
 import NotFoundComponent from './Components/error/404.component.tsx';
+import { useEffect, useState } from 'react';
+const url: string = import.meta.env.VITE_API_AUTH_KEY;
+
 function App() {
-  const isAuthenticated = 'true'
-  // Cookies.get('isAuthenticated');
+  // const [isAuthenticated, setIsAuthenticated] = useState<any>();
+  // useEffect(() => {
+  //   const fetchToken = async () => {
+  //     const response = await fetch(url + 'auth/tokenInfo', {
+  //       method: 'GET',
+  //       credentials: 'include',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
+  //     const data = await response.json();
+  //     console.log(data)
+  //     if (data) {
+  //       setIsAuthenticated(data.isAuthenticated);
+  //       // Cookies.set('isAuthenticated', 'true');
+  //     }
+  //   };
+  //   fetchToken();
+  // }, []);
+  // // Cookies.get('isAuthenticated');
+  // console.log(isAuthenticated);
 
   // localStorage.setItem('theme', 'light');
   return (
@@ -25,7 +47,7 @@ function App() {
         <Route path="/" element={<HomePageComponent />} />
         <Route
           path="/dashboard/*"
-          element={((isAuthenticated) && (isAuthenticated.length > 0) && (isAuthenticated === 'true')) ? (<DashboardComponent />) : (<Navigate to="/" replace />)}
+          element={(<DashboardComponent />)}
         >
           <Route index element={<HomeComponent />} />
           <Route path="analytics" element={<AnalyticsComponent />} />

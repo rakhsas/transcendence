@@ -26,7 +26,8 @@ const colorSettings: CustomFlowbiteTheme['textInput'] = {
 
 enum NotificationType {
     CallRequest = "CallRequest",
-    DirectMessage = "DirectMessage"
+    DirectMessage = "DirectMessage",
+    FriendRequest = "FriendRequest"
 }
 type notifItems = {
     from: string;
@@ -94,7 +95,7 @@ function NavbarComponent(): JSX.Element {
         const newItem: notifItems = {
             from: data.from,
             to: data.to,
-            message: ' Directs You.',
+            message: data.message,
             sender: sender,
             type: NotificationType.DirectMessage
         }
@@ -130,54 +131,89 @@ function NavbarComponent(): JSX.Element {
             <div className="max-w-md pl-4 flex flex-col sm:flex-row sm:space-x-4">
                 <div className="relative h-10 flex items-center">
                     <button onClick={() => { toggleDropdown(), console.log("isNotifOpen: ", isNotifOpen) }}>
-                        <svg className='fill-black dark:fill-white' xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="26" height="26" viewBox="0 0 24 24">
-                            <path d="M16.5,3C13.605,3,12,5.09,12,5.09S10.395,3,7.5,3C4.462,3,2,5.462,2,8.5C2,14,12,21,12,21s10-7,10-12.5 C22,5.462,19.538,3,16.5,3z M12,18.518C8.517,15.845,4,11.406,4,8.5C4,6.57,5.57,5,7.5,5C9.902,5,12,7.907,12,7.907S14.14,5,16.5,5 C18.43,5,20,6.57,20,8.5C20,11.406,15.483,15.845,12,18.518z"></path>
-                            {notificationCount ? <circle cx="20" cy="6" r="4" fill="#FF0000" /> : ''}
+                        <svg className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                            <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
                         </svg>
+                        {notificationCount ? <div className="absolute block w-3 h-3 bg-red-500 border-2 border-white rounded-full top-1 start-2.5 dark:border-gray-900" /> : ''}
                     </button>
-                    <div className={`fixed z-100 top-14 w-64 mt-2  bg-white divide-y divide-gray-500 rounded-lg shadow dark:bg-main-light-EGGSHELL ${isNotifOpen ? 'block' : 'hidden'}`}>
-                        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+                    <div className={`fixed z-50 -right-0 mx-2 top-14 mt-2 w-full max-w-md bg-slate-100 divide-y divide-gray-700 rounded-lg shadow dark:bg-zinc-900 dark:divide-gray-300 ${isNotifOpen ? 'block' : 'hidden'}`}>
+                        <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-neutral-100 dark:bg-zinc-900 dark:text-white">
+                            Notifications
+                        </div>
+                        <div className="divide-y divide-gray-100 dark:divide-gray-700">
                             {
                                 notifications.length > 0
                                     ?
-                                    notifications.map((item, index) => (
-                                        item.type === NotificationType.DirectMessage ?
-                                            <li className="flex items-center px-4 py-2" key={index}>
-                                                <img src={item.sender.picture} alt="Action Owner" className="w-8 h-8 rounded-full mr-2" />
-                                                <span><span className="font-poppins font-semibold">{item.sender.username}</span>{item.message}</span>
-                                            </li>
-                                            :
-                                            // <li className="flex items-center justify-between px-4 py-2">
-                                            //     <div className="flex items-center">
-                                            //         <img className="w-8 h-8 rounded-full mr-2" src= alt="User Avatar" />
-                                            //         <span></span>
-                                            //     </div>
-                                            //     <button className="bg-green-400 hover:bg-green-400 text-white font-semibold py-1 px-4 rounded-2xl focus:outline-none">
-                                            //         Join
-                                            //     </button>
-                                            // </li>
-                                            <li>
-                                                <a href="#" className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"  key={index}>
-                                                <img className="w-6 h-6 me-2 rounded-full" src={item.sender.picture} alt="Jese image"/>
-                                                {item.sender.firstName} {item.sender.lastName}
+                                    notifications.map((item, index) => {
+                                        if (item.type === NotificationType.DirectMessage)
+                                        {
+                                            console.log(item.message)
+                                            return (
+                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-12 h-12">
+                                                            <img className="h-full w-full bject-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Jese image" />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-main-light-FERN border border-white rounded-full dark:border-gray-800">
+                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
+                                                                <path d="M1 18h16a1 1 0 0 0 1-1v-6h-4.439a.99.99 0 0 0-.908.6 3.978 3.978 0 0 1-7.306 0 .99.99 0 0 0-.908-.6H0v6a1 1 0 0 0 1 1Z" />
+                                                                <path d="M4.439 9a2.99 2.99 0 0 1 2.742 1.8 1.977 1.977 0 0 0 3.638 0A2.99 2.99 0 0 1 13.561 9H17.8L15.977.783A1 1 0 0 0 15 0H3a1 1 0 0 0-.977.783L.2 9h4.239Z" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">New message from <span className="font-semibold text-gray-900 dark:text-main-light-FERN">{item.sender.username}</span>: {item.message.length > 10 ? item.message.slice(0, 10) + ' ...' : item.message}</div>
+                                                        <div className="text-xs text-main-light-FERN ">a few moments ago</div>
+                                                    </div>
                                                 </a>
-                                            </li>
-                                    ))
-                                    :
-                                    <li className="flex items-center px-4 py-2">
-                                        {/* <img src={item.sender.picture} alt="Action Owner" className="w-8 h-8 rounded-full mr-2" /> */}
-                                        <span className="font-poppins font-semibold">No Notification</span>
-                                    </li>
-                                    
-
-                            }
-                            <a href="#" className="flex items-center p-3 text-sm font-medium text-blue-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-blue-500 hover:underline">
-                                <svg className="w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                                    <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z"/>
-                                </svg>
-                                Add new user
-                            </a>
-                        </ul>
+                                            )
+                                        } else if (item.type === NotificationType.FriendRequest) {
+                                            return (
+                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-11 h-11">
+                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src="/docs/images/people/profile-picture-2.jpg" alt="Joseph image" />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                                            <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z"/>
+                                                        </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Joseph Mcfall</span> and <span className="font-medium text-gray-900 dark:text-white">5 others</span> started following you.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">10 minutes ago</div>
+                                                    </div>
+                                                </a>
+                                            )
+                                        }
+                                        else if (item.type === NotificationType.CallRequest) {
+                                            return (
+                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-11 h-11">
+                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src="/docs/images/people/profile-picture-5.jpg" alt="Robert image" />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                                                            <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
+                                                        </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">3 hours ago</div>
+                                                    </div>
+                                                </a>
+                                            )
+                                        }
+                                    })
+                                                :
+                                                <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg dark:text-white">
+                                                    Notifications
+                                                </div>
+                                            }
+                        </div>
                     </div>
                 </div>
                 <div className="mode p-1 mt-[1px] mr-1 cursor-pointer" onClick={() => { setTheme(colorTheme); }}>
@@ -188,14 +224,14 @@ function NavbarComponent(): JSX.Element {
                         <path className="fill-none dark:fill-white" d="M55.68,36.83c0.32,0.45,0.41,1.02,0.22,1.57C52.59,47.73,43.72,54,33.83,54c-12.9,0-23.4-10.5-23.4-23.41	c0-11.02,7.83-20.65,18.61-22.9c0.12-0.03,0.24-0.04,0.36-0.04c0.65,0,1.23,0.37,1.53,0.96c0.3,0.61,0.24,1.33-0.19,1.89	C28.25,13.62,27,17,27,23c0.44,5.97,3.66,11.21,9,14c2.42,1.23,5.62,1.82,8.38,1.82c3.14,0,6.24-0.86,8.96-2.48	c0.27-0.17,0.58-0.25,0.9-0.25C54.81,36.09,55.35,36.36,55.68,36.83z M33.83,50.68c7.04,0,13.51-3.7,17.13-9.61	c-2.11,0.71-4.31,1.07-6.58,1.07c-11.45,0-20.77-9.32-20.77-20.77c0-3.2,0.73-6.31,2.12-9.14c-7.17,3.17-11.98,10.38-11.98,18.36	C13.75,41.67,22.76,50.68,33.83,50.68z"></path>
                     </svg>
                 </div>
-                <div className="group" onClick={() => { toogleSearchDropDown()}}>
+                <div className="group" onClick={() => { toogleSearchDropDown() }}>
                     <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => setSearchInput(e.target.value)} />
                     <div className={`absolute mt-2 z-10 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
                         {filteredUsers.slice(0, 3).map((user, index) => (
                             <li>
                                 <a key={index} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
-                                {user.firstName} {user.lastName}
+                                    <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
+                                    {user.firstName} {user.lastName}
                                 </a>
                             </li>
                         ))}

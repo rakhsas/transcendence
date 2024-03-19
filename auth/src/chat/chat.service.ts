@@ -46,8 +46,8 @@ export class ChatService {
   // ================================= Users functions ================================================================================
 
   async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
-    const sender = await this.userRepository.findOne({where: {id: IdSender}, select: { blocks: true }});
-    const receiver = await this.userRepository.findOne({where: {id: idReceiver}, select: {blocks: true}});
+    const sender = await this.userRepository.findOne({ where: { id: IdSender }, select: { blocks: true } });
+    const receiver = await this.userRepository.findOne({ where: { id: idReceiver }, select: { blocks: true } });
 
     const isReceiverBlocked = sender?.blocks.includes(idReceiver) ?? false;
     const isSenderBlocker = receiver?.blocks.includes(IdSender) ?? false;
@@ -56,19 +56,16 @@ export class ChatService {
   }
 
 
-  async BlockUser(userId: UUID, idOfBlockedUser: UUID): Promise <User>
-  {
-    const user = await this.userRepository.findOne({where: {id: userId}});
-    
+  async BlockUser(userId: UUID, idOfBlockedUser: UUID): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
     if (!user)
       throw new Error("User Not Found!");
-    if (!user.blocks.includes(idOfBlockedUser))
-    {
+    if (!user.blocks.includes(idOfBlockedUser)) {
       user.blocks = [...user.blocks, idOfBlockedUser];
       return this.userRepository.save(user);
     }
-    else
-    {
+    else {
       throw new Error("User already blocked!! :)");
     }
   }
@@ -82,14 +79,15 @@ export class ChatService {
    * @param content the content of the message
    */
   async addMessage(payload: any): Promise<void> {
-    // console.log('payload.recieverId: ',payload.recieverId, 'payload.senderId: ', payload.senderId)
     const directMessage = this.msgRepository.create({
       message: payload.message,
       recieverId: payload.recieverId,
       senderId: payload.senderId,
       cid: (payload.cid !== undefined) ? payload.cid : null,
+      img: (payload.image !== undefined) ? payload.image : null,
+      audio: (payload.audio !== undefined) ? payload.audio : null
     });
-    await this.msgRepository.save(directMessage);
+      await this.msgRepository.save(directMessage);
   }
 
   /**
@@ -98,7 +96,7 @@ export class ChatService {
    * @param channelId the channel where the message will broadcasted.
    * @param content the content of the message
    */
-  async saveMessageRoom(senderId: UUID, channelId: number, content: string): Promise <void> {
+  async saveMessageRoom(senderId: UUID, channelId: number, content: string): Promise<void> {
     const newMessageRoom = this.msgRepository.create({
       message: content,
       senderId,
@@ -110,14 +108,12 @@ export class ChatService {
   /**
    * @returns all messages from database
    */
-  async findAllMsg()
-  {
+  async findAllMsg() {
     return await this.msgRepository.find();
   }
 
-  async findOneMessage(id: number): Promise<Msg>
-  {
-    return await this.msgRepository.findOne({where: {id}});
+  async findOneMessage(id: number): Promise<Msg> {
+    return await this.msgRepository.findOne({ where: { id } });
   }
 
 
@@ -133,7 +129,6 @@ export class ChatService {
    * addNewChannelEntity - function that add a new entity to channel
    * @payload the data attribute of channel entity
    */
-
   async addNewChannelEntity(payload: any)
   {
     const ownerPromise: Promise<User> = this.userRepository.findOne(payload.ownerId);
@@ -218,14 +213,13 @@ export class ChatService {
   }
 
   // =============================== Mute functions ================================================
-  async muteUser(payload: any)
-  {
+  async muteUser(payload: any) {
     const newEntity = this.muteRepository.create({
       finishAt: payload.endOfMute,
       userId: payload.userId,
       cid: payload.channelId
     })
-    
+
     await this.muteRepository.save(newEntity);
   }
 }

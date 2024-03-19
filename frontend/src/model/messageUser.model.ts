@@ -18,21 +18,15 @@ interface messageUser {
 }
 
 interface messageUser1 {
-    // sender: string;
-    // message: string;
-    // date: string;
-    // recieverId: number;
-    // img: string;
-    // // profile: string;
-    // username: string;
-    // recieverUserName: string;
     to: string;
     from: string;
     message: string;
     image: string;
+    audio: string;
     senderId: string;
     recieverId: string;
-    recieverName: string
+    recieverName: string;
+    date: string;
 }
 
 export type { messageUser, messageUser1}
