@@ -110,9 +110,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('joinChannel')
-  async handleJoinChannel(payload: any): Promise<void> {
-    
-    // await this.chatService.joinChannel(payload);
+  async handleJoinChannel(client: Socket ,payload: any): Promise<void> {
+    // the payload should contain the channel ID,
+    const channel = await this.chatService.getChannel(payload.channelId);
+    if (channel.password !== null && channel.password !== "")
+    {
+      if ("password" in payload && channel.password === payload.password)
+      {
+        client.join(payload.channelId);
+        await this.chatService.addNewMemberToChannel(payload);
+      }
+      else
+      {
+        client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
+      }
+    }
+    else
+    {
+      client.join(payload.channelId);
+      await this.chatService.addNewMemberToChannel(payload);
+    }
   }
 
   @SubscribeMessage('channelMessages')
@@ -140,6 +157,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.chatService.changeChannelType(payload);
   }
 
+  @SubscribeMessage('promoteUser')
+  async handlePromteUser(payload: any): Promise<void>{
+    await this.chatService.promoteUser(payload);
+  }
   // ============================== Vedio call events ===================================================================
 
   @SubscribeMessage('callUser')

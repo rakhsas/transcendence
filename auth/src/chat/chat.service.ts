@@ -123,6 +123,12 @@ export class ChatService {
 
   // ============================= Channel function =================================================================
 
+
+  async getChannel(channelId: number): Promise<Channel>
+  {
+    return await this.channelRepository.findOne({where: {id: channelId}});
+  }
+
   /**
    * addNewChannelEntity - function that add a new entity to channel
    * @payload the data attribute of channel entity
@@ -195,6 +201,20 @@ export class ChatService {
       channelRecord.password = payload.password;
     }
     await this.channelRepository.save(channelRecord);
+  }
+
+  async promoteUser(payload: any)
+  {
+    const channelRecord = await this.channelRepository.findOne({where: {id: payload.channelId}});
+    const userRecord = await this.userRepository.findOne({where: {id: payload.userId}});
+    
+    if (channelRecord === null || userRecord === null)
+      throw new NotFoundException("the disire channel or user not found");
+    const recordToUpdate = await this.channelUserRepository.findOne({where: {user: userRecord, channel: channelRecord}});
+    if (recordToUpdate === null)
+      throw new NotFoundException("the channel user record not found (updating role of the user in a channel)");
+    recordToUpdate.role = payload.role;
+    await this.channelUserRepository.save(recordToUpdate);
   }
 
   // =============================== Mute functions ================================================
