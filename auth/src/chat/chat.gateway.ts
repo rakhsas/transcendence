@@ -61,13 +61,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           "from": payload.from,
           "message": payload.message,
           "image": payload.image,
+          "audio": payload.audio,
           // "isOwner": false
         });
         toUserSocket.emit('directMessageNotif', {
           to: payload.to,
           from: payload.from,
           senderId: payload.senderId,
-          recieverId: payload.recieverId
+          recieverId: payload.recieverId,
+          message: payload.message,
         })
         await this.chatService.addDirectMessage(payload)
       }

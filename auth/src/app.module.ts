@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,12 +12,12 @@ import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { FreindsModule } from './friends/friends.module';
-import { MessageController } from './msg/message.controller';
-import { MessageService } from './msg/message.service';
-import { Repository } from 'typeorm';
 import { GameGetwayModule } from './game-getway/game-getway.module';
 import { ChannelModule } from './channel/channel.module';
 import { ChannelUser } from './user/entities/channel_member.entity';
+import { UploadModule } from './upload/upload.module';
+import express from 'express';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -43,8 +43,15 @@ import { ChannelUser } from './user/entities/channel_member.entity';
     FreindsModule,
     GameGetwayModule,
     ChannelModule,
+    UploadModule
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(express.static(join(__dirname, '..', 'uploads')))
+      .forRoutes('upload');
+  }
+}

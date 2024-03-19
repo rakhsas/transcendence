@@ -28,7 +28,6 @@ export class MessageController {
     @Get(':userId/:friendId')
     @UseGuards(UserGuard)
     async getMessages(@Param('userId')userId: string, @Param('friendId') friendId: string) {
-        console.log('here')
         return await this.messageService.getMessages(userId, friendId);
     }
 }

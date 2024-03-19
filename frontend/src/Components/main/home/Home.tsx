@@ -47,7 +47,7 @@ const HomeComponent: React.FC = () => {
     const [friends, setFriends] = useState<any[]>([]);
     const [friendData, setFriendData] = useState<friend[]>([]);
     const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
-	const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
+    const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
     let chartInstance: Chart | null = null;
     // if (!userData[0])
     //     return <LoadingComponent />;
@@ -69,10 +69,10 @@ const HomeComponent: React.FC = () => {
             }
             setFriends(['No Friends']);
             const globalSocket: Socket = io(url, {
-            	path: "/global",
-            	query: {
-            		name : userData[0].username
-            	},
+                path: "/global",
+                query: {
+                    name: userData[0].username
+                },
             });
             setGlobalSocket(globalSocket);
         };
@@ -248,16 +248,16 @@ const HomeComponent: React.FC = () => {
                                                             No connected users
                                                         </Table.Cell>
                                                     </Table.Row>
-                                                :
-                                                connectedUsers.map((user, index) => {
-                                                    return (
-                                                        <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={index}>
-                                                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                                {user}
-                                                            </Table.Cell>
-                                                        </Table.Row>
-                                                    )
-                                                })
+                                                    :
+                                                    connectedUsers.map((user, index) => {
+                                                        return (
+                                                            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={index}>
+                                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                                                                    {user}
+                                                                </Table.Cell>
+                                                            </Table.Row>
+                                                        )
+                                                    })
                                             }
                                         </Table.Body>
                                     </Table>
@@ -300,21 +300,24 @@ const HomeComponent: React.FC = () => {
                     </div>
                     <div className="friends mt-4 flex flex-wrap gap-2 flex-col">
                         {
-                            friendData.length == 0 ? 'Loading...' :
-                                friendData.map((friend, index) => {
-                                    // console.log('friendData: ', friend)
-                                    return (
-                                        <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
-                                            <div className="img p-2" key={index}>
-                                                <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full ring-2 ${ friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
+                            friendData.length == 0
+                                ?
+                                    'Loading...'
+                                :
+                                    friendData.map((friend, index) => {
+                                        // console.log('friendData: ', friend)
+                                        return (
+                                            <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
+                                                <div className="img p-2" key={index}>
+                                                    <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
+                                                </div>
+                                                <div className="absolute top-0 right-2 mb-1 mr-[1px]">
+                                                    <div className={`w-4 h-4 rounded-full ${friend.status === 'online' ? 'bg-green-500' : 'bg-[#A5BAA9]'}  border-2 border-main-dark-SPRUCE`}></div>
+                                                </div>
+                                                <div className={`absolute text-sm rounded-lg text-white bg-main-light-FERN p-[3px] top-12 ${friend.gameStatus === 'online' ? '' : 'hidden'} `}>In Game</div>
                                             </div>
-                                            <div className="absolute top-0 right-2 mb-1 mr-[1px]">
-                                                <div className={`w-4 h-4 rounded-full ${friend.status === 'online' ? 'bg-green-500' : 'bg-[#A5BAA9]'}  border-2 border-main-dark-SPRUCE`}></div>
-                                            </div>
-                                            <div className={`absolute text-sm rounded-lg text-white bg-main-light-FERN p-[3px] top-12 ${friend.gameStatus === 'online' ? '' : 'hidden'} `}>In Game</div>
-                                        </div>
-                                    )
-                                })
+                                        )
+                                    })
                         }
                     </div>
                 </div>

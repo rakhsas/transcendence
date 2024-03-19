@@ -13,6 +13,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import User from '../../../model/user.model';
 import DataContext from '../../../services/data.context';
 import { PathLiteral, Paths } from '../../../utils/types';
+import AuthService from '../../../services/auth.service';
 const paths = {
 	[Paths.EMPTY]: 0,
 	[Paths.PROFILE]: 1,
@@ -30,7 +31,12 @@ function SidebarComponent(): JSX.Element {
 	useEffect(() => {
 		if (pathname)
 			setActiveIndex(paths[pathname]);
+		
 	}, [pathname]);
+	const logout = async () => {
+		const authService = new AuthService();
+		await authService.logout();
+	};
 	const icons = [
 		{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: Paths.EMPTY },
 		{ icon: <ProfileIcon activeIndex={activeIndex} />, label: (Paths.PROFILE), path: Paths.PROFILE },
@@ -56,8 +62,8 @@ function SidebarComponent(): JSX.Element {
 					</NavLink>
 				))}
 			</div>
-			<div className="mx-auto pb-10">
-				<LogoutIcon activeIndex={false} />
+			<div className="mx-auto pb-10" onClick={() => { logout() }}>
+				<LogoutIcon activeIndex={false}/>
 			</div>
 		</div>
 	</>
