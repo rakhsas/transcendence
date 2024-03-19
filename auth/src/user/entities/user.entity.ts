@@ -69,20 +69,20 @@ export class User {
   @Column('uuid', { array: true, default: [] })
   blocks: string[];
   
-  @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true })
+  @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true, cascade: true  })
   Muted: Promise<Mute[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.senderId, { lazy: true })
+  @OneToMany(() => Msg, (msg) => msg.senderId, { lazy: true, cascade: true  })
   sendmessages: Promise<Msg[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.reciever, { lazy: true })
+  @OneToMany(() => Msg, (msg) => msg.reciever, { lazy: true, cascade: true  })
   receivedMessages: Promise<Msg[]>;
 
 
-  @OneToMany(() => Friendship, friend => friend.user, {lazy: true})
+  @OneToMany(() => Friendship, friend => friend.user, {lazy: true, cascade: true })
   friends: Promise<Friendship[]>;
 
-  @OneToMany(() => Friendship, friend => friend.friend, { lazy: true})
+  @OneToMany(() => Friendship, friend => friend.friend, { lazy: true, cascade: true })
   friendOf: Promise<Friendship[]>;
 
   // ======================
