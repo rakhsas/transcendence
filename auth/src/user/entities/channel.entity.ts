@@ -54,6 +54,9 @@ export class Channel {
   @OneToMany(() => Mute, (mute) => mute.channel, { lazy: true })
   muted: Promise<Mute[]>;
 
+  @OneToMany(() => Msg, message => message.channel, { cascade: true })
+  messages: Promise<Msg[]>; // Define the messages relationship
+
   // @Column({ default: ''})
   // ownerId: string;
 
