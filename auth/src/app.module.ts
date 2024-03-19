@@ -18,6 +18,7 @@ import { Repository } from 'typeorm';
 import { GameGetwayModule } from './game-getway/game-getway.module';
 import { ChannelModule } from './channel/channel.module';
 import { ChannelUser } from './user/entities/channel_member.entity';
+import { Game } from './user/entities/game.entity';
 
 @Module({
   imports: [
@@ -34,7 +35,7 @@ import { ChannelUser } from './user/entities/channel_member.entity';
       database: 'db1',
       synchronize: true,
       // logging: true,
-      entities: [User, Msg, Channel, Mute, Friendship, ChannelUser],
+      entities: [User, Msg, Game, Channel, Mute, Friendship, ChannelUser],
 
     }),
     UserModule,
