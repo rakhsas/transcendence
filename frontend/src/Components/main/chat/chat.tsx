@@ -12,6 +12,8 @@ import { messageUser, messageUser1 } from "../../../model/messageUser.model";
 import MessageService from "../../../services/message.service";
 import { Socket } from "socket.io-client";
 import AuthService from "../../../services/auth.service";
+import User from "../../../model/user.model";
+import React from "react";
 
 function chatComponent(): JSX.Element {
     const [MESSAGES, setMESSAGES] = useState<any>(null);
@@ -27,6 +29,12 @@ function chatComponent(): JSX.Element {
     const [latestMessages, setLatestMessages] = useState<any[]>([]);
     const [onOpenDetails, setOnOpenDetails] = useState<boolean>(false);
     const [onOpenConversation, setOnOpenConversation] = useState<boolean>(false);
+    const [recording, setRecording] = useState(false);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const chunksRef = useRef<Blob[]>([]);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [volume, setVolume] = useState(0.5); // Initial volume set to 50%
+    const audioRef = React.createRef();
     const messageService = new MessageService();
     const messagesRef = useRef<HTMLElement>(null);
     const userData = useContext(DataContext);
@@ -65,32 +73,81 @@ function chatComponent(): JSX.Element {
             (message: { senderId: any; }) => message.senderId === userData[0].id);
     }
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleTextSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (!event.currentTarget.message.value)
+        const formData = new FormData(event.currentTarget);
+        const messageValue = formData.get('message') as string;
+        if (!messageValue) {
             return;
+        }
         const newMessage: messageUser1 = {
             to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
             from: userData[0].id,
-            message: event.currentTarget.message.value,
-            image: '',
+            message: messageValue,
+            image: '', // No image selected
             senderId: userData[0].id,
             recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
-            recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username
+            recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+            date: new Date().toISOString()
         };
         socketChat?.emit('message', newMessage);
         const newMessages = [...MESSAGES, newMessage];
         setMESSAGES(newMessages);
         setMessage('');
-        setLatestMessages(await messageService.latestMessages(userData[0].id))
+        setLatestMessages(await messageService.latestMessages(userData[0].id));
     };
-    var messages: messageUser[] = [];
+
+    const handleImageSubmit = async (selectedFile: File) => {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        let imagePath;
+        try {
+            const APIURL = import.meta.env.VITE_API_AUTH_KEY;
+            const response = await fetch(APIURL + 'upload', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            });
+            if (response.ok) {
+                imagePath = await response.json();
+                imagePath = imagePath.url;
+                const newMessage: messageUser1 = {
+                    to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+                    from: userData[0].id,
+                    message: '',
+                    image: imagePath ? imagePath : '',
+                    senderId: userData[0].id,
+                    recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+                    recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+                    date: new Date().toISOString()
+                };
+                socketChat?.emit('message', newMessage);
+                handleSelectMessage(selectedMessageIndex, friendId);
+                setMessage('');
+                setLatestMessages(await messageService.latestMessages(userData[0].id));
+            } else {
+                console.error('Failed to upload image');
+            }
+        } catch (error) {
+            console.error('Error uploading file:', error);
+        }
+    };
+
+    const handleChange = (event: any) => {
+        const selectedFile = event.target.files[0];
+        handleImageSubmit(selectedFile);
+    };
+    const chooseFile = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.addEventListener('change', handleChange); // Add event listener
+        input.click();
+    };
     const handleSelectMessage = async (index: string, friendId: string) => {
         setSelectedMessageIndex(index);
         setFriendId(friendId);
-        // console.log(selectedMessageIndex)
         await setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
-        // await setLastMessageIndex(userLastMessageIndex())
     };
     const onDirectMessage = async (data: any) => {
         await setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
@@ -118,6 +175,78 @@ function chatComponent(): JSX.Element {
         const { __owner__, __reciever__ } = message;
         return __owner__.id === userData[0].id ? __reciever__ : __owner__;
     };
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+
+            const chunks: any = []; // Create a new array for chunks
+
+            mediaRecorder.ondataavailable = (e) => {
+                chunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                const audioBlob = new Blob(chunks, { type: 'audio/wav' }); // Use the chunks array directly
+                const formData = new FormData();
+                formData.append('file', audioBlob);
+                const APIURL = import.meta.env.VITE_API_AUTH_KEY;
+                try {
+                    const response = await fetch(APIURL + 'upload/audio', {
+                        method: 'POST',
+                        body: formData,
+                        credentials: 'same-origin'
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const audioPath = data.url;
+                        const newMessage: messageUser1 = {
+                            to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+                            from: userData[0].id,
+                            message: '',
+                            audio: audioPath || '',
+                            image: '',
+                            senderId: userData[0].id,
+                            recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+                            recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+                            date: new Date().toISOString()
+                        };
+                        socketChat?.emit('message', newMessage);
+                        const newMessages = [...MESSAGES, newMessage];
+                        setMESSAGES(newMessages);
+                        setLatestMessages(await messageService.latestMessages(userData[0].id));
+                    } else {
+                        console.error('Failed to upload audio:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error uploading audio:', error);
+                }
+            }
+            mediaRecorder.start();
+            setRecording(true);
+        } catch (error) {
+            console.error('Error starting recording:', error);
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            mediaRecorderRef.current.stop();
+            setRecording(false);
+        }
+    };
+
+    const togglePlay = () => {
+        if (!audioRef.current) return;
+        console.log('audioRef.current', audioRef.current);
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    };
 
     return (
         <>
@@ -132,89 +261,187 @@ function chatComponent(): JSX.Element {
 
                         </div>
                         :
-                        <div className="flex flex-col overflow-hidden flex-1 bg-rose-300 h-full">
+                        <div className="flex flex-col overflow-hidden flex-1 h-full">
                             {/* <div className="area  bg-slate-400"></div> */}
                             <div className="flex-1 overflow-hidden h-[85%]">
                                 {/* <div className="pb-2"> */}
-                                    <div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-zinc-800">
-                                        <div className="flex flex-row items-center space-x-2">
-                                            <div className="msg-profile group">
-                                                <img src={getMessageFriend(MESSAGES[selectedMessageIndex]).picture} alt="" />
-                                            </div>
-                                            <div className="font-onest text-xl capitalize">
-                                                {
-                                                    getMessageFriend(MESSAGES[selectedMessageIndex]).firstName + ' ' + getMessageFriend(MESSAGES[selectedMessageIndex]).lastName
-                                                }
-                                            </div>
+                                <div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800">
+                                    <div className="flex flex-row items-center space-x-2">
+                                        <div className="msg-profile group bg-white" style={{ backgroundImage: `url(${getMessageFriend(MESSAGES[selectedMessageIndex]).picture})` }}>
                                         </div>
-                                        <div className="flex flex-row justify-between w-20 h-8">
-                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 50 50">
-                                                <path d="M 11.839844 2.988281 C 11.070313 2.925781 10.214844 3.148438 9.425781 3.703125 C 8.730469 4.1875 7.230469 5.378906 5.828125 6.726563 C 5.128906 7.398438 4.460938 8.097656 3.945313 8.785156 C 3.425781 9.472656 2.972656 10.101563 3 11.015625 C 3.027344 11.835938 3.109375 14.261719 4.855469 17.980469 C 6.601563 21.695313 9.988281 26.792969 16.59375 33.402344 C 23.203125 40.011719 28.300781 43.398438 32.015625 45.144531 C 35.730469 46.890625 38.160156 46.972656 38.980469 47 C 39.890625 47.027344 40.519531 46.574219 41.207031 46.054688 C 41.894531 45.535156 42.59375 44.871094 43.265625 44.171875 C 44.609375 42.769531 45.800781 41.269531 46.285156 40.574219 C 47.390625 39 47.207031 37.140625 45.976563 36.277344 C 45.203125 35.734375 38.089844 31 37.019531 30.34375 C 35.933594 29.679688 34.683594 29.980469 33.566406 30.570313 C 32.6875 31.035156 30.308594 32.398438 29.628906 32.789063 C 29.117188 32.464844 27.175781 31.171875 23 26.996094 C 18.820313 22.820313 17.53125 20.878906 17.207031 20.367188 C 17.597656 19.6875 18.957031 17.320313 19.425781 16.425781 C 20.011719 15.3125 20.339844 14.050781 19.640625 12.957031 C 19.347656 12.492188 18.015625 10.464844 16.671875 8.429688 C 15.324219 6.394531 14.046875 4.464844 13.714844 4.003906 L 13.714844 4 C 13.28125 3.402344 12.605469 3.050781 11.839844 2.988281 Z M 11.65625 5.03125 C 11.929688 5.066406 12.09375 5.175781 12.09375 5.175781 C 12.253906 5.398438 13.65625 7.5 15 9.53125 C 16.34375 11.566406 17.714844 13.652344 17.953125 14.03125 C 17.992188 14.089844 18.046875 14.753906 17.65625 15.492188 L 17.65625 15.496094 C 17.214844 16.335938 15.15625 19.933594 15.15625 19.933594 L 14.871094 20.4375 L 15.164063 20.9375 C 15.164063 20.9375 16.699219 23.527344 21.582031 28.410156 C 26.46875 33.292969 29.058594 34.832031 29.058594 34.832031 L 29.558594 35.125 L 30.0625 34.839844 C 30.0625 34.839844 33.652344 32.785156 34.5 32.339844 C 35.238281 31.953125 35.902344 32.003906 35.980469 32.050781 C 36.671875 32.476563 44.355469 37.582031 44.828125 37.914063 C 44.84375 37.925781 45.261719 38.558594 44.652344 39.425781 L 44.648438 39.425781 C 44.28125 39.953125 43.078125 41.480469 41.824219 42.785156 C 41.195313 43.4375 40.550781 44.046875 40.003906 44.457031 C 39.457031 44.867188 38.96875 44.996094 39.046875 45 C 38.195313 44.972656 36.316406 44.953125 32.867188 43.332031 C 29.417969 41.714844 24.496094 38.476563 18.007813 31.984375 C 11.523438 25.5 8.285156 20.578125 6.664063 17.125 C 5.046875 13.675781 5.027344 11.796875 5 10.949219 C 5.003906 11.027344 5.132813 10.535156 5.542969 9.988281 C 5.953125 9.441406 6.558594 8.792969 7.210938 8.164063 C 8.519531 6.910156 10.042969 5.707031 10.570313 5.339844 L 10.570313 5.34375 C 11.003906 5.039063 11.382813 5 11.65625 5.03125 Z" fill="white"></path>
-                                            </svg>
-                                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24">
-                                                <path d="M 4 4.75 C 3.271 4.75 2.5706875 5.0396875 2.0546875 5.5546875 C 1.5396875 6.0706875 1.25 6.771 1.25 7.5 L 1.25 16.5 C 1.25 17.229 1.5396875 17.929313 2.0546875 18.445312 C 2.5706875 18.960313 3.271 19.25 4 19.25 L 14.5 19.25 C 15.229 19.25 15.929312 18.960313 16.445312 18.445312 C 16.960313 17.929313 17.25 17.229 17.25 16.5 L 17.25 16.166016 L 20.982422 17.861328 C 21.369422 18.037328 21.819734 18.004438 22.177734 17.773438 C 22.534734 17.543438 22.75 17.147656 22.75 16.722656 L 22.75 7.2773438 C 22.75 6.8523438 22.534734 6.4565625 22.177734 6.2265625 C 21.819734 5.9955625 21.369422 5.9626719 20.982422 6.1386719 L 17.25 7.8339844 L 17.25 7.5 C 17.25 6.771 16.960313 6.0706875 16.445312 5.5546875 C 15.929312 5.0396875 15.229 4.75 14.5 4.75 L 4 4.75 z M 4 6.25 L 14.5 6.25 C 14.832 6.25 15.149766 6.3812344 15.384766 6.6152344 C 15.618766 6.8502344 15.75 7.168 15.75 7.5 L 15.75 9 L 15.75 15 L 15.75 16.5 C 15.75 16.832 15.618766 17.149766 15.384766 17.384766 C 15.149766 17.618766 14.832 17.75 14.5 17.75 L 4 17.75 C 3.668 17.75 3.3502344 17.618766 3.1152344 17.384766 C 2.8812344 17.149766 2.75 16.832 2.75 16.5 L 2.75 7.5 C 2.75 7.168 2.8812344 6.8502344 3.1152344 6.6152344 C 3.3502344 6.3812344 3.668 6.25 4 6.25 z M 21.25 7.6640625 L 21.25 16.335938 L 17.25 14.517578 L 17.25 9.4824219 C 17.25 9.4824219 20.213 8.1350625 21.25 7.6640625 z" fill="white"></path>
-                                            </svg>
-                                            <svg className="button-option icon" stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="23" width="23" xmlns="http://www.w3.org/2000/svg" onClick={handleOpenDetails}>
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                            </svg>
+                                        <div className="font-onest text-lg capitalize text-zinc-700 dark:text-white">
+                                            {
+                                                getMessageFriend(MESSAGES[selectedMessageIndex]).firstName + ' ' + getMessageFriend(MESSAGES[selectedMessageIndex]).lastName
+                                            }
                                         </div>
                                     </div>
-                                    <div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-20 ${selectedColor}`}>
-                                        {MESSAGES.map((message: any, index: any) => (
-                                            <div className={`chat-msg ${message.senderId === userData[0].id ? 'owner' : null}`} key={index}>
-                                                <div className="chat-msg-profile">
-                                                    <img className="chat-msg-img" src={message.senderId === userData[0].id ? userData[0].picture : getMessageFriend(MESSAGES[selectedMessageIndex]).picture} alt="" />
-                                                </div>
-                                                <div className="chat-msg-content">
-                                                    {message.img ? (
-                                                        <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                            <img src={message.img} alt="" onDoubleClick={() => onOpenModal(message.img || '')} />
-                                                        </div>
-                                                    ) : null}
-                                                    {
-                                                        // message.message.length > 0 ? (
-                                                        <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                            {message.message}
-                                                        </div>
-                                                        // ) :
-                                                        // <div className="chat-msg-text bg-main-light-FERN text-white">
-                                                        //     {message.message}
-                                                        // </div>
-                                                    }
-                                                    {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
-                                                    {
-                                                        (
-                                                            message.senderId === userData[0].id
-                                                            && index === (userLastMessageIndex())
-                                                        )
-                                                            ?
-                                                            <div className='chat-msg-date text-main-light-FERN'>
-                                                                {new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}
+                                    <div className="flex flex-row justify-around w-20 h-8 gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 50 50" className="fill-black dark:fill-white stroke-2">
+                                            <path d="M 11.839844 2.988281 C 11.070313 2.925781 10.214844 3.148438 9.425781 3.703125 C 8.730469 4.1875 7.230469 5.378906 5.828125 6.726563 C 5.128906 7.398438 4.460938 8.097656 3.945313 8.785156 C 3.425781 9.472656 2.972656 10.101563 3 11.015625 C 3.027344 11.835938 3.109375 14.261719 4.855469 17.980469 C 6.601563 21.695313 9.988281 26.792969 16.59375 33.402344 C 23.203125 40.011719 28.300781 43.398438 32.015625 45.144531 C 35.730469 46.890625 38.160156 46.972656 38.980469 47 C 39.890625 47.027344 40.519531 46.574219 41.207031 46.054688 C 41.894531 45.535156 42.59375 44.871094 43.265625 44.171875 C 44.609375 42.769531 45.800781 41.269531 46.285156 40.574219 C 47.390625 39 47.207031 37.140625 45.976563 36.277344 C 45.203125 35.734375 38.089844 31 37.019531 30.34375 C 35.933594 29.679688 34.683594 29.980469 33.566406 30.570313 C 32.6875 31.035156 30.308594 32.398438 29.628906 32.789063 C 29.117188 32.464844 27.175781 31.171875 23 26.996094 C 18.820313 22.820313 17.53125 20.878906 17.207031 20.367188 C 17.597656 19.6875 18.957031 17.320313 19.425781 16.425781 C 20.011719 15.3125 20.339844 14.050781 19.640625 12.957031 C 19.347656 12.492188 18.015625 10.464844 16.671875 8.429688 C 15.324219 6.394531 14.046875 4.464844 13.714844 4.003906 L 13.714844 4 C 13.28125 3.402344 12.605469 3.050781 11.839844 2.988281 Z M 11.65625 5.03125 C 11.929688 5.066406 12.09375 5.175781 12.09375 5.175781 C 12.253906 5.398438 13.65625 7.5 15 9.53125 C 16.34375 11.566406 17.714844 13.652344 17.953125 14.03125 C 17.992188 14.089844 18.046875 14.753906 17.65625 15.492188 L 17.65625 15.496094 C 17.214844 16.335938 15.15625 19.933594 15.15625 19.933594 L 14.871094 20.4375 L 15.164063 20.9375 C 15.164063 20.9375 16.699219 23.527344 21.582031 28.410156 C 26.46875 33.292969 29.058594 34.832031 29.058594 34.832031 L 29.558594 35.125 L 30.0625 34.839844 C 30.0625 34.839844 33.652344 32.785156 34.5 32.339844 C 35.238281 31.953125 35.902344 32.003906 35.980469 32.050781 C 36.671875 32.476563 44.355469 37.582031 44.828125 37.914063 C 44.84375 37.925781 45.261719 38.558594 44.652344 39.425781 L 44.648438 39.425781 C 44.28125 39.953125 43.078125 41.480469 41.824219 42.785156 C 41.195313 43.4375 40.550781 44.046875 40.003906 44.457031 C 39.457031 44.867188 38.96875 44.996094 39.046875 45 C 38.195313 44.972656 36.316406 44.953125 32.867188 43.332031 C 29.417969 41.714844 24.496094 38.476563 18.007813 31.984375 C 11.523438 25.5 8.285156 20.578125 6.664063 17.125 C 5.046875 13.675781 5.027344 11.796875 5 10.949219 C 5.003906 11.027344 5.132813 10.535156 5.542969 9.988281 C 5.953125 9.441406 6.558594 8.792969 7.210938 8.164063 C 8.519531 6.910156 10.042969 5.707031 10.570313 5.339844 L 10.570313 5.34375 C 11.003906 5.039063 11.382813 5 11.65625 5.03125 Z"></path>
+                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" className="fill-black dark:fill-white">
+                                            <path d="M 4 4.75 C 3.271 4.75 2.5706875 5.0396875 2.0546875 5.5546875 C 1.5396875 6.0706875 1.25 6.771 1.25 7.5 L 1.25 16.5 C 1.25 17.229 1.5396875 17.929313 2.0546875 18.445312 C 2.5706875 18.960313 3.271 19.25 4 19.25 L 14.5 19.25 C 15.229 19.25 15.929312 18.960313 16.445312 18.445312 C 16.960313 17.929313 17.25 17.229 17.25 16.5 L 17.25 16.166016 L 20.982422 17.861328 C 21.369422 18.037328 21.819734 18.004438 22.177734 17.773438 C 22.534734 17.543438 22.75 17.147656 22.75 16.722656 L 22.75 7.2773438 C 22.75 6.8523438 22.534734 6.4565625 22.177734 6.2265625 C 21.819734 5.9955625 21.369422 5.9626719 20.982422 6.1386719 L 17.25 7.8339844 L 17.25 7.5 C 17.25 6.771 16.960313 6.0706875 16.445312 5.5546875 C 15.929312 5.0396875 15.229 4.75 14.5 4.75 L 4 4.75 z M 4 6.25 L 14.5 6.25 C 14.832 6.25 15.149766 6.3812344 15.384766 6.6152344 C 15.618766 6.8502344 15.75 7.168 15.75 7.5 L 15.75 9 L 15.75 15 L 15.75 16.5 C 15.75 16.832 15.618766 17.149766 15.384766 17.384766 C 15.149766 17.618766 14.832 17.75 14.5 17.75 L 4 17.75 C 3.668 17.75 3.3502344 17.618766 3.1152344 17.384766 C 2.8812344 17.149766 2.75 16.832 2.75 16.5 L 2.75 7.5 C 2.75 7.168 2.8812344 6.8502344 3.1152344 6.6152344 C 3.3502344 6.3812344 3.668 6.25 4 6.25 z M 21.25 7.6640625 L 21.25 16.335938 L 17.25 14.517578 L 17.25 9.4824219 C 17.25 9.4824219 20.213 8.1350625 21.25 7.6640625 z"></path>
+                                        </svg>
+                                        <svg stroke="currentColor" className="stroke-black dark:stroke-white" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="23" width="23" xmlns="http://www.w3.org/2000/svg" onClick={handleOpenDetails}>
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `}>
+                                    {MESSAGES.map((message: any, index: any) => {
+                                        const sender: User = message.senderId === userData[0].id ? userData[0] : getMessageFriend(MESSAGES[selectedMessageIndex]);
+                                        const reciever: User = message.senderId === userData[0].id ? getMessageFriend(MESSAGES[selectedMessageIndex]) : userData[0];
+                                        if (message.message.length > 0) {
+                                            return (
+                                                <div className="p-4" key={index}>
+                                                    <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
+                                                        <img className="w-8 h-8 rounded-full" src={sender.picture} alt="Jese image" />
+                                                        <div className="flex message flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
+                                                            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                                                <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
+                                                                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                                             </div>
-                                                            :
-                                                            null
-                                                    }
+                                                            <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{message.message}</p>
+                                                            {/* <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span> */}
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                {/* </div> */}
+                                            )
+                                        }
+                                        else if (message.img) {
+                                            return (
+                                                <div className="p-4" key={index}>
+                                                    <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
+                                                        <img className="w-8 h-8 rounded-full" src={sender.picture} alt="" />
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex message flex-col w-full max-w-[326px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
+                                                                <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
+                                                                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
+                                                                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                                </div>
+                                                                <div className="group relative my-2.5">
+                                                                    <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
+                                                                        <button onDoubleClick={() => onOpenModal(message.img || '')} className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
+                                                                            <svg className="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
+                                                                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
+                                                                            </svg>
+                                                                        </button>
+                                                                        <div id="download-image" role="tooltip" className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+                                                                            Download image
+                                                                            <div className="tooltip-arrow" data-popper-arrow></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <img src={message.img} className="rounded-lg" />
+                                                                </div>
+                                                                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
+                                                                {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                        else if (message.audio) {
+                                            return (
+                                                <div className="p-4" key={index}>
+                                                    <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
+                                                        <img className="w-8 h-8 rounded-full" src={sender.picture} alt="" />
+                                                        <div className="flex message flex-col gap-2.5 w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
+                                                            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                                                <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
+                                                                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                            </div>
+                                                            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                                                <audio ref={audioRef} src={message.audio} volume={volume} />
+                                                                <button onClick={() => { togglePlay()}} className="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-600" type="button">
+                                                                    <svg className="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 12 16">
+                                                                        <path d="M3 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm7 0H9a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Z" />
+                                                                    </svg>
+                                                                </button>
+                                                                <svg aria-hidden="true" className="w-[145px] md:w-[185px] md:h-[40px]" viewBox="0 0 185 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                    <rect y="17" width="3" height="6" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="7" y="15.5" width="3" height="9" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="21" y="6.5" width="3" height="27" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="14" y="6.5" width="3" height="27" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="28" y="3" width="3" height="34" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="35" y="3" width="3" height="34" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="42" y="5.5" width="3" height="29" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="49" y="10" width="3" height="20" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="56" y="13.5" width="3" height="13" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="63" y="16" width="3" height="8" rx="1.5" fill="#6B7280" className="dark:fill-white" />
+                                                                    <rect x="70" y="12.5" width="3" height="15" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="77" y="3" width="3" height="34" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="84" y="3" width="3" height="34" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="91" y="0.5" width="3" height="39" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="98" y="0.5" width="3" height="39" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="105" y="2" width="3" height="36" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="112" y="6.5" width="3" height="27" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="119" y="9" width="3" height="22" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="126" y="11.5" width="3" height="17" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="133" y="2" width="3" height="36" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="140" y="2" width="3" height="36" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="147" y="7" width="3" height="26" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="154" y="9" width="3" height="22" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="161" y="9" width="3" height="22" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="168" y="13.5" width="3" height="13" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="175" y="16" width="3" height="8" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="182" y="17.5" width="3" height="5" rx="1.5" fill="#E5E7EB" className="dark:fill-gray-500" />
+                                                                    <rect x="66" y="16" width="8" height="8" rx="4" fill="#1C64F2" />
+                                                                </svg>
+                                                                <span className="inline-flex self-center items-center p-2 text-sm font-medium text-gray-900 dark:text-white">3:42</span>
+                                                            </div>
+                                                            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+                                    })}
+                                </div>
                             </div>
-                            <div className="area h-[11%] bg-slate-700">
-                                {/* <div className="text h-full bg-red-400"></div> */}
-                                <form onSubmit={handleSubmit} className=" m-0 h-full bg-green-400">
-                                    <div className=" border-t-2 border-t-gray-500 bg-zinc-900 flex flex-row h-full justify-center w-full overflow-hidden">
+                            <div className="area h-[11%] border-t border-gray-300">
+                                <form onSubmit={handleTextSubmit} className="w-full h-full m-0 px-4 flex items-center justify-center">
+                                    <div className="field flex justify-center w-full h-full py-4 items-center gap-2 transition-all ease-in-out duration-500">
+                                        <svg className="stroke-gray-600 dark:stroke-gray-400" fill="none" viewBox="0 0 24 24" height="1.5em" width="1.5em" xmlns="http://www.w3.org/2000/svg">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <input value={message} name="message" onChange={(e) => setMessage(e.target.value)} color={"primary"} className="input-message w-full px-4 focus:ring-0 focus:border-b-0 focus:outline-none bg-gray-300 dark:bg-zinc-900 text-black dark:text-gray-200 py-4 rounded-full border-none outline-none placeholder-gray-500 transition-all ease-in-out duration-500" type="" placeholder="Type something..." />
+                                        <div className={`plus flex flex-row gap-1 ${message.length > 0 ? 'hidden' : 'block'}`}>
+                                            <div className="send text flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 dark:bg-transparent overflow-hidden" onClick={chooseFile}>
+                                                <svg className="stroke-gray-600 dark:stroke-current" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                                                </svg>
+                                            </div>
+                                            <div className={`send audio flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 overflow-hidden`} onClick={recording ? stopRecording : startRecording}>
+                                                {/* <svg stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                                                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                                                </svg> */}
+                                                {recording ? <div className="recording flex items-center justify-center w-8 h-8 rounded-full bg-red-500 overflow-hidden" /> : <div className="recording flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 overflow-hidden" />}
+                                            </div>
+                                        </div>
+                                        <div className={`plus flex justify-center items-center p-1 rounded-full bg-blue-500 ${message.length > 0 ? 'block' : 'hidden'}`}>
+                                            <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+                                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </form>
+
+                            </div>
+
+                            {/* <div className=" border-t-2 border-t-gray-500 bg-zinc-900 flex flex-row h-full justify-center w-full overflow-hidden">
                                             <TextInput className="p-4 mt-2 w-full" name="message" type="text" theme={inputTheme} autoComplete="off" value={message} onChange={(e) => setMessage(e.target.value)} color={"primary"} placeholder="Type something here..." />
-                                            <button type="submit">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32px" height="32px" >
                                                     <path d="M 5.4453125 4.0019531 A 1.50015 1.50015 0 0 0 4.109375 6.0644531 L 11.380859 24 L 4.109375 41.935547 A 1.50015 1.50015 0 0 0 6.1699219 43.841797 L 43.169922 25.341797 A 1.50015 1.50015 0 0 0 43.169922 22.658203 L 6.1699219 4.1582031 A 1.50015 1.50015 0 0 0 5.4453125 4.0019531 z M 8.3828125 8.6191406 L 39.146484 24 L 8.3828125 39.380859 L 14.011719 25.5 L 27.5 25.5 A 1.50015 1.50015 0 1 0 27.5 22.5 L 14.011719 22.5 L 8.3828125 8.6191406 z" fill="white" />
                                                 </svg>
                                             </button>
-                                    </div>
-                                </form>
-                            </div>
+                                    </div> */}
                         </div>
                 }
 

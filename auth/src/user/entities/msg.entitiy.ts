@@ -51,4 +51,6 @@ export class Msg {
   @Column({ nullable: true})
   img: string;
 
+  @Column({ nullable: true })
+  audio: string; 
 }
