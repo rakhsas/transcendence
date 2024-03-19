@@ -79,9 +79,9 @@ class Game {
   computer: Computer;
   net: Net;
   ball: Ball;
-  intervalId: NodeJS.Timeout | any;
   socket: any;
-  roomId: String;
+  roomId: string;
+  index : number;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -89,8 +89,9 @@ class Game {
     roomId: string,
     index: number
   ) {
-    this.socket = socket;
+    this.index = index;
     this.roomId = roomId;
+    this.socket = socket;
     this.user = new User(canvas);
     this.computer = new Computer(canvas);
     this.net = new Net(canvas);
@@ -98,29 +99,15 @@ class Game {
     this.ball.vx *= index;
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
-    socket.on("message", (comp) => {
-      this.computer.y = comp.y;
-      if(this.computer.score < comp.score)
-        this.computer.score = comp.score;
-      else
-        socket.emit("message", { user: this.user, id: roomId });
-    });
 
-    socket.on("ball", (ball) => {
-      if (ball.x > this.canvas.width / 2) {
-        this.ball = ball;
-        this.ball.x = this.canvas.width / 2 - (ball.x - this.canvas.width / 2);
-        this.ball.vx = -ball.vx;
-      }
-    });
-
-    socket.on("start", () => {
-      console.log("starting");
-      setTimeout(() => this.render(), 2000);
+    socket.on("message", (user, comp, ball) => {
+      this.user = user;
+      this.computer = comp;
+      this.ball = ball;
+      this.render();
     });
 
     socket.on("win", () => {
-      clearTimeout(this.intervalId);
       this.drawRect(
         0,
         0,
@@ -146,7 +133,6 @@ class Game {
     });
 
     socket.on("lose", () => {
-      clearTimeout(this.intervalId);
       this.drawRect(
         0,
         0,
@@ -174,9 +160,13 @@ class Game {
 
     this.canvas.addEventListener("mousemove", (evt) => {
       const rect = canvas.getBoundingClientRect();
-      this.user.y = evt.clientY - rect.top - this.user.height / 2;
-      socket.emit("message", { user: this.user, id: roomId });
-      //socket.emit("ball", { ball: this.ball, id: this.roomId });
+      if(this.index === 1) {
+        this.user.y = evt.clientY - rect.top - this.user.height / 2;
+      }
+      else {
+        this.computer.y = evt.clientY - rect.top - this.computer.height / 2;
+      }
+      socket.emit("message", {uy: this.user.y, cy: this.computer.y, id: this.roomId});
     });
   }
 
@@ -219,89 +209,8 @@ class Game {
     }
   }
 
-  // collision detection
-  collision(b: any, p: any) {
-    p.top = p.y;
-    p.bottom = p.y + p.height;
-    p.left = p.x;
-    p.right = p.x + p.width;
 
-    b.top = b.y - b.r;
-    b.bottom = b.y + b.r;
-    b.left = b.x - b.r;
-    b.right = b.x + b.r;
-
-    return (
-      p.left < b.right &&
-      p.top < b.bottom &&
-      p.right > b.left &&
-      p.bottom > b.top
-    );
-  }
-
-  resetBall() {
-    // i want to sleep for 1 second
-    this.ball.x = this.canvas.width / 2;
-    this.ball.y = this.canvas.height / 2;
-    const oldx = -this.ball.vx;
-    const oldy = this.ball.vy;
-    this.ball.vy = 0;
-    this.ball.vx = 0;
-
-    setTimeout((vx = oldx, vy = oldy) => {
-      this.ball.vx = vx;
-      this.ball.vy = vy;
-      this.ball.speed = 7;
-    }, 2000);
-  }
-
-  update() {
-    if (this.user.score === 5 || this.computer.score === 5) {
-      const state = this.user.score === 5 ? "win" : "lose";
-      console.log("state is:", state);
-      clearInterval(this.intervalId);
-      this.render();
-      if (state === "lose") this.socket.emit("lose", { id: this.roomId });
-    } else {
-      if (this.ball.x - this.ball.r < 0) {
-        this.computer.score++;
-        this.resetBall();
-      } else if (this.ball.x + this.ball.r > this.canvas.width) {
-        this.user.score++;
-        this.resetBall();
-      }
-      this.ball.x += this.ball.vx;
-      this.ball.y += this.ball.vy;
-      //this.socket.emit("ball", { ball: this.ball , id: this.roomId });
-      if (
-        this.ball.y + this.ball.r > this.canvas.height ||
-        this.ball.y - this.ball.r < 0
-      )
-        this.ball.vy = -this.ball.vy;
-
-      const player: User | Computer =
-        this.ball.x + this.ball.r < this.canvas.width / 2
-          ? this.user
-          : this.computer;
-
-      if (this.collision(this.ball, player)) {
-        let collidePoint: number = this.ball.y - (player.y + player.height / 2);
-        collidePoint = collidePoint / (player.height / 2);
-        const angle = (Math.PI / 4) * collidePoint;
-
-        const direction: 1 | -1 = this.ball.x < this.canvas.width / 2 ? 1 : -1;
-        this.ball.vx = direction * this.ball.speed * Math.cos(angle);
-        this.ball.vy = this.ball.speed * Math.sin(angle);
-
-        this.ball.speed += 0.1;
-        this.socket.emit("ball", { ball: this.ball, id: this.roomId });
-      }
-    }
-  }
   render() {
-    const game = () => {
-      this.update();
-
       this.drawRect(0, 0, this.canvas.width, this.canvas.height, "black");
       this.drawText(
         this.user.score,
@@ -355,8 +264,6 @@ class Game {
         this.computer.color
       );
       this.drawCirecle(this.ball.x, this.ball.y, this.ball.r, this.ball.color);
-    };
-    this.intervalId = setInterval(game, 1000 / 60);
   }
 }
 
