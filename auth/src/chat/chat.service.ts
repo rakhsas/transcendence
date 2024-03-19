@@ -1,11 +1,11 @@
 // src/chat/chat.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Msg } from './../user/entities/msg.entitiy';
 import { UUID, privateDecrypt } from 'crypto';
 import { Repository, UnorderedBulkOperation } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { Channel } from 'src/user/entities/channel.entity';
+import { User} from 'src/user/entities/user.entity';
+import { Channel, ChannelTypes } from 'src/user/entities/channel.entity';
 import { channel } from 'diagnostics_channel';
 import { Mute } from 'src/user/entities/mute.entity';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
@@ -78,7 +78,7 @@ export class ChatService {
    * @param receiverId the receiver
    * @param content the content of the message
    */
-  async addDirectMessage(payload: any): Promise<void> {
+  async addMessage(payload: any): Promise<void> {
     const directMessage = this.msgRepository.create({
       message: payload.message,
       recieverId: payload.recieverId,
@@ -119,19 +119,26 @@ export class ChatService {
 
   // ============================= Channel function =================================================================
 
+
+  async getChannel(channelId: number): Promise<Channel>
+  {
+    return await this.channelRepository.findOne({where: {id: channelId}});
+  }
+
   /**
    * addNewChannelEntity - function that add a new entity to channel
    * @payload the data attribute of channel entity
    */
-
-  async addNewChannelEntity(payload: any) {
-    const newEntityChannel = this.channelRepository.create({
+  async addNewChannelEntity(payload: any)
+  {
+    const ownerPromise: Promise<User> = this.userRepository.findOne(payload.ownerId);
+    const newEntityChannel =  this.channelRepository.create({
       name: payload.channelName,
       private: payload.isPrivate,
       password: "password" in payload ? payload.password : null,
       // password: payload.password !== undefined ? payload.password : null,
       type: payload.channelType,
-      ownerId: payload.ownerId
+      owner: ownerPromise,
     });
 
     await this.channelRepository.save(newEntityChannel);
@@ -162,19 +169,48 @@ export class ChatService {
    * @param payload userId and channelId from where the user will be kicked
    * in the channel-user entity.
    */
-  // async kickUserFromChannel(payload: any)
-  // {
-  //   const targetedEntity = await this.UserChannelRelation.findOne({
-  //     where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
-  //   });
+  async kickUserFromChannel(payload: any)
+  {
+    const targetedEntity = await this.channelUserRepository.findOne({
+      where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
+    });
 
-  //   if (targetedEntity)
-  //   {
-  //     await this.UserChannelRelation.delete(targetedEntity);
-  //   }
-  //   else
-  //     console.log("the user in channel-user relation is not found!!!");
-  // }
+    if (targetedEntity)
+    {
+      await this.channelUserRepository.delete(targetedEntity);
+    }
+    else
+      console.log("the user in channel-user relation is not found!!!");
+  }
+
+  async changeChannelType(payload: any)
+  {
+    const channelRecord = await this.channelRepository.findOne({where: {id: payload.channelId}});
+
+    if (!channelRecord)
+      throw new NotFoundException("The channel not found !");
+
+    channelRecord.type = payload.channelType;
+    if (payload.channelType == ChannelTypes.PROTECTED)
+    {
+      channelRecord.password = payload.password;
+    }
+    await this.channelRepository.save(channelRecord);
+  }
+
+  async promoteUser(payload: any)
+  {
+    const channelRecord = await this.channelRepository.findOne({where: {id: payload.channelId}});
+    const userRecord = await this.userRepository.findOne({where: {id: payload.userId}});
+    
+    if (channelRecord === null || userRecord === null)
+      throw new NotFoundException("the disire channel or user not found");
+    const recordToUpdate = await this.channelUserRepository.findOne({where: {user: userRecord, channel: channelRecord}});
+    if (recordToUpdate === null)
+      throw new NotFoundException("the channel user record not found (updating role of the user in a channel)");
+    recordToUpdate.role = payload.role;
+    await this.channelUserRepository.save(recordToUpdate);
+  }
 
   // =============================== Mute functions ================================================
   async muteUser(payload: any) {
