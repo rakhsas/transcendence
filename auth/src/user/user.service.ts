@@ -102,7 +102,7 @@ export class UserService {
 	async findOne(userData: Partial<User>): Promise<any> {
 		const { email, firstName, lastName, picture, username, providerId, provider } = userData;
 		let user = await this.userRepository.findOneBy({ email, firstName, lastName, picture, username, providerId, provider });
-		return (user) ? { user: user, firstLogin: true } : null;
+		return (user) ? { user: user, firstLogin: false } : null;
 	}
 
 	async getCoalition(id: number, providerAccessToken: string): Promise<any> {

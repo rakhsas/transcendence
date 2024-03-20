@@ -29,6 +29,7 @@ export class MessageService {
                 { senderId: recieverId, recieverId: senderId }
             ],
             relations: ['owner', 'reciever', 'channel'],
+            order: { date: 'ASC' }
         });
     }
 

@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
-
+import path from 'path';
+import * as fs from 'fs';
+import { promisify } from 'util';
 @Injectable()
 export class AppService {
   /**
@@ -27,5 +29,15 @@ export class AppService {
   hello() {
     return "Hello"
   }
-
+  writeFileAsync = promisify(fs.writeFile);
+  async uploadFile(file) {
+    const { originalname, buffer } = file;
+      const filename = `${Date.now()}-${originalname}`;
+      const uploadDir = path.resolve(__dirname, 'uploads');
+      const filePath = path.join(uploadDir, filename);
+      await this.writeFileAsync(filePath, buffer);
+    return {
+      url: `${process.env.HOST}${filename}`
+    }
+  }
 }

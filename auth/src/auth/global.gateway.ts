@@ -42,7 +42,6 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	private async updateConnectedUsers() {
 		this.userIds = Array.from(this.connectedUserIds);
-		console.log('connectedUsers', this.userIds.length);
 		// this.server.emit('connectedUsers', { msg: 'hello'});
 	}
 

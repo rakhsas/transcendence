@@ -44,7 +44,7 @@
   --theme-color: #38b2ac;
   --button-color: #38b2ac;
   --button-bg-color: rgba(56, 178, 171, 0.15);
-}
+} 
 
 [data-theme="orange"] {
   --theme-color: #ed8936;
@@ -53,6 +53,11 @@
 }
 
 .black {
+  /* background-color:white; */
+  background-color:white;
+}
+.dark .black {
+  /* background-color: theme('colors.zinc.900'); */
   background-color: theme('colors.zinc.900');
 }
 
@@ -142,16 +147,13 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  object-fit: cover;
   margin-right: 15px;
+  margin: auto;
+  background-repeat: no-repeat;
+  background-size: cover; /* Ensure the image covers the entire div */
+  background-position: center; /* Center the image within the div */
 }
 
-.msg-profile.group {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--border-color);
-}
 
 .msg-profile.group svg {
   width: 60%;
@@ -331,6 +333,26 @@ body {
 
 .owner {
   flex-direction: row-reverse;
+}
+
+.dark .owner .message {
+  background-color: theme('colors.main.light.EGGSHELL');
+  color: #fff;
+  border-radius: 20px 20px 0 20px;
+}
+.owner .message {
+  background-color: theme('colors.main.light.FERN');
+  color: #fff;
+  border-radius: 20px 20px 0 20px;
+}
+
+.dark .reciever .message{
+  background-color: theme('colors.zinc.600');
+  color: var(--chat-text-color);
+}
+.reciever .message{
+  background-color: theme('colors.main.light.COLDSTEEL');
+  color: var(--chat-text-color);
 }
 
 .owner .chat-msg-content {

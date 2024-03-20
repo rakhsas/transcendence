@@ -65,5 +65,28 @@ export class AuthController {
         // console.log(req.cookies)
         return await this.authService.decodeToken(req);
     }
+
+    @Get('logout')
+    @UseGuards(UseGuards)
+    async logout(@Res() res) {
+        res.clearCookie('access_token');
+        res.clearCookie('provider_access_token');
+        res.clearCookie('isAuthenticated');
+        res.clearCookie('firstLogin');
+        res.redirect(process.env.FRONT_URL);
+    }
     
+    @Get('tokenInfo')
+    @UseGuards(UseGuards)
+    async tokenInfo(@Req() req) {
+        const { cookie } : any = req.headers;
+        const authToken = this.authService.getCookie('access_token', cookie);
+        const providerToken = this.authService.getCookie('provider_access_token', cookie);
+        
+        const payload = await this.authService.decodeToken(authToken)
+        return {
+            payload,
+            providerToken
+        }
+    }
 }
