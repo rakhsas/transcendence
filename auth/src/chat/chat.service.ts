@@ -10,6 +10,7 @@ import { channel } from 'diagnostics_channel';
 import { Mute } from 'src/user/entities/mute.entity';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { UserRole } from '../user/entities/channel_member.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ChatService {
@@ -23,7 +24,8 @@ export class ChatService {
     @InjectRepository(Mute)
     private readonly muteRepository: Repository<Mute>,
     @InjectRepository(ChannelUser)
-    private readonly channelUserRepository: Repository<ChannelUser>
+    private readonly channelUserRepository: Repository<ChannelUser>,
+    private userService: UserService,
   ) {}
 
   /**
@@ -79,7 +81,6 @@ export class ChatService {
    * @param content the content of the message
    */
   async addMessage(payload: any): Promise<void> {
-    // console.log('payload.recieverId: ',payload.recieverId, 'payload.senderId: ', payload.senderId)
     const directMessage = this.msgRepository.create({
       message: payload.message,
       recieverId: payload.recieverId,
@@ -131,47 +132,66 @@ export class ChatService {
    * @payload the data attribute of channel entity
    */
 
-  async addNewChannelEntity(payload: any)
-  {
-    const ownerPromise: Promise<User> = this.userRepository.findOne(payload.ownerId);
-    const newEntityChannel =  this.channelRepository.create({
-      name: payload.channelName,
-      private: payload.isPrivate,
-      password: "password" in payload ? payload.password : null,
-      // password: payload.password !== undefined ? payload.password : null,
-      type: payload.channelType,
-      owner: ownerPromise,
-    });
-    /*
-      {
-        channelName:
-        isPrivate: bool,
-        channelType:,
-        ownerId,
-        password: it can be exist it can be not.
-      }
-    */
-    await this.channelRepository.save(newEntityChannel);
+  // async addNewChannelEntity(payload: any)
+  // {
+  //   const ownerPromise: Promise<User> = this.userRepository.findOne(payload.ownerId);
+  //   const newEntityChannel =  this.channelRepository.create({
+  //     name: payload.channelName,
+  //     private: payload.isPrivate,
+  //     password: "password" in payload ? payload.password : null,
+  //     // password: payload.password !== undefined ? payload.password : null,
+  //     type: payload.channelType,
+  //     owner: ownerPromise,
+  //   });
+  //   /*
+  //     {
+  //       channelName:
+  //       isPrivate: bool,
+  //       channelType:,
+  //       ownerId,
+  //       password: it can be exist it can be not.
+  //     }
+  //   */
+  //   await this.channelRepository.save(newEntityChannel);
+  // }
+
+  async addNewChannelEntity(payload: any): Promise<Channel> {
+
+    try {
+      const newEntityChannel = new Channel();
+      newEntityChannel.name = payload.channelName;
+      newEntityChannel.private = payload.isPrivate;
+      newEntityChannel.password = "password" in payload ? payload.password : null;
+      newEntityChannel.type = payload.channelType;
+      console.log("=> ", payload.ownerId);
+      newEntityChannel.owner = Promise.resolve(payload.ownerId);
+
+
+      // Save the new Channel entity
+      const savedChannel = await this.channelRepository.save(newEntityChannel);
+      return savedChannel;
+    } catch (error) {
+      console.error("Error adding new channel:", error);
+    }
   }
+  
 
-  async addNewMemberToChannel(payload: any) {
+  async addNewMemberToChannel(payload: any, role: string) {
     // Load user and channel entities
-    const user = await this.userRepository.findOne(payload.userId);
-    const channel = await this.channelRepository.findOne(payload.channelId);
-
+    const user = await this.userService.viewUser(payload.__owner__.id);
+    const channel: Channel = await this.channelRepository.findOne({where: {id: payload.id}});
     if (!user || !channel) {
       throw new Error('User or channel not found'); // Handle the case where user or channel is not found
     }
 
-    // Create a new ChannelUser instance
-    const newEntity = this.channelUserRepository.create({
-      user,
-      channel,
-      role: payload.role,
-    });
+    const newChannelUser = new ChannelUser();
+    // newEntity.user = Promise.resolve(payload.__owner__.id);
+    newChannelUser.user = Promise.resolve(user);
+    newChannelUser.channel = Promise.resolve(channel);
+    newChannelUser.role = (role !== "") ? role : payload.role
 
     // Save the new ChannelUser record
-    await this.channelUserRepository.save(newEntity);
+    await this.channelUserRepository.save(newChannelUser);
   }
 
   /**
@@ -187,7 +207,7 @@ export class ChatService {
 
     if (targetedEntity)
     {
-      await this.channelUserRepository.delete(targetedEntity);
+      await this.channelUserRepository.delete(targetedEntity.id);
     }
     else
       console.log("the user in channel-user relation is not found!!!");

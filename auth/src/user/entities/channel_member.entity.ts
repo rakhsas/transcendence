@@ -14,11 +14,11 @@ export class ChannelUser {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.channels)
-  user: User;
+  @ManyToOne(() => User, (user) => user.channels, {lazy: true})
+  user: Promise<User>;
 
-  @ManyToOne(() => Channel, (channel) => channel.members)
-  channel: Channel;
+  @ManyToOne(() => Channel, (channel) => channel.members, {lazy: true})
+  channel: Promise<Channel>;
 
   @Column()
   role: UserRole;

@@ -3,6 +3,7 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnectio
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
+import { UserRole } from 'src/user/entities/channel_member.entity';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
@@ -106,9 +107,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     socket.join(payload.channelId);
-    await this.chatService.addNewChannelEntity(payload);
-
-    await this.chatService.addNewMemberToChannel(payload);
+    // const process1 = JSON.stringify(await this.chatService.addNewChannelEntity(payload));
+    await this.chatService.addNewChannelEntity(payload)
+    .then(async(process1) => {
+      await this.chatService.addNewMemberToChannel(process1, UserRole.OWNER);
+    })
   }
 
   @SubscribeMessage('joinChannel')
@@ -120,7 +123,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if ("password" in payload && channel.password === payload.password)
       {
         client.join(payload.channelId);
-        await this.chatService.addNewMemberToChannel(payload);
+        await this.chatService.addNewMemberToChannel(payload, "");
       }
       else
       {
@@ -130,7 +133,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     else
     {
       client.join(payload.channelId);
-      await this.chatService.addNewMemberToChannel(payload);
+      await this.chatService.addNewMemberToChannel(payload, "");
     }
   }
 
