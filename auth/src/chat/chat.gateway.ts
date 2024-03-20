@@ -106,9 +106,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     socket.join(payload.channelId);
-    await this.chatService.addNewChannelEntity(payload);
-
-    await this.chatService.addNewMemberToChannel(payload);
+    // const process1 = JSON.stringify(await this.chatService.addNewChannelEntity(payload));
+    await this.chatService.addNewChannelEntity(payload)
+    .then(async(process1) => {
+      // await this.chatService.addNewMemberToChannel(process1);
+    })
   }
 
   @SubscribeMessage('joinChannel')
