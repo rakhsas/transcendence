@@ -1,18 +1,13 @@
-import { useContext, useState, useEffect, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useRef } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import "./chat.css";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
-import { TextInput } from "flowbite-react";
-import { inputTheme } from "../../../utils/themes";
 import ConversationArea from "./conversation";
-// import { latestGroupMessages, messages } from "../../../utils/data";
 import DetailsArea from "./details";
-import ModalComponent from "../../../utils/modal.component";
 import { messageUser, messageUser1 } from "../../../model/messageUser.model";
 import MessageService from "../../../services/message.service";
 import { Socket } from "socket.io-client";
 import AuthService from "../../../services/auth.service";
-import User from "../../../model/user.model";
 import React from "react";
 import ChatAreaComponent from "./chatArea";
 
@@ -30,13 +25,15 @@ function chatComponent(): JSX.Element {
     const [onOpenDetails, setOnOpenDetails] = useState<boolean>(false);
     const [recording, setRecording] = useState(false);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
     const messageService = new MessageService();
     const messagesRef = useRef<HTMLElement>(null);
+    const audioRefs = useRef([] as HTMLAudioElement[]);
     const userData = useContext(DataContext);
     if (!userData) {
         return <LoadingComponent />;
     }
+    const latestGroupMessages: any = [];
     useEffect(() => {
         if (messagesRef.current)
             scrollToBottom(messagesRef.current!);
@@ -62,7 +59,6 @@ function chatComponent(): JSX.Element {
     if (!userData[0] || !userData[1]) {
         return <LoadingComponent />;
     }
-    const latestGroupMessages: any = [];
     const handleTextSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -87,7 +83,6 @@ function chatComponent(): JSX.Element {
         setMessage('');
         setLatestMessages(await messageService.latestMessages(userData[0].id));
     };
-
     const handleImageSubmit = async (selectedFile: File) => {
         const formData = new FormData();
         formData.append('file', selectedFile);
@@ -234,9 +229,8 @@ function chatComponent(): JSX.Element {
     return (
         <>
             <div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
-                <div className="flex flex-col relative overflow-y-auto overflow-x-hidden border-r-[1px] dark:border-gray-700 border-black">
+                
                     {ConversationArea({ latestMessages, selectedMessageIndex, latestGroupMessages, handleSelectMessage, userData })}
-                </div>
                 {
                     !MESSAGES
                         ?
@@ -273,7 +267,7 @@ function chatComponent(): JSX.Element {
                                     </div>
                                 </div>
                                 <div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `}>
-                                    { ChatAreaComponent({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, isPlaying, modalPicPath }) }
+                                    { ChatAreaComponent({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, isPlaying, setIsPlaying, modalPicPath, audioRefs }) }
                                 </div>
                             </div>
                             <div className="area h-[11%] border-t border-gray-300">

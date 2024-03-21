@@ -234,7 +234,7 @@ body {
 
 .add {
   position: sticky;
-  bottom: 25px;
+  /* bottom: 25px; */
   background-color: var(--theme-color);
   width: 60px;
   height: 60px;

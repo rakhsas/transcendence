@@ -35,6 +35,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
         const name = event.currentTarget.channelName.value;
         const type = event.currentTarget.types.value;
         const password =  event.currentTarget.password?.value;
+        if (name === '' || type === '') {
+            return;
+        }
         setOpenModal(false);
         setSelectedItem('');
         socket?.emit('createChannel', {
@@ -46,7 +49,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
         })
     }
     return (
-        <>
+        <div className="flex flex-col relative justify-between pb-5 overflow-y-auto overflow-x-hidden border-r-[1px] dark:border-gray-700 border-black">
             <Tabs aria-label="Tabs with icons" style="underline" theme={tabsTheme}>
                 <Tabs.Item active title="Friends" icon={LiaUserFriendsSolid}>
                     {latestMessages.length == 0 ?
@@ -79,11 +82,13 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                                                     <path d="M2 15.5l10-7 10 7M12 2v6.5" />
                                                 </svg>
                                             ) : (
-                                                <img
-                                                    src={userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture}
-                                                    className="object-cover bg-contain h-full bg-no-repeat bg-center"
-                                                    alt=""
-                                                />
+                                                // <img
+                                                //     src={userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture}
+                                                //     className="object-cover bg-contain h-full bg-no-repeat bg-center"
+                                                //     alt=""
+                                                // />
+                                                <div className="msg-profile group" style={{ backgroundImage: `url(${userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture})` }}>
+                                                </div>
                                             )}
                                     </div>
                                     <div className="msg-detail overflow-hidden ml-2">
@@ -156,18 +161,19 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                         ))} */}
                 </Tabs.Item>
             </Tabs>
-            <button className="add" onClick={() => { setIsOpen(!isOpen) }}></button>
-            {/* <div className="overlay"></div> */}
-            <Modal show={isOpen} onClose={() => setOpenModal(false)}>
-                <Modal.Header>Terms of Service</Modal.Header>
+            {/* <div className="btn h-auto"> */}
+                <button className="add bottom-6" onClick={() => { setIsOpen(!isOpen) }}></button>
+            {/* </div> */}
+            {isOpen ? <Modal show={isOpen} onClose={() => setOpenModal(false)}>
+                <Modal.Header>Channel Details</Modal.Header>
                 <Modal.Body>
-                    <form className="flex max-w-md flex-col gap-4" onSubmit={addChannel}>
-                        <div className="w-full">
+                    <form className="flex flex-col gap-4 m-0" onSubmit={addChannel}>
+                        <div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
                             <div>
                                 <div className="mb-2 block">
                                     <Label htmlFor="channelName" value="Your email" />
                                 </div>
-                                <TextInput id="channelName" type="text" placeholder="TESTTTTOS" required />
+                                <TextInput id="channelName" type="text" placeholder="Give It a name" required />
                             </div>
                             <div className="mb-2 block">
                                 <div className="mb-2 block">
@@ -196,14 +202,8 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                         <Button type="submit">Submit</Button>
                     </form>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={() => setOpenModal(false)}>I accept</Button>
-                    <Button color="gray" onClick={() => setOpenModal(false)}>
-                        Decline
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
+            </Modal> : null}
+        </div>
 
     );
 };

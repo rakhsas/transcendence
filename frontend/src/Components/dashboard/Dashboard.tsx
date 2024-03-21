@@ -10,6 +10,7 @@ import AuthService from './../../services/auth.service';
 import DataContext from '../../services/data.context';
 import { Socket, io } from 'socket.io-client';
 import LoadingComponent from '../shared/loading/loading';
+import { ChannelService } from '../../services/channel.service';
 // const url: string = "wss://10.12.249.229";
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
@@ -44,6 +45,8 @@ function DashboardComponent() {
 				const fetchedPayloadData = await authService.getPayload();
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
+				const channelService = new ChannelService();
+				const fetchedChannels = await channelService.latestChannels(fetchedUserData.id);
 				setUserData(fetchedUserData);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",

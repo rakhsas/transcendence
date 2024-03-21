@@ -41,10 +41,12 @@ export class ChannelService {
         })
 
         // const users = channelUsers.map((channelUser) => channelUser.user);
-        const users = channelUsers.map((channelUser) => ({
-            user: channelUser.user,
-            role: channelUser.role, // 
-        }));
+        const users = await Promise.all(
+            channelUsers.map(async (channelUser) => ({
+               user: await channelUser.user,
+               role: channelUser.role, // 
+           }))
+        )
 
         return users;
     }
@@ -55,17 +57,19 @@ export class ChannelService {
             relations: ['channel']
         });
 
-        // const channels = userChannels.map((channelUser) => channelUser.channel);
-        const channels = userChannels.map((channelUser) => ({
-            channel: channelUser.channel,
-            role: channelUser.role,
-        }));
 
+        const channels = await Promise.all(
+            userChannels.map(async (channelUser) => ({
+                channel: await channelUser.channel,
+                role: channelUser.role,
+            }))
+        );
+        
         return channels;
     }
 
     async getLastMessageOfChannel(channelId: number): Promise<{}>{
-        return this.msgRepository.createQueryBuilder('msg')
+        return await this.msgRepository.createQueryBuilder('msg')
       .where('msg.cid = :channelId', { channelId })
       .orderBy('msg.date', 'DESC')
       .limit(1)

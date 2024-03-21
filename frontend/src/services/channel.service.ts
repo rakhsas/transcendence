@@ -4,16 +4,16 @@ export class ChannelService {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
             // console.log(APIURL + `messages/${userId}`);
             // const response = await fetch("https://10.13.249.229/api/messages", 
-            const response = await fetch(APIURL + `channels/${userId}`, 
-            // {
-            //     method: 'GET',
-            //     credentials: 'include'
-            // }
+            const response = await fetch(APIURL + `channels/channels/${userId}`, 
+            {
+                method: 'GET',
+                credentials: 'include'
+            }
             );
             // console.log(response);
             if (response.ok) {
                 const messages = await response.json();
-                // console.log(response)
+                console.log(messages)
                 return messages;
             }
             else if (response.status === 401 || response.status === 403)
