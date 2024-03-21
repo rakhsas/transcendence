@@ -1,13 +1,23 @@
 // app.gateway.ts
+import { Interval } from '@nestjs/schedule';
 import {
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-
 import { Server } from 'socket.io';
-import { Logger } from '@nestjs/common';
 
+interface Player {
+  socket: any;
+}
+
+interface Room {
+  id: string;
+  players: Player[];
+  game: Game;
+}
 class User {
   x: number;
   y: number;
@@ -69,7 +79,6 @@ class Game {
   computer: Computer;
   server: Server;
   ball: Ball;
-  intervalId: NodeJS.Timeout | any;
   roomId: string;
   width: number;
   height: number;
@@ -119,14 +128,15 @@ class Game {
     setTimeout((vx = oldx, vy = oldy) => {
       this.ball.vx = vx;
       this.ball.vy = vy;
-      this.ball.speed = 7;
+      this.ball.speed = 5;
     }, 2000);
   }
 
   update() {
     if (this.user.score === 5 || this.computer.score === 5) {
-      const state = this.user.score === 5 ? 'win' : 'lose';
-      console.log('state is:', state);
+      this.server
+        .to(this.roomId)
+        .emit('message', this.user, this.computer, this.ball);
     } else {
       if (this.ball.x - this.ball.r < 0) {
         this.computer.score++;
@@ -139,8 +149,8 @@ class Game {
       this.ball.x += this.ball.vx;
       this.ball.y += this.ball.vy;
       if (
-        this.ball.y + this.ball.r > this.height ||
-        this.ball.y - this.ball.r < 0
+        this.ball.y + this.ball.r + 1 > this.height ||
+        this.ball.y - this.ball.r + 1 < 0
       )
         this.ball.vy = -this.ball.vy;
 
@@ -160,77 +170,79 @@ class Game {
     }
   }
   render() {
-    const game = () => {
-      this.update();
-      this.server
-        .to(this.roomId)
-        .emit('message', this.user, this.computer, this.ball);
-    };
-    this.intervalId = setInterval(game, 1000 / 60);
+    this.update();
+    this.server
+      .to(this.roomId)
+      .emit('message', this.user, this.computer, this.ball);
+  }
+
+  stop(): void {
+    console.log('stop');
   }
 }
-
-interface Player {
-  socket: any;
-}
-
-interface Room {
-  id: string;
-  players: Player[];
-  game: Game;
-}
-
 @WebSocketGateway({
   cors: true,
   path: '/sogame',
 })
-export class GameGetwayService {
+export class GameGetwayService
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
   rooms: Room[] = [];
   waitingPlayers: Player[] = [];
-  private logger = new Logger('ChatGateway');
 
-  @SubscribeMessage('connection')
   handleConnection(client: any): void {
-    this.logger.log('Client connected');
+    console.log('Client connected');
     this.waitingPlayers.push({ socket: client });
     this.matchPlayers();
   }
 
-  matchPlayers(): void {
-    while (this.waitingPlayers.length >= 2) {
-      const players = this.waitingPlayers.splice(0, 2);
-      const roomId = Math.random().toString(36).substring(7);
-      const room: Room = {
-        id: roomId,
-        players,
-        game: new Game(this.server, roomId),
-      };
-      this.rooms.push(room);
-      let index = 1;
-      players.forEach((player) => {
-        player.socket.join(room.id);
-        this.server.to(player.socket.id).emit('roomJoined', room.id, index);
-        index++;
-      });
-      room.game.render();
-    }
+  handleDisconnect(client: any): void {
+    console.log('client disconnected');
+    this.removePlayer(client.id);
   }
 
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): void {
-    const { uy, cy, id } = payload;
+    const { uy, cy } = payload;
     const room = this.getRoom(client.id);
     room.game.computer.y = cy;
     room.game.user.y = uy;
   }
 
-  @SubscribeMessage('disconnected')
-  handleDisconnect(client: any): void {
-    this.logger.log('Client disconnected');
-    this.removePlayer(client.id);
+  private matchPlayers(): void {
+    while (this.waitingPlayers.length >= 2) {
+      const players = this.waitingPlayers.splice(0, 2);
+      const roomId = Math.random().toString(36).substring(7);
+      let index = 1;
+
+      players.forEach((player) => {
+        player.socket.join(roomId);
+        this.server.to(player.socket.id).emit('roomJoined', roomId, index);
+        index++;
+      });
+      const game = new Game(this.server, roomId);
+      const room: Room = {
+        id: roomId,
+        players,
+        game,
+      };
+      this.rooms.push(room);
+    }
+  }
+
+  @Interval(10)
+  handleInterval() {
+    for (let i = 0; i < this.rooms.length; i++) {
+      const room = this.rooms[i];
+      room.game.render();
+      if (room.game.user.score === 5 || room.game.computer.score === 5) {
+        this.rooms.splice(i, 1);
+        i--; // Decrement i to adjust for the removed item
+      }
+    }
   }
 
   private getRoom(playerId: string): Room | undefined {
@@ -254,6 +266,8 @@ export class GameGetwayService {
 
     const room: Room = this.getRoom(playerId);
     if (room === undefined) return;
+    console.log('room id : ', room.id);
+    room.game.stop();
     this.server.to(room.id).emit('win');
     // Remove object with id 2
     const indexToRemove = this.rooms.findIndex((obj) => obj.id === room.id);
