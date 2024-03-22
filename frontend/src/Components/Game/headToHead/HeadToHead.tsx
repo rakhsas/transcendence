@@ -1,58 +1,77 @@
-import Game from './Game';
-import io, { Socket } from 'socket.io-client';
-import { useRef, useEffect, useState } from 'react';
+import Game from "./Game";
+import io, { Socket } from "socket.io-client";
+import { useRef, useEffect, useState, useContext } from "react";
+import DataContext from "../../../services/data.context";
+import LoadingComponent from "../../shared/loading/loading";
+const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
-const url: string = 'wss://' + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
-
-
-const CanvasHeadToHead = (props: any) =>{
+const CanvasHeadToHead = (props: any) => {
   const ref = useRef(null);
-  const [roomId, setRoomId] = useState(null);
-
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const userData = useContext(DataContext);
-  useEffect(() => {
-    if (!userData) return;
-    const canvas = ref.current;
-    const socket: Socket = io(url, {
-      path: "/sogame"
-    });
+  if (!userData[0]) return <LoadingComponent />;
 
+  useEffect(() => {
+    const newSocket: Socket = io(url, {
+      path: "/sogame",
+      transports: ["polling"],
+    });
+    setSocket(newSocket);
+    return (): void => {
+      newSocket.close(); // Close the WebSocket connection when component unmounts
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const canvas = ref.current;
     // Event listener for receiving roomJoined event
-    socket.on('roomJoined', (roomId) => {
+    socket.on("roomJoined", (roomId, index) => {
       console.log("Joinded room");
-      if (!canvas || !socket || !roomId)
-        return () => socket.close();
-      new Game(canvas, socket, roomId);
+      console.log(userData[0]);
+      if (!canvas || !socket || !roomId) return () => socket.close();
+      new Game(canvas, socket, roomId, index);
       setRoomId(roomId);
     });
 
-    socket.on('connect', () => console.log('Connected'));
-    socket.on('disconnect', () => console.log('Disconnected'));
+    socket.on("win", () => {
+      setRoomId("win");
+    });
+
+    socket.on("lose", () => {
+      setRoomId("win");
+    });
+    socket.on("connect", () => console.log("Connected"));
+    socket.on("disconnect", () => {
+      console.log("Disconnected");
+    });
 
     return () => {
-      socket.off('roomJoined');
-      socket.off('message');
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.close(); // Close the WebSocket connection when component unmounts
+      socket.off("roomJoined");
+      socket.off("message");
+      socket.off("connect");
+      socket.off("disconnect");
     };
-  },[]);
+  }, [socket]);
 
   return (
-    <div>
+    <div className="font-kenia text-GREEN size-6 text-center w-auto h-auto">
       {roomId ? (
-        <div>
-          <p>You are in room: {roomId}</p>
-        </div>
+        roomId === "win" ? (
+          <p className="font-kenia ">
+            right click to go back to dashboard or left click to play again
+          </p>
+        ) : (
+          <p className="font-kenia">start playing {roomId}</p>
+        )
       ) : (
-        <>
-            <p>Waiting for another player to join...</p>
-        </>
+        <p>Waiting for another player to join...</p>
       )}
-          {/* Your game UI here */}
-        <canvas ref={ref} className='border-black border-2' {...props} />
+      <canvas ref={ref} className="border-black border-2" {...props} />
     </div>
-  )
-}
+  );
+};
 
 export default CanvasHeadToHead;
