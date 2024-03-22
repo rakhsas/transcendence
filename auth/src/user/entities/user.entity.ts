@@ -16,6 +16,7 @@ import { Friendship } from './freindship.entity'; // Assuming you have a Friends
 import { Msg } from './msg.entitiy'; // Assuming you have a Msg entity
 import { Mute } from './mute.entity'; // Assuming you have a Mute entity
 import { v4 as uuidv4 } from 'uuid'
+import { Game } from './game.entity';
 
 @Entity('users') // Table name mapping
 @Unique(['id', 'email', 'providerId', 'username'])
@@ -27,7 +28,9 @@ export class User {
   @Column()
   providerId: string;
 
-
+  // @Column()
+  // totalScore: number;
+  
   @CreateDateColumn()
   createdAt: Date;
 
@@ -64,61 +67,40 @@ export class User {
   @Column({ nullable: false, unique: true })
   username: string;
 
-  // friends     Int[]
-  @Column('uuid', { array: true, default: [] })
-  adding: string[];
-
   @Column('uuid', { array: true, default: [] })
   added: string[];
 
   @Column('uuid', { array: true, default: [] })
   blocks: string[];
-
-  @Column('uuid', { array: true, default: [] })
-  blocking: string[];
-
-  // blocked     Int[] // ...
-
-  // @OneToMany(() => Channel, (channel) => channel.owners, { lazy: true })
-  // owner: Promise<Channel[]>;
-
-  // @ManyToMany(() => Channel, (channel) => channel.admins, { lazy: true })
-  // @JoinTable()
-  // admin: Promise<Channel[]>;
-
-  // @ManyToMany(() => Channel, (channel) => channel.members, { lazy: true })
-  // @JoinTable()
-  // member: Promise<Channel[]>;
-
-  // @ManyToMany(() => Channel, (channel) => channel.inviteds, { lazy: true })
-  // @JoinTable()
-  // invited: Promise<Channel[]>;
-
-  // @ManyToMany(() => Channel, (channel) => channel.blocked, { lazy: true })
-  // @JoinTable()
-  // chanBlocked: Promise<Channel[]>;
-
   
-  @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true })
+  @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true, cascade: true  })
   Muted: Promise<Mute[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.senderId, { lazy: true })
+  @OneToMany(() => Msg, (msg) => msg.senderId, { lazy: true, cascade: true  })
   sendmessages: Promise<Msg[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.receiver, { lazy: true })
+  @OneToMany(() => Msg, (msg) => msg.reciever, { lazy: true, cascade: true  })
   receivedMessages: Promise<Msg[]>;
 
-  @OneToMany(() => Friendship, friend => friend.user, {lazy: true})
+
+  @OneToMany(() => Friendship, friend => friend.user, {lazy: true, cascade: true })
   friends: Promise<Friendship[]>;
 
-  @OneToMany(() => Friendship, friend => friend.friend, { lazy: true})
+  @OneToMany(() => Friendship, friend => friend.friend, { lazy: true, cascade: true })
   friendOf: Promise<Friendship[]>;
 
-  // @OneToMany(() => Friendship, (friendship) => friendship.user, { lazy: true })
-  // friendsUser: Promise<Friendship[]>;
+  // ======================
 
-  // @OneToMany(() => Friendship, (friendship) => friendship.friend, { lazy: true })
-  // userFriends: Promise<Friendship[]>;
+  // @ManyToMany(() => Channel, (channel) => channel.members)
+  // @JoinTable()
+  // channels: Channel[];
+
+  @ManyToMany(() => Channel)
+  @JoinTable({ name: 'user_channels' }) // Specify the name for the join table
+  channels: Channel[];
+
+  @ManyToMany(() => Game, (game) => game.players)
+  games: Game[]; // Array of games the player is involved in
 
   @BeforeInsert()
   generateUUID() {

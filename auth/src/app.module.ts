@@ -1,27 +1,30 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module'; 
+import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { Channel } from './user/entities/channel.entity';
 import { Friendship } from './user/entities/freindship.entity';
 import { Msg } from './user/entities/msg.entitiy';
 import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
-import { UserChannelRelationship } from './user/entities/user_channel_relation.entity';
 import { ConfigModule } from '@nestjs/config';
-import { MessageController } from './user/message.controller';
-import { MessageService } from './user/message.service';
-import { Repository } from 'typeorm';
+import { FreindsModule } from './friends/friends.module';
 import { GameGetwayModule } from './game-getway/game-getway.module';
+import { ChannelModule } from './channel/channel.module';
+import { ChannelUser } from './user/entities/channel_member.entity';
+import { Game } from './user/entities/game.entity';
+import { UploadModule } from './upload/upload.module';
+import express from 'express';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: 'config/.env',
-      isGlobal: true
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -32,15 +35,23 @@ import { GameGetwayModule } from './game-getway/game-getway.module';
       database: 'db1',
       synchronize: true,
       // logging: true,
-      entities: [User, Msg, Channel, Mute, Friendship, UserChannelRelationship],
-
+      entities: [User, Msg, Game, Channel, Mute, Friendship, ChannelUser],
     }),
     UserModule,
     AuthModule,
     ChatModule,
-    GameGetwayModule
+    FreindsModule,
+    GameGetwayModule,
+    ChannelModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(express.static(join(__dirname, '..', 'uploads')))
+      .forRoutes('upload');
+  }
+}

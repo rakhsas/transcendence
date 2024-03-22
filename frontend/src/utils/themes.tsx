@@ -14,7 +14,7 @@ const inputTheme: CustomFlowbiteTheme["textInput"] = {
 const tabsTheme: CustomFlowbiteTheme["tabs"] = {
     tablist: {
         tabitem: {
-            base: "flex items-center justify-center p-4 rounded-t-lg text-red-500 text-sm font-poppins first:ml-0",
+            base: "flex items-center justify-center p-4 rounded-t-lg text-red-500 text-sm font-poppins first:ml-0 h-[83px]",
             styles: {
                 underline: {
                     active: {

@@ -7,7 +7,9 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+
+import { Server, Socket } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
 
 interface Player {
   socket: any;
@@ -193,8 +195,12 @@ export class GameGetwayService
   rooms: Room[] = [];
   waitingPlayers: Player[] = [];
 
+  /**
+   *
+   */
+  constructor(private readonly authService: AuthService) {}
   handleConnection(client: any): void {
-    console.log('Client connected');
+    this.GuardsConsumer(client);
     this.waitingPlayers.push({ socket: client });
     this.matchPlayers();
   }
@@ -273,6 +279,21 @@ export class GameGetwayService
     const indexToRemove = this.rooms.findIndex((obj) => obj.id === room.id);
     if (indexToRemove !== -1) {
       this.rooms.splice(indexToRemove, 1);
+    }
+  }
+
+  async GuardsConsumer(client: Socket) {
+    const cookies = client.handshake.headers.cookie?.split(';');
+    let access_token;
+    for (let index = 0; index < cookies.length; index++) {
+      const cookie = cookies[index].trim();
+      if (cookie.startsWith('access_token=')) {
+        access_token = cookie.substring(String('access_token=').length);
+      }
+    }
+    const payload = await this.authService.validateToken(access_token);
+    if (!payload) {
+      client.disconnect();
     }
   }
 }

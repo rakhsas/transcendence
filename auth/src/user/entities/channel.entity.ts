@@ -7,11 +7,15 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
-import { User } from './user.entity'; // Import the User1 entity
-import { Mute } from './mute.entity'; // Import the Mute entity
-import { Msg } from './msg.entitiy'; // Import the Msg entity
+import { User } from './user.entity';
+import { Mute } from './mute.entity';
+import { Msg } from './msg.entitiy';
+import { forwardRef } from '@nestjs/common';
+import { UUID } from 'crypto';
 
 export enum ChannelTypes {
   PUBLIC = 'public',
@@ -24,7 +28,8 @@ export class Channel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: 'uuid_generate_v4()', unique: true })
+  @Column({unique: true})
+  // @Column({ default: 'uuid_generate_v4()', unique: true })
   name: string;
 
   @CreateDateColumn()
@@ -39,9 +44,6 @@ export class Channel {
   @Column({ nullable: true })
   password: string;
 
-  // @Column()
-  // type: string
-
   @Column({
     type: 'enum',
     enum: ChannelTypes,
@@ -49,31 +51,25 @@ export class Channel {
   })
   type: ChannelTypes;
 
-  // @ManyToMany(() => User1, (user) => user.owner, { lazy: true })
-  // @JoinTable()
-  // owners: Promise<User1[]>;
-
-  // @ManyToMany(() => User1, (user) => user.admin, { lazy: true })
-  // @JoinTable()
-  // admins: Promise<User1[]>;
-
-  // @ManyToMany(() => User1, (user) => user.member, { lazy: true })
-  // @JoinTable()
-  // members: Promise<User1[]>;
-
-  // @ManyToMany(() => User1, (user) => user.invited, { lazy: true })
-  // @JoinTable()
-  // inviteds: Promise<User1[]>;
-
-  // @ManyToMany(() => User1, (user) => user.chanBlocked, { lazy: true })
-  // @JoinTable()
-  // blocked: Promise<User1[]>;
-
   @OneToMany(() => Mute, (mute) => mute.channel, { lazy: true })
   muted: Promise<Mute[]>;
 
-  @OneToMany(() => Msg, (msg) => msg.channel, { lazy: true })
-  messages: Promise<Msg[]>;
+  @OneToMany(() => Msg, message => message.channel, { cascade: true })
+  messages: Promise<Msg[]>; // Define the messages relationship
+
+  // @Column({ default: ''})
+  // ownerId: string;
+
+  @ManyToOne(() => User, (user) => user.channels, { lazy: true })
+  @JoinTable()
+  owner: Promise<User>;
+
+  // @ManyToMany(() => User, (user) => user.channels, { lazy: true })
+  // @JoinTable()
+  // members: Promise<User[]>;
+
+  @ManyToMany(() => User, (user) => user.channels)
+  members: User[];
+
+
 }
-
-

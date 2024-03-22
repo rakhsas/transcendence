@@ -27,15 +27,17 @@ export class AuthController {
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
         res.cookie('access_token', accessToken, { httpOnly: true});
-        res.cookie('provider_access_token', providerAccessToken);
+        res.cookie('provider_access_token', providerAccessToken, { httpOnly: true});
         res.cookie('isAuthenticated', true);
         res.cookie('firstLogin', firstLogin);
         // return {
         //     user,
         //     accessToken,
-        //     providerAccessToken,
+        //     providerAccessToken, 
         //     firstLogin
         // }
+        // console.log(accessToken) 
+        // console.log(providerAccessToken)
         res.redirect(process.env.FRONT_URL);
     }
 
@@ -60,7 +62,31 @@ export class AuthController {
     @Get('decodeToken')
     @UseGuards(UseGuards)
     async decodedToken(@Req() req) {
+        // console.log(req.cookies)
         return await this.authService.decodeToken(req);
     }
+
+    @Get('logout')
+    @UseGuards(UseGuards)
+    async logout(@Res() res) {
+        res.clearCookie('access_token');
+        res.clearCookie('provider_access_token');
+        res.clearCookie('isAuthenticated');
+        res.clearCookie('firstLogin');
+        res.redirect(process.env.FRONT_URL);
+    }
     
+    @Get('tokenInfo')
+    @UseGuards(UseGuards)
+    async tokenInfo(@Req() req) {
+        const { cookie } : any = req.headers;
+        const authToken = this.authService.getCookie('access_token', cookie);
+        const providerToken = this.authService.getCookie('provider_access_token', cookie);
+        
+        const payload = await this.authService.decodeToken(authToken)
+        return {
+            payload,
+            providerToken
+        }
+    }
 }

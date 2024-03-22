@@ -48,7 +48,9 @@ export class Msg {
   @Column({nullable: true})
   recieverId: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true})
   img: string;
 
+  @Column({ nullable: true })
+  audio: string; 
 }
