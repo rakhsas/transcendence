@@ -23,9 +23,9 @@ export class UploadController {
     @UseInterceptors(FileInterceptor('file', {storage}))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
         if (file) {
-            const baseURL = process.env.HOST;
+            // const baseURL = process.env.HOST;
             console.log('Uploaded file:', {url: `upload/${file.filename}`});
-            return { url: `${baseURL}upload/${file.filename}` };
+            return { url: `upload/${file.filename}` };
         } else {
             return { message: 'No file uploaded!' };
         }
@@ -41,9 +41,8 @@ export class UploadController {
     @UseInterceptors(FileInterceptor('file', {storage}))
     async uploadAudio(@UploadedFile() file: Express.Multer.File) {
         if (file) {
-            const baseURL = process.env.HOST;
             console.log('Uploaded file:', {url: `upload/${file.filename}`});
-            return { url: `${baseURL}upload/${file.filename}` };
+            return { url: `upload/${file.filename}` };
         } else {
             return { message: 'No file uploaded!' };
         }

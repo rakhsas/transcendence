@@ -83,13 +83,13 @@ export class ChatService {
   async addMessage(payload: any): Promise<void> {
     const directMessage = this.msgRepository.create({
       message: payload.message,
-      recieverId: payload.recieverId,
-      senderId: payload.senderId,
+      recieverId: payload.recieverId ? payload.recieverId : null,
+      senderId: payload.senderId ? payload.senderId : payload.from,
       cid: (payload.cid !== undefined) ? payload.cid : null,
       img: (payload.image !== undefined) ? payload.image : null,
       audio: (payload.audio !== undefined) ? payload.audio : null
     });
-      await this.msgRepository.save(directMessage);
+    await this.msgRepository.save(directMessage);
   }
 
   /**
@@ -178,7 +178,8 @@ export class ChatService {
 
   async addNewMemberToChannel(payload: any, role: string) {
     // Load user and channel entities
-    const user = await this.userService.viewUser(payload.__owner__.id);
+    const id = payload.__owner__;
+    const user = await this.userService.viewUser(id);
     const channel: Channel = await this.channelRepository.findOne({where: {id: payload.id}});
     if (!user || !channel) {
       throw new Error('User or channel not found'); // Handle the case where user or channel is not found

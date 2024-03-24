@@ -4,6 +4,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserRole } from 'src/user/entities/channel_member.entity';
+import { ChannelService } from 'src/channel/channel.service';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
@@ -18,7 +19,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private connectedUsers: Map<string, Socket> = new Map();
   constructor(
     private readonly chatService: ChatService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly channelService: ChannelService
     ) { }
 
   handleConnection(client: Socket) {
@@ -94,24 +96,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('createChannel')
   async handleCreateChannel(socket: Socket, payload: any): Promise<void> {
-    // here the payload must containe the id of the user who create the channel so it can be set as owner
-    // create a new entity in the database (new channel)
-    // add new entity in user channel relation the user must set as owner
-
-    // if the channel is protected we must first check for the password is correct or not.!
-
-    if ("password" in payload && payload.password != "")
-    {
-      console.log("password exist and its not empty :)");
-
-    }
-
     socket.join(payload.channelId);
-    // const process1 = JSON.stringify(await this.chatService.addNewChannelEntity(payload));
-    await this.chatService.addNewChannelEntity(payload)
-    .then(async(process1) => {
-      await this.chatService.addNewMemberToChannel(process1, UserRole.OWNER);
-    })
+    const newChannel = await this.chatService.addNewChannelEntity(payload);
+    await this.chatService.addNewMemberToChannel(newChannel, UserRole.OWNER);
+
+    // Fetch updated channels and emit the updated channel list to the client
+    const updatedChannels = await this.channelService.getChannelsByUserId(payload.ownerId);
+    socket.emit('channelCreated', updatedChannels);
   }
 
   @SubscribeMessage('joinChannel')
@@ -139,12 +130,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('channelMessages')
   async handleEvent(socket: Socket, payload: any): Promise<void> {
-
     this.server.to(payload.cid).emit('channelMessage', {
+      "from": payload.senderId,
       "cid": payload.cid,
       "message": payload.message,
-      "from": payload.senderId,
       "image": payload.image,
+      "audio": payload.audio,
     })
     await this.chatService.addMessage(payload);
   }

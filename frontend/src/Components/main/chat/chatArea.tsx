@@ -11,13 +11,12 @@ type props = {
     isModalOpen: any;
     onOpenModal: any;
     onCloseModal: any;
-    isPlaying: any;
-    setIsPlaying: (prev: any) => void;
     modalPicPath: any;
-    audioRefs: HTMLAudioElement[];
 }
-const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, isPlaying, setIsPlaying, modalPicPath, audioRefs }) => {
-    const [playingAudioIds, setPlayingAudioIds] = useState<string[]>([]);
+const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, modalPicPath }) => {
+    const audioRefs = useRef([] as HTMLAudioElement[]);
+    const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
+    const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     return (
         <>
             {MESSAGES.map((message: any, index: any) => {
@@ -53,7 +52,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                                         </div>
                                         <div className="group relative my-2.5">
                                             <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
-                                                <button onDoubleClick={() => onOpenModal(message.img || '')} className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
+                                                <button onDoubleClick={() => onOpenModal(baseAPIUrl + message.img || '')} className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
                                                     <svg className="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
                                                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
                                                     </svg>
@@ -63,7 +62,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                                                     <div className="tooltip-arrow" data-popper-arrow></div>
                                                 </div>
                                             </div>
-                                            <img src={message.img} className="rounded-lg" />
+                                            <img src={baseAPIUrl + message.img} className="rounded-lg" />
                                         </div>
                                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
                                         {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
@@ -73,7 +72,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                         </div>
                     )
                 }
-                else if (message.audio.length > 0) {
+                else if (message.audio && message.audio.length > 0) {
                     isPlaying[index] = false;
                     return (
                         <div className="p-4" key={index}>
@@ -86,7 +85,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                                     </div>
                                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                                         {/* <React.Fragment key={message.id}> */}
-                                        <audio ref={(el) => (audioRefs[index] = el)} src={message.audio} />
+                                        <audio ref={(el) => (audioRefs[index] = el)} src={baseAPIUrl + message.audio} />
                                         {/* { audioRefs[index] = new Audio(message.audio)} */}
                                         <button onClick={() => {
                                             if (!audioRefs[index]) return;

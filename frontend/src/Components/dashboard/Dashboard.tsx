@@ -45,8 +45,6 @@ function DashboardComponent() {
 				const fetchedPayloadData = await authService.getPayload();
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
-				const channelService = new ChannelService();
-				const fetchedChannels = await channelService.latestChannels(fetchedUserData.id);
 				setUserData(fetchedUserData);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",

@@ -2,13 +2,11 @@ class MessageService {
     async latestMessages(userId: string): Promise<any> {
         try {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
-            // console.log(APIURL + `messages/${userId}`);
-            // const response = await fetch("https://10.13.249.229/api/messages", 
             const response = await fetch(APIURL + `messages/${userId}`, 
-            // {
-            //     method: 'GET',
-            //     credentials: 'include'
-            // }
+            {
+                method: 'GET',
+                credentials: 'same-origin'
+            }
             );
             // console.log(response);
             if (response.ok) {
@@ -37,10 +35,10 @@ class MessageService {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
             // const response = await fetch("https://10.13.249.229/api/messages", 
             const response = await fetch(APIURL + `messages/${userId}/${friendId}`, 
-            // {
-            //     method: 'GET',
-            //     credentials: 'include'
-            // }
+            {
+                method: 'GET',
+                credentials: 'include'
+            }
             );
             if (response.ok) {
                 const messages = await response.json();

@@ -63,12 +63,12 @@ function CallComponent() {
         stream.getTracks().forEach((track) => peer.addTrack(track, stream));
     };
     const EndCall = () => {
-        // const localVideo = document.getElementById("localVideo") as HTMLVideoElement;
+        const localVideo = document.getElementById("localVideo") as HTMLVideoElement;
         const remoteVideo = document.getElementById("remoteVideo") as HTMLVideoElement;
-        // localVideo.srcObject = null;
+        localVideo.srcObject = null;
         remoteVideo.srcObject = null;
         peer.close();
-        // socket?.disconnect();
+        socket?.disconnect();
     };
     socket?.on("connect", onSocketConnect);
     const call = async () => {
@@ -78,64 +78,65 @@ function CallComponent() {
             to: selectedUser,
             senderId: userData[0].id
         });
-        // const localOfferPeer = await peer.createOffer();
-        // await peer.setLocalDescription(new RTCSessionDescription(localOfferPeer));
-        // socket?.emit("mediaOffer", {
-        //     offer: localOfferPeer,
-        //     from: socket?.id,
-        //     to: selectedUser,
-        // });
-        // console.log(`mediaOffer is emitted`);
-        // const onMediaOffer = async (data: any) => {
-        //     try {
-        //         console.log("Received media offer:", data.offer);
-        //         await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
-        //         const peerAnswer = await peer.createAnswer();
-        //         await peer.setLocalDescription(new RTCSessionDescription(peerAnswer));
+        const localOfferPeer = await peer.createOffer();
+        await peer.setLocalDescription(new RTCSessionDescription(localOfferPeer));
+        socket?.emit("mediaOffer", {
+            offer: localOfferPeer,
+            from: socket?.id,
+            to: selectedUser,
+        });
+        console.log(`mediaOffer is emitted`);
+        const onMediaOffer = async (data: any) => {
+            try {
+                console.log("Received media offer:", data.offer);
+                await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
+                const peerAnswer = await peer.createAnswer();
+                await peer.setLocalDescription(new RTCSessionDescription(peerAnswer));
 
-        //         socket?.emit("mediaAnswer", {
-        //             answer: peerAnswer,
-        //             from: socket?.id,
-        //             to: data.from,
-        //         });
-        //     } catch (error) {
-        //         console.error(error);
-        //     }
-        // };
-        // socket?.on("mediaOffer", onMediaOffer);
-        // const onMediaAnswer = async (data: any) => {
-        //     try {
-        //         console.log("Received media answer:", data.answer);
-        //         await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
-        //     } catch (error) {
-        //         console.error("Error setting remote description:", error);
-        //     }
-        // };
-        // const onIceCandidateEvent = (event: any) => {
-        //     socket?.emit("iceCandidate", {
-        //         to: selectedUser,
-        //         candidate: event.candidate,
-        //     });
-        // };
-        // socket?.on("mediaAnswer", onMediaAnswer);
-        // peer.onicecandidate = onIceCandidateEvent;
-        // const onRemotePeerIceCandidate = async (data: any) => {
-        //     try {
-        //         const candidate = new RTCIceCandidate(data.candidate);
-        //         await peer.addIceCandidate(candidate);
-        //     } catch (error) {
-        //     }
-        // };
-        // socket?.on("remotePeerIceCandidate", onRemotePeerIceCandidate);
-        // const gotRemoteStream = (event: any) => {
-        //     const [stream] = event.streams;
-        //     const remoteVideo =
-        //         document.querySelector<HTMLVideoElement>("#remoteVideo");
-        //     if (remoteVideo) {
-        //         remoteVideo.srcObject = stream;
-        //     }
-        // };
-        // peer.addEventListener("track", gotRemoteStream);
+                socket?.emit("mediaAnswer", {
+                    answer: peerAnswer,
+                    from: socket?.id,
+                    to: data.from,
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        socket?.on("mediaOffer", onMediaOffer);
+        const onMediaAnswer = async (data: any) => {
+            try {
+                console.log("Received media answer:", data.answer);
+                await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
+            } catch (error) {
+                console.error("Error setting remote description:", error);
+            }
+        };
+        const onIceCandidateEvent = (event: any) => {
+            socket?.emit("iceCandidate", {
+                to: selectedUser,
+                candidate: event.candidate,
+            });
+        };
+        socket?.on("mediaAnswer", onMediaAnswer);
+        peer.onicecandidate = onIceCandidateEvent;
+        const onRemotePeerIceCandidate = async (data: any) => {
+            try {
+                const candidate = new RTCIceCandidate(data.candidate);
+                await peer.addIceCandidate(candidate);
+            } catch (error) {
+            }
+        };
+        socket?.on("remotePeerIceCandidate", onRemotePeerIceCandidate);
+        const gotRemoteStream = (event: any) => {
+            const [stream] = event.streams;
+            console.log("Got remote stream:", stream);
+            const remoteVideo =
+                document.querySelector<HTMLVideoElement>("#remoteVideo");
+            if (remoteVideo) {
+                remoteVideo.srcObject = stream;
+            }
+        };
+        peer.addEventListener("track", gotRemoteStream);
         socket?.on('user-disconnected', (data: any) => {
             const disconnectedUserId = data.userId;
         });
@@ -188,3 +189,5 @@ function CallComponent() {
 
 export default CallComponent;
 // export default React.memo(CallComponent);
+
+

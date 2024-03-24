@@ -1,0 +1,72 @@
+:root 
+{
+    --main-color: #161A30;
+    --second-color: #31304D;
+    --third-color: #B6BBC4;
+    --fourth-color: #F0ECE5;
+    --container-width: 455px;
+    --form-width:430px;
+}
+
+
+.Usredit--Achievements{
+    background-color: #18181b;
+    width: 100%;
+    
+}
+
+.Acheivementpart, .ScorePart{
+    border-radius: 2px solid black;
+}
+
+.Valid--Achievement{
+    width: 75%;
+    height: 75px;
+    /* height: 55px; */
+    margin-top: 12px;
+    background-color: var(--main-color);
+    border-radius: 15px;
+}
+
+.Center--paragraph{
+    margin-left: 5%;
+    /* font-weight: 500; */
+    font-size: 12px;
+    /* width: ; */
+}
+
+.Achieve--Border{
+    border-radius: 8px;
+}
+
+h5.l5{
+    width: 150px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /* transform: translateY(-50px); */
+    background-color: blue;
+    border-radius: 5px;
+}
+
+
+.picture-user{
+    border-radius: 15px;
+    width: 85px;
+    height: auto;
+}
+
+
+.Score--Match{
+    width: 35vw;
+    height: 75px;
+    border-radius: 15px;
+    background-color: #31304D;
+}
+
+.picture--User{
+    width: 55px;
+    height: 55px;
+    border-radius: 15px;
+}

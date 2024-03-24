@@ -16,7 +16,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ image, heading }) => (
     <>
         <div className='w-[21rem] h-[21rem]'>
             <div className="outli mt-6 mx-auto w-64 h-64 rounded-[1.7rem] -z-10" style={{ background: 'transparent'}}>
-                <div className="container overflow-hidden mt-6 top-0 left-10 w-64 h-64 rounded-[1.7rem] p-4 flex absolute flex-col justify-between bg-zinc-900 ">
+                <div className="container4 overflow-hidden mt-6 top-0 left-10 w-64 h-64 rounded-[1.7rem] p-4 flex absolute flex-col justify-between bg-zinc-900 ">
                     <div className="play rounded-full w-8 h-8 bg-main-light-FERN">
                         <img src={image} alt="Play" />
                     </div>

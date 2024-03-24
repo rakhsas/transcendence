@@ -54,6 +54,7 @@ export class UserService {
 		// return await this.userRepository.findOne({ where:{
 		// 	id: Number(id)
 		// } });
+		console.log('id', id);
 		return await this.userRepository.findOneBy({
 			id
 		})
