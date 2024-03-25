@@ -38,7 +38,7 @@ export class TwoFactorAuthenticationController {
     const url = await this.twoFactorAuthenticationService.pipeQrCodeStream(otpauthUrl);
     return { url: url }
   }
-  @Post('authenticate/:code/:id')
+  @Get('authenticate/:code/:id')
   // @UseGuards(UserGuard)
   // @HttpCode(200)
   async authenticate(
@@ -46,22 +46,20 @@ export class TwoFactorAuthenticationController {
     @Param('id') id: string,
     @Res() res: any,
   ) {
-    try {
+    // try {
       const user: User = await this.usersService.viewUser(id);
       const isCodeValid =  await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         code,
         user,
       );
       if (!isCodeValid) {
-        throw new UnauthorizedException('Wrong authentication code');
+        res.redirect(`https://localhost/dashboard/settings?invalid`);
       }
       await this.usersService.turnOnTwoFactorAuthentication(user.id);
-      // return res.redirect(`http://localhost:4200/`);
-      console.log('iscodevaid: ', isCodeValid);
-      return isCodeValid;
-    } catch (error) {
-      throw new UnauthorizedException('hna fin kayn');
-    }
+      res.redirect(`https://localhost/dashboard`);
+    // } catch (error) {
+    //   throw new UnauthorizedException('hna fin kayn');
+    // }
   }
 
   /*

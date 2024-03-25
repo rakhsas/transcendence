@@ -109,12 +109,13 @@ function SettingFunction(): JSX.Element {
   const fetchQRcode = async () => {
     try{
       // console.log('Tfcode --> ', TfCode, 'userData --> ', userData[0].id, ' input', input);
-      const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
-        method: 'POST',
-        credentials: 'same-origin'
-      })
+      window.location.href = APIURL + `2fa/authenticate/${input}/${userData[0].id}`;
+      // const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
+      //   method: 'POST',
+      //   credentials: 'same-origin'
+      // })
       // if (ValidQRcode.ok)
-        console.log(await ValidQRcode.json());
+        // console.log(await ValidQRcode.json());
 
       // if (ValidQRcode == true)
       //   window.location.href = "http://localhost:4200";
@@ -175,6 +176,7 @@ function SettingFunction(): JSX.Element {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   maxLength={6}
+                  autoComplete="OFF"
                   data-focus-input-init
                   data-focus-input-next="code-2"
                   id="code-1"
