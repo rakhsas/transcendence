@@ -27,7 +27,7 @@ import { GlobalGateway } from './global.gateway';
         })
     ],
     controllers: [AuthController],
-    providers: [ AuthService, FortyTwoStrategy, GithubStrategy, JwtService, GlobalGateway],
+    providers: [ AuthService, FortyTwoStrategy, JwtService, GlobalGateway],
     exports: [AuthService]
 })
 export class AuthModule {}
