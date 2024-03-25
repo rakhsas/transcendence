@@ -10,8 +10,8 @@ import HeadToHead from "./Components/Game/headToHead.tsx";
 import Cookies from "js-cookie";
 import chatComponent from "./Components/main/chat/chat";
 import CallComponent from "./Components/call/call";
-import SettingsComponent from "./Components/main/settings/settings.tsx";
-import ProfileComponent from "./Components/main/profile/Sprofile.tsx";
+import SettingFunction from "./Components/main/settings/settings.tsx";
+// import ProfileComponent from "./Components/main/profile/Sprofile.tsx";
 import NotFoundComponent from "./Components/error/404.component.tsx";
 import { useEffect, useState } from "react";
 const url: string = import.meta.env.VITE_API_AUTH_KEY;
@@ -50,7 +50,7 @@ function App() {
           <Route path="analytics" element={<AnalyticsComponent />} />
           <Route path="chat" Component={chatComponent} />
           <Route path="call" element={<CallComponent />} />
-          <Route path="settings" element={<SettingsComponent />} />
+          <Route path="settings" element={<SettingFunction />} />
           <Route path="game" element={<Game />} />
           <Route path="HeadToHead" element={<HeadToHead />} />
           {/* <Route path="profile" element={<ProfileComponent />} /> */}

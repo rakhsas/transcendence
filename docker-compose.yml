@@ -48,8 +48,8 @@ services:
     image: postgres:latest
     ports:
       - "5432:5432"
-    # volumes:
-      # - potgres_data:/var/lib/postgresql/data
+    volumes:
+      - potgres_data:/var/lib/postgresql/data
     networks:
       - backend
     env_file: ./.env
@@ -73,18 +73,18 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./auth/node_modules
+      device: /Users/mdarify/Desktop/Transcendence-Ms/auth/node_modules
   node_modules_front:
     name: node_modules_front
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./frontend/node_modules
-  # potgres_data:
-  #   name: postgres_data
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: ./postgres
+      device: /Users/mdarify/Desktop/Transcendence-Ms/frontend/node_modules
+  potgres_data:
+    name: postgres_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /Users/mdarify/Desktop/Transcendence-Ms/postgres

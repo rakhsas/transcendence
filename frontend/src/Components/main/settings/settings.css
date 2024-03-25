@@ -1,0 +1,138 @@
+:root 
+{
+    --main-color: rgb(22, 26, 48);
+    --second-color: #31304D;
+    --third-color: #B6BBC4;
+    --fourth-color: #F0ECE5;
+    --fontColor: #433fa5;
+    ---heigth-calc: calc(75vh - 125px);
+    ---width-col: 300px;
+}
+
+.Setting{
+    /* background-color: var(--fontColor); */
+}
+
+.Usredit, .Information{
+    background-color: #18181b;
+    width: 100%;
+}
+
+.Sp2{
+    /* transform: translate(75%, 25%); */
+    height: 25%;
+}
+
+
+.cameraIcon{
+    width: 25px;
+    border-radius: 15px;
+    display: flex;
+    margin-left: 35px;
+    /* background-color: #B6BBC4; */
+}
+
+
+.-twof--part1{
+    width: 225px;
+    display: flex;
+    margin-left: 15px;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    height: max-content;
+    border-radius: 5px;
+    background-color: #31304D;
+    color: #18181b;
+    margin-top: 50px;
+    
+    font-family:  'Roboto', sans-serif;
+    font-weight: bolder;
+}
+
+.parPhoto{
+    font-family:monospace;
+    font-weight: bolder;
+    font-size:15px;
+}
+
+.--Enable-2fa{
+    
+    font-family:  'Roboto', sans-serif;
+    font-weight: bolder;
+}
+
+
+.Morocco{
+    width: 25px;
+    height: 25px;
+}
+
+.header--info{
+    top: 0px;
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    background-color: rgb(26 86 219 / var(--tw-bg-opacity));
+    width: 50%;
+    margin-left: 25%;
+    margin-bottom: 35px;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+#list{
+    width: 200px;
+    height: 200px;
+    display: flex;
+    /* margin-left: 35%; */
+    position: relative;
+    /* left: 50%; */
+    /* margin: auto; */
+    display: flex;
+    /* transform: translateY(-5%); */
+    /* justify-content: center; */
+    /* align-items: center; */
+    border-radius: 15px;
+    margin-top: 75px;
+  }
+
+
+
+  #file {
+    display: none;
+  }
+
+  .info {
+    font-weight: bold;
+    color: #807ebc;
+    text-decoration: underline;
+  }
+
+  .Sp {
+    background-color: #161A30;
+  }
+
+  
+
+  #uploadbtn {
+    /* position: ; */
+    display: flex;
+    /* flex-direction: row; */
+    width: 200px;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    /* transform: translate(13%,650%); */
+    /* margin-top: 200px; */
+    /* margin-left: 8%; */
+    background-color: #31304D;
+    box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.644);
+  }
