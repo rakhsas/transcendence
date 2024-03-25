@@ -23,9 +23,10 @@ export default {
             WHITEBLUE: '#F5F6FA',
             FERN: '#3DBDA7',
             EGGSHELL: '#00453F',
-            PUMPKIN: '#E86931'
+            PUMPKIN: '#E86931',
           }
-        }
+        },
+        GREEN: '#BFFF3C',
       }
     },
     screens: {
@@ -37,7 +38,8 @@ export default {
     },
     fontFamily: {
       'poppins': ['Poppins'],
-      'onest': ['Onest']
+      'onest': ['Onest'],
+      'kenia': ['Kenia'],
    }
   },
   plugins: [

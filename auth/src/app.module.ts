@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module'; 
+import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { Channel } from './user/entities/channel.entity';
 import { Friendship } from './user/entities/freindship.entity';
@@ -24,7 +24,7 @@ import { join } from 'path';
   imports: [
     ConfigModule.forRoot({
       envFilePath: 'config/.env',
-      isGlobal: true
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -36,7 +36,6 @@ import { join } from 'path';
       synchronize: true,
       // logging: true,
       entities: [User, Msg, Game, Channel, Mute, Friendship, ChannelUser],
-
     }),
     UserModule,
     AuthModule,
@@ -44,7 +43,7 @@ import { join } from 'path';
     FreindsModule,
     GameGetwayModule,
     ChannelModule,
-    UploadModule
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

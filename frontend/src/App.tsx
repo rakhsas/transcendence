@@ -45,10 +45,7 @@ function App() {
       {/* <BrowserRouter> */}
       <Routes>
         <Route path="/" element={<HomePageComponent />} />
-        <Route
-          path="/dashboard/*"
-          element={(<DashboardComponent />)}
-        >
+        <Route path="/dashboard/*" element={<DashboardComponent />}>
           <Route index element={<HomeComponent />} />
           <Route path="analytics" element={<AnalyticsComponent />} />
           <Route path="chat" Component={chatComponent} />
@@ -56,7 +53,7 @@ function App() {
           <Route path="profile/*" element={<ProfileComponent />} />
           <Route path="settings" element={<SettingsComponent />} />
           <Route path="game" element={<Game />} />
-          <Route path='HeadToHead' element={<HeadToHead />} /> 
+          <Route path="HeadToHead" element={<HeadToHead />} />
           {/* <Route path="profile" element={<ProfileComponent />} /> */}
           <Route path="*" element={<NotFoundComponent />} />
         </Route>

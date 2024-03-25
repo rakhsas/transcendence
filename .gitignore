@@ -8,3 +8,4 @@ Makefile
 postgres/
 .editorconfig
 auth/uploads
+# docker-compose.yml
