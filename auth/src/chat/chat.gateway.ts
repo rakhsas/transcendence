@@ -206,7 +206,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
 
-  async GuardsConsumer(client: Socket) {
+  async GuardsConsumer(client: Socket): Promise<string> {
 		const cookies = client.handshake.headers.cookie?.split(';');
 		let access_token;
 		for (let index = 0; index < cookies.length; index++) {
@@ -216,10 +216,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				access_token = cookie.substring(String('access_token=').length);
 			}
 		}
-		const payload = await this.authService.validateToken(access_token);
+		const payload = await this.authService.validateTokenId(access_token);
 		if (!payload)
 		{
 			client.disconnect();
 		}
+    return payload.id
 	}
 }

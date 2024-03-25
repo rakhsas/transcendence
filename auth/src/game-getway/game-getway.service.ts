@@ -187,8 +187,7 @@ class Game {
   path: '/sogame',
 })
 export class GameGetwayService
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -198,9 +197,10 @@ export class GameGetwayService
   /**
    *
    */
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
   handleConnection(client: any): void {
-    this.GuardsConsumer(client);
+    const id = this.GuardsConsumer(client);
+    console.log('idGame: ', id);
     this.waitingPlayers.push({ socket: client });
     this.matchPlayers();
   }
@@ -282,18 +282,21 @@ export class GameGetwayService
     }
   }
 
-  async GuardsConsumer(client: Socket) {
-    const cookies = client.handshake.headers.cookie?.split(';');
-    let access_token;
-    for (let index = 0; index < cookies.length; index++) {
-      const cookie = cookies[index].trim();
-      if (cookie.startsWith('access_token=')) {
-        access_token = cookie.substring(String('access_token=').length);
-      }
-    }
-    const payload = await this.authService.validateToken(access_token);
-    if (!payload) {
-      client.disconnect();
-    }
-  }
+  async GuardsConsumer(client: Socket): Promise<string> {
+		const cookies = client.handshake.headers.cookie?.split(';');
+		let access_token;
+		for (let index = 0; index < cookies.length; index++) {
+			const cookie = cookies[index].trim();
+			if (cookie.startsWith('access_token='))
+			{
+				access_token = cookie.substring(String('access_token=').length);
+			}
+		}
+		const payload = await this.authService.validateTokenId(access_token);
+		if (!payload)
+		{
+			client.disconnect();
+		}
+    return payload.id
+	}
 }
