@@ -15,6 +15,7 @@ import {
   Redirect,
   Query,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { TwoFactorAuthenticationService } from './twoFactorAuthentication.service';
 import { UserService } from '../user.service';
@@ -38,9 +39,9 @@ export class TwoFactorAuthenticationController {
     const url = await this.twoFactorAuthenticationService.pipeQrCodeStream(otpauthUrl);
     return { url: url }
   }
-  @Get('authenticate/:code/:id')
+  @Post('authenticate/:code/:id')
   // @UseGuards(UserGuard)
-  // @HttpCode(200)
+  @HttpCode(200)
   async authenticate(
     @Param('code') code: string,
     @Param('id') id: string,
@@ -53,10 +54,14 @@ export class TwoFactorAuthenticationController {
         user,
       );
       if (!isCodeValid) {
-        res.redirect(`https://localhost/dashboard/settings?invalid`);
+        //  return res.redirect(`https://localhost/dashboard/settings?invalid`);
+        throw new BadRequestException('invalide code --> :');
+        // return false;
       }
       await this.usersService.turnOnTwoFactorAuthentication(user.id);
-      res.redirect(`https://localhost/dashboard`);
+      console.log('code --> list',code);
+      return  res.redirect(`https://10.12.13.6/dashboard/`);
+      
     // } catch (error) {
     //   throw new UnauthorizedException('hna fin kayn');
     // }

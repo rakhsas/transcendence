@@ -109,12 +109,16 @@ function SettingFunction(): JSX.Element {
   const fetchQRcode = async () => {
     try{
       // console.log('Tfcode --> ', TfCode, 'userData --> ', userData[0].id, ' input', input);
-      window.location.href = APIURL + `2fa/authenticate/${input}/${userData[0].id}`;
-      // const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
-      //   method: 'POST',
-      //   credentials: 'same-origin'
-      // })
-      // if (ValidQRcode.ok)
+      const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        // redirect: 'follow'
+      })
+      console.log('status code --> : ', ValidQRcode)
+
+      if (ValidQRcode.status == 200)
+        window.location.href = `https://10.12.13.6/`;
+        // window.location.href = APIURL + `2fa/authenticate/${input}/${userData[0].id}`;
         // console.log(await ValidQRcode.json());
 
       // if (ValidQRcode == true)

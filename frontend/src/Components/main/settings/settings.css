@@ -1,3 +1,5 @@
+
+
 :root 
 {
     --main-color: rgb(22, 26, 48);
@@ -21,6 +23,13 @@
 .Sp2{
     /* transform: translate(75%, 25%); */
     height: 25%;
+}
+
+.form--setting{
+    border: 2px solid var(--second-color);
+    border-radius: 15px;
+    background-color: var(--second-color);
+    width: 75%;
 }
 
 
