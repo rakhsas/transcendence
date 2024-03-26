@@ -132,40 +132,45 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                 </Tabs.Item>
             </Tabs>
             <button className="add bottom-6" onClick={() => { setIsOpen(!isOpen) }}></button>
-            {isOpen ? <Modal show={isOpen} onClose={() => setOpenModal(false)}>
-                <Modal.Header>Channel Details</Modal.Header>
+            {isOpen ? <Modal show={isOpen} onClose={() => {setIsOpen(false)}}>
+                <Modal.Header className="text-center">Channel Details</Modal.Header>
                 <Modal.Body>
                     <form className="flex flex-col gap-4 m-0" onSubmit={addChannel}>
-                        <div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
-                            <div>
-                                <div className="mb-2 block">
-                                    <Label htmlFor="channelName" value="Your email" />
-                                </div>
-                                <TextInput id="channelName" type="text" placeholder="Give It a name" required />
+                        <div className="conta flex flex-col">
+                            <div className="flex justify-center bg-rose-200">
+                                <input type="image" name="" id="" />
                             </div>
-                            <div className="mb-2 block">
-                                <div className="mb-2 block">
-                                    <Label htmlFor="types" value="Select your country" />
-                                </div>
-                                <Select id="types" required onChange={(e) => setSelectedItem(e.currentTarget.value)}>
-                                    <option value={ChannelTypes.PUBLIC}>Public</option>
-                                    <option value={ChannelTypes.PROTECTED}>Protected</option>
-                                    <option value={ChannelTypes.PRIVATE}>Private</option>
-                                </Select>
-                            </div>
-                            {
-                                selectedItem === ChannelTypes.PROTECTED ? (
+                            <div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
+                                <div>
                                     <div className="mb-2 block">
-                                        <div>
-                                            <div className="mb-2 block">
-                                                <Label htmlFor="password" value="Your password" />
-                                            </div>
-                                            <TextInput id="password" type="password" required />
-                                        </div>
+                                        <Label htmlFor="channelName" value="Your email" />
                                     </div>
-                                ) :
-                                    null
-                            }
+                                    <TextInput id="channelName" type="text" placeholder="Give It a name" required />
+                                </div>
+                                <div className="mb-2 block">
+                                    <div className="mb-2 block">
+                                        <Label htmlFor="types" value="Select your country" />
+                                    </div>
+                                    <Select id="types" required onChange={(e) => setSelectedItem(e.currentTarget.value)}>
+                                        <option value={ChannelTypes.PUBLIC}>Public</option>
+                                        <option value={ChannelTypes.PROTECTED}>Protected</option>
+                                        <option value={ChannelTypes.PRIVATE}>Private</option>
+                                    </Select>
+                                </div>
+                                {
+                                    selectedItem === ChannelTypes.PROTECTED ? (
+                                        <div className="mb-2 block">
+                                            <div>
+                                                <div className="mb-2 block">
+                                                    <Label htmlFor="password" value="Your password" />
+                                                </div>
+                                                <TextInput id="password" type="password" required />
+                                            </div>
+                                        </div>
+                                    ) :
+                                        null
+                                }
+                            </div>
                         </div>
                         <Button type="submit">Submit</Button>
                     </form>
