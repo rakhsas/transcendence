@@ -43,7 +43,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                             </div>
                         ) : (
                             latestMessages.map((message, index) => (
-                                <div key={index} className={`msg ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
+                                <div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
                                     handleSelectMessage(
                                         index.toString(),
                                         message.__reciever__.id === userData[0].id ? message.__owner__.id : message.__reciever__.id,
@@ -86,7 +86,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
                         // const latestMessage = item.lastMessage;
                         const channel = item.channel;
                         return (
-                            <div key={index} className={`msg ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
+                            <div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
                                 handleSelectMessage(index.toString(), undefined, channel.id)
                             }}>
                                 <div className="msg-profile rounded-full mr-4">
