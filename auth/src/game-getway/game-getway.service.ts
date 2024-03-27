@@ -9,11 +9,17 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
+import { Game } from 'src/user/entities/game.entity';
+import { User } from 'src/user/entities/user.entity';
+
 
 interface Player {
   socket: any;
 }
-  
+
 interface Room {
   id: string;
   players: Player[];
@@ -36,10 +42,33 @@ export class GameGetwayService {
    *
    */
   constructor(
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    @InjectRepository(Game)
+    private readonly gameRepository: Repository<Game>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    private userService: UserService,
   ) {
     
   }
+
+  /* ============================== start game functions ================================= */
+  async addGame(payload: any): Promise<void> {
+    
+    const pl1 = await this.userService.viewUser(payload.player1Id);
+    const pl2 = await this.userService.viewUser(payload.player2Id);
+
+    const gameRecord = this.gameRepository.create({
+      player1: pl1,
+      player2: pl2,
+      player1Score: payload.pl1Scoore,
+      player2Score: payload.pl2Scoore,
+    });
+      await this.gameRepository.save(gameRecord);
+  }
+  /* ============================== end game functions ================================= */
+
+
   @SubscribeMessage("connection")
   handleConnection(client: any): void {
 		this.GuardsConsumer(client);
