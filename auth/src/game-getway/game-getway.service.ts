@@ -13,7 +13,7 @@ import { AuthService } from 'src/auth/auth.service';
 interface Player {
   socket: any;
 }
-
+  
 interface Room {
   id: string;
   players: Player[];
