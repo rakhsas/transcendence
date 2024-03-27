@@ -19,7 +19,7 @@ export class MessageController {
 
 
     @Get(':senderId')
-    @UseGuards(UserGuard)
+    // @UseGuards(UserGuard)
     async getLastMessages(@Param('senderId') senderId: string){
         const messages = await this.messageService.getLastMessagesOfUsers(senderId);
         return messages;

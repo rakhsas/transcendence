@@ -16,6 +16,18 @@ export class AuthService {
     }
     return true;
   }
+  async validateTokenId(token: string) {
+    let payload;
+    try {
+      payload = await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWTSECRET,
+      });
+    } catch {
+      // throw new UnauthorizedException();
+      return null;
+    }
+    return payload;
+  }
 
   async generateAccessToken(user: any): Promise<string> {
     const payload = {

@@ -1,5 +1,6 @@
 // app.gateway.ts
 import { Interval } from '@nestjs/schedule';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -10,13 +11,19 @@ import {
 
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+import { Channel } from 'src/user/entities/channel.entity';
+import { ChannelUser } from 'src/user/entities/channel_member.entity';
+import { Msg } from 'src/user/entities/msg.entitiy';
+import { Mute } from 'src/user/entities/mute.entity';
+import { UserService } from 'src/user/user.service';
+import { Repository } from 'typeorm';
 
 interface Player {
+  id: string;
   socket: any;
 }
 
 interface Room {
-  id: string;
   players: Player[];
   game: Game;
 }
@@ -70,7 +77,7 @@ class Ball {
     this.y = height / 2;
     this.r = 10;
     this.color = '#FDA403';
-    this.speed = 7;
+    this.speed = 4;
     this.vx = 5;
     this.vy = 5;
   }
@@ -135,11 +142,12 @@ class Game {
   }
 
   update() {
-    if (this.user.score === 5 || this.computer.score === 5) {
-      this.server
-        .to(this.roomId)
-        .emit('message', this.user, this.computer, this.ball);
-    } else {
+    // if (this.user.score === 5 || this.computer.score === 5) {
+    //   this.server
+    //     .to(this.roomId)
+    //     .emit('message', this.user, this.computer, this.ball);
+    // } else
+    {
       if (this.ball.x - this.ball.r < 0) {
         this.computer.score++;
         this.resetBall();
@@ -172,10 +180,10 @@ class Game {
     }
   }
   render() {
-    this.update();
     this.server
       .to(this.roomId)
       .emit('message', this.user, this.computer, this.ball);
+    this.update();
   }
 
   stop(): void {
@@ -192,30 +200,44 @@ export class GameGetwayService
   @WebSocketServer()
   server: Server;
 
-  rooms: Room[] = [];
+  rooms: { [id: string]: Room } = {};
   waitingPlayers: Player[] = [];
+  constructor(
+    private readonly authService: AuthService,
+    @InjectRepository(Msg)
+    private readonly msgRepository: Repository<Msg>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Channel)
+    private readonly channelRepository: Repository<Channel>,
+    @InjectRepository(Mute)
+    private readonly muteRepository: Repository<Mute>,
+    @InjectRepository(ChannelUser)
+    private readonly channelUserRepository: Repository<ChannelUser>,
+    private userService: UserService,
+  ) {}
 
-  /**
-   *
-   */
-  constructor(private readonly authService: AuthService) {}
-  handleConnection(client: any): void {
-    this.GuardsConsumer(client);
-    this.waitingPlayers.push({ socket: client });
+  async handleConnection(client: any): Promise<void> {
+    const id = await this.GuardsConsumer(client);
+    console.log('idGame: ', id);
+    // if (this.waitingPlayers.find((player) => player.id === id)) return;
+    this.waitingPlayers.push({ socket: client, id: id });
     this.matchPlayers();
   }
 
   handleDisconnect(client: any): void {
     console.log('client disconnected');
+    // save the state to db
+    // sent win to room
+    // remove from room
     this.removePlayer(client.id);
   }
 
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): void {
-    const { uy, cy } = payload;
-    const room = this.getRoom(client.id);
-    room.game.computer.y = cy;
-    room.game.user.y = uy;
+    const { uy, cy, id } = payload;
+    this.rooms[id].game.computer.y = cy;
+    this.rooms[id].game.user.y = uy;
   }
 
   private matchPlayers(): void {
@@ -231,58 +253,74 @@ export class GameGetwayService
       });
       const game = new Game(this.server, roomId);
       const room: Room = {
-        id: roomId,
         players,
         game,
       };
-      this.rooms.push(room);
+      room.game.render();
+      setTimeout(() => {
+        this.rooms[roomId] = room;
+      }, 2000);
     }
   }
 
   @Interval(10)
   handleInterval() {
-    for (let i = 0; i < this.rooms.length; i++) {
-      const room = this.rooms[i];
-      room.game.render();
-      if (room.game.user.score === 5 || room.game.computer.score === 5) {
-        this.rooms.splice(i, 1);
-        i--; // Decrement i to adjust for the removed item
+    for (const id in this.rooms) {
+      this.rooms[id].game.render();
+      if (
+        this.rooms[id].game.user.score === 5 ||
+        this.rooms[id].game.computer.score === 5
+      ) {
+        // addGame({
+        //   pl1Id,
+        //   pl2Id,
+        //   sc1,
+        //   sc2,
+        // });
+        // save data to db
+        this.rooms[id].game.render();
+        delete this.rooms[id];
       }
     }
   }
 
-  private getRoom(playerId: string): Room | undefined {
-    for (const room of this.rooms) {
-      const player = room.players.find((p) => p.socket.id === playerId);
+  private getIdOfRoom(playerId: string): string | undefined {
+    for (const id in this.rooms) {
+      const player = this.rooms[id].players.find(
+        (p) => p.socket.id === playerId,
+      );
       if (player) {
-        return room;
+        return id;
       }
     }
     return undefined;
   }
 
   private removePlayer(playerId: string): void {
+    // remove player from waiting palyers if it existes
     const indexOfPlayerToRemove = this.waitingPlayers.findIndex(
       (obj) => obj.socket.id === playerId,
     );
     // Get index of object with id 2 and remove it
     if (indexOfPlayerToRemove !== -1) {
       this.waitingPlayers.splice(indexOfPlayerToRemove, 1);
+      return;
     }
 
-    const room: Room = this.getRoom(playerId);
-    if (room === undefined) return;
-    console.log('room id : ', room.id);
-    room.game.stop();
-    this.server.to(room.id).emit('win');
+    // romove it from the room
+
+    const id: string = this.getIdOfRoom(playerId);
+    if (id === undefined) return;
+    console.log('room id is removed : ', id);
+    this.rooms[id].game.stop();
     // Remove object with id 2
-    const indexToRemove = this.rooms.findIndex((obj) => obj.id === room.id);
-    if (indexToRemove !== -1) {
-      this.rooms.splice(indexToRemove, 1);
-    }
+    delete this.rooms[id];
+
+    // sent win to room
+    this.server.to(id).emit('win');
   }
 
-  async GuardsConsumer(client: Socket) {
+  async GuardsConsumer(client: Socket): Promise<string> {
     const cookies = client.handshake.headers.cookie?.split(';');
     let access_token;
     for (let index = 0; index < cookies.length; index++) {
@@ -291,9 +329,10 @@ export class GameGetwayService
         access_token = cookie.substring(String('access_token=').length);
       }
     }
-    const payload = await this.authService.validateToken(access_token);
+    const payload = await this.authService.validateTokenId(access_token);
     if (!payload) {
       client.disconnect();
     }
+    return payload.id;
   }
 }

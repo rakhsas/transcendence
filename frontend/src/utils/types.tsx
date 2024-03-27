@@ -7,3 +7,9 @@ export enum Paths {
     CHAT = 'chat',
     SETTINGS = 'settings'
 }
+
+export enum ChannelTypes {
+    PUBLIC = 'public',
+    PROTECTED = 'protected',
+    PRIVATE = 'private',
+}

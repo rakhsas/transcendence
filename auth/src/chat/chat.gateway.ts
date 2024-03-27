@@ -1,14 +1,10 @@
 // src/chat/chat.gateway.ts
-import {
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-} from '@nestjs/websockets';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
+import { UserRole } from 'src/user/entities/channel_member.entity';
+import { ChannelService } from 'src/channel/channel.service';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
@@ -24,10 +20,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly chatService: ChatService,
     private readonly authService: AuthService,
-  ) {}
+    private readonly channelService: ChannelService
+    ) { }
 
   handleConnection(client: Socket) {
-    this.GuardsConsumer(client);
+		this.GuardsConsumer(client);
     const userName = String(client.handshake.query.userName);
     this.connectedUsers.set(userName, client);
     this.usersArray.push(client.id);
@@ -42,7 +39,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     // console.log('A user disconnected');
-    this.usersArray = this.usersArray.filter((id) => id !== client.id);
+    this.usersArray = this.usersArray.filter(id => id !== client.id);
     client.broadcast.emit('update-user-list', { userIds: this.usersArray });
     client.broadcast.emit('user-disconnected', { userId: client.id });
     const userName = String(client.handshake.query.userName);
@@ -50,26 +47,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // ============================ messages functions ===============================================================
-
+  
   @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any): Promise<void> {
-    // you can put the blocked code here {if they are blocked they can't send messages}.
-    if (
-      (await this.chatService.areUsersBlocked(payload.to, payload.from)) ===
-      true
-    )
+   // you can put the blocked code here {if they are blocked they can't send messages}.
+   if (await this.chatService.areUsersBlocked(payload.to, payload.from) === true)
       return;
-    if (payload.hasOwnProperty('recieverName')) {
+    if (payload.hasOwnProperty('recieverName'))
+    {
       const recieverName = String(payload.recieverName);
       const toUserSocket = this.connectedUsers.get(recieverName);
       console.log('toUserSocket: ', payload.message);
       if (toUserSocket) {
         toUserSocket.emit('message', {
-          to: payload.to,
-          from: payload.from,
-          message: payload.message,
-          image: payload.image,
-          audio: payload.audio,
+          "to": payload.to,
+          "from": payload.from,
+          "message": payload.message,
+          "image": payload.image,
+          "audio": payload.audio,
           // "isOwner": false
         });
         toUserSocket.emit('directMessageNotif', {
@@ -78,13 +73,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           senderId: payload.senderId,
           recieverId: payload.recieverId,
           message: payload.message,
-        });
-        await this.chatService.addMessage(payload);
-      } else await this.chatService.addMessage(payload);
+        })
+        await this.chatService.addMessage(payload)
+      }
+      else
+        await this.chatService.addMessage(payload)
       client.emit('message', payload);
     }
     //   this.server.emit('message', payload);
   }
+
+ 
 
   // =============================== Handle Muted users from a channel ============================
 
@@ -97,50 +96,47 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('createChannel')
   async handleCreateChannel(socket: Socket, payload: any): Promise<void> {
-    // here the payload must containe the id of the user who create the channel so it can be set as owner
-    // create a new entity in the database (new channel)
-    // add new entity in user channel relation the user must set as owner
-
-    // if the channel is protected we must first check for the password is correct or not.!
-
-    if ('password' in payload && payload.password != '') {
-      console.log('password exist and its not empty :)');
-    }
-
     socket.join(payload.channelId);
-    await this.chatService.addNewChannelEntity(payload);
+    const newChannel = await this.chatService.addNewChannelEntity(payload);
+    await this.chatService.addNewMemberToChannel(newChannel, UserRole.OWNER);
 
-    await this.chatService.addNewMemberToChannel(payload);
+    // Fetch updated channels and emit the updated channel list to the client
+    const updatedChannels = await this.channelService.getChannelsByUserId(payload.ownerId);
+    socket.emit('channelCreated', updatedChannels);
   }
 
   @SubscribeMessage('joinChannel')
-  async handleJoinChannel(client: Socket, payload: any): Promise<void> {
+  async handleJoinChannel(client: Socket ,payload: any): Promise<void> {
     // the payload should contain the channel ID,
     const channel = await this.chatService.getChannel(payload.channelId);
-    if (channel.password !== null && channel.password !== '') {
-      if ('password' in payload && channel.password === payload.password) {
+    if (channel.password !== null && channel.password !== "")
+    {
+      if ("password" in payload && channel.password === payload.password)
+      {
         client.join(payload.channelId);
-        await this.chatService.addNewMemberToChannel(payload);
-      } else {
-        client.emit(
-          'wrongPassowrd',
-          'Cannot join the room (incorrect password)',
-        );
+        await this.chatService.addNewMemberToChannel(payload, "");
       }
-    } else {
+      else
+      {
+        client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
+      }
+    }
+    else
+    {
       client.join(payload.channelId);
-      await this.chatService.addNewMemberToChannel(payload);
+      await this.chatService.addNewMemberToChannel(payload, "");
     }
   }
 
   @SubscribeMessage('channelMessages')
   async handleEvent(socket: Socket, payload: any): Promise<void> {
     this.server.to(payload.cid).emit('channelMessage', {
-      cid: payload.cid,
-      message: payload.message,
-      from: payload.senderId,
-      image: payload.image,
-    });
+      "from": payload.senderId,
+      "cid": payload.cid,
+      "message": payload.message,
+      "image": payload.image,
+      "audio": payload.audio,
+    })
     await this.chatService.addMessage(payload);
   }
 
@@ -158,7 +154,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('promoteUser')
-  async handlePromteUser(payload: any): Promise<void> {
+  async handlePromteUser(payload: any): Promise<void>{
     await this.chatService.promoteUser(payload);
   }
   // ============================== Vedio call events ===================================================================
@@ -169,55 +165,62 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       from: payload.from,
       offer: payload.offer,
       senderId: payload.senderId,
-      recieverId: payload.recieverId,
+      recieverId: payload.recieverId
     });
   }
-
+  
   @SubscribeMessage('mediaOffer')
   async handleOnMediaOffer(client: Socket, payload: any) {
-    // console.log(payload)
     client.to(payload.to).emit('mediaOffer', {
       from: payload.from,
-      offer: payload.offer,
+      offer: payload.offer
     });
-  }
+  };
 
   @SubscribeMessage('mediaAnswer')
   async handleOnMediaAnswer(client: Socket, payload: any) {
     client.to(payload.to).emit('mediaAnswer', {
       answer: payload.answer,
-      from: payload.from,
+      from: payload.from
     });
+
   }
 
   @SubscribeMessage('iceCandidate')
   async handleIceCandidate(client: Socket, payload: any) {
     client.to(payload.to).emit('remotePeerIceCandidate', {
       candidate: payload.candidate,
-      client: client.id,
+      client: client.id
     });
   }
+
+ 
 
   @SubscribeMessage('acceptCall')
   async handleAcceptCall(client: Socket, payload: any) {
     console.log('acceptCall');
     client.to(payload.to).emit('AcceptCall', {
       answer: payload.answer,
-      from: payload.from,
+      from: payload.from
     });
   }
-  async GuardsConsumer(client: Socket) {
-    const cookies = client.handshake.headers.cookie?.split(';');
-    let access_token;
-    for (let index = 0; index < cookies.length; index++) {
-      const cookie = cookies[index].trim();
-      if (cookie.startsWith('access_token=')) {
-        access_token = cookie.substring(String('access_token=').length);
-      }
-    }
-    const payload = await this.authService.validateToken(access_token);
-    if (!payload) {
-      client.disconnect();
-    }
-  }
+
+
+  async GuardsConsumer(client: Socket): Promise<string> {
+		const cookies = client.handshake.headers.cookie?.split(';');
+		let access_token;
+		for (let index = 0; index < cookies.length; index++) {
+			const cookie = cookies[index].trim();
+			if (cookie.startsWith('access_token='))
+			{
+				access_token = cookie.substring(String('access_token=').length);
+			}
+		}
+		const payload = await this.authService.validateTokenId(access_token);
+		if (!payload)
+		{
+			client.disconnect();
+		}
+    return payload.id
+	}
 }
