@@ -163,12 +163,12 @@ export class ChatService {
       newEntityChannel.private = payload.isPrivate;
       newEntityChannel.password = "password" in payload ? payload.password : null;
       newEntityChannel.type = payload.channelType;
-      console.log("=> ", payload.ownerId);
+      newEntityChannel.picture = payload.picture
+      console.log("=> ", payload.picture);
       newEntityChannel.owner = Promise.resolve(payload.ownerId);
-
-
       // Save the new Channel entity
       const savedChannel = await this.channelRepository.save(newEntityChannel);
+      console.log('saveChannel: ', savedChannel)
       return savedChannel;
     } catch (error) {
       console.error("Error adding new channel:", error);
