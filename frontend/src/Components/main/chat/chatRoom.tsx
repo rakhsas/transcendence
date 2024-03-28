@@ -12,22 +12,31 @@ interface props {
     onOpenModal: any;
     onCloseModal: any;
     modalPicPath: any;
+    setRoomMessages: any;
 }
 
-const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMembers, isModalOpen, onOpenModal, onCloseModal, modalPicPath }) => {
+const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMembers, isModalOpen, onOpenModal, onCloseModal, modalPicPath, setRoomMessages }) => {
     const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
-    const audioRefs = useRef([] as HTMLAudioElement[]);
+    const audioRefs: any = useRef([] as HTMLAudioElement[]);
+    const messagesRef = useRef<HTMLDivElement>(null);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
     useEffect(() => {
-    }, [channelId, userData, roomMessages, roomMembers]); // Include channelId as a dependency
-
+        if (messagesRef.current)
+            scrollToBottom(messagesRef.current!);
+    }, [channelId, userData, roomMessages, roomMembers]);
+    const scrollToBottom = (element: HTMLElement) => {
+        console.log('to Bottom')
+        element.scrollTop = element.scrollHeight;
+    };
     if (!roomMessages || !userData || !channelId || !roomMembers)
         return <LoadingComponent />;
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     return (
-        <>
+        <div className="" ref={messagesRef}>
             {
                 roomMessages.map((message: any, index) => {
+                    console.log("message: ", message)
                     const sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId)).user;
                     if (message.message.length > 0) {
                         return (
@@ -60,10 +69,10 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
                                             <div className="group relative my-2.5">
                                                 <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
                                                     <button onDoubleClick={() => onOpenModal(baseAPIUrl + message.img || '')} className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
-                                                    <svg className="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
-                                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
-                                                    </svg>
-                                                </button>
+                                                        <svg className="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
+                                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
+                                                        </svg>
+                                                    </button>
                                                     <div id="download-image" role="tooltip" className="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
                                                         Download image
                                                         <div className="tooltip-arrow" data-popper-arrow></div>
@@ -155,7 +164,7 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
                     }
                 })
             }
-        </>
+        </div>
     )
 }
 export default ChatRoom;

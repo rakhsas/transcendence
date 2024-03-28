@@ -6,7 +6,7 @@ const inputTheme: CustomFlowbiteTheme["textInput"] = {
         input: {
             colors: {
                 primary:
-                    "bg-zinc-900 text-gray-200 placeholder-gray-700 focus:border-1 focus:border-white",
+                    "dark:bg-zinc-900 bg-neutral-100 focus:text-black dark:focus:text-white text-gray-200 focus:border-black placeholder-gray-700 focus:border-1 focus:ring-0 dark:focus:border-white",
             },
         },
     },

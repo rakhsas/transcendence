@@ -67,6 +67,10 @@ function NavbarComponent(): JSX.Element {
         fetchData();
     }, []);
     useEffect(() => {
+        if (!searchInput) {
+            setFilteredUsers([]);
+            return;
+        }
         const filtered = users.filter(user => {
             const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
             return fullName.includes(searchInput.toLowerCase()) || user.username.toLowerCase().includes(searchInput.toLowerCase());
@@ -128,14 +132,14 @@ function NavbarComponent(): JSX.Element {
             <div className="heading mb-2 sm:mb-0">
                 <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased font-poppins">Good Evening,<span className="dark:text-white text-black uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
             </div>
-            <div className="max-w-md pl-4 flex flex-col sm:flex-row sm:space-x-4">
+            <div className="max-w-md pl-4 flex flex-col md:sm:flex-row sm:space-x-4 xs:space-x-2 xs:flex-row">
                 <div className="relative h-10 flex items-center">
-                    <button onClick={() => { toggleDropdown(), console.log("isNotifOpen: ", isNotifOpen) }}>
-                        <svg className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                    {/* <button> */}
+                        <svg  onClick={() => { toggleDropdown(), console.log("isNotifOpen: ", isNotifOpen) }} className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
                             <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
                         </svg>
                         {notificationCount ? <div className="absolute block w-3 h-3 bg-red-500 border-2 border-white rounded-full top-1 start-2.5 dark:border-gray-900" /> : ''}
-                    </button>
+                    {/* </button> */}
                     <div className={`fixed z-50 -right-0 mx-2 top-14 mt-2 w-full max-w-md bg-slate-100 divide-y divide-gray-700 rounded-lg shadow dark:bg-zinc-900 dark:divide-gray-300 ${isNotifOpen ? 'block' : 'hidden'}`}>
                         <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-neutral-100 dark:bg-zinc-900 dark:text-white">
                             Notifications
@@ -228,17 +232,40 @@ function NavbarComponent(): JSX.Element {
                     <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => setSearchInput(e.target.value)} />
                     <div className={`absolute mt-2 z-10 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
                         {filteredUsers.slice(0, 3).map((user, index) => (
-                            <li>
-                                <a key={index} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                            <div key={index} className="flex flex-col">
+                                <a className="flex justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-fit">
                                     <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
-                                    {user.firstName} {user.lastName}
+                                    <span>{user.firstName + ' ' + user.lastName}</span>
                                 </a>
-                            </li>
+                            </div>
                         ))}
                     </div>
                 </div>
             </div>
         </div>
+        // <header className="flex flex-wrap sm:justify-start sm:flex-nowrap z-50 w-full bg-white text-sm py-4 dark:bg-gray-800">
+        //     <nav className="max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between" aria-label="Global">
+        //         <div className="flex items-center justify-between">
+        //         <a className="flex-none" href="#">
+        //             <img className="w-10 h-auto" src="../assets/img/logo/logo-short.png" alt="Logo"/>
+        //         </a>
+        //         <div className="sm:hidden">
+        //             <button type="button" className="hs-collapse-toggle p-2 inline-flex justify-center items-center gap-x-2 rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-transparent dark:border-gray-700 dark:text-white dark:hover:bg-white/10 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-collapse="#navbar-image-2" aria-controls="navbar-image-2" aria-label="Toggle navigation">
+        //             <svg className="hs-collapse-open:hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+        //             <svg className="hs-collapse-open:block hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        //             </button>
+        //         </div>
+        //         </div>
+        //         <div id="navbar-image-2" className="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow sm:block">
+        //             <div className="flex flex-col gap-5 mt-5 sm:flex-row sm:items-center sm:justify-end sm:mt-0 sm:ps-5">
+        //                 <a className="font-medium text-blue-500 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#" aria-current="page">Landing</a>
+        //                 <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-500 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#">Account</a>
+        //                 <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-500 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#">Work</a>
+        //                 <a className="font-medium text-gray-600 hover:text-gray-400 dark:text-gray-400 dark:hover:text-gray-500 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#">Blog</a>
+        //             </div>
+        //         </div>
+        //     </nav>
+        // </header>
     )
 }
 
