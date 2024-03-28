@@ -73,7 +73,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
             if (user.selected) {
                 chatSocket?.emit('joinChannel', {
                     id: channelInfo.id,
-                    __owner__: userData[0].id,
+                    __owner__: user.id,
                     role: 'MEMBER'
                 })
             }

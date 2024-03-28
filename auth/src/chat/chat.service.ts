@@ -178,12 +178,13 @@ export class ChatService {
 
   async addNewMemberToChannel(payload: any, role: string) {
     // Load user and channel entities
+    console.log("-----------------------------------------------> joined");
     const id = payload.__owner__;
     const user = await this.userService.viewUser(id);
     const channel: Channel = await this.channelRepository.findOne({where: {id: payload.id}});
-    if (!user || !channel) {
-      throw new Error('User or channel not found'); // Handle the case where user or channel is not found
-    }
+    // if (!user || !channel) {
+    //   throw new Error('User or channel not found'); // Handle the case where user or channel is not found
+    // }
 
     const newChannelUser = new ChannelUser();
     // newEntity.user = Promise.resolve(payload.__owner__.id);

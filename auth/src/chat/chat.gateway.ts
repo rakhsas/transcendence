@@ -5,7 +5,7 @@ import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserRole } from 'src/user/entities/channel_member.entity';
 import { ChannelService } from 'src/channel/channel.service';
-import cli from '@angular/cli';
+// import cli from '@angular/cli';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()

@@ -13,8 +13,14 @@ export class GameEntity {
   player2: User;
 
   @Column({ type: 'int' })
-  player1Score: number;
+  userScoore: number;
 
   @Column({ type: 'int' })
-  player2Score: number;
+  playerScoore: number;
+
+  // @Column()
+  // winnerId: string
+
+  @ManyToOne(() => User)
+  winner: User;
 }

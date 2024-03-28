@@ -216,26 +216,24 @@ export class GameGetwayService
 
   /* ============================== start game functions ================================= */
   async addGame(payload: any): Promise<void> {
-    
+    // userId: ,
+    // playerId:,
+    // userScoore:,
+    // playerScoore:,
+    // winnerId:,
     const gameResult = new GameEntity();
-    const pl1 =  await this.userService.viewUser(payload.player1Id);
-    const pl2 =  await this.userService.viewUser(payload.player2Id);
+    const pl1 =  await this.userService.viewUser(payload.userId);
+    const pl2 =  await this.userService.viewUser(payload.playerId);
+    const winner = await this.userService.viewUser(payload.winnerId);
     console.log("-------------------------------------------------------------------=-==============>>  player: ", pl1.username, payload.pl1Scoore);
     gameResult.player1 = pl1;
     gameResult.player2 = pl2;
-    gameResult.player1Score = payload.pl1Scoore;
-    gameResult.player2Score = payload.pl2Scoore;
+    gameResult.userScoore = payload.userScoore;
+    gameResult.playerScoore = payload.playerScoore;
+    gameResult.winner = winner;
 
-    console.log("players: ", pl1, pl2);
-    // console.log("scoores: ", payload.pl1Scoore, payload.pl2Scoore);
-    // const gameRecord = this.gameRepository.create({
-    //   player1: pl1,
-    //   player2: pl2,
-    //   player1Score: payload.pl1Scoore,
-    //   player2Score: payload.pl2Scoore,
-    // });
-      // await this.gameRepository.save(gameRecord);
-      await this.gameRepository.save(gameResult);
+    // console.log("players: ", pl1, pl2);
+    await this.gameRepository.save(gameResult);
   }
   /* ============================== end game functions ================================= */
   
