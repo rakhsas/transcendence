@@ -225,7 +225,7 @@ export class GameGetwayService
     const pl1 =  await this.userService.viewUser(payload.userId);
     const pl2 =  await this.userService.viewUser(payload.playerId);
     const winner = await this.userService.viewUser(payload.winnerId);
-    console.log("-------------------------------------------------------------------=-==============>>  player: ", pl1.username, payload.pl1Scoore);
+    // console.log("-------------------------------------------------------------------=-==============>>  player: ", pl1.username, payload.pl1Scoore);
     gameResult.player1 = pl1;
     gameResult.player2 = pl2;
     gameResult.userScoore = payload.userScoore;
