@@ -15,6 +15,7 @@ import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { GameEntity } from 'src/user/entities/game.entity';
 import { User as User1 } from 'src/user/entities/user.entity';
+import { Logger } from '@nestjs/common';
 
 
 interface Player {
@@ -219,7 +220,7 @@ export class GameGetwayService
     const gameResult = new GameEntity();
     const pl1 =  await this.userService.viewUser(payload.player1Id);
     const pl2 =  await this.userService.viewUser(payload.player2Id);
-
+    console.log("-------------------------------------------------------------------=-==============>>  player: ", pl1.username, payload.pl1Scoore);
     gameResult.player1 = pl1;
     gameResult.player2 = pl2;
     gameResult.player1Score = payload.pl1Scoore;
@@ -293,6 +294,7 @@ export class GameGetwayService
         this.rooms[id].game.user.score === 5 ||
         this.rooms[id].game.computer.score === 5
       ) {
+        console.log("logged user: ", this.logedUser);
         this.addGame({
           player1Id: this.logedUser,
           player2Id: this.rooms[id].players[0].id === this.logedUser? this.rooms[id].players[1].id : this.rooms[id].players[0].id,
