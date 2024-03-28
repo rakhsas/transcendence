@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { messageUser, messageUser1 } from "../../../model/messageUser.model";
 import User from "../../../model/user.model";
 import ModalComponent from "../../../utils/modal.component";
@@ -12,26 +12,11 @@ type props = {
     onOpenModal: any;
     onCloseModal: any;
     modalPicPath: any;
-    isPlaying: any;
 }
-function ChatAreaComponent({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, modalPicPath, isPlaying }: props) {
-    // const audioRefs = MESSAGES.map(() => useRef(null));
-    // const filteredAudioRefs = audioRefs.filter((ref, index) => MESSAGES[index].audio !== undefined);
-    // const audioElements = MESSAGES.map((message: any) => {
-    //     if (message.audio) {
-    //         return new Audio(message.audio);
-    //     }
-    //     return null;
-    // });
-
-    // const audioDurations = audioElements.map((audio: any) => {
-    //     if (audio) {
-    //         return audio.duration.toFixed(0);
-    //     }
-    //     return null;
-    // });
-
-
+const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, modalPicPath }) => {
+    const audioRefs = useRef([] as HTMLAudioElement[]);
+    const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
+    const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     return (
         <>
             {MESSAGES.map((message: any, index: any) => {
@@ -67,7 +52,7 @@ function ChatAreaComponent({ MESSAGES, userData, selectedMessageIndex, getMessag
                                         </div>
                                         <div className="group relative my-2.5">
                                             <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
-                                                <button onDoubleClick={() => onOpenModal(message.img || '')} className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
+                                                <button onDoubleClick={() => onOpenModal(baseAPIUrl + message.img || '')} className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
                                                     <svg className="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
                                                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
                                                     </svg>
@@ -77,7 +62,7 @@ function ChatAreaComponent({ MESSAGES, userData, selectedMessageIndex, getMessag
                                                     <div className="tooltip-arrow" data-popper-arrow></div>
                                                 </div>
                                             </div>
-                                            <img src={message.img} className="rounded-lg" />
+                                            <img src={baseAPIUrl + message.img} className="rounded-lg" />
                                         </div>
                                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
                                         {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
@@ -87,18 +72,8 @@ function ChatAreaComponent({ MESSAGES, userData, selectedMessageIndex, getMessag
                         </div>
                     )
                 }
-                else if (message.audio) {
-                    // const audioUrl = URL.createObjectURL(message.audio);
-                    // const togglePlay = () => {
-                    //     if (!audioRef.current) return;
-                    //     console.log('audioRef.current', audioRef.current);
-                    //     if (isPlaying) {
-                    //         audioRef.current.pause();
-                    //     } else {
-                    //         audioRef.current.play();
-                    //     }
-                    //     setIsPlaying(!isPlaying);
-                    // };
+                else if (message.audio && message.audio.length > 0) {
+                    isPlaying[index] = false;
                     return (
                         <div className="p-4" key={index}>
                             <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
@@ -109,15 +84,33 @@ function ChatAreaComponent({ MESSAGES, userData, selectedMessageIndex, getMessag
                                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
                                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                        <audio src={message.audio} />
-                                        <button /* onClick={() => { togglePlay() }} */ className="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-600" type="button">
-                                            <svg className={`w-4 h-4 text-gray-800 dark:text-white ${isPlaying ? 'block' : 'hidden'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 12 16">
+                                        {/* <React.Fragment key={message.id}> */}
+                                        <audio ref={(el) => (audioRefs[index] = el)} src={baseAPIUrl + message.audio} />
+                                        {/* { audioRefs[index] = new Audio(message.audio)} */}
+                                        <button onClick={() => {
+                                            if (!audioRefs[index]) return;
+                                            if (audioRefs[index].paused) {
+                                                audioRefs[index].play();
+                                            } else {
+                                                audioRefs[index].pause();
+                                            }
+                                            console.log("isPlaying[index] before update", isPlaying[index]);
+                                            setIsPlaying((prevIsPlaying: boolean[]) => {
+                                                const temp = [...prevIsPlaying];
+                                                temp[index] = !temp[index];
+                                                console.log("temp[index]", temp[index]); // Log the updated value
+                                                return temp;
+                                            });
+
+                                        }} className="inline-flex self-center items-center p-2 text-sm font-medium text-center text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-600" type="button">
+                                            <svg className={`w-4 h-4 text-gray-800 dark:text-white ${isPlaying[index] ? 'block' : 'hidden'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 12 16">
                                                 <path d="M3 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm7 0H9a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Z" />
                                             </svg>
-                                            <svg className={`w-4 h-4 text-gray-800 dark:text-white ${isPlaying ? 'hidden' : 'block'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <svg className={`w-4 h-4 text-gray-800 dark:text-white ${isPlaying[index] ? 'hidden' : 'block'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 18V6l8 6-8 6Z" />
                                             </svg>
                                         </button>
+                                        {/* </React.Fragment> */}
                                         <svg aria-hidden="true" className="w-[145px] md:w-[185px] md:h-[40px]" viewBox="0 0 185 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <rect y="17" width="3" height="6" rx="1.5" fill="#6B7280" className="dark:fill-white" />
                                             <rect x="7" y="15.5" width="3" height="9" rx="1.5" fill="#6B7280" className="dark:fill-white" />

@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module'; 
+import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { Channel } from './user/entities/channel.entity';
 import { Friendship } from './user/entities/freindship.entity';
@@ -15,7 +15,7 @@ import { FreindsModule } from './friends/friends.module';
 import { GameGetwayModule } from './game-getway/game-getway.module';
 import { ChannelModule } from './channel/channel.module';
 import { ChannelUser } from './user/entities/channel_member.entity';
-import { Game } from './user/entities/game.entity';
+import { GameEntity } from './user/entities/game.entity';
 import { UploadModule } from './upload/upload.module';
 import express from 'express';
 import { join } from 'path';
@@ -24,7 +24,7 @@ import { join } from 'path';
   imports: [
     ConfigModule.forRoot({
       envFilePath: 'config/.env',
-      isGlobal: true
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -35,8 +35,7 @@ import { join } from 'path';
       database: 'db1',
       synchronize: true,
       // logging: true,
-      entities: [User, Msg, Game, Channel, Mute, Friendship, ChannelUser],
-
+      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser],
     }),
     UserModule,
     AuthModule,
@@ -44,7 +43,7 @@ import { join } from 'path';
     FreindsModule,
     GameGetwayModule,
     ChannelModule,
-    UploadModule
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

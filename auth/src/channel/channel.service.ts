@@ -39,13 +39,13 @@ export class ChannelService {
             where: {channel: {id: channelId}},
             relations: ['user']
         })
-
         // const users = channelUsers.map((channelUser) => channelUser.user);
-        const users = channelUsers.map((channelUser) => ({
-            user: channelUser.user,
-            role: channelUser.role, // 
-        }));
-
+        const users = await Promise.all(
+            channelUsers.map(async (channelUser) => ({
+               user: await channelUser.user,
+               role: channelUser.role,
+           }))
+        )
         return users;
     }
 
@@ -55,17 +55,20 @@ export class ChannelService {
             relations: ['channel']
         });
 
-        // const channels = userChannels.map((channelUser) => channelUser.channel);
-        const channels = userChannels.map((channelUser) => ({
-            channel: channelUser.channel,
-            role: channelUser.role,
-        }));
 
+        const channels = await Promise.all(
+            userChannels.map(async (channelUser) => ({
+                channel: await channelUser.channel,
+                role: channelUser.role,
+            }))
+        );
+        console.log(channels.length)
         return channels;
     }
 
     async getLastMessageOfChannel(channelId: number): Promise<{}>{
-        return this.msgRepository.createQueryBuilder('msg')
+        console.log('channelId', channelId)
+        return await this.msgRepository.createQueryBuilder('msg')
       .where('msg.cid = :channelId', { channelId })
       .orderBy('msg.date', 'DESC')
       .limit(1)
@@ -76,6 +79,21 @@ export class ChannelService {
         return this.msgRepository.createQueryBuilder('msg')
         .where('msg.cid = :channelId', {channelId})
         .getMany()
+    }
+
+    async getChannelsLastMessageByUserIdAndLastMessage(userId: string): Promise<{}> {
+        const userChannels =  await this.channelUserRepository.find({
+            where: {user: {id: userId}},
+            relations: ['channel']
+        });
+
+        const fullchannels = await Promise.all(
+            userChannels.map(async (channelUser) => ({
+               channel: await channelUser,
+               lastMessage: await this.getLastMessageOfChannel((await channelUser.channel).id)
+           }))
+        )
+        return fullchannels;   
     }
 
 }

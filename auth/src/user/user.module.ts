@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 import { UserGuard } from '../guards/user.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { Repository } from 'typeorm';
@@ -21,6 +21,6 @@ import { MessageController } from '../msg/message.controller';
   ],
   providers: [UserService, UserGuard, AuthService, Repository, MessageService],
   controllers: [UserController, MessageController],
-  exports: [UserService, MessageService]
+  exports: [UserService, MessageService],
 })
 export class UserModule {}

@@ -2,14 +2,14 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
-export class Game {
+export class GameEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
   player1: User;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
   player2: User;
 
   @Column({ type: 'int' })

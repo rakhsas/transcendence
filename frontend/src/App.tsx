@@ -11,7 +11,7 @@ import Cookies from 'js-cookie';
 import chatComponent from './Components/main/chat/chat';
 import CallComponent from './Components/call/call';
 import SettingsComponent from './Components/main/settings/settings.tsx';
-import ProfileComponent from './Components/main/profile/Sprofile.tsx';
+import ProfileComponent from './Components/main/profile/profile.tsx';
 import NotFoundComponent from './Components/error/404.component.tsx';
 import { useEffect, useState } from 'react';
 const url: string = import.meta.env.VITE_API_AUTH_KEY;
@@ -39,23 +39,21 @@ function App() {
   // // Cookies.get('isAuthenticated');
   // console.log(isAuthenticated);
 
-  // localStorage.setItem('theme', 'light');
+  localStorage.setItem('theme', 'light');
   return (
     <>
       {/* <BrowserRouter> */}
       <Routes>
         <Route path="/" element={<HomePageComponent />} />
-        <Route
-          path="/dashboard/*"
-          element={(<DashboardComponent />)}
-        >
+        <Route path="/dashboard/*" element={<DashboardComponent />}>
           <Route index element={<HomeComponent />} />
           <Route path="analytics" element={<AnalyticsComponent />} />
           <Route path="chat" Component={chatComponent} />
           <Route path="call" element={<CallComponent />} />
+          <Route path="profile/*" element={<ProfileComponent />} />
           <Route path="settings" element={<SettingsComponent />} />
           <Route path="game" element={<Game />} />
-          <Route path='HeadToHead' element={<HeadToHead />} /> 
+          <Route path="HeadToHead" element={<HeadToHead />} />
           {/* <Route path="profile" element={<ProfileComponent />} /> */}
           <Route path="*" element={<NotFoundComponent />} />
         </Route>
