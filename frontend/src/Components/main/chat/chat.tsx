@@ -312,11 +312,9 @@ function chatComponent(): JSX.Element {
             setRecording(false);
         }
     };
-
     const setOpenModal = (status: boolean) => {
         setIsOpen(status);
     }
-    
 
     return (
       <>

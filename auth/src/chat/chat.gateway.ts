@@ -108,7 +108,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(client: Socket ,payload: any): Promise<void> {
-    console.log('joinChannel');
     // the payload should contain the channel ID,
     try {
       const channel = await this.chatService.getChannel(payload.channelId);
@@ -129,7 +128,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.join(payload.channelId);
         await this.chatService.addNewMemberToChannel(payload, "");
       }
-      client.emit('channelJoined', payload.__owner__);
+      const members = await this.channelService.getMembersOfChannel(payload.requestedUserId);
+      if (members)
+      {
+        // console.log(members); 
+        client.emit('channelJoined', members);
+      }
     } catch(error) {
       client.emit('channelError', error);
     }
