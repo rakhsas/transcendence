@@ -1,4 +1,4 @@
-import './list.css';
+// import './list.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import HomePageComponent from './Components/HomePage';
 import ValidInformation from './Components/Info/Information';
@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react';
 const url: string = import.meta.env.VITE_API_AUTH_KEY;
 
 function App() {
-  localStorage.setItem('theme', 'light');
+  localStorage.setItem('theme', 'dark');
   return (
     <>
       {/* <BrowserRouter> */}

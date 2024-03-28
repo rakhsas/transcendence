@@ -157,7 +157,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 					<form className="flex flex-col gap-4 m-0" onSubmit={addChannel}>
 						<div className="conta flex flex-col">
 							<div className="flex justify-center">
-								<input type="file" onChange={(e) => setImagePath(e.target.files[0])} />
+								<input type="file" onChange={(e) => setImagePath(e.target?.files[0])} />
 							</div>
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
 								<div>

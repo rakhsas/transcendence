@@ -5,6 +5,7 @@ import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserRole } from 'src/user/entities/channel_member.entity';
 import { ChannelService } from 'src/channel/channel.service';
+import cli from '@angular/cli';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
@@ -107,24 +108,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('joinChannel')
   async handleJoinChannel(client: Socket ,payload: any): Promise<void> {
+    console.log('joinChannel');
     // the payload should contain the channel ID,
-    const channel = await this.chatService.getChannel(payload.channelId);
-    if (channel.password !== null && channel.password !== "")
-    {
-      if ("password" in payload && channel.password === payload.password)
+    try {
+      const channel = await this.chatService.getChannel(payload.channelId);
+      if (channel.password !== null && channel.password !== "")
+      {
+        if ("password" in payload && channel.password === payload.password)
+        {
+          client.join(payload.channelId);
+          await this.chatService.addNewMemberToChannel(payload, "");
+        }
+        else
+        {
+          client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
+        }
+      }
+      else
       {
         client.join(payload.channelId);
         await this.chatService.addNewMemberToChannel(payload, "");
       }
-      else
-      {
-        client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
-      }
-    }
-    else
-    {
-      client.join(payload.channelId);
-      await this.chatService.addNewMemberToChannel(payload, "");
+      client.emit('channelJoined', payload.__owner__);
+    } catch(error) {
+      client.emit('channelError', error);
     }
   }
 

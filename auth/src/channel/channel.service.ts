@@ -39,6 +39,7 @@ export class ChannelService {
             where: {channel: {id: channelId}},
             relations: ['user']
         })
+        console.log(channelUsers)
         // const users = channelUsers.map((channelUser) => channelUser.user);
         const users = await Promise.all(
             channelUsers.map(async (channelUser) => ({

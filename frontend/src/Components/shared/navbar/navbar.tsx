@@ -67,6 +67,10 @@ function NavbarComponent(): JSX.Element {
         fetchData();
     }, []);
     useEffect(() => {
+        if (!searchInput) {
+            setFilteredUsers([]);
+            return;
+        }
         const filtered = users.filter(user => {
             const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
             return fullName.includes(searchInput.toLowerCase()) || user.username.toLowerCase().includes(searchInput.toLowerCase());
@@ -228,12 +232,12 @@ function NavbarComponent(): JSX.Element {
                     <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => setSearchInput(e.target.value)} />
                     <div className={`absolute mt-2 z-10 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
                         {filteredUsers.slice(0, 3).map((user, index) => (
-                            <li>
-                                <a key={index} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                            <div key={index} className="flex flex-col">
+                                <a className="flex justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-fit">
                                     <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
-                                    {user.firstName} {user.lastName}
+                                    <span>{user.firstName + ' ' + user.lastName}</span>
                                 </a>
-                            </li>
+                            </div>
                         ))}
                     </div>
                 </div>

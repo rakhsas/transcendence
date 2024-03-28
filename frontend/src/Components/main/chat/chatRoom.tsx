@@ -17,7 +17,7 @@ interface props {
 
 const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMembers, isModalOpen, onOpenModal, onCloseModal, modalPicPath, setRoomMessages }) => {
     const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
-    const audioRefs = useRef([] as HTMLAudioElement[]);
+    const audioRefs: any = useRef([] as HTMLAudioElement[]);
     const messagesRef = useRef<HTMLDivElement>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 

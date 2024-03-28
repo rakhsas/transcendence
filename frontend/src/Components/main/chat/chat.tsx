@@ -434,6 +434,7 @@ function chatComponent(): JSX.Element {
                       <div className="flex flex-row items-center gap-2">
                         <Avatar.Group className="justify-around w-fit h-full">
                           {roomMembers.map((member, index) => (
+                            console.log('member: ', member),
                             <Avatar img={member.user.picture} rounded stacked key={index} />
                           ))}
                           {<Avatar.Counter total={roomMembers.length} />}
@@ -609,7 +610,7 @@ function chatComponent(): JSX.Element {
               ?
               <RoomDetails
                 channelInfo={lstGroupMessages[selectedMessageIndex].channel} handleOpenDetails={handleOpenDetails}
-                handleSelectedColor={handleSelectedColor} isModalOpen={isModalOpen} modalPicPath={modalPicPath}
+                handleSelectedColor={handleSelectedColor} isModalOpen={isModalOpen} modalPicPath={modalPicPath} userData={userData} chatSocket={socketChat}
                 onCloseModal={onCloseModal} onOpenModal={onOpenModal} selectedColor={selectedColor} selectedMessageIndex={selectedMessageIndex}
               />
               :
