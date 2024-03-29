@@ -1,18 +1,27 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Kenia&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root{
     --green: #3DBDA7;
 }
 
 
-.container {
+.container-analytics {
     width: 100%;
     /* margin-top: 20px; */
     display: flex;
     flex-wrap: wrap-reverse;
     align-items: center;
     justify-content: space-around;
+    font-family: poppins !important;
 }
 
-.container .leader-board{
+
+.container-analytics .leader-board{
     /* background-color: orange; */
     /* width: 45%; */
     min-width: 500px;
@@ -21,7 +30,7 @@
 
 
 
-.container .leader-board .top3{
+.container-analytics .leader-board .top3{
     display: flex;
     width: 100%;
     flex-wrap: wrap;
@@ -32,7 +41,7 @@
 }
 
 
-.container .leader-board .top3 .first-cards{
+.container-analytics .leader-board .top3 .first-cards{
     /* width: 30%; */
     width: 220px;
     min-width: 220px;
@@ -49,11 +58,11 @@
     margin-bottom: 15px;
 }
 
-.container .leader-board .top3 .first-cards:hover{
+.container-analytics .leader-board .top3 .first-cards:hover{
     box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
 }
 
-.container .leader-board .top3 .first-cards img
+.container-analytics .leader-board .top3 .first-cards img
 {
     width: 100px;
     height: 100px;
@@ -62,14 +71,15 @@
     margin-bottom: 5px;
 }
 
-.container .leader-board .top3 .first-cards .fullName,
-.container .leader-board .top3 .first-cards .login,
-.container .leader-board .top3 .first-cards .btn-profile{
+.container-analytics .leader-board .top3 .first-cards .fullName,
+.container-analytics .leader-board .top3 .first-cards .login,
+.container-analytics .leader-board .top3 .first-cards .btn-profile{
     color: black;
+    text-align: center;
     /* font-family: sans-serif; */
 }
 
-.container .leader-board .top3 .first-cards .btn-profile{
+.container-analytics .leader-board .top3 .first-cards .btn-profile{
     padding: 7px 20px;
     border-radius: 7px;
     /* border: 1px solid gray; */
@@ -81,18 +91,18 @@
     border: 1px solid var(--green);
 }
 
-.container .leader-board .top3 .first-cards .btn-profile:hover{
+.container-analytics .leader-board .top3 .first-cards .btn-profile:hover{
     background-color: white;
     border: 1px solid var(--green);
     color: var(--green);
 }
 
-.container .leader-board .top3 .first-cards .login{
+.container-analytics .leader-board .top3 .first-cards .login{
     color: gray;
     margin-bottom: 10px;
 }
 
-.container .leader-board .top3 .first-cards .rank
+.container-analytics .leader-board .top3 .first-cards .rank
 {
     background-color: var(--green);
     padding: 5px;
@@ -102,7 +112,7 @@
     border-bottom-right-radius: 7px;
 }
 
-.container .leader-board .top3 .first-cards .score{
+.container-analytics .leader-board .top3 .first-cards .score{
     position: absolute;
     left: 0;
     bottom: 0;
@@ -119,7 +129,7 @@
 
 /* =================================== start the other players sections ==================================== */
 
-.container .leader-board .other-players{
+.container-analytics .leader-board .other-players{
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -127,7 +137,7 @@
     position: relative;
 }
 
-.container .leader-board .other-players .row-cards{
+.container-analytics .leader-board .other-players .row-cards{
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -137,54 +147,54 @@
     transition: all 0.5s ease;
 }
 
-.container .leader-board .other-players .row-cards:hover {
+.container-analytics .leader-board .other-players .row-cards:hover {
     box-shadow: rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px;
 }
 
-.container .leader-board .other-players .row-cards:not(:last-child)
+.container-analytics .leader-board .other-players .row-cards:not(:last-child)
 {
     margin-bottom: 30px;
 }
 
-.container .leader-board .other-players .row-cards .image-wrappear{
+.container-analytics .leader-board .other-players .row-cards .image-wrappear{
     position: absolute;
     left: 9%;
 }
 
 @media only screen and (max-width: 1705px) {
-    .container .leader-board .other-players .row-cards .image-wrappear,
-    .container .leader-board .other-players .row-cards img{
+    .container-analytics .leader-board .other-players .row-cards .image-wrappear,
+    .container-analytics .leader-board .other-players .row-cards img{
         display: none;
     }
 }
 
-.container .leader-board .other-players .row-cards img{
+.container-analytics .leader-board .other-players .row-cards img{
     width: 80px;
     height: 80px;
     object-fit: cover;
     border-radius: 50%;
 }
 
-.container .leader-board .other-players .row-cards p,
-.container .leader-board .other-players .row-cards h4,
-.container .leader-board .other-players .row-cards span,
-.container .leader-board .other-players .row-cards button
+.container-analytics .leader-board .other-players .row-cards p,
+.container-analytics .leader-board .other-players .row-cards h4,
+.container-analytics .leader-board .other-players .row-cards span,
+.container-analytics .leader-board .other-players .row-cards button
 {
     color: black;
 }
 
-.container .leader-board .other-players .row-cards .rank{
+.container-analytics .leader-board .other-players .row-cards .rank{
     padding-left: 10px;
 }
 
 
 
 
-.container .leader-board .other-players .row-cards .info p{
+.container-analytics .leader-board .other-players .row-cards .info p{
     color: var(--green);
 }
 
-.container .leader-board .other-players .row-cards .btn-profile{
+.container-analytics .leader-board .other-players .row-cards .btn-profile{
     padding: 6px 20px;
     color: white;
     border-radius: 5px;
@@ -193,13 +203,13 @@
     transition: all 0.5s;
 }
 
-.container .leader-board .other-players .row-cards .btn-profile:hover{
+.container-analytics .leader-board .other-players .row-cards .btn-profile:hover{
     background-color: white;
     color: var(--green);
     border: 1px solid var(--green);
 }
 
-.container .leader-board .other-players .row-cards .score{
+.container-analytics .leader-board .other-players .row-cards .score{
     text-align: center;
     padding: 0 10px;
     /* background-color: var(--green); */
@@ -211,13 +221,46 @@
 
 /* ============================== Start of analytics part ============================== */
 
-.container .analytics{
+/* @media only screen and (max-width: 1413px)  */
+@media (max-width: 1413px) {
+    .container-analytics .analytics{
+        height: auto;
+    }
+}
+
+@media (max-width: 530px) {
+    .analytics .mini-profile .midle-content .last-achivement{
+        display: none !important;
+    }
+
+    .analytics .mini-profile .bottom-content{
+        display: flex;
+        flex-direction: column;
+
+    }
+
+    .analytics .mini-profile .midle-content .user-info{
+        display: flex;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100%;
+        text-align: center;
+    }
+
+    .analytics .mini-profile .bottom-content .separator::after{
+        width: 0 !important;
+        height: 0 !important;
+
+    }
+}
+
+.container-analytics .analytics{
     /* width: 45%; */
     margin-bottom: 20px;
     /* min-width: 500px; */
     display: flex;
     flex-direction: column;
-    height: 100%;
+    /* height: 100%; */
     justify-content: space-around;
     align-items: center;
     padding: 10px;
@@ -354,6 +397,7 @@
 .analytics .statistics{
     /* background-color: gold; */
     min-width: 300px;
+    min-height: 300px;
     width: 500px;
     height: 300px;
     background-color: white;

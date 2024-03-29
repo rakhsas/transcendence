@@ -3,6 +3,8 @@ import { Checkbox, TextInput } from "flowbite-react";
 import UserService from "../../../services/user.service";
 import { inputTheme } from "../../../utils/themes";
 import { Translate } from "@mui/icons-material";
+import { Socket } from "socket.io-client";
+import User from "../../../model/user.model";
 
 type DetailsAreaProps = {
 	channelInfo: any;
@@ -17,6 +19,11 @@ const search: any = () => (
 		<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
 	</svg>
 )
+
+type alertProps = {
+	user: User,
+	isVisible: boolean
+}
 
 const RoomDetails: React.FC<DetailsAreaProps> = ({
 	channelInfo,
@@ -38,12 +45,14 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 	const [filtredUsers, setFiltredUsers] = useState<any[]>();
 	const userService = new UserService();
 	const [optionsDropdown, setOptionsDropdown] = useState<boolean[]>(Array(roomMembers.length).fill(false));
+	const [alerts, setAlerts] = useState<alertProps[]>(roomMembers.map((member: any) => ({ user: member.user, isVisible: false })));
 	useEffect(() => {
 		const fetchUsers = async () => {
 			const users = await userService.getAllUsersExcept(userData[0].id);
-			console.log(users);
 			setUsers(users);
-			setUsersCopy(users);
+			const usersCopy = users.map((user: any) => ({ ...user, selected: false }));
+			setUsersCopy(usersCopy);
+			// setUsersCopy(users);
 		}
 		fetchUsers();
 	}, [])
@@ -52,12 +61,15 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 			setFiltredUsers([]);
 			return;
 		}
-		const filtered = users?.filter(user => {
+		const filteredUsers = users?.filter(user => {
 			const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-			return fullName.includes(userInput.toLowerCase()) || user.username.toLowerCase().includes(userInput.toLowerCase());
+			return (
+				(fullName.includes(userInput.toLowerCase()) || user.username.toLowerCase().includes(userInput.toLowerCase())) &&
+				!roomMembers.some((member: any) => member.user.id === user.id)
+			);
 		});
-		setFiltredUsers(filtered);
-	}, [userInput]);
+		setFiltredUsers(filteredUsers);
+	}, [userInput, alerts]);
 	const toggleOptionsDropdown = (index: number) => {
 		const newDropdownOpen = [...optionsDropdown];
 		newDropdownOpen[index] = !newDropdownOpen[index];
@@ -66,26 +78,27 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 	const addUser = async () => {
 		usersCopy?.forEach(user => {
 			if (user.selected) {
-				console.log('user: ', user);
 				chatSocket?.emit('joinChannel', {
 					id: channelInfo.id,
 					__owner__: user.id,
 					role: 'MEMBER',
 					requestedUserId: userData[0].id,
 					userName: user.username
-				})
+				});
 			}
 		});
-		setUsersCopy(...[users]);
-		console.log('usersCopy: ', usersCopy);
-		setFiltredUsers([]);
+		const usersCopy1 = users?.map((user: any) => ({ ...user, selected: false }));
+		setUsersCopy(usersCopy1);
+		setUserInput('');
 	};
-
 	chatSocket?.on('channelJoined', async (data: any) => {
-		Promise.resolve(data).then((data) => {
-			setRoomMembers(data);
-		});
+		setRoomMembers(data);
 	})
+	chatSocket?.on('joinedError', (payload: any) => {
+	})
+	useEffect(() => {
+		console.log(users)
+	}, [filtredUsers, users])
 	return (
 		<>
 			{
@@ -160,7 +173,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 								<div className="p-3">
 									<div className="flex max-w-md flex-col gap-4" id="checkbox">
 										<div className="flex items-center gap-2">
-											<TextInput type="text" theme={inputTheme} color="primary" rightIcon={search} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
+											<TextInput type="text" theme={inputTheme} color="primary" value={userInput} rightIcon={search} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
 										</div>
 									</div>
 								</div>
@@ -215,23 +228,25 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 														</div>
 													</div>
 													<svg onClick={() => toggleOptionsDropdown(index)} className="w-5 h-5 cursor-pointer fill-black dark:fill-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 3">
-														<path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>
+														<path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
 													</svg>
 												</a>
-												<div className={`z-30 absolute bg-white divide-y left-1/2 divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600 ${optionsDropdown[index] ? 'block' : 'hidden'}`} style={{transform: 'translateX(-50%)'}}>
-													<ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconHorizontalButton">
+												<div className={`z-30 absolute bg-white divide-y left-1/2 divide-gray-100 rounded-lg shadow w-44 dark:bg-zinc-700 dark:divide-gray-600 ${optionsDropdown[index] ? 'block' : 'hidden'}`} style={{ transform: 'translateX(-50%)' }}>
+													<ul className="py-2 text-sm text-gray-700 text-center dark:text-gray-200 divide-y divide-gray-100  dark:divide-gray-600">
 														<li>
-															<a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
-														</li>
-														<li>
-															<a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
+															<a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Make Admin</a>
 														</li>
 														<li>
 															<a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
 														</li>
 													</ul>
 													<div className="py-2">
-														<a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Separated link</a>
+														<a className="cursor-pointer bg-inherit flex justify-center items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
+															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+															</svg>
+															Kick
+														</a>
 													</div>
 												</div>
 											</div>
@@ -241,6 +256,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 							</div>
 						</div>
 					</div>
+
 			}
 		</>
 	);

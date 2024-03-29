@@ -1,27 +1,26 @@
-
-import { Entity, ManyToMany, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
-export class Game {
-    @PrimaryGeneratedColumn()
-    id: number;
+export class GameEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    // @ManyToOne(() => User, (player) => player.games)
-    // player1: User;
+  @ManyToOne(() => User)
+  player1: User;
 
-    // @ManyToOne(() => User, (player) => player.games)
-    // player2: User;
-    
-    @Column()
-    winnerId: string
+  @ManyToOne(() => User)
+  player2: User;
 
-    @Column()
-    scoreOfPlayer1: number
+  @Column({ type: 'int' })
+  userScoore: number;
 
-    @Column()
-    scoreOfPlayer2: number
+  @Column({ type: 'int' })
+  playerScoore: number;
 
-    @ManyToMany(() => User, (player) => player.games)
-    players: User[]; // Array of players involved in the game
+  // @Column()
+  // winnerId: string
+
+  @ManyToOne(() => User)
+  winner: User;
 }

@@ -1,16 +1,12 @@
 import Game from "./Game";
 import io, { Socket } from "socket.io-client";
 import { useRef, useEffect, useState, useContext } from "react";
-import DataContext from "../../../services/data.context";
-import LoadingComponent from "../../shared/loading/loading";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
 const CanvasHeadToHead = (props: any) => {
   const ref = useRef(null);
   const [roomId, setRoomId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const userData = useContext(DataContext);
-  if (!userData[0]) return <LoadingComponent />;
 
   useEffect(() => {
     const newSocket: Socket = io(url, {
@@ -30,7 +26,6 @@ const CanvasHeadToHead = (props: any) => {
     // Event listener for receiving roomJoined event
     socket.on("roomJoined", (roomId, index) => {
       console.log("Joinded room");
-      console.log(userData[0]);
       if (!canvas || !socket || !roomId) return () => socket.close();
       new Game(canvas, socket, roomId, index);
       setRoomId(roomId);

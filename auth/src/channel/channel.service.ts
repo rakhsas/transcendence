@@ -61,12 +61,10 @@ export class ChannelService {
                 role: channelUser.role,
             }))
         );
-        console.log('channels', channels)
         return channels;
     }
 
     async getLastMessageOfChannel(channelId: number): Promise<{}>{
-        console.log('channelId', channelId)
         return await this.msgRepository.createQueryBuilder('msg')
       .where('msg.cid = :channelId', { channelId })
       .orderBy('msg.date', 'DESC')

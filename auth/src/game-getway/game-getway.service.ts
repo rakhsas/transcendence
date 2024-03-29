@@ -1,5 +1,6 @@
 // app.gateway.ts
 import { Interval } from '@nestjs/schedule';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -10,13 +11,19 @@ import {
 
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+import { Repository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
+import { GameEntity } from 'src/user/entities/game.entity';
+import { User as User1 } from 'src/user/entities/user.entity';
+import { Logger } from '@nestjs/common';
+
 
 interface Player {
+  id: string;
   socket: any;
 }
 
 interface Room {
-  id: string;
   players: Player[];
   game: Game;
 }
@@ -70,7 +77,7 @@ class Ball {
     this.y = height / 2;
     this.r = 10;
     this.color = '#FDA403';
-    this.speed = 7;
+    this.speed = 4;
     this.vx = 5;
     this.vy = 5;
   }
@@ -135,11 +142,12 @@ class Game {
   }
 
   update() {
-    if (this.user.score === 5 || this.computer.score === 5) {
-      this.server
-        .to(this.roomId)
-        .emit('message', this.user, this.computer, this.ball);
-    } else {
+    // if (this.user.score === 5 || this.computer.score === 5) {
+    //   this.server
+    //     .to(this.roomId)
+    //     .emit('message', this.user, this.computer, this.ball);
+    // } else
+    {
       if (this.ball.x - this.ball.r < 0) {
         this.computer.score++;
         this.resetBall();
@@ -172,10 +180,10 @@ class Game {
     }
   }
   render() {
-    this.update();
     this.server
       .to(this.roomId)
       .emit('message', this.user, this.computer, this.ball);
+    this.update();
   }
 
   stop(): void {
@@ -187,35 +195,70 @@ class Game {
   path: '/sogame',
 })
 export class GameGetwayService
-  implements OnGatewayConnection, OnGatewayDisconnect {
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
+  logedUser: string;
 
-  rooms: Room[] = [];
+  rooms: { [id: string]: Room } = {};
   waitingPlayers: Player[] = [];
+  constructor(
+    private readonly authService: AuthService,
+    @InjectRepository(GameEntity)
+    private readonly gameRepository: Repository<GameEntity>,
+    // @InjectRepository(User)
+    // private readonly userRepository: Repository<User>,
+    private userService: UserService,
+  ) 
+  {
+  }
 
-  /**
-   *
-   */
-  constructor(private readonly authService: AuthService) { }
-  handleConnection(client: any): void {
-    const id = this.GuardsConsumer(client);
+  /* ============================== start game functions ================================= */
+  async addGame(payload: any): Promise<void> {
+    // userId: ,
+    // playerId:,
+    // userScoore:,
+    // playerScoore:,
+    // winnerId:,
+    const gameResult = new GameEntity();
+    const pl1 =  await this.userService.viewUser(payload.userId);
+    const pl2 =  await this.userService.viewUser(payload.playerId);
+    const winner = await this.userService.viewUser(payload.winnerId);
+    // console.log("-------------------------------------------------------------------=-==============>>  player: ", pl1.username, payload.pl1Scoore);
+    gameResult.player1 = pl1;
+    gameResult.player2 = pl2;
+    gameResult.userScoore = payload.userScoore;
+    gameResult.playerScoore = payload.playerScoore;
+    gameResult.winner = winner;
+
+    // console.log("players: ", pl1, pl2);
+    await this.gameRepository.save(gameResult);
+  }
+  /* ============================== end game functions ================================= */
+  
+  async handleConnection(client: any): Promise<void> {
+    const id = await this.GuardsConsumer(client);
+    this.logedUser = id;
     console.log('idGame: ', id);
-    this.waitingPlayers.push({ socket: client });
+    // if (this.waitingPlayers.find((player) => player.id === id)) return;
+    this.waitingPlayers.push({ socket: client, id: id });
     this.matchPlayers();
   }
 
   handleDisconnect(client: any): void {
     console.log('client disconnected');
+    // save the state to db
+    // sent win to room
+    // remove from room
     this.removePlayer(client.id);
   }
 
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): void {
-    const { uy, cy } = payload;
-    const room = this.getRoom(client.id);
-    room.game.computer.y = cy;
-    room.game.user.y = uy;
+    const { uy, cy, id } = payload;
+    this.rooms[id].game.computer.y = cy;
+    this.rooms[id].game.user.y = uy;
   }
 
   private matchPlayers(): void {
@@ -231,72 +274,87 @@ export class GameGetwayService
       });
       const game = new Game(this.server, roomId);
       const room: Room = {
-        id: roomId,
         players,
         game,
       };
-      this.rooms.push(room);
+      room.game.render();
+      setTimeout(() => {
+        this.rooms[roomId] = room;
+      }, 2000);
     }
   }
 
   @Interval(10)
   handleInterval() {
-    for (let i = 0; i < this.rooms.length; i++) {
-      const room = this.rooms[i];
-      room.game.render();
-      if (room.game.user.score === 5 || room.game.computer.score === 5) {
-        this.rooms.splice(i, 1);
-        i--; // Decrement i to adjust for the removed item
+    for (const id in this.rooms) {
+      this.rooms[id].game.render();
+      if (
+        this.rooms[id].game.user.score === 5 ||
+        this.rooms[id].game.computer.score === 5
+      ) {
+        console.log("logged user: ", this.logedUser);
+        this.addGame({
+          player1Id: this.logedUser,
+          player2Id: this.rooms[id].players[0].id === this.logedUser? this.rooms[id].players[1].id : this.rooms[id].players[0].id,
+          pl1Scoore: this.rooms[id].game.user.score,
+          pl2Scoore: this.rooms[id].game.computer.score,
+        });
+        // save data to db
+        this.rooms[id].game.render();
+        delete this.rooms[id];
       }
     }
   }
 
-  private getRoom(playerId: string): Room | undefined {
-    for (const room of this.rooms) {
-      const player = room.players.find((p) => p.socket.id === playerId);
+  private getIdOfRoom(playerId: string): string | undefined {
+    for (const id in this.rooms) {
+      const player = this.rooms[id].players.find(
+        (p) => p.socket.id === playerId,
+      );
       if (player) {
-        return room;
+        return id;
       }
     }
     return undefined;
   }
 
   private removePlayer(playerId: string): void {
+    // remove player from waiting palyers if it existes
     const indexOfPlayerToRemove = this.waitingPlayers.findIndex(
       (obj) => obj.socket.id === playerId,
     );
     // Get index of object with id 2 and remove it
     if (indexOfPlayerToRemove !== -1) {
       this.waitingPlayers.splice(indexOfPlayerToRemove, 1);
+      return;
     }
 
-    const room: Room = this.getRoom(playerId);
-    if (room === undefined) return;
-    console.log('room id : ', room.id);
-    room.game.stop();
-    this.server.to(room.id).emit('win');
+    // romove it from the room
+
+    const id: string = this.getIdOfRoom(playerId);
+    if (id === undefined) return;
+    console.log('room id is removed : ', id);
+    this.rooms[id].game.stop();
     // Remove object with id 2
-    const indexToRemove = this.rooms.findIndex((obj) => obj.id === room.id);
-    if (indexToRemove !== -1) {
-      this.rooms.splice(indexToRemove, 1);
-    }
+    delete this.rooms[id];
+
+    // sent win to room
+    this.server.to(id).emit('win');
   }
 
   async GuardsConsumer(client: Socket): Promise<string> {
-		const cookies = client.handshake.headers.cookie?.split(';');
-		let access_token;
-		for (let index = 0; index < cookies.length; index++) {
-			const cookie = cookies[index].trim();
-			if (cookie.startsWith('access_token='))
-			{
-				access_token = cookie.substring(String('access_token=').length);
-			}
-		}
-		const payload = await this.authService.validateTokenId(access_token);
-		if (!payload)
-		{
-			client.disconnect();
-		}
-    return payload.id
-	}
+    const cookies = client.handshake.headers.cookie?.split(';');
+    let access_token;
+    for (let index = 0; index < cookies.length; index++) {
+      const cookie = cookies[index].trim();
+      if (cookie.startsWith('access_token=')) {
+        access_token = cookie.substring(String('access_token=').length);
+      }
+    }
+    const payload = await this.authService.validateTokenId(access_token);
+    if (!payload) {
+      client.disconnect();
+    }
+    return payload.id;
+  }
 }

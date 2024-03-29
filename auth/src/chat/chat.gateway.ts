@@ -5,7 +5,7 @@ import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserRole } from 'src/user/entities/channel_member.entity';
 import { ChannelService } from 'src/channel/channel.service';
-import cli from '@angular/cli';
+// import cli from '@angular/cli';
 // import { Paths } from '../../../frontend/src/utils/types';
 
 // @WebSocketGateway()
@@ -28,7 +28,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.GuardsConsumer(client);
 		const userName = String(client.handshake.query.userName);
 		this.connectedUsers.set(userName, client);
-		console.log('userName=>',userName)
 		this.usersArray.push(client.id);
 		client.emit('update-user-list', { userIds: this.usersArray });
 		this.server.emit('update-user-list', { userIds: this.usersArray });
@@ -109,23 +108,34 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('joinChannel')
 	async handleJoinChannel(client: Socket, payload: any): Promise<void> {
 		try {
-			const channel = await this.chatService.getChannel(payload.channelId);
-			if (channel.password !== null && channel.password !== "") {
-				if ("password" in payload && channel.password === payload.password) {
+			console.log('payload: ', payload.__owner__)
+			if (await this.chatService.isJoined(payload.id, payload.__owner__) === true)
+			{
+				client.emit("joinedError", {
+					userId: payload.__owner__,
+				})
+			}
+			else 
+			{
+				const channel = await this.chatService.getChannel(payload.channelId);
+				if (channel.password !== null && channel.password !== "") {
+					if ("password" in payload && channel.password === payload.password) {
+						client.join(payload.channelId);
+						await this.chatService.addNewMemberToChannel(payload, "");
+					}
+					else if ("password" in payload && channel.password !== payload.password) {
+						client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
+					}
+				}
+				else {
 					client.join(payload.channelId);
 					await this.chatService.addNewMemberToChannel(payload, "");
-				} else {
-					client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
 				}
+				// client.emit('channelJoined', payload.__owner__);
+				const members = await this.channelService.getMembersOfChannel(payload.channelId);
+				client.emit('channelJoined', members);
+				this.connectedUsers.get(payload.userName).emit('channelJoinNotif', payload);
 			}
-			else {
-				client.join(payload.channelId);
-				await this.chatService.addNewMemberToChannel(payload, "");
-			}
-			const members = await this.channelService.getMembersOfChannel(payload.channelId);
-			client.emit('channelJoined', members);
-			this.connectedUsers.get(payload.userName).emit('channelJoinNotif', payload);
-			// Add to the channel table
 		} catch (error) {
 			client.emit('channelError', error);
 		}
