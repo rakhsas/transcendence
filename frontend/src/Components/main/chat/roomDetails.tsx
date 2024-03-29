@@ -1,357 +1,249 @@
 import { useEffect, useState } from "react";
-import { Checkbox, Dropdown, TextInput } from "flowbite-react";
-import ModalComponent from "../../../utils/modal.component";
-import User from "../../../model/user.model";
+import { Checkbox, TextInput } from "flowbite-react";
 import UserService from "../../../services/user.service";
-import { Search } from "@mui/icons-material";
 import { inputTheme } from "../../../utils/themes";
-import { Socket } from "socket.io-client";
+import { Translate } from "@mui/icons-material";
 
 type DetailsAreaProps = {
-    channelInfo: any;
-    selectedMessageIndex: string;
-    handleSelectedColor: (color: string) => void;
-    selectedColor: string;
-    modalPicPath: string;
-    isModalOpen: boolean;
-    onCloseModal: () => void;
-    onOpenModal: (picPath: string) => void;
-    handleOpenDetails: () => void,
-    userData: any,
-    chatSocket: any,
+	channelInfo: any;
+	handleOpenDetails: () => void,
+	userData: any,
+	chatSocket: any,
+	setRoomMembers: any,
+	roomMembers: any
 }
 const search: any = () => (
-    <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-    </svg>
+	<svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+		<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+	</svg>
 )
 
 const RoomDetails: React.FC<DetailsAreaProps> = ({
-    channelInfo,
-    selectedMessageIndex,
-    handleSelectedColor,
-    selectedColor,
-    modalPicPath,
-    isModalOpen,
-    onCloseModal,
-    onOpenModal,
-    handleOpenDetails,
-    userData,
-    chatSocket
+	channelInfo,
+	handleOpenDetails,
+	userData,
+	chatSocket,
+	setRoomMembers,
+	roomMembers
 }) => {
-    const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
-    if (!channelInfo) {
-        return null;
-    }
-    const [isdropdownUsersOpen, setDropdownUsersStatus] = useState<boolean>(false);
-    const [userInput, setUserInput] = useState<string>('');
-    const [users, setUsers] = useState<any[]>();
-    const [filtredUsers, setFiltredUsers] = useState<any[]>();
-    const userService = new UserService();
-    useEffect(() => {
-        const fetchUsers = async () => {
-            const users = await userService.getAllUsersExcept(userData[0].id);
-            console.log(users);
-            setUsers(users);
-        }
-        fetchUsers();
-    }, [])
-    useEffect(() => {
-        if (userInput === '') {
-            setFiltredUsers([]);
-            return ;
-        }
-        const filtered = users?.filter(user => {
-            const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-            return fullName.includes(userInput.toLowerCase()) || user.username.toLowerCase().includes(userInput.toLowerCase());
-        });
-        setFiltredUsers(filtered);
-    }, [userInput]);
-    const addUser = async () => {
-        users?.forEach(user => {
-            if (user.selected) {
-                chatSocket?.emit('joinChannel', {
-                    id: channelInfo.id,
-                    __owner__: user.id,
-                    role: 'MEMBER',
-                    requestedUserId: userData[0].id
-                })
-            }
-        });
-    };
+	const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
+	if (!channelInfo) {
+		return null;
+	}
+	const [isdropdownUsersOpen, setDropdownUsersStatus] = useState<boolean>(false);
+	const [muteUsersDropdown, setmuteUsersDropdownStatus] = useState<boolean>(false);
+	const [userInput, setUserInput] = useState<string>('');
+	const [users, setUsers] = useState<any[]>();
+	const [usersCopy, setUsersCopy] = useState<any[]>();
+	const [filtredUsers, setFiltredUsers] = useState<any[]>();
+	const userService = new UserService();
+	const [optionsDropdown, setOptionsDropdown] = useState<boolean[]>(Array(roomMembers.length).fill(false));
+	useEffect(() => {
+		const fetchUsers = async () => {
+			const users = await userService.getAllUsersExcept(userData[0].id);
+			console.log(users);
+			setUsers(users);
+			setUsersCopy(users);
+		}
+		fetchUsers();
+	}, [])
+	useEffect(() => {
+		if (userInput === '') {
+			setFiltredUsers([]);
+			return;
+		}
+		const filtered = users?.filter(user => {
+			const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+			return fullName.includes(userInput.toLowerCase()) || user.username.toLowerCase().includes(userInput.toLowerCase());
+		});
+		setFiltredUsers(filtered);
+	}, [userInput]);
+	const toggleOptionsDropdown = (index: number) => {
+		const newDropdownOpen = [...optionsDropdown];
+		newDropdownOpen[index] = !newDropdownOpen[index];
+		setOptionsDropdown(newDropdownOpen);
+	}
+	const addUser = async () => {
+		usersCopy?.forEach(user => {
+			if (user.selected) {
+				console.log('user: ', user);
+				chatSocket?.emit('joinChannel', {
+					id: channelInfo.id,
+					__owner__: user.id,
+					role: 'MEMBER',
+					requestedUserId: userData[0].id,
+					userName: user.username
+				})
+			}
+		});
+		setUsersCopy(...[users]);
+		console.log('usersCopy: ', usersCopy);
+		setFiltredUsers([]);
+	};
 
-    chatSocket?.on('channelJoined', (data: any) => {
-        console.log('here');
-        // console.log('channelJoined', await data)
-    })
-    // console.log('users', users)
-    return (
-        <>
-            {
-                !channelInfo ? null :
-                    <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
-                        <div className="detail-area-header">
-                            <div className="msg-profile group" onClick={handleOpenDetails}>
-                                <img src={baseAPIUrl + channelInfo.picture} alt="" />
-                            </div>
-                            <div className="font-onest text-xl capitalize text-black dark:text-white">{channelInfo.name}</div>
-                        </div>
-                        <div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
-                            <div className="item flex justify-between flex-col items-center space-y-1 cursor-pointer" onClick={() => setDropdownUsersStatus(!isdropdownUsersOpen)}>
-                                <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                </svg>
-                                <span className="text-black dark:text-white font-onest text-xs capitalize"> Add Member </span>
-                            </div>
-                            <Dropdown label="" dismissOnClick={false} placement="bottom" renderTrigger={() =>
-                                <div className="item flex items-center flex-col space-y-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="29" height="29" viewBox="0 0 4000 4000" className="fill-black dark:fill-white">
-                                        <path d="M2000 1660A340 340 0 102000 2340 340 340 0 102000 1660zM2952 1660A340 340 0 102952 2340 340 340 0 102952 1660zM1048 1660A340 340 0 101048 2340 340 340 0 101048 1660z"></path>
-                                    </svg>
-                                    <span className="text-black dark:text-white font-onest text-xs capitalize"> Options</span>
-                                </div>
-                            }>
-                                <Dropdown.Item>
-                                    <span className="mr-2 text-red-600 font-normal"> Block </span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0 0 24 24" >
-                                        <path d="M 12 2 C 6.4889971 2 2 6.4889971 2 12 C 2 17.511003 6.4889971 22 12 22 C 17.511003 22 22 17.511003 22 12 C 22 6.4889971 17.511003 2 12 2 z M 12 4 C 16.430123 4 20 7.5698774 20 12 C 20 13.85307 19.369262 15.55056 18.318359 16.904297 L 7.0957031 5.6816406 C 8.4494397 4.6307377 10.14693 4 12 4 z M 5.6816406 7.0957031 L 16.904297 18.318359 C 15.55056 19.369262 13.85307 20 12 20 C 7.5698774 20 4 16.430123 4 12 C 4 10.14693 4.6307377 8.4494397 5.6816406 7.0957031 z" fill="red"></path>
-                                    </svg>
-                                </Dropdown.Item>
-                            </Dropdown>
-                        </div>
-                        <div className={`w-auto max-w-xl h-auto ${isdropdownUsersOpen ? 'block' : 'hidden'} mx-auto`}>
-                            
-                            <div className="z-10 bg-white rounded-lg shadow w-60 dark:bg-zinc-950" >
-                                <div className="p-3">
-                                    <div className="flex max-w-md flex-col gap-4" id="checkbox">
-                                        <div className="flex items-center gap-2">
-                                            <TextInput type="text" theme={inputTheme} color="primary" rightIcon={search} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <ul className="h-auto flex flex-col gap-2 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200 w-full">
-                                    {
-                                        filtredUsers?.map((user, index) => (
-                                            <li key={index} className="mx-2 bg-zinc-800 rounded">
-                                                <div className="flex flex-row gap-2 w-full h-12 rounded justify-between items-center px-2">
-                                                    <div className="pic">
-                                                        <img src={user.picture} className="w-8 h-8 rounded-full" />
-                                                    </div>
-                                                    <div className="info">
-                                                        <span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
-                                                    </div>
-                                                    <Checkbox id="add-to-room" defaultChecked={users && users[index]?.selected} onChange={() => {
-                                                        const user = users && [...users];
-                                                        if (user && user[index])
-                                                        {
-                                                            user[index].selected = !users[index].selected;
-                                                            setUsers(users);
-                                                        }
-                                                    }} />
-                                                </div>
-                                            </li>
-                                        ))
-                                    }
-                                </ul>
-                                <a onClick={addUser} className="cursor-pointer flex justify-center items-center p-3 text-sm font-medium text-green-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-green-500 hover:underline">
-                                    <svg className="w-6 h-6 text-green-500 dark:text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                                    </svg>
-                                    Delete user
-                                </a>
-                            </div>
-                        </div>
-                        <div className="theme flex flex-row">
-                            <div className="pic">
-                                <img src="" alt="" />
-                            </div>
-                            <div className="description">
-                            </div>
-                        </div>
-                        <div className="detail-changes overflow-hidden">
-                            <div className="detail-change">
-                                Change Color
-                                <div className="colors">
-                                    <div
-                                        className={`color black ${selectedColor === "black" ? "selected" : ""
-                                            }`}
-                                        data-color="blue"
-                                        onClick={() => handleSelectedColor("black")}
-                                    ></div>
-                                    <div
-                                        className={`color blue ${selectedColor === "blue" ? "selected" : ""
-                                            }`}
-                                        data-color="blue"
-                                        onClick={() => handleSelectedColor("blue")}
-                                    ></div>
-                                    <div
-                                        className={`color purple ${selectedColor === "purple" ? "selected" : ""
-                                            }`}
-                                        data-color="purple"
-                                        onClick={() => handleSelectedColor("purple")}
-                                    ></div>
-                                    <div
-                                        className={`color green ${selectedColor === "green" ? "selected" : ""
-                                            }`}
-                                        data-color="green"
-                                        onClick={() => handleSelectedColor("green")}
-                                    ></div>
-                                    <div
-                                        className={`color orange ${selectedColor === "orange" ? "selected" : ""
-                                            }`}
-                                        data-color="orange"
-                                        onClick={() => handleSelectedColor("orange")}
-                                    ></div>
-                                </div>
-                            </div>
-                            {/* <div className="theme change flex p-2 flex-row border-b-2 justify-center">
-                            Theme
-                            <div className="colors">
-                                <Select id="countries" required>
-                                    <option>United States</option>
-                                    <option>Canada</option>
-                                    <option>Morocco</option>
-                                    <option>Germany</option>
-                                </Select>
-                            </div>
-                        </div> */}
-                        </div>
-                        <div className="detail-photos">
-                            <div className="detail-photo-title">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="feather feather-image"
-                                >
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                    <path d="M21 15l-5-5L5 21" />
-                                </svg>
-                                Shared photos
-                            </div>
-                            <div className="detail-photo-grid">
-                                {/* {
-                                    console.log("messagedetails: ", message),
-                                    MESSAGES[selectedMessageIndex].map((message, index) => (
-                                        (message.img! && message.img != "") ?
-                                            <div key={index} className="detail-photo"
-                                                onClick={() => onOpenModal(message.img)}
-                                            >
-                                                <img src={message.img} alt="" />
-                                            </div>
-                                            : null
-                                    ))
-                                } */}
-                                {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
-                            </div>
-                            {/* <div className="view-more">View More</div> */}
-                        </div>
-                    </div>
-                // <div id="options" className="options">
-                //     <div className="head">
-                //         <div className="close icon">
-                //             <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="2em" width="2em" xmlns="http://www.w3.org/2000/svg">
-                //                 <line x1="19" y1="12" x2="5" y2="12"></line>
-                //                 <polyline points="12 19 5 12 12 5"></polyline>
-                //             </svg>
-                //         </div>
-                //     </div>
-
-                //     <div className="info">
-                //         <div className="person photo">
-                //             <div className="online"></div>
-                //         </div>
-                //         <h2 className="name">Millie</h2>
-                //         <div className="buttons">
-                //             <div className="button">
-                //                 <div className="icon">
-                //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                //                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                //                     </svg>
-                //                 </div>
-                //                 <p className="title">Audio</p>
-                //             </div>
-                //             <div className="button">
-                //                 <div className="icon">
-                //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                //                         <polygon points="23 7 16 12 23 17 23 7"></polygon>
-                //                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-                //                     </svg>
-                //                 </div>
-                //                 <p className="title">Video</p>
-                //             </div>
-                //             <div className="button">
-                //                 <div className="icon">
-                //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                //                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                //                         <circle cx="12" cy="7" r="4"></circle>
-                //                     </svg>
-                //                 </div>
-                //                 <p className="title">Profile</p>
-                //             </div>
-                //             <div className="button">
-                //                 <div className="icon">
-                //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                //                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                //                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                //                     </svg>
-                //                 </div>
-                //                 <p className="title">Mute</p>
-                //             </div>
-                //         </div>
-                //         <hr />
-                //         <div className="details">
-                //             <label className="search-field">
-                //                 <div className="icon">
-                //                     <svg stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                //                         <circle cx="11" cy="11" r="8"></circle>
-                //                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                //                     </svg>
-                //                 </div>
-                //                 <input id="search" className="search" type="text" placeholder="Search" />
-                //             </label>
-                //             <label className="dark-mode">
-                //                 <span className="label">Dark Mode</span>
-                //                 <input id="input-dark" className="input-dark" type="checkbox" />
-                //                 <div className="toggle">
-                //                     <div className="circle"></div>
-                //                 </div>
-                //             </label>
-                //             <div className="theme">
-                //                 <span className="label">Theme</span>
-                //                 <div className="colors">
-                //                     <div id="color-blue" className="color blue"></div>
-                //                     <div id="color-red" className="color red"></div>
-                //                     <div id="color-green" className="color green"></div>
-                //                     <div id="color-purple" className="color purple"></div>
-                //                 </div>
-                //             </div>
-                //             <div className="media">
-                //                 <span className="label">
-                //                     <svg stroke="currentColor" fill="none" strokeWidth="0" viewBox="0 0 24 24" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                //                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                //                     </svg>
-                //                     <span>Shared photos</span>
-                //                 </span>
-                //                 <div className="photos">
-                //                     <img className="img" src="https://i.imgur.com/8jqYvFL.jpeg" />
-                //                     <img className="img" src="https://i.imgur.com/jlFgGpe.jpeg" />
-                //                     <img className="img" src="https://i.imgur.com/BfyXuwR.gif" />
-                //                 </div>
-                //                 <span className="view-more">View more</span>
-                //             </div>
-                //         </div>
-                //     </div>
-                // </div>
-            }
-
-        </>
-    );
+	chatSocket?.on('channelJoined', async (data: any) => {
+		Promise.resolve(data).then((data) => {
+			setRoomMembers(data);
+		});
+	})
+	return (
+		<>
+			{
+				!channelInfo ? null :
+					<div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
+						<div className="detail-area-header">
+							<div className="msg-profile group w-16 h-16" onClick={handleOpenDetails}>
+								<img src={baseAPIUrl + channelInfo.picture} alt="" className="w-full h-full" />
+							</div>
+							<div className="font-onest text-xl capitalize text-black dark:text-white overflow-hidden">{channelInfo.name}</div>
+						</div>
+						<div className="flex flex-row justify-between items-center">
+							<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
+								<div className="item flex justify-between flex-col items-center space-y-1 cursor-pointer" onClick={() => setDropdownUsersStatus(!isdropdownUsersOpen)}>
+									<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+									</svg>
+									<span className="text-black dark:text-white font-onest text-xs capitalize"> Add Member </span>
+								</div>
+							</div>
+							<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
+								<div className="item flex justify-between flex-col items-center space-y-1 cursor-pointer" onClick={() => setmuteUsersDropdownStatus(!muteUsersDropdown)}>
+									<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+									</svg>
+									<span className="text-black dark:text-white font-onest text-xs capitalize"> Mute Member </span>
+								</div>
+							</div>
+						</div>
+						<div className={`w-auto max-w-xl h-auto ${isdropdownUsersOpen ? 'block' : 'hidden'} mx-auto`}>
+							<div className="z-10 bg-white rounded-lg shadow w-60 dark:bg-zinc-950" >
+								<div className="p-3">
+									<div className="flex max-w-md flex-col gap-4" id="checkbox">
+										<div className="flex items-center gap-2">
+											<TextInput type="text" theme={inputTheme} color="primary" rightIcon={search} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
+										</div>
+									</div>
+								</div>
+								<ul className="h-auto flex flex-col gap-2 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200 w-full">
+									{
+										filtredUsers?.map((user, index) => (
+											<li key={index} className="mx-2 bg-zinc-800 rounded">
+												<div className="flex flex-row gap-2 w-full h-12 rounded justify-between items-center px-2">
+													<div className="pic">
+														<img src={user.picture} className="w-8 h-8 rounded-full" />
+													</div>
+													<div className="info">
+														<span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
+													</div>
+													<Checkbox id="add-to-room" defaultChecked={usersCopy && usersCopy[index]?.selected} onChange={() => {
+														const user1 = usersCopy && [...usersCopy];
+														if (user1 && user1[index]) {
+															user1[index].selected = !usersCopy[index].selected;
+															setUsersCopy(user1);
+														}
+													}} />
+												</div>
+											</li>
+										))
+									}
+								</ul>
+								<a onClick={addUser} className="cursor-pointer flex justify-center items-center p-3 text-sm font-medium text-green-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-green-500 hover:underline">
+									<svg className="w-6 h-6 text-green-500 dark:text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+									</svg>
+									Add users
+								</a>
+							</div>
+						</div>
+						<div className={`w-auto max-w-xl h-auto ${muteUsersDropdown ? 'block' : 'hidden'} mx-auto`}>
+							<div className="z-10 bg-white rounded-lg shadow w-60 dark:bg-zinc-950" >
+								<div className="p-3">
+									<div className="flex max-w-md flex-col gap-4" id="checkbox">
+										<div className="flex items-center gap-2">
+											<TextInput type="text" theme={inputTheme} color="primary" rightIcon={search} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
+										</div>
+									</div>
+								</div>
+								<ul className="h-auto flex flex-col gap-2 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200 w-full">
+									{
+										filtredUsers?.map((user, index) => (
+											<li key={index} className="mx-2 bg-zinc-800 rounded">
+												<div className="flex flex-row gap-2 w-full h-12 rounded justify-between items-center px-2">
+													<div className="pic">
+														<img src={user.picture} className="w-8 h-8 rounded-full" />
+													</div>
+													<div className="info">
+														<span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
+													</div>
+													<Checkbox id="add-to-room" defaultChecked={usersCopy && usersCopy[index]?.selected} onChange={() => {
+														const user = usersCopy && [...usersCopy];
+														if (user && user[index]) {
+															user[index].selected = !usersCopy[index].selected;
+															setUsersCopy(users);
+														}
+													}} />
+												</div>
+											</li>
+										))
+									}
+								</ul>
+								<a onClick={addUser} className="cursor-pointer flex justify-center gap-2 items-center p-3 text-sm font-medium text-red-500 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 hover:underline">
+									<svg className="w-6 h-6 text-black dark:fill-red-500" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 50 50">
+										<path d="M 0.90625 -0.03125 C 0.863281 -0.0234375 0.820313 -0.0117188 0.78125 0 C 0.40625 0.0664063 0.105469 0.339844 0 0.703125 C -0.105469 1.070313 0.00390625 1.460938 0.28125 1.71875 L 48.28125 49.71875 C 48.679688 50.117188 49.320313 50.117188 49.71875 49.71875 C 50.117188 49.320313 50.117188 48.679688 49.71875 48.28125 L 48.71875 47.25 C 48.933594 47.171875 49.125 47.109375 49.3125 47 L 49.8125 46.6875 L 49.8125 46.125 C 49.816406 44.007813 47.96875 42.289063 46.15625 40.625 C 45.738281 40.238281 45.304688 39.832031 44.90625 39.4375 C 48.203125 36.296875 50 32.261719 50 27.9375 C 50 20.636719 44.859375 14.246094 37.15625 11.90625 C 34.753906 5.007813 27.519531 0 19 0 C 13.984375 0 9.429688 1.753906 6.03125 4.59375 L 1.71875 0.28125 C 1.511719 0.0585938 1.210938 -0.0546875 0.90625 -0.03125 Z M 19 2 C 28.375 2 36 8.707031 36 16.9375 C 36 21.550781 33.601563 25.667969 29.84375 28.40625 L 7.4375 6 C 10.472656 3.515625 14.53125 2 19 2 Z M 3.28125 7.4375 C 1.214844 10.144531 0 13.421875 0 16.9375 C 0 21.390625 1.921875 25.539063 5.40625 28.71875 C 4.761719 30.484375 3.179688 31.726563 2 32.65625 C 0.878906 33.542969 -0.0820313 34.292969 0.21875 35.375 L 0.3125 35.78125 L 0.65625 36 C 1.410156 36.4375 2.417969 36.59375 3.53125 36.59375 C 6.472656 36.59375 10.332031 35.332031 13.34375 34.125 C 16.1875 40.574219 23.128906 44.84375 31 44.84375 C 32.316406 44.84375 33.667969 44.699219 35.03125 44.4375 C 37.207031 45.378906 40.199219 46.539063 43 47.15625 L 26.25 30.40625 C 24.050781 31.320313 21.59375 31.84375 19 31.84375 C 17.722656 31.84375 16.398438 31.714844 15.0625 31.4375 L 14.75 31.375 L 14.46875 31.5 C 9.425781 33.714844 5.101563 34.816406 2.8125 34.5625 C 2.960938 34.441406 3.113281 34.328125 3.25 34.21875 C 4.695313 33.078125 6.851563 31.367188 7.5 28.625 L 7.65625 28.03125 L 7.1875 27.625 C 3.84375 24.785156 2 21 2 16.9375 C 2 13.96875 3.011719 11.199219 4.71875 8.875 Z"></path>
+									</svg>
+									Add users
+								</a>
+							</div>
+						</div>
+						<div className="z-20 mt-2 w-full max-w-sm bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-zinc-800 dark:divide-gray-700" aria-labelledby="dropdownNotificationButton">
+							<div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-gray-50 dark:bg-zinc-700 dark:text-white">
+								Room Members
+							</div>
+							<div className="divide-y divide-gray-100 dark:divide-gray-700 relative">
+								{
+									roomMembers?.map((member: any, index: number) => {
+										const user = member.user;
+										return (
+											<div key={index} className="">
+												<a className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
+													<div className="flex-shrink-0">
+														<img className="rounded-full w-11 h-11" src={user.picture} alt={user.firstName + ' ' + user.lastName} />
+													</div>
+													<div className="w-full ps-3">
+														<div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">
+															<span className="font-semibold text-gray-900 dark:text-white">{user.firstName + ' ' + user.lastName}</span>
+														</div>
+													</div>
+													<svg onClick={() => toggleOptionsDropdown(index)} className="w-5 h-5 cursor-pointer fill-black dark:fill-gray-200" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 3">
+														<path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z"/>
+													</svg>
+												</a>
+												<div className={`z-30 absolute bg-white divide-y left-1/2 divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600 ${optionsDropdown[index] ? 'block' : 'hidden'}`} style={{transform: 'translateX(-50%)'}}>
+													<ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownMenuIconHorizontalButton">
+														<li>
+															<a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a>
+														</li>
+														<li>
+															<a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a>
+														</li>
+														<li>
+															<a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
+														</li>
+													</ul>
+													<div className="py-2">
+														<a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Separated link</a>
+													</div>
+												</div>
+											</div>
+										)
+									})
+								}
+							</div>
+						</div>
+					</div>
+			}
+		</>
+	);
 }
 
 export default RoomDetails

@@ -46,7 +46,6 @@ export class ChannelService {
                role: channelUser.role,
             }))
         )
-        console.log(users)
         return users;
     }
 
@@ -56,14 +55,13 @@ export class ChannelService {
             relations: ['channel']
         });
 
-
         const channels = await Promise.all(
             userChannels.map(async (channelUser) => ({
                 channel: await channelUser.channel,
                 role: channelUser.role,
             }))
         );
-        console.log(channels.length)
+        console.log('channels', channels)
         return channels;
     }
 
