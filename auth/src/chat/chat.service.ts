@@ -11,6 +11,7 @@ import { Mute } from 'src/user/entities/mute.entity';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { UserRole } from '../user/entities/channel_member.entity';
 import { UserService } from 'src/user/user.service';
+import { ChannelService } from 'src/channel/channel.service';
 
 @Injectable()
 export class ChatService {
@@ -26,6 +27,7 @@ export class ChatService {
     @InjectRepository(ChannelUser)
     private readonly channelUserRepository: Repository<ChannelUser>,
     private userService: UserService,
+    private channelService: ChannelService,
   ) {}
 
   /**
@@ -120,7 +122,24 @@ export class ChatService {
 
 
   // ============================= Channel function =================================================================
+  getId(userObject: any) {
+    return userObject.user.id; // Access the id property within the nested user object
+  }
 
+  async isJoined(channelId: number, userId: string): Promise<boolean>{
+    
+    const users = this.channelService.getMembersOfChannel(channelId);
+    let flag = false;
+    const userIds = (await users).map(this.getId);
+    
+    userIds.forEach((id) => {
+      if (id === userId)
+      {
+        flag = true;
+      }
+    })
+    return flag;
+  }
 
   async getChannel(channelId: number): Promise<Channel>
   {
