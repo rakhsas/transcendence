@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { GameGetwayService } from './game-getway.service';
-import { GameGetwayController } from './game-getway.controller';
+import { GameGetwayService } from './game.service';
+import { GameController } from './game.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthService } from 'src/auth/auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,7 +14,7 @@ import { User } from 'src/user/entities/user.entity';
     ScheduleModule.forRoot(),
   ],
   // imports: [ScheduleModule.forRoot()],
-  controllers: [GameGetwayController],
+  controllers: [GameController],
   providers: [GameGetwayService, AuthService],
 })
 export class GameGetwayModule {}

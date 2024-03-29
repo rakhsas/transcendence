@@ -17,7 +17,6 @@ import { GameEntity } from 'src/user/entities/game.entity';
 import { User as User1 } from 'src/user/entities/user.entity';
 import { Logger } from '@nestjs/common';
 
-
 interface Player {
   id: string;
   socket: any;
@@ -210,9 +209,7 @@ export class GameGetwayService
     // @InjectRepository(User)
     // private readonly userRepository: Repository<User>,
     private userService: UserService,
-  ) 
-  {
-  }
+  ) {}
 
   /* ============================== start game functions ================================= */
   async addGame(payload: any): Promise<void> {
@@ -222,10 +219,14 @@ export class GameGetwayService
     // playerScoore:,
     // winnerId:,
     const gameResult = new GameEntity();
-    const pl1 =  await this.userService.viewUser(payload.userId);
-    const pl2 =  await this.userService.viewUser(payload.playerId);
+    const pl1 = await this.userService.viewUser(payload.userId);
+    const pl2 = await this.userService.viewUser(payload.playerId);
     const winner = await this.userService.viewUser(payload.winnerId);
-    console.log("-------------------------------------------------------------------=-==============>>  player: ", pl1.username, payload.pl1Scoore);
+    console.log(
+      '-------------------------------------------------------------------=-==============>>  player: ',
+      pl1.username,
+      payload.pl1Scoore,
+    );
     gameResult.player1 = pl1;
     gameResult.player2 = pl2;
     gameResult.userScoore = payload.userScoore;
@@ -236,7 +237,7 @@ export class GameGetwayService
     await this.gameRepository.save(gameResult);
   }
   /* ============================== end game functions ================================= */
-  
+
   async handleConnection(client: any): Promise<void> {
     const id = await this.GuardsConsumer(client);
     this.logedUser = id;
@@ -292,10 +293,13 @@ export class GameGetwayService
         this.rooms[id].game.user.score === 5 ||
         this.rooms[id].game.computer.score === 5
       ) {
-        console.log("logged user: ", this.logedUser);
+        console.log('logged user: ', this.logedUser);
         this.addGame({
           player1Id: this.logedUser,
-          player2Id: this.rooms[id].players[0].id === this.logedUser? this.rooms[id].players[1].id : this.rooms[id].players[0].id,
+          player2Id:
+            this.rooms[id].players[0].id === this.logedUser
+              ? this.rooms[id].players[1].id
+              : this.rooms[id].players[0].id,
           pl1Scoore: this.rooms[id].game.user.score,
           pl2Scoore: this.rooms[id].game.computer.score,
         });

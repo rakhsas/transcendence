@@ -1,9 +1,9 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
-import { GameGetwayService } from './game-getway.service';
+import { GameGetwayService } from './game.service';
 import { CreateGameDto } from './dto/createGameDto';
 
 @Controller('game-getway')
-export class GameGetwayController {
+export class GameController {
     constructor(private readonly gameService: GameGetwayService) {}
 
     @Post()
