@@ -79,7 +79,7 @@ class Game {
   computer: Computer;
   net: Net;
   ball: Ball;
-  socket: any;
+  socket: Socket;
   roomId: string;
   index: number;
 
@@ -128,11 +128,6 @@ class Game {
         this.canvas.height / 2,
         "#BFFF3C"
       );
-      // right click to go back to dashboard
-      this.canvas.addEventListener("contextmenu", (evt) => {
-        evt.preventDefault();
-        window.location.reload();
-      });
       // left click to restart game
       this.canvas.addEventListener("click", () => {
         window.location.replace("/dashboard");
@@ -153,11 +148,6 @@ class Game {
         this.canvas.height / 2,
         "#BFFF3C"
       );
-      // right click to go back to dashboard
-      this.canvas.addEventListener("contextmenu", (evt) => {
-        evt.preventDefault();
-        window.location.reload();
-      });
       // left click to restart game
       this.canvas.addEventListener("click", (evt) => {
         evt.preventDefault();
@@ -194,11 +184,6 @@ class Game {
       this.canvas.height / 2,
       "#BFFF3C"
     );
-    // right click to go back to dashboard
-    this.canvas.addEventListener("contextmenu", (evt) => {
-      evt.preventDefault();
-      window.location.reload();
-    });
     // left click to restart game
     this.canvas.addEventListener("click", () => {
       window.location.replace("/dashboard");

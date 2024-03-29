@@ -1,12 +1,20 @@
 import Game from "./Game";
 import io, { Socket } from "socket.io-client";
 import { useRef, useEffect, useState, useContext } from "react";
+import GameStatus from "../GameStatus";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
 const CanvasHeadToHead = (props: any) => {
   const ref = useRef(null);
   const [roomId, setRoomId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [counter, setCounter] = useState<number>(0);
+
+  // Third Attempts
+  useEffect(() => {
+    const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
+    return () => {clearInterval(timer);}
+  }, [counter]);
 
   useEffect(() => {
     const newSocket: Socket = io(url, {
@@ -28,6 +36,7 @@ const CanvasHeadToHead = (props: any) => {
       console.log("Joinded room");
       if (!canvas || !socket || !roomId) return () => socket.close();
       new Game(canvas, socket, roomId, index);
+      setCounter(2);
       setRoomId(roomId);
     });
 
@@ -52,18 +61,17 @@ const CanvasHeadToHead = (props: any) => {
   }, [socket]);
 
   return (
-    <div className="font-kenia text-GREEN size-6 text-center w-auto h-auto">
-      {roomId ? (
+    <div className="font-kenia text-white border-red-700 border size-6 text-center w-screen h-auto ">
+      {/* {roomId ? (
         roomId === "win" ? (
-          <p className="font-kenia ">
-            right click to go back to dashboard or left click to play again
-          </p>
+          <p>right click to go back to dashboard</p>
         ) : (
-          <p className="font-kenia">start playing {roomId}</p>
+            <p>Start playing  {counter === 0 ? 'Go Go': counter} </p>
         )
       ) : (
         <p>Waiting for another player to join...</p>
-      )}
+      )} */}
+      <GameStatus hamza="hello" />
       <canvas ref={ref} className="border-black border-2" {...props} />
     </div>
   );

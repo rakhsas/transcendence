@@ -24,6 +24,8 @@ interface Room {
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
+  myId: string;
+  me: number;
 
   rooms: { [id: string]: Room } = {};
   waitingPlayers: Player[] = [];
@@ -31,10 +33,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly gameService: GameService) {}
 
   async handleConnection(client: any): Promise<void> {
-    const id = await this.gameService.GuardsConsumer(client);
-    console.log('idGame: ', id);
+    this.myId = await this.gameService.GuardsConsumer(client);
+    console.log('idGame: ', this.myId);
     // if (this.waitingPlayers.find((player) => player.id === id)) return;
-    this.waitingPlayers.push({ socket: client, id: id });
+    this.waitingPlayers.push({ id: this.myId, socket: client });
     this.matchPlayers();
   }
 
@@ -49,6 +51,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): void {
     const { uy, cy, id } = payload;
+    if (!this.rooms[id]) return;
+
     this.rooms[id].game.computer.y = cy;
     this.rooms[id].game.user.y = uy;
   }
@@ -61,6 +65,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       players.forEach((player) => {
         player.socket.join(roomId);
+        this.me = index;
         this.server.to(player.socket.id).emit('roomJoined', roomId, index);
         index++;
       });
@@ -81,19 +86,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const id in this.rooms) {
       this.rooms[id].game.render();
       if (
-        this.rooms[id].game.user.score === 5 ||
-        this.rooms[id].game.computer.score === 5
+        this.rooms[id].game.user.score === 1 ||
+        this.rooms[id].game.computer.score === 1
       ) {
-        console.log('logged user: ', this.logedUser);
-        // this.addGame({
-        //   player1Id: this.logedUser,
-        //   player2Id:
-        //     this.rooms[id].players[0].id === this.logedUser
-        //       ? this.rooms[id].players[1].id
-        //       : this.rooms[id].players[0].id,
-        //   pl1Scoore: this.rooms[id].game.user.score,
-        //   pl2Scoore: this.rooms[id].game.computer.score,
-        // });
+        let myScore;
+        let playerScore;
+        let playerId;
+        if (this.me === 1) {
+          myScore = this.rooms[id].game.user.score;
+          playerScore = this.rooms[id].game.computer.score;
+          playerId = this.rooms[id].players[1].id;
+        } else {
+          myScore = this.rooms[id].game.computer.score;
+          playerScore = this.rooms[id].game.user.score;
+          playerId = this.rooms[id].players[0].id;
+        }
+        this.gameService.addGame({
+          userId: this.myId,
+          playerId: playerId,
+          userScoore: myScore,
+          playerScoore: playerScore,
+          winnerId: this.myId,
+        });
         // save data to db
         this.rooms[id].game.render();
         delete this.rooms[id];
