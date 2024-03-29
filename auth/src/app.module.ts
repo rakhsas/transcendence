@@ -15,7 +15,7 @@ import { FreindsModule } from './friends/friends.module';
 import { GameGetwayModule } from './game-getway/game-getway.module';
 import { ChannelModule } from './channel/channel.module';
 import { ChannelUser } from './user/entities/channel_member.entity';
-import { Game } from './user/entities/game.entity';
+import { GameEntity } from './user/entities/game.entity';
 import { UploadModule } from './upload/upload.module';
 import express from 'express';
 import { join } from 'path';
@@ -35,7 +35,7 @@ import { join } from 'path';
       database: 'db1',
       synchronize: true,
       // logging: true,
-      entities: [User, Msg, Game, Channel, Mute, Friendship, ChannelUser],
+      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser],
     }),
     UserModule,
     AuthModule,

@@ -11,6 +11,7 @@ import { Mute } from 'src/user/entities/mute.entity';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { UserRole } from '../user/entities/channel_member.entity';
 import { UserService } from 'src/user/user.service';
+import { ChannelService } from 'src/channel/channel.service';
 
 @Injectable()
 export class ChatService {
@@ -26,6 +27,7 @@ export class ChatService {
     @InjectRepository(ChannelUser)
     private readonly channelUserRepository: Repository<ChannelUser>,
     private userService: UserService,
+    private channelService: ChannelService,
   ) {}
 
   /**
@@ -120,7 +122,24 @@ export class ChatService {
 
 
   // ============================= Channel function =================================================================
+  getId(userObject: any) {
+    return userObject.user.id; // Access the id property within the nested user object
+  }
 
+  async isJoined(channelId: number, userId: string): Promise<boolean>{
+    
+    const users = this.channelService.getMembersOfChannel(channelId);
+    let flag = false;
+    const userIds = (await users).map(this.getId);
+    
+    userIds.forEach((id) => {
+      if (id === userId)
+      {
+        flag = true;
+      }
+    })
+    return flag;
+  }
 
   async getChannel(channelId: number): Promise<Channel>
   {
@@ -163,12 +182,12 @@ export class ChatService {
       newEntityChannel.private = payload.isPrivate;
       newEntityChannel.password = "password" in payload ? payload.password : null;
       newEntityChannel.type = payload.channelType;
-      console.log("=> ", payload.ownerId);
+      newEntityChannel.picture = payload.picture
+      console.log("=> ", payload.picture);
       newEntityChannel.owner = Promise.resolve(payload.ownerId);
-
-
       // Save the new Channel entity
       const savedChannel = await this.channelRepository.save(newEntityChannel);
+      console.log('saveChannel: ', savedChannel)
       return savedChannel;
     } catch (error) {
       console.error("Error adding new channel:", error);
@@ -178,12 +197,13 @@ export class ChatService {
 
   async addNewMemberToChannel(payload: any, role: string) {
     // Load user and channel entities
+    console.log("-----------------------------------------------> joined");
     const id = payload.__owner__;
     const user = await this.userService.viewUser(id);
     const channel: Channel = await this.channelRepository.findOne({where: {id: payload.id}});
-    if (!user || !channel) {
-      throw new Error('User or channel not found'); // Handle the case where user or channel is not found
-    }
+    // if (!user || !channel) {
+    //   throw new Error('User or channel not found'); // Handle the case where user or channel is not found
+    // }
 
     const newChannelUser = new ChannelUser();
     // newEntity.user = Promise.resolve(payload.__owner__.id);
