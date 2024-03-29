@@ -12,9 +12,11 @@ import chatComponent from "./Components/main/chat/chat";
 import CallComponent from "./Components/call/call";
 import SettingFunction from "./Components/main/settings/settings.tsx";
 // import ProfileComponent from "./Components/main/profile/Sprofile.tsx";
-import NotFoundComponent from "./Components/error/404.component.tsx";
+import NotFoundComponent from "./Components/error/InvalidQrcode.tsx";
+import INVALIDQRCODEComponent from './Components/error/InvalidQrcode.tsx'
 import { useEffect, useState } from "react";
-const url: string = import.meta.env.VITE_API_AUTH_KEY;
+// const url: string = import.meta.env.VITE_API_AUTH_KEY;
+
 
 function App() {
   // const [isAuthenticated, setIsAuthenticated] = useState<any>();
@@ -45,6 +47,7 @@ function App() {
       {/* <BrowserRouter> */}
       <Routes>
         <Route path="/" element={<HomePageComponent />} />
+        <Route path="/Error" element={< INVALIDQRCODEComponent/>} />
         <Route path="/dashboard/*" element={<DashboardComponent />}>
           <Route index element={<HomeComponent />} />
           <Route path="analytics" element={<AnalyticsComponent />} />

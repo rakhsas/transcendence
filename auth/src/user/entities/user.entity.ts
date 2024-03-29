@@ -90,10 +90,10 @@ export class User {
   friendOf: Promise<Friendship[]>;
 
   @Column({ nullable: true })
-     public twoFactorAuthenticationSecret?: string;
+  public twoFactorAuthenticationSecret?: string;
      
-    @Column({ default: false })
-    public isTwoFactorAuthenticationEnabled: boolean;
+  @Column({ default: false })
+  public isTwoFactorAuthenticationEnabled: boolean;
   // ======================
 
   // @ManyToMany(() => Channel, (channel) => channel.members)

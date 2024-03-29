@@ -300,3 +300,12 @@ a.google span{
         pointer-events: none;
     }
 }
+
+ul {
+    list-style: none;
+  }
+  
+  /* to remove bullets from an ordered list */
+li {
+    list-style:none; 
+} 

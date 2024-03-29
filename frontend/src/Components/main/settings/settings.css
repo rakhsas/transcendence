@@ -20,6 +20,7 @@
     width: 100%;
 }
 
+
 .Sp2{
     /* transform: translate(75%, 25%); */
     height: 25%;
@@ -145,3 +146,9 @@
     background-color: #31304D;
     box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.644);
   }
+
+
+   .click-function{
+    background: linear-gradient(to right, #217441, #207a3f, #22A34A);
+} 
+/* onClick={changeBackgroundColor} style={{backgroundColor: backgroundColor}} */

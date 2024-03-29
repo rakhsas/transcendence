@@ -10,6 +10,37 @@ import DataContext from "../../../services/data.context";
 // import axios from 'axios';
 // import picture from "./mdarify.png";
 import LoadingComponent from "../../shared/loading/loading";
+// import FourHundredFourComponent from "../../error/404.component";
+import { Route, Router, Routes } from "react-router-dom";
+import HomePageComponent from "../../HomePage";
+import { jsx } from "@emotion/react";
+import { Alert } from "flowbite-react";
+import { AlertProps } from '@mui/material/Alert';
+
+
+/*
+
+import React, { useState } from 'react';
+
+function App() {
+  const [backgroundColor, setBackgroundColor] = useState("lightblue");
+
+  const changeBackgroundColor = () => {
+    setBackgroundColor(getRandomColor()); // Replace getRandomColor() with your color generation logic
+  }
+
+  return (
+    <div>
+      <div style={{ backgroundColor: backgroundColor }} className="your-component-class">
+        Your component content here 
+        </div>
+        <button onClick={changeBackgroundColor}>Change Color</button>
+      </div>
+    );
+  }
+  
+  export default App;
+*/
 
 const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
   const fileInput = event.target;
@@ -29,7 +60,20 @@ const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
   }
 };
 
+
+// "linear-gradient(to right, #d80909, #a02626, #610101)"
+
 function SettingFunction(): JSX.Element {
+  const [ShowSignUp, SetShowSignUp] = useState<boolean>(false);
+  const [ischecked, setIsChecked] = useState<boolean>(false);
+  const [backgroundColor, setBackgroundColor] = useState<string>("linear-gradient(to right, #217441, #207a3f, #22A34A)");
+  const FuncClick = () => {
+    SetShowSignUp(!ShowSignUp);
+    setIsChecked(!ischecked);
+  }
+  const changeBackgroundColor = () => {
+      setBackgroundColor("linear-gradient(to right, #217441, #207a3f, #22A34A)"); // Replace getRandomColor() with your color generation logic
+  }
   const APIURL = import.meta.env.VITE_API_AUTH_KEY;
   const [input, setInput] = useState("");
   const [url, setUrl] = useState<string>("");
@@ -42,7 +86,7 @@ function SettingFunction(): JSX.Element {
       try {
         console.log("Uf2wserId: -->", userData);
         const Qrcode = await fetch(
-           APIURL + `2fa/generate/${userData[0].id}/${userData[0].email}`,
+          APIURL + `2fa/generate/${userData[0].id}/${userData[0].email}`,
           {
             method: "GET",
             credentials: "same-origin",
@@ -107,28 +151,41 @@ function SettingFunction(): JSX.Element {
     await fetchQRcode();
   }
   const fetchQRcode = async () => {
-    try{
+    try {
       // console.log('Tfcode --> ', TfCode, 'userData --> ', userData[0].id, ' input', input);
       const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
         method: 'POST',
         credentials: 'same-origin',
         // redirect: 'follow'
       })
-      console.log('status code --> : ', ValidQRcode)
+      console.log('status code1 --> : ', ValidQRcode)
+      if (ValidQRcode.status == 200) {
+        console.log("lisljsjfs -> ");
+        userData.isTwoFactorAuthenticationEnabled = true;
+        console.log('State Two valud --> : ', userData.isTwoFactorAuthenticationEnabled)
+        console.log('valid UserDate --> ', userData);
+        console.log('status code2 --> : ', ValidQRcode);
 
-      if (ValidQRcode.status == 200)
-        window.location.href = `https://10.12.13.6/`;
-        // window.location.href = APIURL + `2fa/authenticate/${input}/${userData[0].id}`;
-        // console.log(await ValidQRcode.json());
+        // window.location.href = `https://10.12.13.6/`;
+      }
+      else {
+        console.log('invalid Qrcode --> : ', ValidQRcode)
+        console.log('valid UserDate --> ', userData);
+        window.location.href = `https://10.12.13.6/Error`;
+      }
+      // window.location.href = APIURL + `2fa/authenticate/${input}/${userData[0].id}`;
+      // window.location.href = `https://10.11.6.10/`;
+      // console.log(await ValidQRcode.json());
 
       // if (ValidQRcode == true)
       //   window.location.href = "http://localhost:4200";
       // console.log("ValidQRcode: ", ValidQRcode);
     }
-    catch(error){
+    catch (error) {
       console.log('Invalid qrcode \n');
     }
   };
+  useEffect(() => {}, [ischecked])
   return (
     <div
       className="
@@ -146,9 +203,9 @@ function SettingFunction(): JSX.Element {
               TAKE A PHOTO
             </p>
             {/* <FontAwesomeIcon icon={faCamera} className="cameraIcon" /> */}
-             <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-  <path fillRule="evenodd" d="M7.5 4.586A2 2 0 0 1 8.914 4h6.172a2 2 0 0 1 1.414.586L17.914 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1.086L7.5 4.586ZM10 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm2-4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" clipRule="evenodd"/>
-</svg> 
+            <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+              <path fillRule="evenodd" d="M7.5 4.586A2 2 0 0 1 8.914 4h6.172a2 2 0 0 1 1.414.586L17.914 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1.086L7.5 4.586ZM10 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm2-4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" clipRule="evenodd" />
+            </svg>
 
           </label>
         </div>
@@ -166,7 +223,14 @@ function SettingFunction(): JSX.Element {
           <img src={url} alt="" />
 
           <form className="max-w-sm mx-auto" onSubmit={onchange}>
-            <div className="flex mb-2 space-x-2 rtl:space-x-reverse flex-row justify-center items-center">
+          <p
+              id="helper-text-explanation"
+              className="mt-2 text-sm text-gray-500 dark:text-gray-400 -twof--part1 font-extrabold "
+            >
+              Please introduce the 6 digit <br />
+              code scanned by application
+            </p>
+            <div className="flex mt-8 space-x-2 rtl:space-x-reverse flex-row justify-center items-center">
               <div className="flex flex-row justify-center items-center">
                 <label
                   htmlFor="code-1"
@@ -191,65 +255,17 @@ function SettingFunction(): JSX.Element {
                   required
                 />
               </div>
-              {/* <div>
-                <label htmlFor="code-1" className="sr-only" onClick={SettingFunction}>First code</label>
-                <input type="text" maxLength={1} data-focus-input-init data-focus-input-next="code-2" id="code-1"
-                  className="block w-9 h-9 py-3 text-sm font-extrabold text-center text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 border 
-            border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 
-            dark:focus:border-primary-500" required />
-              </div>
-              <div>
-                <label htmlFor="code-2" className="sr-only" onClick={SettingFunction}>Second code</label>
-                <input type="text" maxLength={1} data-focus-input-init data-focus-input-prev="code-1"
-                  data-focus-input-next="code-3" id="code-2" className="block w-9 h-9 py-3 text-sm font-extrabold text-center
-             text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 
-              dark:focus:border-primary-500" required />
-              </div>
-              <div>
-                <label htmlFor="code-3" className="sr-only" onClick={SettingFunction}>Third code</label>
-                <input type="text" maxLength={1} data-focus-input-init data-focus-input-prev="code-2"
-                  data-focus-input-next="code-4" id="code-3" className="block w-9 h-9 py-3 text-sm font-extrabold text-center
-             text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 
-              dark:focus:border-primary-500" required />
-              </div>
-              <div>
-                <label htmlFor="code-4" className="sr-only" onClick={SettingFunction}>Fourth code</label>
-                <input type="text" maxLength={1} data-focus-input-init data-focus-input-prev="code-3" data-focus-input-next="code-5" id="code-4" className="block w-9 h-9 py-3 text-sm 
-                font-extrabold text-center text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 border border-gray-300 rounded-lg focus:ring-primary-500 
-                focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
-              </div>
-              <div>
-                <label htmlFor="code-5" className="sr-only" onClick={SettingFunction}>Fifth code</label>
-                <input type="text" maxLength={1} data-focus-input-init data-focus-input-prev="code-4" data-focus-input-next="code-6" id="code-5" className="block w-9 h-9 py-3 text-sm 
-                font-extrabold text-center text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 border border-gray-300 rounded-lg focus:ring-primary-500 
-                focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
-              </div>
-              <div>
-                <label htmlFor="code-6" className="sr-only" onClick={SettingFunction}>Sixth code</label>
-                <input type="text" maxLength={1} data-focus-input-init data-focus-input-prev="code-5" id="code-6" className="block w-9 h-9 py-3 text-sm font-extrabold text-center 
-                text-gray-900 bg-gradient-to-r from-green-400 via-green-500 to-green-600 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 
-                dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required />
-              </div> */}
             </div>
-            <p
-              id="helper-text-explanation"
-              className="mt-2 text-sm text-gray-500 dark:text-gray-400 -twof--part1 "
-            >
-              Please introduce the 6 digit <br />
-              code scanned by application
-            </p>
+            
           </form>
           <li>
-            <div className="flex p-2 rounded bg-gray-100 dark:hover:bg-gray-600 bg-gradient-to-r from-green-400 via-green-500 to-green-600">
-              <div className="flex items-center h-auto w-8 justify-center">
+            <div className={`flex p-2 rounded ${ischecked ? 'bg-green-600' : 'bg-red-500'}`} onChange={FuncClick}>
+              <div className="flex items-center h-auto w-8 justify-center" >
                 <input
                   id="helper-checkbox-2"
                   aria-describedby="helper-checkbox-text-2"
                   type="checkbox"
-                  value=""
+                  checked={ischecked}
                   className="w-4 h-4  bg-gray-100 border-gray-300 rounded "
                 />
                 <label className="inline-flex items-center cursor-pointer">
@@ -263,13 +279,13 @@ function SettingFunction(): JSX.Element {
                   {/* <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Checked toggle</span> */}
                 </label>
               </div>
-              <div className="ms-2 text-sm flex flex-row justify-center items-center">
+              <div className="ms-2 text-sm flex flex-row justify-center items-center "  >
                 <label
                   htmlFor="helper-checkbox-2"
                   className="font-medium text-gray-900 dark:text-gray-300 "
                 >
-                  <div className="--Enable-2fa FontAwesome font-medium">
-                    Enable 2FA AUTHENTICATION
+                  <div className="--Enable-2fa FontAwesome font-medium flex flex-row justify-center items-center " >
+                    {ShowSignUp ? '2F-AUTHENTICATION-ATCIVE': '2F-AUTHENTICATION-DISACTIVE'}
                   </div>
                   {/* <p id="helper-checkbox-text-2" className="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p> */}
                 </label>
@@ -439,8 +455,10 @@ function SettingFunction(): JSX.Element {
                 id="remember"
                 type="checkbox"
                 value=""
-                className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+                className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600
+                 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
                 required
+                
               />
             </div>
             <label
