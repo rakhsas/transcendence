@@ -9,26 +9,21 @@ import { ConfigModule } from '@nestjs/config';
 import { GlobalGateway } from './global.gateway';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      envFilePath: 'config/.env',
-      isGlobal: true,
-    }),
-    PassportModule.register({ defaultStrategy: '42' }),
-    UserModule,
-    JwtModule.register({
-      global: true,
-      secret: process.env.JWTSECRET,
-      signOptions: { expiresIn: '60s' },
-    }),
-  ],
-  controllers: [AuthController],
-  providers: [
-    AuthService,
-    FortyTwoStrategy,
-    JwtService,
-    GlobalGateway,
-  ],
-  exports: [AuthService],
+    imports: [
+        ConfigModule.forRoot({
+            envFilePath: 'config/.env',
+            isGlobal: true,
+        }),
+        PassportModule.register({ defaultStrategy: '42' }),
+        UserModule,     
+        JwtModule.register({
+            global: true,
+            secret: process.env.JWTSECRET,
+            signOptions: { expiresIn: '60s' }
+        })
+    ],
+    controllers: [AuthController],
+    providers: [ AuthService, FortyTwoStrategy, JwtService, GlobalGateway],
+    exports: [AuthService]
 })
 export class AuthModule {}

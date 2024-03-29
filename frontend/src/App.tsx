@@ -1,47 +1,26 @@
-import "./list.css";
-import { Navigate, Route, Routes } from "react-router-dom";
-import HomePageComponent from "./Components/HomePage";
-import ValidInformation from "./Components/Info/Information";
-import DashboardComponent from "./Components/dashboard/Dashboard";
-import AnalyticsComponent from "./Components/main/analytics/analytics";
-import HomeComponent from "./Components/main/home/Home";
-import Game from "./Components/Game/Game.tsx";
-import HeadToHead from "./Components/Game/headToHead.tsx";
-import Cookies from "js-cookie";
-import chatComponent from "./Components/main/chat/chat";
-import CallComponent from "./Components/call/call";
-import SettingFunction from "./Components/main/settings/settings.tsx";
-// import ProfileComponent from "./Components/main/profile/Sprofile.tsx";
-import NotFoundComponent from "./Components/error/InvalidQrcode.tsx";
-import INVALIDQRCODEComponent from './Components/error/InvalidQrcode.tsx'
-import { useEffect, useState } from "react";
-// const url: string = import.meta.env.VITE_API_AUTH_KEY;
 
+import './list.css';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import HomePageComponent from './Components/HomePage';
+import ValidInformation from './Components/Info/Information';
+import DashboardComponent from './Components/dashboard/Dashboard';
+import AnalyticsComponent from './Components/main/analytics/analytics';
+import HomeComponent from './Components/main/home/Home'
+import Game from './Components/Game/Game.tsx';
+import HeadToHead from './Components/Game/headToHead.tsx';
+import Cookies from 'js-cookie';
+import chatComponent from './Components/main/chat/chat';
+import CallComponent from './Components/call/call';
+import SettingsComponent from './Components/main/settings/settings.tsx';
+import ProfileComponent from './Components/main/profile/profile.tsx';
+import NotFoundComponent from './Components/error/FourHunFour.tsx';
+import { useEffect, useState } from 'react';
+import INVALIDQRCODEComponent from './Components/error/InvalidQrcode.tsx';
+import SettingFunction from './Components/main/settings/settings.tsx';
+const url: string = import.meta.env.VITE_API_AUTH_KEY;
 
 function App() {
-  // const [isAuthenticated, setIsAuthenticated] = useState<any>();
-  // useEffect(() => {
-  //   const fetchToken = async () => {
-  //     const response = await fetch(url + 'auth/tokenInfo', {
-  //       method: 'GET',
-  //       credentials: 'include',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     });
-  //     const data = await response.json();
-  //     console.log(data)
-  //     if (data) {
-  //       setIsAuthenticated(data.isAuthenticated);
-  //       // Cookies.set('isAuthenticated', 'true');
-  //     }
-  //   };
-  //   fetchToken();
-  // }, []);
-  // // Cookies.get('isAuthenticated');
-  // console.log(isAuthenticated);
-
-  // localStorage.setItem('theme', 'light');
+  localStorage.setItem('theme', 'light');
   return (
     <>
       {/* <BrowserRouter> */}
@@ -54,6 +33,7 @@ function App() {
           <Route path="chat" Component={chatComponent} />
           <Route path="call" element={<CallComponent />} />
           <Route path="settings" element={<SettingFunction />} />
+          <Route path="profile/*" element={<ProfileComponent />} />
           <Route path="game" element={<Game />} />
           <Route path="HeadToHead" element={<HeadToHead />} />
           {/* <Route path="profile" element={<ProfileComponent />} /> */}

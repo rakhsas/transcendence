@@ -13,6 +13,7 @@ interface messageUser {
     cid: number;
     date: string;
     id: number;
+    audio: string;
     __reciever__: User;
     __owner__: User;
 }

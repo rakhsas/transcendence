@@ -11,12 +11,17 @@ import { Channel } from 'src/user/entities/channel.entity';
 import { Mute } from 'src/user/entities/mute.entity';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { AuthService } from 'src/auth/auth.service';
+import { UserModule } from 'src/user/user.module';
+import { ChannelModule } from 'src/channel/channel.module';
+import { ChannelService } from 'src/channel/channel.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser]),
+    UserModule,
+    // ChannelModule
   ],
-  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService],
+  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService],
   // providers: [ChatService, ChatGateway, Repository, MsgController, MsgRepository, UserRepository],
   controllers: [ChatController],
   // exports: [MsgRepository, UserRepository]

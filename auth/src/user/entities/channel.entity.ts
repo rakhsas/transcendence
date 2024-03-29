@@ -60,15 +60,19 @@ export class Channel {
   // @Column({ default: ''})
   // ownerId: string;
 
-  @ManyToOne(() => User, (user) => user.channels, { lazy: true })
-  @JoinTable()
+  // @ManyToOne(() => User, (user) => user.channels, { lazy: true })
+  // @JoinTable()
+  // owner: Promise<User>;
+
+  @ManyToOne(() => User, user => user.channels, {lazy: true})
+  @JoinColumn({ name: 'ownerId' })
   owner: Promise<User>;
 
   // @ManyToMany(() => User, (user) => user.channels, { lazy: true })
   // @JoinTable()
   // members: Promise<User[]>;
 
-  @ManyToMany(() => User, (user) => user.channels)
+  @ManyToMany(() => User, (user) => user.channels, {lazy: true})
   members: User[];
 
 

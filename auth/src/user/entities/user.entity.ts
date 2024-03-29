@@ -100,9 +100,9 @@ export class User {
   // @JoinTable()
   // channels: Channel[];
 
-  @ManyToMany(() => Channel)
-  @JoinTable({ name: 'user_channels' }) // Specify the name for the join table
-  channels: Channel[];
+  @ManyToMany(() => Channel, {lazy: true})
+  @JoinTable({ name: 'user_channels'}) // Specify the name for the join table
+  channels: Promise<Channel[]>;
 
   @ManyToMany(() => Game, (game) => game.players)
   games: Game[]; // Array of games the player is involved in
