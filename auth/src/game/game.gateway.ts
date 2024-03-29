@@ -86,8 +86,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const id in this.rooms) {
       this.rooms[id].game.render();
       if (
-        this.rooms[id].game.user.score === 1 ||
-        this.rooms[id].game.computer.score === 1
+        this.rooms[id].game.user.score === 5 ||
+        this.rooms[id].game.computer.score === 5
       ) {
         let myScore;
         let playerScore;

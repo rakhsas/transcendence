@@ -26,7 +26,6 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
             scrollToBottom(messagesRef.current!);
     }, [channelId, userData, roomMessages, roomMembers]);
     const scrollToBottom = (element: HTMLElement) => {
-        console.log('to Bottom')
         element.scrollTop = element.scrollHeight;
     };
     if (!roomMessages || !userData || !channelId || !roomMembers)
@@ -36,7 +35,6 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
         <div className="" ref={messagesRef}>
             {
                 roomMessages.map((message: any, index) => {
-                    console.log("message: ", message)
                     const sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId)).user;
                     if (message.message.length > 0) {
                         return (

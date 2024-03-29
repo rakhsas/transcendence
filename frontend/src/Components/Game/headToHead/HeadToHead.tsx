@@ -36,7 +36,6 @@ const CanvasHeadToHead = (props: any) => {
       console.log("Joinded room");
       if (!canvas || !socket || !roomId) return () => socket.close();
       new Game(canvas, socket, roomId, index);
-      setCounter(2);
       setRoomId(roomId);
     });
 
@@ -61,7 +60,7 @@ const CanvasHeadToHead = (props: any) => {
   }, [socket]);
 
   return (
-    <div className="font-kenia text-white border-red-700 border size-6 text-center w-screen h-auto ">
+    <div className=" flex  flex-col  items-center text-white border-red-700 border w-screen h-screen ">
       {/* {roomId ? (
         roomId === "win" ? (
           <p>right click to go back to dashboard</p>
@@ -72,7 +71,7 @@ const CanvasHeadToHead = (props: any) => {
         <p>Waiting for another player to join...</p>
       )} */}
       <GameStatus hamza="hello" />
-      <canvas ref={ref} className="border-black border-2" {...props} />
+      <canvas ref={ref} className="border-black my-auto border-2 w-full max-w-2xl" {...props} />
     </div>
   );
 };

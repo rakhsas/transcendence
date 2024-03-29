@@ -17,6 +17,7 @@ function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
+	const [users, setUsers] = useState<User[]>([]);
 	const user = {
 		"id": "92ec84f8-33aa-4134-9f26-36bb12d68576",
 		"providerId": "95248",
@@ -46,6 +47,8 @@ function DashboardComponent() {
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
 				setUserData(fetchedUserData);
+				const users = await userService.getAllUsersExcept(fetchedUserData.id);
+				setUsers(users);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",
 					query: {
@@ -73,11 +76,11 @@ function DashboardComponent() {
 			globalSocket?.disconnect();
 		};
 	}, []);
-	if (!userData || !socket) {
+	if (!userData || !socket || !globalSocket || !users) {
 		return <LoadingComponent />;
 	}
 	return (
-		<DataContext.Provider value={[userData, socket, globalSocket]}>
+		<DataContext.Provider value={[userData, socket, globalSocket, users]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full">
