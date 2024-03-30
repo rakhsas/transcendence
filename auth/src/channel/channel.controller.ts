@@ -9,6 +9,10 @@ export class ChannelController {
 
     
     constructor(private readonly channelService: ChannelService) {}
+    @Get('protected')
+    async protected() {
+        return await this.channelService.getProtectedChannels();
+    }
     
     @Get(':userId')
     @ApiParam({ name: 'userId', type: 'string', format: 'uuid' }) // Adjust type/format if needed
@@ -46,4 +50,6 @@ export class ChannelController {
     {
         return await this.channelService.getAllMessages(channelId);
     }
+
+    
 }

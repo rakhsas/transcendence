@@ -105,6 +105,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.emit('channelCreated', updatedChannels);
 	}
 
+
+	@SubscribeMessage('acceptJoinChannel')
+	async handleAcceptJoinChannel(client: Socket, payload: any): Promise<void> {
+		const channel = await this.chatService.getChannel(payload.channelId);
+		if (channel.password !== null && channel.password !== "") {
+			if ("password" in payload && channel.password === payload.password) {
+				client.join(payload.channelId);
+				await this.chatService.addNewMemberToChannel(payload, "");
+			}
+			else if ("password" in payload && channel.password !== payload.password) {
+				client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
+			}
+		}
+		else {
+			client.join(payload.channelId);
+			await this.chatService.addNewMemberToChannel(payload, "");
+		}
+		// client.emit('channelJoined', payload.__owner__);
+		const members = await this.channelService.getMembersOfChannel(payload.channelId);
+		client.emit('channelJoined', members);
+	}
+
 	@SubscribeMessage('joinChannel')
 	async handleJoinChannel(client: Socket, payload: any): Promise<void> {
 		try {
@@ -117,23 +139,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			else 
 			{
-				const channel = await this.chatService.getChannel(payload.channelId);
-				if (channel.password !== null && channel.password !== "") {
-					if ("password" in payload && channel.password === payload.password) {
-						client.join(payload.channelId);
-						await this.chatService.addNewMemberToChannel(payload, "");
-					}
-					else if ("password" in payload && channel.password !== payload.password) {
-						client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
-					}
-				}
-				else {
-					client.join(payload.channelId);
-					await this.chatService.addNewMemberToChannel(payload, "");
-				}
-				// client.emit('channelJoined', payload.__owner__);
-				const members = await this.channelService.getMembersOfChannel(payload.channelId);
-				client.emit('channelJoined', members);
 				this.connectedUsers.get(payload.userName).emit('channelJoinNotif', payload);
 			}
 		} catch (error) {

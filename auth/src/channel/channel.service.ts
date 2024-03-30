@@ -1,7 +1,7 @@
 import { User } from 'src/user/entities/user.entity';
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Channel } from "src/user/entities/channel.entity";
+import { Channel, ChannelTypes } from "src/user/entities/channel.entity";
 import { Repository } from "typeorm/repository/Repository";
 import { UUID, privateDecrypt } from 'crypto';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
@@ -92,5 +92,12 @@ export class ChannelService {
         )
         return fullchannels;   
     }
-
+    
+    async getProtectedChannels() {
+        return await this.channelRepository.find({
+            where: {
+                type: ChannelTypes.PROTECTED
+            }
+        })
+    }
 }

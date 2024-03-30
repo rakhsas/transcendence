@@ -226,63 +226,29 @@ const HomeComponent: React.FC = () => {
                         }
                     </div>
                 </section>
-                <section className='flex flex-row mb-20  flex-wrap justify-between p-2'>
+                <section className='flex flex-col mb-20  flex-wrap justify-between p-2'>
                     <div className='min-w-[601px] flex-row flex-1 h-full p-2'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
                         <div className="flex flex-col w-full flex-1  gap-6">
                             <GameModesCarousel />
-                            <div className=" rounded-3xl bg-red-800 m-8">
-                                <div className="div w-full h-full ">
-                                    <Table>
-                                        {/* <Table.Head>
-                                            <Table.HeadCell>Product name</Table.HeadCell>
-                                            <Table.HeadCell>Color</Table.HeadCell>
-                                            <Table.HeadCell>Category</Table.HeadCell>
-                                            <Table.HeadCell>Price</Table.HeadCell>
-                                        </Table.Head> */}
-                                        <Table.Body className="divide-y p-4">
-                                            {
-                                                connectedUsers.length == 0 ?
-                                                    <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                                                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                            No connected users
-                                                        </Table.Cell>
-                                                    </Table.Row>
-                                                    :
-                                                    connectedUsers.map((user, index) => {
-                                                        return (
-                                                            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800" key={index}>
-                                                                <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                                                                    {user}
-                                                                </Table.Cell>
-                                                            </Table.Row>
-                                                        )
-                                                    })
-                                            }
-                                        </Table.Body>
-                                    </Table>
-                                </div>
-                            </div>
                         </div>
                     </div>
-                    <div className='flex w-[35rem] max-w-[60rem] flex-col items-center place-self-start p-4 justify-center'>
-                        <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> your statistic </p>
-                        <div className="w-full m-4 p-2 bg-main-light-EGGSHELL rounded-3xl relative">
-                            <div className="flex min-h-[50vh] flex-col items-start p-4">
-                                <div className="top overflow-hidden">
-                                    <span className='font-poppins text-stone-300 text-3xl font-semibold overflow-hidden'> Top Weekend </span>
-                                </div>
-                                <div className="content flex flex-row py-px">
-                                    <div className="item-left flex flex-col items-start pr-4">
-                                        <span className='text-3xl font-bold text-white'> Kratos </span>
-                                        <span className='text-2xl font-bold text-white'> 2000 </span>
-                                        <p className='text-stone-400 text-xl'> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. </p>
-                                        <canvas ref={chartRef}></canvas>
+                    <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
+                        <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
+                        <div className="flex-col w-full">
+                            <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2 w-full">
+                                <div className="infos flex flex-row items-center space-x-4">
+                                    <div className="pic w-12 h-12 bg-white rounded-2xl">
+                                        <img src={''} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
+                                    </div>
+                                    <div className="description">
+                                        <div className="text-white font-bold">Room 1</div>
+                                        <span className='text-gray-500'>Protected</span>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="item-right absolute bottom-0 right-0">
-                                <img className='w-32 h-[28rem]' src={avatarGirl} alt="Avatar" />
+                                <div className="action">
+                                    <img src={play} alt="Play" />
+                                </div>
                             </div>
                         </div>
                     </div>

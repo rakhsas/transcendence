@@ -162,9 +162,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
 								<div>
 									<div className="mb-2 block">
-										<Label htmlFor="channelName" value="Your email" />
+										<Label htmlFor="channelName" value="Room Name" />
 									</div>
-									<TextInput id="channelName" type="text" placeholder="Give It a name" />
+									<TextInput id="channelName" type="text" autoComplete="OFF" placeholder="Give It a name" />
 								</div>
 								<div className="mb-2 block">
 									<div className="mb-2 block">

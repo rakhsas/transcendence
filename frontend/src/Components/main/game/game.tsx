@@ -53,25 +53,19 @@ const GameModesCarousel: React.FC = () => {
                 className="owl-theme"
                 autoplay={true}
                 center
-                responsive={
-                    {
-                        1000: {
-                            items: 3,
-                        },
-                        600: {
-                            items: 2,
-                        },
-                        0: {
-                            items: 1,
-                        }
-                    }
-                }
+                // responsive={
+                //     // {
+                //     //     2000: {
+                //     //         items: 5,
+                //     //     }
+                //     // }
+                // }
                 autoplayHoverPause={true}
                 animateOut={true}
-                smartSpeed={700}
+                smartSpeed={500}
                 autoplayTimeout={2000}
                 navClass={[expandLeft, expandRight]}
-                // navText={['<', '>']}
+                navText={['<', '>']}
                 loop
             >
                 {renderImages()}

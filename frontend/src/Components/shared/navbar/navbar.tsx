@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import "./navbar.css"
-import { CustomFlowbiteTheme, TextInput } from 'flowbite-react';
+import { Button, CustomFlowbiteTheme, TextInput } from 'flowbite-react';
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../loading/loading";
 import { Socket } from "socket.io-client";
@@ -47,6 +47,7 @@ function NavbarComponent(): JSX.Element {
     const [users, setUsers] = useState<User[]>([]);
     const [searchInput, setSearchInput] = useState('');
     const userService = new UserService();
+    const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     useEffect(() => {
         const root = window.document.documentElement;
@@ -79,7 +80,7 @@ function NavbarComponent(): JSX.Element {
     }, [searchInput]);
     const socket: Socket = userData[1];
     const onRequestCall = async (data: any) => {
-        console.log(data.senderId)
+        setChannelNotifPayload(data);
         const sender: User = await userService.getUser(data.senderId);
         const newItem: notifItems = {
             from: data.from,
@@ -108,11 +109,13 @@ function NavbarComponent(): JSX.Element {
     }
     socket?.on("directMessageNotif", onDirectMessage);
     socket?.on("channelJoinNotif", (data: any)=> {
+        setChannelNotifPayload(data);
+        console.log('Payload received from socket:', channelNotifPayload);
         const sender: User = users.find(user => user.id === data.requestedUserId);
         const newItem: notifItems = {
             from: data.requestedUserId,
             to: data.__owner__,
-            message: ' invited you to join the channel.',
+            message: ' Requested to join the channel.',
             sender: sender,
             type: NotificationType.ChannelInvite
         }
@@ -212,14 +215,28 @@ function NavbarComponent(): JSX.Element {
                                                             <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
-                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
-                                                            <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
-                                                        </svg>
+                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                                                                <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
+                                                            </svg>
                                                         </div>
                                                     </div>
-                                                    <div className="w-full ps-3">
-                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.sender.username}</span>: {item.message.length > 15 ? item.message.slice(0, 15) + ' ...' : item.message}</div>
+                                                    <div className="w-fit px-2">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400 w-fit§">
+                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.sender.username}</span>: {item.message.length > 15 ? item.message.slice(0, 15) + ' ...' : item.message}
+                                                        </div>
                                                         <div className="text-xs text-blue-600 dark:text-blue-500">few moments ago</div>
+                                                    </div>
+                                                    <div className="flex gap-2 w-fit">
+                                                        <Button color="success" pill onClick={()=> {
+                                                            socket?.emit("acceptJoinChannel", 
+                                                                channelNotifPayload
+                                                            );
+                                                        }}>
+                                                            Accept
+                                                        </Button>
+                                                        <Button color="failure" pill>
+                                                            Decline
+                                                        </Button>
                                                     </div>
                                                 </a>
                                             )
