@@ -17,10 +17,10 @@ import NotFoundComponent from './Components/error/FourHunFour.tsx';
 import { useEffect, useState } from 'react';
 import INVALIDQRCODEComponent from './Components/error/InvalidQrcode.tsx';
 import SettingFunction from './Components/main/settings/settings.tsx';
-const url: string = import.meta.env.VITE_API_AUTH_KEY;
+// const url: string = import.meta.env.VITE_API_AUTH_KEY;
 
 function App() {
-  localStorage.setItem('theme', 'light');
+  localStorage.setItem('theme', 'dark');
   return (
     <>
       {/* <BrowserRouter> */}

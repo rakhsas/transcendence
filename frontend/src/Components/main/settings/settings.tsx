@@ -161,8 +161,9 @@ function SettingFunction(): JSX.Element {
       console.log('status code1 --> : ', ValidQRcode)
       if (ValidQRcode.status == 200) {
         console.log("lisljsjfs -> ");
-        userData.isTwoFactorAuthenticationEnabled = true;
-        console.log('State Two valud --> : ', userData.isTwoFactorAuthenticationEnabled)
+        console.log('State Two valud 1 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
+        userData[0].isTwoFactorAuthenticationEnabled = true;
+        console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
         console.log('valid UserDate --> ', userData);
         console.log('status code2 --> : ', ValidQRcode);
 
@@ -170,8 +171,11 @@ function SettingFunction(): JSX.Element {
       }
       else {
         console.log('invalid Qrcode --> : ', ValidQRcode)
-        console.log('valid UserDate --> ', userData);
-        window.location.href = `https://10.12.13.6/Error`;
+        console.log('State Two valud 1 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
+        userData[0].isTwoFactorAuthenticationEnabled = false;
+        console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
+        console.log('valid UserDate --> ', userData[0]);
+        // window.location.href = `https://10.12.13.6/Error`;
       }
       // window.location.href = APIURL + `2fa/authenticate/${input}/${userData[0].id}`;
       // window.location.href = `https://10.11.6.10/`;
@@ -196,9 +200,9 @@ function SettingFunction(): JSX.Element {
     >
       <div className="part1   gap-4 w-full md:min-w-[35%] overflow-y-scroll no-scrollbar min-h-full overflow-hidden Usredit">
         {/* <div className="titpr"></div> */}
-        <div className="p-4  overflow-hidden flex flex-col  overflow-y-scroll no-scrollbar w-full justify-center items-center gap-2 ">
+        <div className="p-4  overflow-hidden flex flex-col  overflow-y-scroll no-scrollbar w-full justify-center items-center gap-12 ">
           <img src={userData[0]?.picture || ''} id="list" alt="" />
-          <label htmlFor="file" id="uploadbtn">
+          <label htmlFor="file" id="uploadbtn" className="gap-4">
             <p onChange={handleFileChange} className="parPhoto">
               TAKE A PHOTO
             </p>
@@ -211,7 +215,7 @@ function SettingFunction(): JSX.Element {
         </div>
         <input type="file" id="file" onChange={handleFileChange} />
         <div>{/* <YourComponent /> */}</div>
-        <div className="flex flex-col justify-center items-center gap-4 mt-2">
+        <div className="flex flex-col justify-center items-center gap-12 mt-2">
           <h2
             className="
                     text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br 
@@ -220,17 +224,17 @@ function SettingFunction(): JSX.Element {
           >
             2FA-AUTHENTICATION
           </h2>
-          <img src={url} alt="" />
+          <img className={`${ischecked? 'visible' : 'invisible'}`} src={url} alt="" />
 
           <form className="max-w-sm mx-auto" onSubmit={onchange}>
           <p
               id="helper-text-explanation"
-              className="mt-2 text-sm text-gray-500 dark:text-gray-400 -twof--part1 font-extrabold "
+              className={`mt-2 text-sm text-gray-500 dark:text-gray-400 -twof--part1 font-extrabold ${ischecked? 'visible' : 'invisible'}`}
             >
               Please introduce the 6 digit <br />
               code scanned by application
             </p>
-            <div className="flex mt-8 space-x-2 rtl:space-x-reverse flex-row justify-center items-center">
+            <div className={`flex mt-8 space-x-2 rtl:space-x-reverse flex-row justify-center items-center ${ischecked? 'visible' : 'invisible'}`}>
               <div className="flex flex-row justify-center items-center">
                 <label
                   htmlFor="code-1"
@@ -259,7 +263,7 @@ function SettingFunction(): JSX.Element {
             
           </form>
           <li>
-            <div className={`flex p-2 rounded ${ischecked ? 'bg-green-600' : 'bg-red-500'}`} onChange={FuncClick}>
+            <div className={`flex p-2 rounded border-green-600 ${ischecked ? 'bg-gradient-to-r from-green-500 via-green-400 to-green-600 border ' : 'bg-red-500'}`} onChange={FuncClick}>
               <div className="flex items-center h-auto w-8 justify-center" >
                 <input
                   id="helper-checkbox-2"

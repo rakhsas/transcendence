@@ -11,12 +11,12 @@ import {
 
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
-import { Channel } from 'src/user/entities/channel.entity';
-import { ChannelUser } from 'src/user/entities/channel_member.entity';
-import { Msg } from 'src/user/entities/msg.entitiy';
-import { Mute } from 'src/user/entities/mute.entity';
-import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
+import { UserService } from 'src/user/user.service';
+import { GameEntity } from 'src/user/entities/game.entity';
+import { User as User1 } from 'src/user/entities/user.entity';
+import { Logger } from '@nestjs/common';
+
 
 interface Player {
   id: string;
@@ -199,26 +199,47 @@ export class GameGetwayService
 {
   @WebSocketServer()
   server: Server;
+  logedUser: string;
 
   rooms: { [id: string]: Room } = {};
   waitingPlayers: Player[] = [];
   constructor(
     private readonly authService: AuthService,
-    @InjectRepository(Msg)
-    private readonly msgRepository: Repository<Msg>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Channel)
-    private readonly channelRepository: Repository<Channel>,
-    @InjectRepository(Mute)
-    private readonly muteRepository: Repository<Mute>,
-    @InjectRepository(ChannelUser)
-    private readonly channelUserRepository: Repository<ChannelUser>,
+    @InjectRepository(GameEntity)
+    private readonly gameRepository: Repository<GameEntity>,
+    // @InjectRepository(User)
+    // private readonly userRepository: Repository<User>,
     private userService: UserService,
-  ) {}
+  ) 
+  {
+  }
 
+  /* ============================== start game functions ================================= */
+  async addGame(payload: any): Promise<void> {
+    // userId: ,
+    // playerId:,
+    // userScoore:,
+    // playerScoore:,
+    // winnerId:,
+    const gameResult = new GameEntity();
+    const pl1 =  await this.userService.viewUser(payload.userId);
+    const pl2 =  await this.userService.viewUser(payload.playerId);
+    const winner = await this.userService.viewUser(payload.winnerId);
+    // console.log("-------------------------------------------------------------------=-==============>>  player: ", pl1.username, payload.pl1Scoore);
+    gameResult.player1 = pl1;
+    gameResult.player2 = pl2;
+    gameResult.userScoore = payload.userScoore;
+    gameResult.playerScoore = payload.playerScoore;
+    gameResult.winner = winner;
+
+    // console.log("players: ", pl1, pl2);
+    await this.gameRepository.save(gameResult);
+  }
+  /* ============================== end game functions ================================= */
+  
   async handleConnection(client: any): Promise<void> {
     const id = await this.GuardsConsumer(client);
+    this.logedUser = id;
     console.log('idGame: ', id);
     // if (this.waitingPlayers.find((player) => player.id === id)) return;
     this.waitingPlayers.push({ socket: client, id: id });
@@ -271,12 +292,13 @@ export class GameGetwayService
         this.rooms[id].game.user.score === 5 ||
         this.rooms[id].game.computer.score === 5
       ) {
-        // addGame({
-        //   pl1Id,
-        //   pl2Id,
-        //   sc1,
-        //   sc2,
-        // });
+        console.log("logged user: ", this.logedUser);
+        this.addGame({
+          player1Id: this.logedUser,
+          player2Id: this.rooms[id].players[0].id === this.logedUser? this.rooms[id].players[1].id : this.rooms[id].players[0].id,
+          pl1Scoore: this.rooms[id].game.user.score,
+          pl2Scoore: this.rooms[id].game.computer.score,
+        });
         // save data to db
         this.rooms[id].game.render();
         delete this.rooms[id];

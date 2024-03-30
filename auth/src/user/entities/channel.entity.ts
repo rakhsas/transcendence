@@ -75,5 +75,8 @@ export class Channel {
   @ManyToMany(() => User, (user) => user.channels, {lazy: true})
   members: User[];
 
+  @Column({ nullable: false})
+  picture: string;
+
 
 }

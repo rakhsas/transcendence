@@ -10,7 +10,7 @@
 
     /* background-color: red; */
     /* transform: rotate(22deg); */
-    /* .container { */
+    /* .container-analytics { */
         /* } */
 /* } */
     
@@ -34,7 +34,7 @@
     }
   }
   
-.center :hover .container4{
+.center :hover .container-analytics4{
     transform-origin: bottom;
     transform: scale(1.05);
     transform: rotate(-6deg);
@@ -42,7 +42,7 @@
     /* rgba(34,193,195,0.237114914325105) */
     background: theme('colors.zinc.900');
 }
- /* .owl-carousel .owl-stage-outer .owl-stage .active .container {
+ /* .owl-carousel .owl-stage-outer .owl-stage .active .container-analytics {
     background-color: black;
 } */
 

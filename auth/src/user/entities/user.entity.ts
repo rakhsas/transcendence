@@ -16,7 +16,6 @@ import { Friendship } from './freindship.entity'; // Assuming you have a Friends
 import { Msg } from './msg.entitiy'; // Assuming you have a Msg entity
 import { Mute } from './mute.entity'; // Assuming you have a Mute entity
 import { v4 as uuidv4 } from 'uuid'
-import { Game } from './game.entity';
 
 @Entity('users') // Table name mapping
 @Unique(['id', 'email', 'providerId', 'username'])
@@ -104,8 +103,8 @@ export class User {
   @JoinTable({ name: 'user_channels'}) // Specify the name for the join table
   channels: Promise<Channel[]>;
 
-  @ManyToMany(() => Game, (game) => game.players)
-  games: Game[]; // Array of games the player is involved in
+  // @ManyToMany(() => Game, (game) => game.players)
+  // games: Game[]; // Array of games the player is involved in
 
   @BeforeInsert()
   generateUUID() {

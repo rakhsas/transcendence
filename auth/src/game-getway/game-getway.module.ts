@@ -13,10 +13,11 @@ import { Mute } from 'src/user/entities/mute.entity';
 import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { UserModule } from 'src/user/user.module';
 import { HttpModule } from '@nestjs/axios';
+import { GameEntity } from 'src/user/entities/game.entity';
 
 @Module({
   imports: [ScheduleModule.forRoot(),
-    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser]),
+    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser, GameEntity]),
     HttpModule
   ],
   controllers: [GameGetwayController],

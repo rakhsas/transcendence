@@ -150,5 +150,6 @@
 
    .click-function{
     background: linear-gradient(to right, #217441, #207a3f, #22A34A);
+    /* visibility: ; */
 } 
 /* onClick={changeBackgroundColor} style={{backgroundColor: backgroundColor}} */

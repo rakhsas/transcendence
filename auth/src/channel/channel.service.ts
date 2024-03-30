@@ -44,7 +44,7 @@ export class ChannelService {
             channelUsers.map(async (channelUser) => ({
                user: await channelUser.user,
                role: channelUser.role,
-           }))
+            }))
         )
         return users;
     }
@@ -55,19 +55,16 @@ export class ChannelService {
             relations: ['channel']
         });
 
-
         const channels = await Promise.all(
             userChannels.map(async (channelUser) => ({
                 channel: await channelUser.channel,
                 role: channelUser.role,
             }))
         );
-        console.log(channels.length)
         return channels;
     }
 
     async getLastMessageOfChannel(channelId: number): Promise<{}>{
-        console.log('channelId', channelId)
         return await this.msgRepository.createQueryBuilder('msg')
       .where('msg.cid = :channelId', { channelId })
       .orderBy('msg.date', 'DESC')
