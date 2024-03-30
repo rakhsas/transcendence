@@ -242,7 +242,7 @@ export class ChatService {
       throw new NotFoundException("The channel not found !");
 
     channelRecord.type = payload.channelType;
-    if (payload.channelType == ChannelTypes.PROTECTED)
+    if (payload.channelType === ChannelTypes.PROTECTED)
     {
       channelRecord.password = payload.password;
     }

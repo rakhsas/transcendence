@@ -9,23 +9,23 @@ function AnalyticsComponent(): JSX.Element {
             <div className="container-analytics font-poppins">
                 <div className='leader-board'>
                     <div className='top3'>
-                        <div className='first-cards' id='one'>
+                        <div className=' first-cards' id='one'>
                             <img src="/woumecht.jpg" alt="" />
-                            <h3 className='fullName font-poppins'>Walid oumechtak</h3>
+                            <h3 className=' fullName font-poppins '>Walid oumechtak</h3>
                             <p className='login font-poppins'>woumecht</p>
                             <button className='btn-profile font-poppins'>Profile</button>
-                            <span className='rank font-poppins'>1st</span>
-                            <div className='score font-poppins'>Score: 230 exp</div>
+                            <span className=' rank font-poppins'>1st</span>
+                            <div className=' score font-poppins'>Score: 230 exp</div>
                         </div>
                         <div className='first-cards' id='two'>
                             <img src="/rakhsas.jpg" alt="" />
                             <h4 className='fullName font-poppins'>Walid oumechtak</h4>
                             <p className='login font-poppins'>woumecht</p>   
                             <button className='btn-profile font-poppins'>Profile</button>
-                            <span className='rank' font-poppins>2st</span>
+                            <span className='rank' font-poppins>2st</span>  
                             <div className='score font-poppins'>Score: 230 exp</div>
                         </div>
-                        <div className='first-cards' id='three'>
+                        <div className=' first-cards' id='three'>
                             <img src="/hbenfadd.jpg" alt="" />
                             <h3 className='fullName font-poppins'>Walid oumechtak</h3>
                             <p className='login font-poppins'>woumecht</p>
@@ -125,9 +125,9 @@ function AnalyticsComponent(): JSX.Element {
                         </div>
                         <div className="bottom-content">
                             <div className="lastGame font-poppins">Last Game <br /> Win</div>
-                            <span className='separator font-poppins'> - </span>
+                            <span className='separator font-poppins'></span>
                             <div className="status font-poppins">Status <br /> Online</div>
-                            <span className='separator font-poppins'> - </span>
+                            <span className='separator font-poppins'></span>
                             <div className="score font-poppins">Score <br /> 200 pts</div>
                         </div>
                     </div>
