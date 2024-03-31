@@ -128,9 +128,21 @@ export class UserService {
 
 	async findAllUsersExcept(id: string): Promise<User[]> {
 		return await this.userRepository.find({
-			where: {
-				id: Not(id)
-			}
+		where: {
+			id: Not(id),
+		},
+		});
+	}
+
+  	async setTwoFactorAuthenticationSecret(secret: string, userId: string) {
+		return this.userRepository.update(userId, {
+		  twoFactorAuthenticationSecret: secret
+		});
+	  }
+
+	  async turnOnTwoFactorAuthentication(userId: string) {
+		return this.userRepository.update(userId, {
+		  isTwoFactorAuthenticationEnabled: false
 		});
 	}
 }

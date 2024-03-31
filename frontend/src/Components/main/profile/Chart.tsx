@@ -6,6 +6,7 @@ import {
 } from 'chart.js'
 
 
+
 import { Doughnut } from 'react-chartjs-2';
 import DataContext from '../../../services/data.context';
 // import LoadingComponent from '../../shared/loading/loading';
@@ -29,7 +30,8 @@ export default function CreatChartDesign() {
         datasets: [{
             label: '',
             data: [15, 100],
-            backgroundColor: ['#059669', userData?.coalitionColor || ''],
+            backgroundColor: ['#059669', userData[0]?.coalitionColor || ''],
+            fontWeight: 'bold'
 
         }]
     }
@@ -37,9 +39,9 @@ export default function CreatChartDesign() {
 
     }
     return (
-        <div className='appChart overflow-y-scroll no-scrollbar'>
+        <div className='appChart  no-scrollbar'>
             {/* <h1 style={{padding: '120px'}}> How To Creat ChartJs</h1> */}
-            <div style={{width: '250px', height: 'auto', left: '250px', display: 'flex', marginTop: '', flexDirection: 'row'}}>
+            <div style={{width: '250px', height: 'auto', left: '250px', display: 'flex', marginTop: '', flexDirection: 'row',}}>
                 <Doughnut
                     data={data}
                     options={options}

@@ -88,6 +88,11 @@ export class User {
   @OneToMany(() => Friendship, friend => friend.friend, { lazy: true, cascade: true })
   friendOf: Promise<Friendship[]>;
 
+  @Column({ nullable: true })
+  public twoFactorAuthenticationSecret?: string;
+     
+  @Column({ default: false })
+  public isTwoFactorAuthenticationEnabled: boolean;
   // ======================
 
   // @ManyToMany(() => Channel, (channel) => channel.members)

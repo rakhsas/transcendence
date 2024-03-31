@@ -21,7 +21,7 @@ import { ChannelService } from 'src/channel/channel.service';
     UserModule,
     // ChannelModule
   ],
-  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService,ChannelService],
+  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService],
   // providers: [ChatService, ChatGateway, Repository, MsgController, MsgRepository, UserRepository],
   controllers: [ChatController],
   // exports: [MsgRepository, UserRepository]

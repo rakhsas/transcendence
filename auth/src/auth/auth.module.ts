@@ -6,7 +6,6 @@ import { AuthService } from './auth.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { GithubStrategy } from './utils/GithubStrategy';
 import { GlobalGateway } from './global.gateway';
 
 @Module({
