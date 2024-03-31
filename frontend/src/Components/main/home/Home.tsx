@@ -13,6 +13,8 @@ import { friendsService } from '../../../services/friend.service';
 import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
 import { Table } from 'flowbite-react';
+import { ProtectedChannel } from '../../../utils/types';
+import ModalComponent from '../../modal/modal';
 
 const group = () => {
     return (
@@ -42,19 +44,24 @@ type friend = {
 }
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const HomeComponent: React.FC = () => {
+    const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const userData = useContext(DataContext);
+    const [channel, setChannel] = useState<any>({});// channel data
     const [friends, setFriends] = useState<any[]>([]);
     const [friendData, setFriendData] = useState<friend[]>([]);
     const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
     const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
+    const [protectedChannels, setProtectedChannels] = useState<ProtectedChannel[]>([]);
+    const [openModal, setOpenModal] = useState<boolean>(false);
     let chartInstance: Chart | null = null;
     // if (!userData[0])
     //     return <LoadingComponent />;
     useEffect(() => {
-        if (!userData[0]) {
+        if (!userData) {
             return;
         }
+        setProtectedChannels(userData[4]);
         const fetchFriends = async () => {
             const friendService = new friendsService();
             const friends = await friendService.getFriends(userData[0].id);
@@ -167,6 +174,7 @@ const HomeComponent: React.FC = () => {
         title: ['Magic room', 'Traditional room'],
         description: ['This is a magic room', 'This is a Traditional room']
     }
+    
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
@@ -236,20 +244,32 @@ const HomeComponent: React.FC = () => {
                     <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
                         <div className="flex-col w-full">
-                            <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2 w-full">
-                                <div className="infos flex flex-row items-center space-x-4">
-                                    <div className="pic w-12 h-12 bg-white rounded-2xl">
-                                        <img src={''} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
+                            {
+                                protectedChannels.map((channel, index) => (
+                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2 w-full" key={index}>
+                                        <div className="infos flex flex-row items-center space-x-4">
+                                            <div className="pic w-12 h-12 rounded-2xl">
+                                                <img src={baseAPIUrl + channel.picture} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
+                                            </div>
+                                            <div className="description">
+                                                <div className="text-white font-bold">{channel.name}</div>
+                                                <span className='text-gray-500'>{channel.type}</span>
+                                            </div>
+                                        </div>
+                                        <div className="action cursor-pointer" onClick={() => {
+                                            setOpenModal(!openModal);
+                                            setChannel(channel);
+                                        }}>
+                                            <img src={play} alt="Play" />
+                                        </div>
                                     </div>
-                                    <div className="description">
-                                        <div className="text-white font-bold">Room 1</div>
-                                        <span className='text-gray-500'>Protected</span>
-                                    </div>
-                                </div>
-                                <div className="action">
-                                    <img src={play} alt="Play" />
-                                </div>
-                            </div>
+                                ))
+                            }
+                            {
+                                openModal && (
+                                    <ModalComponent isOpen channelData={channel} setOpenModal={setOpenModal} userData={userData}/>
+                                )
+                            }
                         </div>
                     </div>
                 </section>

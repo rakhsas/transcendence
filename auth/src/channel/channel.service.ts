@@ -100,4 +100,34 @@ export class ChannelService {
             }
         })
     }
+
+    async getProtectedChannelsExpectUser(userId: UUID): Promise<Channel[]> {
+        // Find all protected channels
+        const channels = await this.channelRepository.find({
+            where: {
+                type: ChannelTypes.PROTECTED,
+            },
+        });
+
+        // Find channels where the user is already a member
+        const userChannels = await this.channelUserRepository.find({
+            where: { user: { id: userId } },
+            relations: ['channel'],
+        });
+
+        const userChannelIds = userChannels.map(channelUser => channelUser.channel.id);
+
+        // Filter out channels where the user is already a member or the channel owner is the user ID
+        const filteredChannels = channels.filter(async channel => {
+            const owner = await channel.owner; // Await the owner promise
+            return !(await this.isMemberOfChannel(userId, channel)) && owner.id !== userId;
+        });
+
+        return filteredChannels;
+    }
+
+    async isMemberOfChannel(userId: UUID, channel: Channel): Promise<boolean> {
+        const channelUsers = await channel.users;
+        return channelUsers.some(channelUser => channelUser.user.id === userId);
+    }
 }

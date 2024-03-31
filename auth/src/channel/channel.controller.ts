@@ -13,6 +13,12 @@ export class ChannelController {
     async protected() {
         return await this.channelService.getProtectedChannels();
     }
+
+    @Get('protected/:userId')
+    @ApiParam({ name: 'userId', type: 'string', format: 'uuid'})
+    async getProtectedChannelsExpectUser(@Param('userId') userId: UUID) {
+        return await this.channelService.getProtectedChannelsExpectUser(userId);
+    }
     
     @Get(':userId')
     @ApiParam({ name: 'userId', type: 'string', format: 'uuid' }) // Adjust type/format if needed
