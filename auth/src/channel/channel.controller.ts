@@ -65,6 +65,6 @@ export class ChannelController {
     @Get('public/rooms/:userId')
     @ApiParam({ name: 'userId', type: 'string', format: 'uuid'})
     async getPublicChannels(@Param('userId') userId: UUID) {
-        return await this.channelService.getPublicChannels(userId);
+        return await this.channelService.getPublicChannelsExpectUser(userId);
     }
 }

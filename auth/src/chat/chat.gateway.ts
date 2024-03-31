@@ -5,6 +5,7 @@ import { ChatService } from './chat.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UserRole } from 'src/user/entities/channel_member.entity';
 import { ChannelService } from 'src/channel/channel.service';
+import { UserService } from 'src/user/user.service';
 // import cli from '@angular/cli';
 // import { Paths } from '../../../frontend/src/utils/types';
 
@@ -21,7 +22,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private readonly chatService: ChatService,
 		private readonly authService: AuthService,
-		private readonly channelService: ChannelService
+		private readonly channelService: ChannelService,
+		private readonly userService: UserService
 	) { }
 
 	handleConnection(client: Socket) {
@@ -99,10 +101,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.join(payload.channelId);
 		const newChannel = await this.chatService.addNewChannelEntity(payload);
 		await this.chatService.addNewMemberToChannel(newChannel, UserRole.OWNER);
-
-		// Fetch updated channels and emit the updated channel list to the client
 		const updatedChannels = await this.channelService.getChannelsByUserId(payload.ownerId);
 		socket.emit('channelCreated', updatedChannels);
+		const users = await this.userService.findAllUsers();
+		users.forEach(async (user) => {
+			if (this.connectedUsers.has(user.username)) {
+				const protectedChannels = await this.channelService.getProtectedChannelsExpectUser(user.id);
+				const publicchannels = await this.channelService.getPublicChannelsExpectUser(user.id);
+				this.connectedUsers.get(user.username).emit('publicChannels', publicchannels);
+				this.connectedUsers.get(user.username).emit('protectedChannels', protectedChannels);
+			}
+		});
 	}
 
 
@@ -130,7 +139,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit('protectedChannels', ProtectedChannelsMembers);
 		}
 		else if (channel.type === 'public') {
-			const PublicChannelsMembers = await this.channelService.getPublicChannels(payload.__owner__);
+			const PublicChannelsMembers = await this.channelService.getPublicChannelsExpectUser(payload.__owner__);
 			client.emit('publicChannels', PublicChannelsMembers);
 		}
 	}

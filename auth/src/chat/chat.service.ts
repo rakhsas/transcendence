@@ -187,7 +187,6 @@ export class ChatService {
       newEntityChannel.owner = Promise.resolve(payload.ownerId);
       // Save the new Channel entity
       const savedChannel = await this.channelRepository.save(newEntityChannel);
-      console.log('saveChannel: ', savedChannel)
       return savedChannel;
     } catch (error) {
       console.error("Error adding new channel:", error);
@@ -209,7 +208,6 @@ export class ChatService {
     // newEntity.user = Promise.resolve(payload.__owner__.id);
     newChannelUser.user = Promise.resolve(user);
     newChannelUser.channel = Promise.resolve(channel);
-    console.log("role", payload)
     newChannelUser.role = (role !== "") ? role : payload.role
 
     // Save the new ChannelUser record

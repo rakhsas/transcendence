@@ -3,10 +3,7 @@ import OwlCarousel from "react-owl-carousel";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 import playFill from './../../../assets/img/Play-Fill.svg'
-import expandLeft from './../../../assets/Icon/Expand_left.png'
-import expandRight from './../../../assets/Icon/Expand_right.png'
 import './game.css';
-import { useEffect } from 'react';
 interface CarouselItemProps {
     image: string;
     heading: string;
@@ -16,7 +13,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ image, heading }) => (
     <>
         <div className='w-[21rem] h-[21rem]'>
             <div className="outli mt-6 mx-auto w-64 h-64 rounded-[1.7rem] -z-10" style={{ background: 'transparent'}}>
-                <div className="container4 overflow-hidden mt-6 top-0 left-10 w-64 h-64 rounded-[1.7rem] p-4 flex absolute flex-col justify-between bg-zinc-900 ">
+                <div className="container-rooms overflow-hidden mt-6 top-0 left-10 w-64 h-64 rounded-[1.7rem] p-4 flex absolute flex-col justify-between bg-zinc-900 ">
                     <div className="play rounded-full w-8 h-8 bg-main-light-FERN">
                         <img src={image} alt="Play" />
                     </div>
@@ -44,18 +41,15 @@ const GameModesCarousel: React.FC = () => {
         />
     ));
     const options = {
-        className: "owl-theme1",
-        autoplay: true,
+        className: "owl-theme",
         center: true,
-        autoplayHoverPause: true,
         dots: true,
-        animateOut: true,
         loop: true,
         margin: 10
     }
     return (
         <div
-            className='gamesmodeCont z-10'>
+            className='gamesmodeCont w-full z-10'>
             <OwlCarousel
                 {...options}
                 autoWidth
