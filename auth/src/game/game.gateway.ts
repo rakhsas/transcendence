@@ -88,11 +88,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @Interval(10)
   handleInterval() {
     for (const id in this.rooms) {
-      this.rooms[id].game.render();
       if (
         this.rooms[id].game.user.score === 5 ||
         this.rooms[id].game.computer.score === 5
       ) {
+        this.server.to(id).emit('gameOver');
         let myScore;
         let playerScore;
         let playerId;
@@ -112,10 +112,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           playerScoore: playerScore,
           winnerId: this.myId,
         });
-        // save data to db
-        this.rooms[id].game.render();
         delete this.rooms[id];
       }
+      this.rooms[id].game.render();
     }
   }
 

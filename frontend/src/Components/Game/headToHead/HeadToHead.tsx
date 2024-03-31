@@ -75,6 +75,9 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
     socket.on("lose", () => {
       setRoomId("win");
     });
+    socket.on("gameOver",()=>{
+      setRoomId('win');
+    });
     socket.on("connect", () => console.log("Connected"));
     socket.on("disconnect", () => {
       console.log("Disconnected");
@@ -85,6 +88,7 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
       socket.off("roomJoined");
       socket.off("win");
       socket.off("lose");
+      socket.off("gameOver");
       socket.off("connect");
       socket.off("disconnect");
     };

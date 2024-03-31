@@ -153,6 +153,7 @@ class Game {
 
     socket.on("move", (y) => {
       this.computer.y = y;
+      this.render();
     });
 
     this.canvas.addEventListener("mousemove", (evt) => {
