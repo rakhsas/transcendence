@@ -36,7 +36,7 @@ import { Notification as Notif} from './user/entities/notification.entity';
       database: 'db1',
       synchronize: true,
       // logging: true,
-      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser, Notif],
+      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser],
     }),
     UserModule,
     AuthModule,
