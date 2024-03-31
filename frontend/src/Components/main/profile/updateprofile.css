@@ -77,4 +77,7 @@ h5.l5{
     .Achieve--Border, .math-info, .update{
         width: 90%;
     }
+    .Score--Match{
+        width: 90%;
+    }
 }

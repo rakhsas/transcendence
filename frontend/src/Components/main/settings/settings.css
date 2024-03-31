@@ -16,7 +16,7 @@
 }
 
 .Usredit, .Information{
-    background-color: #18181b;
+    /* background-color: #18181b; */
     width: 100%;
 }
 
@@ -53,7 +53,7 @@
     height: max-content;
     border-radius: 5px;
     background-color: #31304D;
-    color: #18181b;
+    /* color: #18181b; */
     margin-top: 50px;
     
     font-family:  'Roboto', sans-serif;
@@ -153,3 +153,8 @@
     /* visibility: ; */
 } 
 /* onClick={changeBackgroundColor} style={{backgroundColor: backgroundColor}} */
+
+
+@media screen and (max-widht: 725px) {
+    
+}

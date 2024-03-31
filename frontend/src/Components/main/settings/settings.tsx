@@ -209,16 +209,16 @@ function SettingFunction(): JSX.Element {
             overflow-y-scroll no-scrollbar 
             Setting"
     >
-      <div className="part1   gap-4 w-full md:min-w-[35%] overflow-y-scroll no-scrollbar min-h-full overflow-hidden Usredit">
+      <div className="part1   gap-4 w-full md:min-w-[35%] overflow-y-scroll no-scrollbar min-h-full overflow-hidden Usredit bg-white dark:bg-black">
         {/* <div className="titpr"></div> */}
         <div className="p-4  overflow-hidden flex flex-col  overflow-y-scroll no-scrollbar w-full justify-center items-center gap-12 ">
           <img src={userData[0]?.picture || ''} id="list" alt="" />
           <label htmlFor="file" id="uploadbtn" className="gap-4">
-            <p onChange={handleFileChange} className="parPhoto">
+            <p onChange={handleFileChange} className="parPhoto text-white dark:text-black bolder font-extrabold font-900">
               TAKE A PHOTO
             </p>
             {/* <FontAwesomeIcon icon={faCamera} className="cameraIcon" /> */}
-            <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 dark:text-black text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
               <path fillRule="evenodd" d="M7.5 4.586A2 2 0 0 1 8.914 4h6.172a2 2 0 0 1 1.414.586L17.914 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1.086L7.5 4.586ZM10 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm2-4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" clipRule="evenodd" />
             </svg>
 
@@ -229,7 +229,7 @@ function SettingFunction(): JSX.Element {
         <div className="flex flex-col justify-center items-center gap-12 mt-2">
           <h2
             className="
-                    text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br 
+                    text-white dark:text-black bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br 
                     focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
                    dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2  FontAwesome -twof--part1"
           >
@@ -240,7 +240,7 @@ function SettingFunction(): JSX.Element {
           <form className="max-w-sm mx-auto" onSubmit={onchange}>
           <p
               id="helper-text-explanation"
-              className={`mt-2 text-sm text-gray-500 dark:text-gray-400 -twof--part1 font-extrabold ${ischecked? 'visible' : 'invisible'}`}
+              className={`mt-2 text-sm  -twof--part1 font-extrabold ${ischecked? 'visible' : 'invisible'} text-white dark:text-black`}
             >
               Please introduce the 6 digit <br />
               code scanned by application
@@ -311,7 +311,7 @@ function SettingFunction(): JSX.Element {
           {/* <h2 className='-twof--part1'>2FA-AUTHENTICATION</h2> */}
         </div>
       </div>
-      <div className="part2 flex flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full overflow-hidden Information justify-center items-center ">
+      <div className="part2 flex flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full overflow-hidden Information justify-center items-center bg-white dark:bg-black ">
         <form className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] overflow-hidden">
           <h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5">
             Information

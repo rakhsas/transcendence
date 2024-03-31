@@ -36,7 +36,7 @@ function FunctionAddFriend() {
 
     const [attributes, setAttributes] = useState<ButtonAttributes>({
         className: 'inline-flex items-center px-4 py-2 text-sm h-auto overflow-hidden text-center text-black-950 font-bold bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800',
-        value: 'Add Friend',
+        value: '+ Friend',
         onClick: handleButtonClick, // assuming handleButtonClick function is defined elsewhere
     });
 
@@ -111,7 +111,7 @@ function FunctionProfileForm() {
                         <img className="w-24 h-auto  shadow-lg picture-user" src={user?.picture || picture} alt="Bonnie image" />
                         <h5 className=" text-xl h-[35px] overflow-hidden text-white-900 text-black dark:text-white font-bolder picture-user2">{user?.username}</h5>
                         <div className="flex gap-1 mt-2">
-
+                            
                             <FunctionAddFriend />
                             <a href="#" onClick={ButtonClick} className="inline-flex items-center px-4 py-2 text-sm h-auto overflow-hidden text-center text-black-950 font-bolder
                              bg-red-600 rounded-lg  focus:ring-4   ">
@@ -123,55 +123,55 @@ function FunctionProfileForm() {
                 </div>
                 <div className='w-[75%] flex flex-col gap-8 items-center h-[75vh] justify-center Achieve--Border dark:bg-black bg-white no-scrollbar '>
                     <h5 className='font-bolder text-gray-800 l5 '>ACHIEVEMENTS</h5>
-                    <div className='Valid--Achievement flex flex-row  justify-center items-center  no-scrollbar '>
+                    <div className='Valid--Achievement flex flex-row  justify-center items-center  no-scrollbar gap-2'>
                         <img src={Achei} alt="" className='ml-2 w-[80px] h-[100%] ' />
-                        <p className='flex flex-row justify-center items-center Center--paragraph'>Play The First Game</p>
-                        <svg className="w-6 h-6 text-gray-800 dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <p className='flex flex-row justify-center items-center Center--paragraph '>Play The First Game</p>
+                        <svg className="w-6 h-6 text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path fillRule="evenodd" d="M12 2a3 3 0 0 0-2.1.9l-.9.9a1 1 0 0 1-.7.3H7a3 3 0 0 0-3 3v1.2c0 .3 0 .5-.2.7l-1 .9a3 3 0 0 0 0 4.2l1 .9c.2.2.3.4.3.7V17a3
                              3 0 0 0 3 3h1.2c.3 0 .5 0 .7.2l.9 1a3 3 0 0 0 4.2 0l.9-1c.2-.2.4-.3.7-.3H17a3 3 0 0 0 3-3v-1.2c0-.3 0-.5.2-.7l1-.9a3 3 0 0 0 0-4.2l-1-.9a1 1 0 0 1-.3-.7V7a3
                               3 0 0 0-3-3h-1.2a1 1 0 0 1-.7-.2l-.9-1A3 3 0 0 0 12 2Zm3.7 7.7a1 1 0 1 0-1.4-1.4L10 12.6l-1.3-1.3a1 1 0 0 0-1.4 1.4l2 2c.4.4 1 .4 1.4 0l5-5Z" clipRule="evenodd" />
                         </svg>
                     </div>
-                    <div className='Valid--Achievement flex flex-row   justify-center items-center'>
+                    <div className='Valid--Achievement flex flex-row   justify-center items-center gap-2'>
                         <img src={Achei1} alt="" className='ml-2 w-[80px] h-[100%]' />
                         <p className='flex flex-row justify-center items-center Center--paragraph'>win The First Game</p>
-                        <svg className="w-6 h-6 text-gray-800 dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6  dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path fillRule="evenodd" d="M12 2a3 3 0 0 0-2.1.9l-.9.9a1 1 0 0 1-.7.3H7a3 3 0 0 0-3 3v1.2c0 .3 0 .5-.2.7l-1 .9a3 3 0 0 0 0 4.2l1 .9c.2.2.3.4.3.7V17a3 3 0 0 0 
                             3 3h1.2c.3 0 .5 0 .7.2l.9 1a3 3 0 0 0 4.2 0l.9-1c.2-.2.4-.3.7-.3H17a3 3 0 0 0 3-3v-1.2c0-.3 0-.5.2-.7l1-.9a3 3 0 0 0 0-4.2l-1-.9a1 1 0 0 1-.3-.7V7a3 3 0 0 0-3-3h-1.2a1
                              1 0 0 1-.7-.2l-.9-1A3 3 0 0 0 12 2Zm3.7 7.7a1 1 0 1 0-1.4-1.4L10 12.6l-1.3-1.3a1 1 0 0 0-1.4 1.4l2 2c.4.4 1 .4 1.4 0l5-5Z" clipRule="evenodd" />
                         </svg>
                     </div>
-                    <div className='Valid--Achievement flex flex-row  justify-center items-center'>
+                    <div className='Valid--Achievement flex flex-row  justify-center items-center gap-2'>
                         <img src={Achei2} alt="" className='ml-2 w-[80px] h-[100%]' />
                         <p className='flex flex-row justify-center items-center Center--paragraph'>win  with Max Score</p>
-                        <svg className="w-6 h-6 text-gray-800 dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6  dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path fillRule="evenodd" d="M12 2a3 3 0 0 0-2.1.9l-.9.9a1 1 0 0 1-.7.3H7a3 3 0 0 0-3 3v1.2c0 .3 0 .5-.2.7l-1 .9a3 3 0 0 0 0 4.2l1 .9c.2.2.3.4.3.7V17a3 3 0 0 0 
                             3 3h1.2c.3 0 .5 0 .7.2l.9 1a3 3 0 0 0 4.2 0l.9-1c.2-.2.4-.3.7-.3H17a3 3 0 0 0 3-3v-1.2c0-.3 0-.5.2-.7l1-.9a3 3 0 0 0 0-4.2l-1-.9a1 1 0 0 1-.3-.7V7a3 3 0 0 0-3-3h-1.2a1
                              1 0 0 1-.7-.2l-.9-1A3 3 0 0 0 12 2Zm3.7 7.7a1 1 0 1 0-1.4-1.4L10 12.6l-1.3-1.3a1 1 0 0 0-1.4 1.4l2 2c.4.4 1 .4 1.4 0l5-5Z" clipRule="evenodd" />
                         </svg>
                     </div>
-                    <div className='Valid--Achievement flex flex-row  justify-center items-center'>
+                    <div className='Valid--Achievement flex flex-row  justify-center items-center gap-2'>
                         <img src={Achei3} alt="" className='ml-2 w-[80px] h-[100%]' />
                         <p className='flex flex-row justify-center items-center Center--paragraph'>Play First 5 Games</p>
-                        <svg className="w-6 h-6 text-gray-800 dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6  dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path fillRule="evenodd" d="M12 2a3 3 0 0 0-2.1.9l-.9.9a1 1 0 0 1-.7.3H7a3 3 0 0 0-3 3v1.2c0 .3 0 .5-.2.7l-1 .9a3 3 0 0 0 0 4.2l1 .9c.2.2.3.4.3.7V17a3 3 0 0 0 3 
                             3h1.2c.3 0 .5 0 .7.2l.9 1a3 3 0 0 0 4.2 0l.9-1c.2-.2.4-.3.7-.3H17a3 3 0 0 0 3-3v-1.2c0-.3 0-.5.2-.7l1-.9a3 3 0 0 0 0-4.2l-1-.9a1 1 0 0 1-.3-.7V7a3 3 0 0 0-3-3h-1.2a1
                              1 0 0 1-.7-.2l-.9-1A3 3 0 0 0 12 2Zm3.7 7.7a1 1 0 1 0-1.4-1.4L10 12.6l-1.3-1.3a1 1 0 0 0-1.4 1.4l2 2c.4.4 1 .4 1.4 0l5-5Z" clipRule="evenodd" />
                         </svg>
                     </div>
-                    <div className='Valid--Achievement flex flex-row  justify-center items-center'>
+                    <div className='Valid--Achievement flex flex-row  justify-center items-center gap-2'>
                         <img src={Achei4} alt="" className='ml-2 w-[80px] h-[100%]' />
                         <p className='flex flex-row justify-center items-center Center--paragraph'>win First 5  Games</p>
-                        <svg className="w-6 h-6 text-gray-800 dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6  dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path fillRule="evenodd" d="M12 2a3 3 0 0 0-2.1.9l-.9.9a1 1 0 0 1-.7.3H7a3 3 0 0 0-3 3v1.2c0 .3 0 .5-.2.7l-1 .9a3 3 0 0 0 0 4.2l1 .9c.2.2.3.4.3.7V17a3 3 0 0 0 3
                              3h1.2c.3 0 .5 0 .7.2l.9 1a3 3 0 0 0 4.2 0l.9-1c.2-.2.4-.3.7-.3H17a3 3 0 0 0 3-3v-1.2c0-.3 0-.5.2-.7l1-.9a3 3 0 0 0 0-4.2l-1-.9a1 1 0 0 1-.3-.7V7a3 3 0 0 0-3-3h-1.2a1
                               1 0 0 1-.7-.2l-.9-1A3 3 0 0 0 12 2Zm3.7 7.7a1 1 0 1 0-1.4-1.4L10 12.6l-1.3-1.3a1 1 0 0 0-1.4 1.4l2 2c.4.4 1 .4 1.4 0l5-5Z" clipRule="evenodd" />
                         </svg>
                     </div>
-                    <div className='Valid--Achievement flex flex-row  justify-center items-center'>
+                    <div className='Valid--Achievement flex flex-row  justify-center items-center gap-2'>
                         <img src={Achei5} alt="" className='ml-2 w-[80px] h-[100%]' />
                         <p className='flex flex-row justify-center items-center Center--paragraph'>Play The First Game</p>
-                        <svg className="w-6 h-6 text-gray-800 dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6  dark:text-white svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                             <path fillRule="evenodd" d="M12 2a3 3 0 0 0-2.1.9l-.9.9a1 1 0 0 1-.7.3H7a3 3 0 0 0-3 3v1.2c0 .3 0 .5-.2.7l-1 .9a3 3 0 0 0 0 4.2l1 .9c.2.2.3.4.3.7V17a3 3 0 0 0 3
                              3h1.2c.3 0 .5 0 .7.2l.9 1a3 3 0 0 0 4.2 0l.9-1c.2-.2.4-.3.7-.3H17a3 3 0 0 0 3-3v-1.2c0-.3 0-.5.2-.7l1-.9a3 3 0 0 0 0-4.2l-1-.9a1 1 0 0 1-.3-.7V7a3 3 0 0 0-3-3h-1.2a1
                               1 0 0 1-.7-.2l-.9-1A3 3 0 0 0 12 2Zm3.7 7.7a1 1 0 1 0-1.4-1.4L10 12.6l-1.3-1.3a1 1 0 0 0-1.4 1.4l2 2c.4.4 1 .4 1.4 0l5-5Z" clipRule="evenodd" />
