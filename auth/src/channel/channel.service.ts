@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Channel, ChannelTypes } from "src/user/entities/channel.entity";
 import { Repository } from "typeorm/repository/Repository";
 import { UUID, privateDecrypt } from 'crypto';
-import { ChannelUser } from 'src/user/entities/channel_member.entity';
+import { ChannelUser, UserRole } from 'src/user/entities/channel_member.entity';
 import { channel } from 'diagnostics_channel';
 import { Msg } from 'src/user/entities/msg.entitiy';
 
@@ -103,31 +103,51 @@ export class ChannelService {
 
     async getProtectedChannelsExpectUser(userId: UUID): Promise<Channel[]> {
         // Find all protected channels
-        const channels = await this.channelRepository.find({
+        const allProtectedChannels = await this.channelRepository.find({
             where: {
                 type: ChannelTypes.PROTECTED,
             },
         });
-
-        // Find channels where the user is already a member
-        const userChannels = await this.channelUserRepository.find({
-            where: { user: { id: userId } },
-            relations: ['channel'],
+    
+        // Find channels the user has joined
+        const userJoinedChannels = await this.getUserJoinedChannels(userId);
+    
+        // Filter out channels the user has already joined
+        const channelsNotJoinedByUser = allProtectedChannels.filter(channel => {
+            return !userJoinedChannels.some(userChannel => userChannel.id === channel.id);
         });
-
-        const userChannelIds = userChannels.map(channelUser => channelUser.channel.id);
-
-        // Filter out channels where the user is already a member or the channel owner is the user ID
-        const filteredChannels = channels.filter(async channel => {
-            const owner = await channel.owner; // Await the owner promise
-            return !(await this.isMemberOfChannel(userId, channel)) && owner.id !== userId;
-        });
-
-        return filteredChannels;
+    
+        return channelsNotJoinedByUser;
     }
 
-    async isMemberOfChannel(userId: UUID, channel: Channel): Promise<boolean> {
-        const channelUsers = await channel.users;
-        return channelUsers.some(channelUser => channelUser.user.id === userId);
+    async getUserJoinedChannels(userId: UUID): Promise<Channel[]> {
+        const channelUsers = await this.channelUserRepository.find({
+            where: {
+                user: {id: userId}
+            },
+            relations: ['channel']
+        });
+        return await Promise.all(
+            channelUsers.map(async (channelUser) => await channelUser.channel)
+        )
     }
+
+    async getPublicChannels(userId: UUID) {
+        const allProtectedChannels = await this.channelRepository.find({
+            where: {
+                type: ChannelTypes.PUBLIC,
+            },
+        });
+    
+        // Find channels the user has joined
+        const userJoinedChannels = await this.getUserJoinedChannels(userId);
+    
+        // Filter out channels the user has already joined
+        const channelsNotJoinedByUser = allProtectedChannels.filter(channel => {
+            return !userJoinedChannels.some(userChannel => userChannel.id === channel.id);
+        });
+    
+        return channelsNotJoinedByUser;
+    }
+
 }

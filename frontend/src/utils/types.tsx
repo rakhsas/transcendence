@@ -15,7 +15,7 @@ export enum ChannelTypes {
 }
 
 
-export interface ProtectedChannel {
+export interface Channel {
     id: number;
     name: string;
     createdAt: Date;

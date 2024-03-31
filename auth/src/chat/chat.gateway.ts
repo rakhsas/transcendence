@@ -115,16 +115,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				await this.chatService.addNewMemberToChannel(payload, "");
 			}
 			else if ("password" in payload && channel.password !== payload.password) {
-				client.emit("wrongPassowrd", "Cannot join the room (incorrect password)");
+				client.emit("channelPasswordInvalid", "Cannot join the room (incorrect password)");
+				return;
 			}
-		}
-		else {
+		} else {
 			client.join(payload.channelId);
 			await this.chatService.addNewMemberToChannel(payload, "");
 		}
 		// client.emit('channelJoined', payload.__owner__);
 		const members = await this.channelService.getMembersOfChannel(payload.channelId);
 		client.emit('channelJoined', members);
+		if (channel.type === 'protected') {
+			const ProtectedChannelsMembers = await this.channelService.getProtectedChannelsExpectUser(payload.__owner__);
+			client.emit('protectedChannels', ProtectedChannelsMembers);
+		}
+		else if (channel.type === 'public') {
+			const PublicChannelsMembers = await this.channelService.getPublicChannels(payload.__owner__);
+			client.emit('publicChannels', PublicChannelsMembers);
+		}
 	}
 
 	@SubscribeMessage('joinChannel')

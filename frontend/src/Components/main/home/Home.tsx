@@ -4,7 +4,6 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import DataContext from '../../../services/data.context';
 import LoadingComponent from '../../shared/loading/loading';
 import Robot from './../../../assets/robot.png';
-import avatarGirl from './../../../assets/avatars/Beautiful_Elf.png'
 import fire from './../../../assets/Icon/fire.svg';
 import play from './../../../assets/img/Play.svg'
 import videoSource from './../../../assets/avatars/490488ec-2f13-402b-b203-951e4a4775cd.mp4';
@@ -12,8 +11,7 @@ import Chart from 'chart.js/auto';
 import { friendsService } from '../../../services/friend.service';
 import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
-import { Table } from 'flowbite-react';
-import { ProtectedChannel } from '../../../utils/types';
+import { Channel } from '../../../utils/types';
 import ModalComponent from '../../modal/modal';
 
 const group = () => {
@@ -52,7 +50,8 @@ const HomeComponent: React.FC = () => {
     const [friendData, setFriendData] = useState<friend[]>([]);
     const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
     const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
-    const [protectedChannels, setProtectedChannels] = useState<ProtectedChannel[]>([]);
+    const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
+    const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
     let chartInstance: Chart | null = null;
     // if (!userData[0])
@@ -62,6 +61,7 @@ const HomeComponent: React.FC = () => {
             return;
         }
         setProtectedChannels(userData[4]);
+        setPublicChannels(userData[5]);
         const fetchFriends = async () => {
             const friendService = new friendsService();
             const friends = await friendService.getFriends(userData[0].id);
@@ -145,7 +145,24 @@ const HomeComponent: React.FC = () => {
     }, [chartRef, userData]);
     if (!userData[0] || !friends.length)
         return <LoadingComponent />;
-    // const socket: Socket = userData[2];
+    const socket: Socket = userData[1];
+    socket?.on('protectedChannels', (data: any) => {
+        setProtectedChannels(data);
+    })
+    socket?.on('publicChannels', (data: any) => {
+        setPublicChannels(data);
+    })
+    const joinChannel = (channel: Channel) => {
+        socket?.emit('acceptJoinChannel', {
+            id: channel.id,
+            channelId: channel.id,
+            __owner__: userData[0].id,
+            role: 'MEMBER',
+            requestedUserId: userData[0].id,
+            userName: userData[0].username,
+        });
+        setOpenModal(false);
+    }
     // const socket: Socket = globalSocket;
     globalSocket?.on('updateList', (data: any) => {
         const connectedUsers: string[] = data.userIds;
@@ -169,11 +186,6 @@ const HomeComponent: React.FC = () => {
             })
         );
     });
-    const roomData = {
-        pictures: ['room1', 'room2'],
-        title: ['Magic room', 'Traditional room'],
-        description: ['This is a magic room', 'This is a Traditional room']
-    }
     
     return (
         <>
@@ -210,41 +222,58 @@ const HomeComponent: React.FC = () => {
                             <img className="w-80 h-[23rem] max-sm:w-40" src={Robot} alt="Robot" />
                         </div>
                     </div>
-                    <div className="w-2/3 bg-transparent flex flex-col justify-around flex-1 lg:flex-initial p-4 space-y-4 blur-[0.5px]">
+                    <div className="roomsHolder w-2/3 bg-transparent flex flex-col overflow-auto justify-around flex-1 lg:flex-initial p-4 space-y-4">
                         <div className="title text-2xl text-black dark:text-white font-poppins overflow-hidden">Public Rooms</div>
-                        {
-                            roomData.pictures.map((room, index) => {
-                                return (
-                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2" key={index}>
-                                        <div className="infos flex flex-row items-center space-x-4">
-                                            <div className="pic w-12 h-12 bg-white rounded-2xl">
-                                                <img src={roomData.pictures[index]} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
-                                            </div>
-                                            <div className="description">
-                                                <div className="text-white font-bold">{roomData.title[index]}</div>
-                                                <span className='text-gray-500'>{roomData.description[index]}</span>
-                                            </div>
-                                        </div>
-                                        <div className="action">
-                                            <img src={play} alt="Play" />
-                                        </div>
+                        <div className="rooms flex flex-col overflow-auto p-4 space-y-4">
+                            {
+                                publicChannels?.length == 0
+                                ?
+                                (
+                                    <div className="noRoom flex justify-start">
+                                        <span className='font-poppins text-lg dark:text-main-light-FERN text-main-light-EGGSHELL'> Noo Rooom Yet</span>
                                     </div>
                                 )
-                            })
-                        }
+                                :
+                                publicChannels.map((channel, index) => {
+                                    return (
+                                        <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2" key={index}>
+                                            <div className="infos flex flex-row items-center space-x-4">
+                                                <div className="pic w-12 h-12 rounded-2xl">
+                                                    <img src={baseAPIUrl + channel.picture} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
+                                                </div>
+                                                <div className="description">
+                                                    <div className="text-white font-bold">{channel.name}</div>
+                                                </div>
+                                            </div>
+                                            <div className="action cursor-pointer"  onClick={() => {joinChannel(channel);}}>
+                                                <img src={play} alt="Play" />
+                                            </div>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </section>
                 <section className='flex flex-col mb-20  flex-wrap justify-between p-2'>
                     <div className='min-w-[601px] flex-row flex-1 h-full p-2'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
-                        <div className="flex flex-col w-full flex-1  gap-6">
+                        <div className="gamesScrollHolder flex flex-col w-full flex-1  gap-6">
                             <GameModesCarousel />
                         </div>
                     </div>
                     <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
-                        <div className="flex-col w-full">
+                        <div className="flex flex-col w-full gap-2">
                             {
+                                protectedChannels?.length == 0
+                                ?
+                                    (
+                                        <div className="flex justify-center">
+                                            <span className='font-poppins text-lg dark:text-main-light-FERN text-main-light-EGGSHELL'> Noo Roooms</span>
+                                        </div>
+                                    )
+                                :
                                 protectedChannels.map((channel, index) => (
                                     <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2 w-full" key={index}>
                                         <div className="infos flex flex-row items-center space-x-4">

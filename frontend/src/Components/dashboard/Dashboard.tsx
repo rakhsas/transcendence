@@ -11,7 +11,7 @@ import DataContext from '../../services/data.context';
 import { Socket, io } from 'socket.io-client';
 import LoadingComponent from '../shared/loading/loading';
 import { ChannelService } from '../../services/channel.service';
-import { ProtectedChannel } from '../../utils/types';
+import { Channel } from '../../utils/types';
 // const url: string = "wss://10.12.249.229";
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
@@ -19,7 +19,8 @@ function DashboardComponent() {
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
 	const [users, setUsers] = useState<User[]>([]);
-	const [protectedChannels, setProtectedChannels] = useState<ProtectedChannel[]>([]);
+	const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
+	const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
 	const user = {
 		"id": "92ec84f8-33aa-4134-9f26-36bb12d68576",
 		"providerId": "95248",
@@ -52,8 +53,10 @@ function DashboardComponent() {
 				const users = await userService.getAllUsersExcept(fetchedUserData.id);
 				setUsers(users);
 				const channelService = new ChannelService();
-				const protectedChannels = await channelService.getProtectedChannels();
+				const protectedChannels = await channelService.getProtectedChannelsExpectUser(fetchedUserData?.id);
 				setProtectedChannels(protectedChannels);
+				const publicChannels = await channelService.getPublicChannels(fetchedPayloadData?.id);
+				setPublicChannels(publicChannels);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",
 					query: {
@@ -85,7 +88,7 @@ function DashboardComponent() {
 		return <LoadingComponent />;
 	}
 	return (
-		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels]}>
+		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full">
