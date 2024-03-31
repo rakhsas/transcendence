@@ -19,6 +19,7 @@ import { GameEntity } from './user/entities/game.entity';
 import { UploadModule } from './upload/upload.module';
 import express from 'express';
 import { join } from 'path';
+import { Notification as Notif} from './user/entities/notification.entity';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { join } from 'path';
       database: 'db1',
       synchronize: true,
       // logging: true,
-      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser],
+      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser, Notif],
     }),
     UserModule,
     AuthModule,

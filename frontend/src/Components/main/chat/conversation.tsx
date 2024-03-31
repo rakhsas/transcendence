@@ -77,6 +77,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 							</div>
 						) : (
 							latestMessages.map((message, index) => (
+								console.log('message', message),
 								<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 									handleSelectMessage(
 										index.toString(),
@@ -84,6 +85,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 										undefined
 									)
 								}}>
+									
 									<div className="msg-profile rounded-full mr-4 bg-rose-400 ">
 										<div className="msg-profile group" style={{ backgroundImage: `url(${userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture})` }}>
 										</div>
@@ -98,13 +100,13 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 													message.senderId === userData[0].id
 														?
 														<span className="font-poppins font-bold text-gray-700">
-															YOU :
-															<span className="text-black dark:text-white">
-																{message.img ? message.img.slice(7, 14) + '...' : message.message.length > 10 ? message.message.slice(0, 10) + '...' : message.message}
+															YOU:
+															<span className="text-black dark:text-white rrrrr">
+																{message.img.length > 0 ? ' Picture' : message.message.length > 10 ? message.message.slice(0, 10) + '...' : message.message}
 															</span>
 														</span>
 														:
-														message.img ? message.img.slice(7, 14) + '...' : message.message.length > 10 ? ' ' + message.message.slice(0, 10) + '...' : ' ' + message.message
+														message.img.length > 0 ? ' Picture' : message.message.length > 10 ? ' ' + message.message.slice(0, 10) + '...' : ' ' + message.message
 												}
 											</span>
 											<span className="msg-date text-main-light-FERN text-sm ml-4">

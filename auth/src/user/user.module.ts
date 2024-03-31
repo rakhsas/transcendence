@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Mute } from './entities/mute.entity';
 import { Channel } from './entities/channel.entity';
+import { Notification as Notif } from './entities/notification.entity';
 import { Msg } from './entities/msg.entitiy';
 import { Friendship } from './entities/freindship.entity';
 import { MessageService } from '../msg/message.service';
@@ -16,7 +17,7 @@ import { MessageController } from '../msg/message.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Msg, Channel, Mute, Friendship]),
+    TypeOrmModule.forFeature([User, Msg, Channel, Mute, Friendship, Notif]),
     HttpModule,
   ],
   providers: [UserService, UserGuard, AuthService, Repository, MessageService],

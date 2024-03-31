@@ -534,23 +534,16 @@ function chatComponent(): JSX.Element {
                       name="message"
                       onChange={(e) => setMessage(e.target.value)}
                       autoComplete="OFF"
-                      className="flex w-full border bg-white dark:bg-zinc-950 focus:ring-1 text-black dark:text-white rounded-xl focus:border-indigo-300 pl-4 h-10"
+                      className="flex w-full border bg-white dark:bg-zinc-950 focus:ring-0 text-black dark:text-white rounded-xl dark:focus:border-main-light-FERN focus:border-main-light-EGGSHELL pl-4 h-10"
                     />
-                    <div className="absolute flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600">
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
-                      </svg>
+                    <div className={`absolute flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600`} onClick={recording ? stopRecording : startRecording}>
+                      <svg stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                      {recording ? <div className="recording flex items-center justify-center w-8 h-8 rounded-full bg-red-500 overflow-hidden" /> : <div className="recording flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 overflow-hidden" />}
                     </div>
                   </div>
                 </div>
