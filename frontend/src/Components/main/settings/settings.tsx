@@ -1,21 +1,14 @@
 import "./settings.css";
 // import ValidInformation from '../../Info/Information';
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faCamera } from "@fortawesome/free-solid-svg-icons";
-// import logo from '../../../assets/avatars/anime_style.png';
-// import '../../Info/Information.css';
 import DataContext from "../../../services/data.context";
-// import QRCODE from "./images.png";
-// import axios from 'axios';
-// import picture from "./mdarify.png";
 import LoadingComponent from "../../shared/loading/loading";
 // import FourHundredFourComponent from "../../error/404.component";
 import { Route, Router, Routes } from "react-router-dom";
 import HomePageComponent from "../../HomePage";
 import { jsx } from "@emotion/react";
-import { Alert } from "flowbite-react";
-import { AlertProps } from '@mui/material/Alert';
+// import { Alert } from "flowbite-react";
+// import { AlertProps } from '@mui/material/Alert';
 
 
 /*
@@ -42,6 +35,19 @@ function App() {
   export default App;
 */
 
+interface AlertProps {
+  message: string;
+}
+
+const Alert: React.FC<AlertProps> = ({ message }) => {
+  return (
+    <div className="alert success">
+      <span className="closebtn">&times;</span>
+      <strong>Success!</strong> {message}
+    </div>
+  );
+};
+
 const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
   const fileInput = event.target;
   const chosenFile = fileInput.files && fileInput.files[0];
@@ -59,6 +65,8 @@ const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     reader.readAsDataURL(chosenFile);
   }
 };
+
+
 
 
 // "linear-gradient(to right, #d80909, #a02626, #610101)"
@@ -166,13 +174,16 @@ function SettingFunction(): JSX.Element {
         console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
         console.log('valid UserDate --> ', userData);
         console.log('status code2 --> : ', ValidQRcode);
-
+        
         // window.location.href = `https://10.12.13.6/`;
       }
       else {
         console.log('invalid Qrcode --> : ', ValidQRcode)
+        console.log('State Two valud 1 --> : ', userData[0])
         console.log('State Two valud 1 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
         userData[0].isTwoFactorAuthenticationEnabled = false;
+        // <SuccessQRCODE/>;
+        // {!ShowSignUp && <Alert message="Valid QR code scanned!" />}
         console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
         console.log('valid UserDate --> ', userData[0]);
         // window.location.href = `https://10.12.13.6/Error`;
