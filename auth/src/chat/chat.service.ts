@@ -209,6 +209,7 @@ export class ChatService {
     // newEntity.user = Promise.resolve(payload.__owner__.id);
     newChannelUser.user = Promise.resolve(user);
     newChannelUser.channel = Promise.resolve(channel);
+    console.log("role", payload)
     newChannelUser.role = (role !== "") ? role : payload.role
 
     // Save the new ChannelUser record

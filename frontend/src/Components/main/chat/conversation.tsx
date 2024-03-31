@@ -37,6 +37,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
         const name = event.currentTarget.channelName.value;
         const type = event.currentTarget.types.value;
         const password = event.currentTarget.password?.value;
+		if (password && password.length !== 6) {
+			return;
+		}
 		const formData = new FormData();
 		formData.append('file', imagePath);
         if (name === '' || type === '') {
@@ -162,9 +165,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
 								<div>
 									<div className="mb-2 block">
-										<Label htmlFor="channelName" value="Your email" />
+										<Label htmlFor="channelName" value="Room Name" />
 									</div>
-									<TextInput id="channelName" type="text" placeholder="Give It a name" />
+									<TextInput id="channelName" type="text" autoComplete="OFF" placeholder="Give It a name" />
 								</div>
 								<div className="mb-2 block">
 									<div className="mb-2 block">
@@ -183,7 +186,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 												<div className="mb-2 block">
 													<Label htmlFor="password" value="Your password" />
 												</div>
-												<TextInput id="password" type="password" />
+												<TextInput id="password" type="password" maxLength={6} minLength={6} />
 											</div>
 										</div>
 									) :

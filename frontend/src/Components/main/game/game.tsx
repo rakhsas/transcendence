@@ -6,6 +6,7 @@ import playFill from './../../../assets/img/Play-Fill.svg'
 import expandLeft from './../../../assets/Icon/Expand_left.png'
 import expandRight from './../../../assets/Icon/Expand_right.png'
 import './game.css';
+import { useEffect } from 'react';
 interface CarouselItemProps {
     image: string;
     heading: string;
@@ -42,37 +43,22 @@ const GameModesCarousel: React.FC = () => {
             heading={heading[index]}
         />
     ));
-
+    const options = {
+        className: "owl-theme1",
+        autoplay: true,
+        center: true,
+        autoplayHoverPause: true,
+        dots: true,
+        animateOut: true,
+        loop: true,
+        margin: 10
+    }
     return (
         <div
-            style={{ }}
-            className='gamesmodeCont w-full z-10'>
+            className='gamesmodeCont z-10'>
             <OwlCarousel
-                nav={false}
-                dots={false}
-                className="owl-theme"
-                autoplay={true}
-                center
-                responsive={
-                    {
-                        1000: {
-                            items: 3,
-                        },
-                        600: {
-                            items: 2,
-                        },
-                        0: {
-                            items: 1,
-                        }
-                    }
-                }
-                autoplayHoverPause={true}
-                animateOut={true}
-                smartSpeed={700}
-                autoplayTimeout={2000}
-                navClass={[expandLeft, expandRight]}
-                // navText={['<', '>']}
-                loop
+                {...options}
+                autoWidth
             >
                 {renderImages()}
             </OwlCarousel>
