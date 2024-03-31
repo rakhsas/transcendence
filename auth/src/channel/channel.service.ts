@@ -101,7 +101,7 @@ export class ChannelService {
         })
     }
 
-    async getProtectedChannelsExpectUser(userId: UUID): Promise<Channel[]> {
+    async getProtectedChannelsExpectUser(userId: string): Promise<Channel[]> {
         // Find all protected channels
         const allProtectedChannels = await this.channelRepository.find({
             where: {
@@ -120,7 +120,7 @@ export class ChannelService {
         return channelsNotJoinedByUser;
     }
 
-    async getUserJoinedChannels(userId: UUID): Promise<Channel[]> {
+    async getUserJoinedChannels(userId: string): Promise<Channel[]> {
         const channelUsers = await this.channelUserRepository.find({
             where: {
                 user: {id: userId}
@@ -132,7 +132,7 @@ export class ChannelService {
         )
     }
 
-    async getPublicChannels(userId: UUID) {
+    async getPublicChannelsExpectUser(userId: string): Promise<Channel[]> {
         const allProtectedChannels = await this.channelRepository.find({
             where: {
                 type: ChannelTypes.PUBLIC,

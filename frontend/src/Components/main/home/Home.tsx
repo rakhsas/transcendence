@@ -48,7 +48,6 @@ const HomeComponent: React.FC = () => {
     const [channel, setChannel] = useState<any>({});// channel data
     const [friends, setFriends] = useState<any[]>([]);
     const [friendData, setFriendData] = useState<friend[]>([]);
-    const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
     const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
     const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
     const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
@@ -146,7 +145,8 @@ const HomeComponent: React.FC = () => {
     if (!userData[0] || !friends.length)
         return <LoadingComponent />;
     const socket: Socket = userData[1];
-    socket?.on('protectedChannels', (data: any) => {
+    socket?.on('protectedChannels', async (data: any) => {
+        console.log('protectedChannels: ', await data);
         setProtectedChannels(data);
     })
     socket?.on('publicChannels', (data: any) => {
