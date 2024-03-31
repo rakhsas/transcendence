@@ -155,7 +155,7 @@ export class Game {
   render() {
     this.server
       .to(this.roomId)
-      .emit('message', this.user, this.computer, this.ball);
+      .emit('render', this.user.score, this.computer.score, this.ball);
     this.update();
   }
 

@@ -48,13 +48,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.removePlayer(client.id);
   }
 
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): void {
-    const { uy, cy, id } = payload;
+  @SubscribeMessage('moves')
+  handleMoves(
+    client: any,
+    payload: { id: string; y: number; index: number },
+  ): void {
+    const { id, y, index } = payload;
+    console.log(1);
     if (!this.rooms[id]) return;
-
-    this.rooms[id].game.computer.y = cy;
-    this.rooms[id].game.user.y = uy;
+    client.broadcast.to(id).emit('move', y);
+    if (index === 1) this.rooms[id].game.user.y = y;
+    else this.rooms[id].game.computer.y = y;
   }
 
   private matchPlayers(): void {

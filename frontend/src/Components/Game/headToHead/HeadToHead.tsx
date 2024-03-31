@@ -89,7 +89,7 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
       socket.off("disconnect");
     };
   }, [socket]);
-  function handleClick(e) {
+  function handleClick(e: React.MouseEvent) {
     e.preventDefault();
     console.log("You clicked submit.");
     window.location.replace("/dashboard");
@@ -101,7 +101,7 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
           <GameStatus socket={socket} />
           <canvas
             ref={ref}
-            className="border-black my-auto border-2 w-full max-w-2xl"
+            className="border-black  my-auto border-2 w-full max-w-2xl"
             {...props}
           />
           {/* { <p className=" border-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center overflow-hidden">go back </p>} */}
