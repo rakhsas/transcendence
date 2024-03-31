@@ -1,20 +1,27 @@
 import Game from "./Game";
 import io, { Socket } from "socket.io-client";
-import { useRef, useEffect, useState, useContext } from "react";
+import { useRef, useEffect, useState } from "react";
 import GameStatus from "../GameStatus";
+import { Button, Spinner } from "flowbite-react";
+import { HiOutlineArrowRight } from "react-icons/hi";
+import CallComponent from "../../call/call";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
-const CanvasHeadToHead = (props: any) => {
+const CanvasHeadToHead = (props: { width: string; height: string }) => {
   const ref = useRef(null);
+  const index = useRef(0);
   const [roomId, setRoomId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [counter, setCounter] = useState<number>(0);
+  // const [counter, setCounter] = useState<number>(0);
 
-  // Third Attempts
-  useEffect(() => {
-    const timer = counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
-    return () => {clearInterval(timer);}
-  }, [counter]);
+  // // Third Attempts
+  // useEffect(() => {
+  //   const timer =
+  //     counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, [counter]);
 
   useEffect(() => {
     const newSocket: Socket = io(url, {
@@ -31,11 +38,33 @@ const CanvasHeadToHead = (props: any) => {
     if (!socket) return;
 
     const canvas = ref.current;
+
+    if (!canvas || !socket || !roomId) {
+      console.error("Canvas, socket, or roomId is not available.");
+      return () => socket.close();
+    }
+
+    // Initialize the game
+    let gameInstance: Game | null = new Game(
+      canvas,
+      socket,
+      roomId,
+      index.current
+    );
+    gameInstance.render();
+
+    return () => {
+      gameInstance = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]);
+
+  useEffect(() => {
+    if (!socket) return;
     // Event listener for receiving roomJoined event
-    socket.on("roomJoined", (roomId, index) => {
-      console.log("Joinded room");
-      if (!canvas || !socket || !roomId) return () => socket.close();
-      new Game(canvas, socket, roomId, index);
+    socket.on("roomJoined", (roomId, i) => {
+      console.log("Joined room");
+      index.current = i;
       setRoomId(roomId);
     });
 
@@ -52,26 +81,67 @@ const CanvasHeadToHead = (props: any) => {
     });
 
     return () => {
+      // Clean up event listeners when component unmounts
       socket.off("roomJoined");
-      socket.off("message");
+      socket.off("win");
+      socket.off("lose");
       socket.off("connect");
       socket.off("disconnect");
     };
   }, [socket]);
-
+  function handleClick(e) {
+    e.preventDefault();
+    console.log("You clicked submit.");
+    window.location.replace("/dashboard");
+  }
   return (
-    <div className=" flex  flex-col  items-center text-white border-red-700 border w-screen h-screen ">
-      {/* {roomId ? (
-        roomId === "win" ? (
-          <p>right click to go back to dashboard</p>
-        ) : (
-            <p>Start playing  {counter === 0 ? 'Go Go': counter} </p>
-        )
+    <div className="flex relative flex-col  items-center justify-center  text-white  border-e border  ">
+      {roomId ? (
+        <>
+          <GameStatus socket={socket} />
+          <canvas
+            ref={ref}
+            className="border-black my-auto border-2 w-full max-w-2xl"
+            {...props}
+          />
+          {/* { <p className=" border-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center overflow-hidden">go back </p>} */}
+          {roomId === "win" && (
+            <div className="absolute bg-[#FD0363] rounded-xl w-1/2 h-1/2 flex flex-col p-4  items-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <div className="flex-1 text-center ">
+                <p className="text-xl pb-4">Game Over</p>
+                <p className="text-xl">You win</p>
+              </div>
+              <Button
+                onClick={handleClick}
+                outline
+                gradientDuoTone="greenToBlue"
+                className="mb-0"
+              >
+                Go back
+                <HiOutlineArrowRight className="ml-2 h-5 w-5" />
+
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
-        <p>Waiting for another player to join...</p>
-      )} */}
-      <GameStatus hamza="hello" />
-      <canvas ref={ref} className="border-black my-auto border-2 w-full max-w-2xl" {...props} />
+        <>
+          <div className="flex flex-col items-center ">
+            {" "}
+            <h2 className=" md:text-3xl text-center  lg:text-4xl sm:text-xl text-sm font-extrabold text-black dark:text-white">
+              {" "}
+              Waiting for another player to join...{" "}
+            </h2>
+            <div className="w-10 h-10 o text-center">
+              <Spinner
+                color="failure"
+                aria-label="Failure spinner example"
+                size="lg"
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

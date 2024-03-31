@@ -128,10 +128,7 @@ class Game {
         this.canvas.height / 2,
         "#BFFF3C"
       );
-      // left click to restart game
-      this.canvas.addEventListener("click", () => {
-        window.location.replace("/dashboard");
-      });
+   
     });
 
     socket.on("lose", () => {
@@ -148,11 +145,7 @@ class Game {
         this.canvas.height / 2,
         "#BFFF3C"
       );
-      // left click to restart game
-      this.canvas.addEventListener("click", (evt) => {
-        evt.preventDefault();
-        window.location.replace("/dashboard");
-      });
+   
     });
 
     this.canvas.addEventListener("mousemove", (evt) => {
@@ -184,10 +177,10 @@ class Game {
       this.canvas.height / 2,
       "#BFFF3C"
     );
-    // left click to restart game
-    this.canvas.addEventListener("click", () => {
-      window.location.replace("/dashboard");
-    });
+    // // left click to restart game
+    // this.canvas.addEventListener("click", () => {
+    //   window.location.replace("/dashboard");
+    // });
   }
 
   drawRect(x: number, y: number, w: number, h: number, color: string) {

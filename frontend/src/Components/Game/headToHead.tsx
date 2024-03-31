@@ -3,7 +3,7 @@ import CanvasHeadToHead from './headToHead/HeadToHead';
 
 const HeadToHead = () => {
   return (
-    <div className='h-lvh flex justify-center items-center'>
+    <div className='flex justify-center w-full h-full items-center'>
       <CanvasHeadToHead
         width="600"
         height="400"
