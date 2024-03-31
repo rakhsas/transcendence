@@ -14,4 +14,7 @@ export class Notification {
 
   @Column()
   isReaded: boolean;
+
+  @Column()
+  content: string;
 }
