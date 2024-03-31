@@ -13,3 +13,15 @@ export enum ChannelTypes {
     PROTECTED = 'protected',
     PRIVATE = 'private',
 }
+
+
+export interface Channel {
+    id: number;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+    private: boolean;
+    password: string;
+    type: ChannelTypes;
+    picture: string;
+}

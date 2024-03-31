@@ -5,6 +5,7 @@ import { inputTheme } from "../../../utils/themes";
 import { Translate } from "@mui/icons-material";
 import { Socket } from "socket.io-client";
 import User from "../../../model/user.model";
+import { log10 } from "chart.js/helpers";
 
 type DetailsAreaProps = {
 	channelInfo: any;
@@ -52,7 +53,6 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 			setUsers(users);
 			const usersCopy = users.map((user: any) => ({ ...user, selected: false }));
 			setUsersCopy(usersCopy);
-			// setUsersCopy(users);
 		}
 		fetchUsers();
 	}, [])
@@ -75,9 +75,22 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 		newDropdownOpen[index] = !newDropdownOpen[index];
 		setOptionsDropdown(newDropdownOpen);
 	}
+
+	const handleCheckboxChange = (index:number, user1: any) => {
+		// Update usersCopy array when a checkbox is toggled
+		const updatedUsersCopy = usersCopy?.map((user, i) =>
+		  user.username === user1.username ? { ...user, selected: !user.selected } : user
+		);
+		setUsersCopy(updatedUsersCopy);
+	  };
 	const addUser = async () => {
-		usersCopy?.forEach(user => {
+		console.log('users: ', users);
+		console.log('usersCopy: ', usersCopy);
+		usersCopy?.forEach((user: any, index: number) => {
 			if (user.selected) {
+				const updatedUsersCopy = [...usersCopy];
+				updatedUsersCopy[index].selected = false; // Set to false after adding
+				setUsersCopy(updatedUsersCopy);
 				chatSocket?.emit('joinChannel', {
 					id: channelInfo.id,
 					__owner__: user.id,
@@ -86,19 +99,27 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 					userName: user.username
 				});
 			}
-		});
-		const usersCopy1 = users?.map((user: any) => ({ ...user, selected: false }));
-		setUsersCopy(usersCopy1);
-		setUserInput('');
+		  });
+		  const selectedUsers = usersCopy?.filter(user => user.selected);
+		  const newRoomMembers = selectedUsers && [...roomMembers, ...selectedUsers];
+		  setRoomMembers(newRoomMembers);
+	  
+		  // Reset the selection in usersCopy state
+		  const updatedUsersCopy = usersCopy?.map(user => ({ ...user, selected: false }));
+		  setUsersCopy(updatedUsersCopy);
+	  
+		  // Clear the userInput state
+		  setUserInput('');
 	};
 	chatSocket?.on('channelJoined', async (data: any) => {
 		setRoomMembers(data);
+		console.log(data);
 	})
 	chatSocket?.on('joinedError', (payload: any) => {
 	})
 	useEffect(() => {
-		console.log(users)
-	}, [filtredUsers, users])
+		console.log(filtredUsers)
+	}, [filtredUsers, users, usersCopy])
 	return (
 		<>
 			{
@@ -133,7 +154,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 								<div className="p-3">
 									<div className="flex max-w-md flex-col gap-4" id="checkbox">
 										<div className="flex items-center gap-2">
-											<TextInput type="text" theme={inputTheme} color="primary" rightIcon={search} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
+											<TextInput type="text" theme={inputTheme} color="primary" rightIcon={search} value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
 										</div>
 									</div>
 								</div>
@@ -148,13 +169,10 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 													<div className="info">
 														<span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
 													</div>
-													<Checkbox id="add-to-room" defaultChecked={usersCopy && usersCopy[index]?.selected} onChange={() => {
-														const user1 = usersCopy && [...usersCopy];
-														if (user1 && user1[index]) {
-															user1[index].selected = !usersCopy[index].selected;
-															setUsersCopy(user1);
-														}
-													}} />
+													<Checkbox
+													 id={`user-${user.id}`}
+													 checked={usersCopy?.some(user1 => user1.id === user.id && user1.selected)}
+													 onChange={() => handleCheckboxChange(index, user)} />
 												</div>
 											</li>
 										))
@@ -168,7 +186,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 								</a>
 							</div>
 						</div>
-						<div className={`w-auto max-w-xl h-auto ${muteUsersDropdown ? 'block' : 'hidden'} mx-auto`}>
+						{/* <div className={`w-auto max-w-xl h-auto ${muteUsersDropdown ? 'block' : 'hidden'} mx-auto`}>
 							<div className="z-10 bg-white rounded-lg shadow w-60 dark:bg-zinc-950" >
 								<div className="p-3">
 									<div className="flex max-w-md flex-col gap-4" id="checkbox">
@@ -189,11 +207,13 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 														<span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
 													</div>
 													<Checkbox id="add-to-room" defaultChecked={usersCopy && usersCopy[index]?.selected} onChange={() => {
-														const user = usersCopy && [...usersCopy];
-														if (user && user[index]) {
-															user[index].selected = !usersCopy[index].selected;
-															setUsersCopy(users);
-														}
+														const updatedUsers = usersCopy?.map((user, i) => {
+															if (user.username === user.username) {
+															  return { ...user, selected: !user.selected };
+															}
+															return user;
+														  });
+														  setUsersCopy(updatedUsers);
 													}} />
 												</div>
 											</li>
@@ -207,7 +227,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 									Add users
 								</a>
 							</div>
-						</div>
+						</div> */}
 						<div className="z-20 mt-2 w-full max-w-sm bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-zinc-800 dark:divide-gray-700" aria-labelledby="dropdownNotificationButton">
 							<div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-gray-50 dark:bg-zinc-700 dark:text-white">
 								Room Members

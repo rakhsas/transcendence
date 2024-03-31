@@ -62,3 +62,13 @@
         z-index: -1;
     }
 }
+
+@media screen and (min-width: 1700px) {
+    .title{
+        text-align: center !important;
+    }
+    .noRoom{
+        text-align: center !important;
+        justify-content: center !important;
+    }
+}

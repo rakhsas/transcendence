@@ -1,10 +1,10 @@
 import { User } from 'src/user/entities/user.entity';
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Channel } from "src/user/entities/channel.entity";
+import { Channel, ChannelTypes } from "src/user/entities/channel.entity";
 import { Repository } from "typeorm/repository/Repository";
 import { UUID, privateDecrypt } from 'crypto';
-import { ChannelUser } from 'src/user/entities/channel_member.entity';
+import { ChannelUser, UserRole } from 'src/user/entities/channel_member.entity';
 import { channel } from 'diagnostics_channel';
 import { Msg } from 'src/user/entities/msg.entitiy';
 
@@ -91,6 +91,63 @@ export class ChannelService {
            }))
         )
         return fullchannels;   
+    }
+    
+    async getProtectedChannels() {
+        return await this.channelRepository.find({
+            where: {
+                type: ChannelTypes.PROTECTED
+            }
+        })
+    }
+
+    async getProtectedChannelsExpectUser(userId: UUID): Promise<Channel[]> {
+        // Find all protected channels
+        const allProtectedChannels = await this.channelRepository.find({
+            where: {
+                type: ChannelTypes.PROTECTED,
+            },
+        });
+    
+        // Find channels the user has joined
+        const userJoinedChannels = await this.getUserJoinedChannels(userId);
+    
+        // Filter out channels the user has already joined
+        const channelsNotJoinedByUser = allProtectedChannels.filter(channel => {
+            return !userJoinedChannels.some(userChannel => userChannel.id === channel.id);
+        });
+    
+        return channelsNotJoinedByUser;
+    }
+
+    async getUserJoinedChannels(userId: UUID): Promise<Channel[]> {
+        const channelUsers = await this.channelUserRepository.find({
+            where: {
+                user: {id: userId}
+            },
+            relations: ['channel']
+        });
+        return await Promise.all(
+            channelUsers.map(async (channelUser) => await channelUser.channel)
+        )
+    }
+
+    async getPublicChannels(userId: UUID) {
+        const allProtectedChannels = await this.channelRepository.find({
+            where: {
+                type: ChannelTypes.PUBLIC,
+            },
+        });
+    
+        // Find channels the user has joined
+        const userJoinedChannels = await this.getUserJoinedChannels(userId);
+    
+        // Filter out channels the user has already joined
+        const channelsNotJoinedByUser = allProtectedChannels.filter(channel => {
+            return !userJoinedChannels.some(userChannel => userChannel.id === channel.id);
+        });
+    
+        return channelsNotJoinedByUser;
     }
 
 }

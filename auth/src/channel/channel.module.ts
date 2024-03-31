@@ -10,12 +10,14 @@ import { Msg } from 'src/user/entities/msg.entitiy';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserGuard } from 'src/guards/user.guard';
 import { HttpModule } from '@nestjs/axios';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Channel, User, ChannelUser, Msg]),
     AuthModule,
     HttpModule,
+    UserModule
   ],
   controllers: [ChannelController],
   providers: [ChannelService, Repository, UserGuard],
