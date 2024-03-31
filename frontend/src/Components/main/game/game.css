@@ -30,8 +30,8 @@
       transform: rotate(360deg);
     }
   }
-  
-.center :hover .container-analytics4{
+
+.center :hover .container-rooms{
     transform-origin: bottom;
     transform: scale(1.05);
     transform: rotate(-6deg);
@@ -55,10 +55,10 @@
     display: flex;
 }
 
-.owl-stage-outer {
+/* .owl-stage-outer {
     height: fit-content !important;
 
-}
+} */
 /* .owl-item {
     width: 330px !important;
 } */
