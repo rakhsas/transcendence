@@ -9,23 +9,23 @@ function AnalyticsComponent(): JSX.Element {
             <div className="container-analytics font-poppins">
                 <div className='leader-board'>
                     <div className='top3'>
-                        <div className=' first-cards' id='one'>
+                        <div className='dark:bg-black first-cards' id='one'>
                             <img src="/woumecht.jpg" alt="" />
-                            <h3 className=' fullName font-poppins '>Walid oumechtak</h3>
+                            <h3 className='dark:text-white!important fullName font-poppins '>Walid oumechtak</h3>
                             <p className='login font-poppins'>woumecht</p>
                             <button className='btn-profile font-poppins'>Profile</button>
-                            <span className=' rank font-poppins'>1st</span>
-                            <div className=' score font-poppins'>Score: 230 exp</div>
+                            <span className='dark:text-white!important rank font-poppins'>1st</span>
+                            <div className='dark:text-white!important score font-poppins'>Score: 230 exp</div>
                         </div>
-                        <div className='first-cards' id='two'>
+                        <div className='dark:bg-black first-cards' id='two'>
                             <img src="/rakhsas.jpg" alt="" />
                             <h4 className='fullName font-poppins'>Walid oumechtak</h4>
                             <p className='login font-poppins'>woumecht</p>   
                             <button className='btn-profile font-poppins'>Profile</button>
-                            <span className='rank' font-poppins>2st</span>  
+                            <span className='rank'>2st</span>  
                             <div className='score font-poppins'>Score: 230 exp</div>
                         </div>
-                        <div className=' first-cards' id='three'>
+                        <div className='dark:bg-black first-cards' id='three'>
                             <img src="/hbenfadd.jpg" alt="" />
                             <h3 className='fullName font-poppins'>Walid oumechtak</h3>
                             <p className='login font-poppins'>woumecht</p>
