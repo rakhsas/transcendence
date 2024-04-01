@@ -187,6 +187,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		});
 	}
+	
+	@SubscribeMessage('changeChannelType')
+	async handleChangeChannelType(payload: any): Promise<void> {
+		await this.chatService.changeChannelType(payload);
+	}
+
+	// ================================= User function ===================================================
 
 	@SubscribeMessage('kickTheUser')
 	async handleKickUserFromChannel(socket: Socket, payload: any): Promise<void> {
@@ -196,9 +203,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		await this.chatService.kickUserFromChannel(payload);
 	}
 
-	@SubscribeMessage('changeChannelType')
-	async handleChangeChannelType(payload: any): Promise<void> {
-		await this.chatService.changeChannelType(payload);
+	@SubscribeMessage('banUser')
+	/*
+		expected payload:
+		{
+			channelId: the channel from where the user will be banned.
+			userId: the user should be banned.
+		}
+	*/
+	async handleBanUser(client: Socket ,payload: any): Promise<void> {
+		client.leave(payload.channelId);
+		await this.chatService.banUser(payload);
 	}
 
 	@SubscribeMessage('promoteUser')

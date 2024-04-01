@@ -12,6 +12,7 @@ import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { UserRole } from '../user/entities/channel_member.entity';
 import { UserService } from 'src/user/user.service';
 import { ChannelService } from 'src/channel/channel.service';
+import { Banned } from 'src/user/entities/ban.entity';
 
 @Injectable()
 export class ChatService {
@@ -26,6 +27,8 @@ export class ChatService {
     private readonly muteRepository: Repository<Mute>,
     @InjectRepository(ChannelUser)
     private readonly channelUserRepository: Repository<ChannelUser>,
+    @InjectRepository(Banned)
+    private readonly BanRepository: Repository<Banned>,
     private userService: UserService,
     private channelService: ChannelService,
   ) {}
@@ -48,6 +51,33 @@ export class ChatService {
 
 
   // ================================= Users functions ================================================================================
+
+   /**
+   * kickUserFromChannel - kick a user from the channel.
+   * @param payload userId and channelId from where the user will be kicked
+   * in the channel-user entity.
+   */
+   async kickUserFromChannel(payload: any)
+   {
+     const targetedEntity = await this.channelUserRepository.findOne({
+       where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
+     });
+ 
+     if (targetedEntity)
+     {
+       await this.channelUserRepository.delete(targetedEntity.id);
+     }
+     else
+       console.log("the user in channel-user relation is not found!!!");
+   }
+
+   async banUser(payload: any){
+      const newRecord = this.BanRepository.create({
+        user: {id: payload.userId},
+        channel: {id: payload.channelId}
+      });
+      this.BanRepository.save(newRecord);
+   }
 
   // async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
   //   const sender = await this.userRepository.findOne({ where: { id: IdSender }, select: { blocks: true } });
@@ -214,24 +244,7 @@ export class ChatService {
     await this.channelUserRepository.save(newChannelUser);
   }
 
-  /**
-   * kickUserFromChannel - kick a user from the channel.
-   * @param payload userId and channelId from where the user will be kicked
-   * in the channel-user entity.
-   */
-  async kickUserFromChannel(payload: any)
-  {
-    const targetedEntity = await this.channelUserRepository.findOne({
-      where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
-    });
-
-    if (targetedEntity)
-    {
-      await this.channelUserRepository.delete(targetedEntity.id);
-    }
-    else
-      console.log("the user in channel-user relation is not found!!!");
-  }
+ 
 
   async changeChannelType(payload: any)
   {
