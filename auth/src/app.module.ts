@@ -19,7 +19,8 @@ import { GameEntity } from './user/entities/game.entity';
 import { UploadModule } from './upload/upload.module';
 import express from 'express';
 import { join } from 'path';
-import { Notification as Notif} from './user/entities/notification.entity';
+import { NotificationModule } from './notification/notification.module';
+import { Blocked } from './user/entities/blocked.entity';
 
 @Module({
   imports: [
@@ -35,8 +36,7 @@ import { Notification as Notif} from './user/entities/notification.entity';
       password: 'root',
       database: 'db1',
       synchronize: true,
-      // logging: true,
-      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser],
+      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser, Blocked],
     }),
     UserModule,
     AuthModule,
@@ -45,6 +45,7 @@ import { Notification as Notif} from './user/entities/notification.entity';
     GameGetwayModule,
     ChannelModule,
     UploadModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [AppService],

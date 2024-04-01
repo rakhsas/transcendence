@@ -8,7 +8,7 @@ enum NotificationType {
 }
 
 @Entity()
-export class Notification {
+export class Notif {
     @PrimaryGeneratedColumn()
     id: number;
   

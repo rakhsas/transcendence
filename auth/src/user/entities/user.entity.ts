@@ -16,6 +16,7 @@ import { Friendship } from './freindship.entity'; // Assuming you have a Friends
 import { Msg } from './msg.entitiy'; // Assuming you have a Msg entity
 import { Mute } from './mute.entity'; // Assuming you have a Mute entity
 import { v4 as uuidv4 } from 'uuid'
+import { Blocked } from './blocked.entity';
 
 @Entity('users') // Table name mapping
 @Unique(['id', 'email', 'providerId', 'username'])
@@ -66,11 +67,11 @@ export class User {
   @Column({ nullable: false, unique: true })
   username: string;
 
-  @Column('uuid', { array: true, default: [] })
-  added: string[];
+  // @Column('uuid', { array: true, default: [] })
+  // added: string[];
 
-  @Column('uuid', { array: true, default: [] })
-  blocks: string[];
+  // @Column('uuid', { array: true, default: [] })
+  // blocks: string[];
   
   @OneToMany(() => Mute, (mute) => mute.userId, { lazy: true, cascade: true  })
   Muted: Promise<Mute[]>;
@@ -88,6 +89,9 @@ export class User {
   @OneToMany(() => Friendship, friend => friend.friend, { lazy: true, cascade: true })
   friendOf: Promise<Friendship[]>;
 
+
+  @OneToMany(() => Blocked, blockedUser => blockedUser.user)
+  blockedUsers: Blocked[];
   // ======================
 
   // @ManyToMany(() => Channel, (channel) => channel.members)

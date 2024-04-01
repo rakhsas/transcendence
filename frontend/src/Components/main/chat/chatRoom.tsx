@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import User from "../../../model/user.model";
 import LoadingComponent from "../../shared/loading/loading";
 import ModalComponent from "../../../utils/modal.component";
+import { Socket } from "socket.io-client";
 
 interface props {
     roomMessages: any[],
@@ -13,41 +14,49 @@ interface props {
     onCloseModal: any;
     modalPicPath: any;
     setRoomMessages: any;
+    socketChat: any;
 }
 
-const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMembers, isModalOpen, onOpenModal, onCloseModal, modalPicPath, setRoomMessages }) => {
+const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMembers, isModalOpen, onOpenModal, onCloseModal, modalPicPath, setRoomMessages, socketChat }) => {
+    const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
     const audioRefs: any = useRef([] as HTMLAudioElement[]);
     const messagesRef = useRef<HTMLDivElement>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-
     useEffect(() => {
         if (messagesRef.current)
-            scrollToBottom(messagesRef.current!);
-    }, [channelId, userData, roomMessages, roomMembers]);
+        scrollToBottom(messagesRef.current!);
+    }, [channelId, userData, roomMessages, roomMembers, setRoomMessages]);
     const scrollToBottom = (element: HTMLElement) => {
+        console.log("element", element);
         element.scrollTop = element.scrollHeight;
     };
     if (!roomMessages || !userData || !channelId || !roomMembers)
         return <LoadingComponent />;
-    const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
+    socketChat?.on('channelMessage', async (data: any) => {
+        const newMessage = [...roomMessages];
+        newMessage.push(data);
+        setRoomMessages(newMessage);
+        scrollToBottom(messagesRef.current!);
+    })
     return (
         <div className="" ref={messagesRef}>
             {
-                roomMessages.map((message: any, index) => {
-                    const sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId)).user;
+                roomMessages.length > 0 && roomMessages?.map((message: any, index) => {
+                    const sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId))?.user;
+                    if (!sender)
+                        return <LoadingComponent />
                     if (message.message.length > 0) {
                         return (
                             <div className="p-4" key={index}>
                                 <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                    <img className="w-8 h-8 rounded-full" src={sender.picture} alt="Jese image" />
+                                    <img className="w-8 h-8 object-cover rounded-full" src={sender.picture} alt="Jese image" />
                                     <div className="flex message flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
                                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
                                             <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
                                             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                         <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{message.message}</p>
-                                        {/* <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span> */}
                                     </div>
                                 </div>
                             </div>
@@ -57,7 +66,7 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
                         return (
                             <div className="p-4" key={index}>
                                 <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                    <img className="w-8 h-8 rounded-full" src={sender.picture} alt="" />
+                                    <img className="w-8 h-8 object-cover rounded-full" src={sender.picture} alt="" />
                                     <div className="flex flex-col gap-1">
                                         <div className="flex message flex-col w-full max-w-[326px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
                                             <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
@@ -90,7 +99,7 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
                         return (
                             <div className="p-4" key={index}>
                                 <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                    <img className="w-8 h-8 rounded-full" src={sender.picture} alt="" />
+                                    <img className="w-8 h-8 object-cover rounded-full" src={sender.picture} alt="" />
                                     <div className="flex message flex-col gap-2.5 w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
                                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
                                             <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
