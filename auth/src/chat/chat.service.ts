@@ -49,30 +49,30 @@ export class ChatService {
 
   // ================================= Users functions ================================================================================
 
-  async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
-    const sender = await this.userRepository.findOne({ where: { id: IdSender }, select: { blocks: true } });
-    const receiver = await this.userRepository.findOne({ where: { id: idReceiver }, select: { blocks: true } });
+  // async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
+  //   const sender = await this.userRepository.findOne({ where: { id: IdSender }, select: { blocks: true } });
+  //   const receiver = await this.userRepository.findOne({ where: { id: idReceiver }, select: { blocks: true } });
 
-    const isReceiverBlocked = sender?.blocks.includes(idReceiver) ?? false;
-    const isSenderBlocker = receiver?.blocks.includes(IdSender) ?? false;
+  //   const isReceiverBlocked = sender?.blocks.includes(idReceiver) ?? false;
+  //   const isSenderBlocker = receiver?.blocks.includes(IdSender) ?? false;
 
-    return isReceiverBlocked || isSenderBlocker;
-  }
+  //   return isReceiverBlocked || isSenderBlocker;
+  // }
 
 
-  async BlockUser(userId: UUID, idOfBlockedUser: UUID): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+  // async BlockUser(userId: UUID, idOfBlockedUser: UUID): Promise<User> {
+  //   const user = await this.userRepository.findOne({ where: { id: userId } });
 
-    if (!user)
-      throw new Error("User Not Found!");
-    if (!user.blocks.includes(idOfBlockedUser)) {
-      user.blocks = [...user.blocks, idOfBlockedUser];
-      return this.userRepository.save(user);
-    }
-    else {
-      throw new Error("User already blocked!! :)");
-    }
-  }
+  //   if (!user)
+  //     throw new Error("User Not Found!");
+  //   if (!user.blocks.includes(idOfBlockedUser)) {
+  //     user.blocks = [...user.blocks, idOfBlockedUser];
+  //     return this.userRepository.save(user);
+  //   }
+  //   else {
+  //     throw new Error("User already blocked!! :)");
+  //   }
+  // }
 
   // ====================================== Messages function ==========================================================================
 
@@ -82,7 +82,7 @@ export class ChatService {
    * @param receiverId the receiver
    * @param content the content of the message
    */
-  async addMessage(payload: any): Promise<void> {
+  async addMessage(payload: any) {
     const directMessage = this.msgRepository.create({
       message: payload.message,
       recieverId: payload.recieverId ? payload.recieverId : null,
@@ -91,7 +91,7 @@ export class ChatService {
       img: (payload.image !== undefined) ? payload.image : null,
       audio: (payload.audio !== undefined) ? payload.audio : null
     });
-    await this.msgRepository.save(directMessage);
+    return await this.msgRepository.save(directMessage);
   }
 
   /**
@@ -241,7 +241,7 @@ export class ChatService {
       throw new NotFoundException("The channel not found !");
 
     channelRecord.type = payload.channelType;
-    if (payload.channelType == ChannelTypes.PROTECTED)
+    if (payload.channelType === ChannelTypes.PROTECTED)
     {
       channelRecord.password = payload.password;
     }

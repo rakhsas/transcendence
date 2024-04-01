@@ -6,6 +6,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserRole } from 'src/user/entities/channel_member.entity';
 import { ChannelService } from 'src/channel/channel.service';
 import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/model/user.model';
 // import cli from '@angular/cli';
 // import { Paths } from '../../../frontend/src/utils/types';
 
@@ -54,8 +55,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('message')
 	async handleMessage(client: Socket, payload: any): Promise<void> {
 		// you can put the blocked code here {if they are blocked they can't send messages}.
-		if (await this.chatService.areUsersBlocked(payload.to, payload.from) === true)
-			return;
+		// if (await this.chatService.areUsersBlocked(payload.to, payload.from) === true)
+		// 	return;
 		if (payload.hasOwnProperty('recieverName')) {
 			const recieverName = String(payload.recieverName);
 			const toUserSocket = this.connectedUsers.get(recieverName);
@@ -114,13 +115,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
-
 	@SubscribeMessage('acceptJoinChannel')
 	async handleAcceptJoinChannel(client: Socket, payload: any): Promise<void> {
-		const channel = await this.chatService.getChannel(payload.channelId);
+		const channel = await this.chatService.getChannel(payload.id);
 		if (channel.password !== null && channel.password !== "") {
+			console.log(channel.password, payload.password)
 			if ("password" in payload && channel.password === payload.password) {
-				client.join(payload.channelId);
+				client.join(payload.id);
 				await this.chatService.addNewMemberToChannel(payload, "");
 			}
 			else if ("password" in payload && channel.password !== payload.password) {
@@ -165,14 +166,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('channelMessages')
 	async handleEvent(socket: Socket, payload: any): Promise<void> {
-		this.server.to(payload.cid).emit('channelMessage', {
-			"from": payload.senderId,
-			"cid": payload.cid,
-			"message": payload.message,
-			"image": payload.image,
-			"audio": payload.audio,
-		})
-		await this.chatService.addMessage(payload);
+		console.log('channelMessages: ', payload)
+		const channelMembers = await this.channelService.getMembersOfChannel(payload.cid);
+		const message = await this.chatService.addMessage(payload);
+		channelMembers.forEach((member: any) => {
+			if (member.user.id !== payload.senderId) {
+				if (this.connectedUsers.has(member.user.username)) {
+					this.connectedUsers.get(member.user.username).emit('channelMessage', 
+					message);
+					this.connectedUsers.get(member.user.username).emit('roomMessageNotif', {
+						to: member.user.id,
+						from: payload.senderId,
+						senderId: payload.senderId,
+						recieverId: member.user.id,
+						message: payload.message,
+						image: payload.image,
+						audio: payload.audio,
+					})
+				}
+			}
+		});
 	}
 
 	@SubscribeMessage('kickTheUser')
