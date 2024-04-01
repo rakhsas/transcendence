@@ -14,10 +14,11 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserModule } from 'src/user/user.module';
 import { ChannelModule } from 'src/channel/channel.module';
 import { ChannelService } from 'src/channel/channel.service';
+import { Banned } from 'src/user/entities/ban.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser]),
+    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser, Banned]),
     UserModule,
     // ChannelModule
   ],
