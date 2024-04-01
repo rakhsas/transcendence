@@ -80,7 +80,7 @@ function SettingFunction(): JSX.Element {
     setIsChecked(!ischecked);
   }
   const changeBackgroundColor = () => {
-      setBackgroundColor("linear-gradient(to right, #217441, #207a3f, #22A34A)"); // Replace getRandomColor() with your color generation logic
+    setBackgroundColor("linear-gradient(to right, #217441, #207a3f, #22A34A)"); // Replace getRandomColor() with your color generation logic
   }
   const APIURL = import.meta.env.VITE_API_AUTH_KEY;
   const [input, setInput] = useState("");
@@ -174,7 +174,7 @@ function SettingFunction(): JSX.Element {
         console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
         console.log('valid UserDate --> ', userData);
         console.log('status code2 --> : ', ValidQRcode);
-        
+
         // window.location.href = `https://10.12.13.6/`;
       }
       else {
@@ -200,18 +200,38 @@ function SettingFunction(): JSX.Element {
       console.log('Invalid qrcode \n');
     }
   };
-  useEffect(() => {}, [ischecked])
+  useEffect(() => { }, [ischecked]);
+  const [firstName, setFirstName] = useState<string>('');
+  const [SecondName, setSecondName] = useState<string>('');
+
+  const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    // Regular expression for validating first name (only alphabets, no special characters)
+    const isValidFirstName = /^[A-Za-z\s]+$/.test(value);
+    if (isValidFirstName || value === '') {
+      setFirstName(value);
+    }
+  };
+  const handleSecondNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    // Regular expression for validating first name (only alphabets, no special characters)
+    const isValidSecond = /^[A-Za-z\s]+$/.test(value);
+    if (isValidSecond || value === '') {
+      setSecondName(value);
+    }
+  };
+
   return (
     <div
       className="
             m-4 flex flex-col new:flex-row w-full h-[90vh] 
             justify-between gap-4 bg-inherit overflow-hidden 
-            overflow-y-scroll no-scrollbar 
+             no-scrollbar overflow-y-scroll 
             Setting"
     >
-      <div className="part1   gap-4 w-full md:min-w-[35%] overflow-y-scroll no-scrollbar min-h-full overflow-hidden Usredit bg-white dark:bg-black">
+      <div className="part1   gap-4 w-full md:min-w-[35%]  min-h-full  Usredit bg-white dark:bg-black">
         {/* <div className="titpr"></div> */}
-        <div className="p-4  overflow-hidden flex flex-col  overflow-y-scroll no-scrollbar w-full justify-center items-center gap-12 ">
+        <div className="p-4  overflow-hidden flex flex-col   no-scrollbar w-full justify-center items-center gap-12 ">
           <img src={userData[0]?.picture || ''} id="list" alt="" />
           <label htmlFor="file" id="uploadbtn" className="gap-4">
             <p onChange={handleFileChange} className="parPhoto text-white dark:text-black bolder font-extrabold font-900">
@@ -235,17 +255,17 @@ function SettingFunction(): JSX.Element {
           >
             2FA-AUTHENTICATION
           </h2>
-          <img className={`${ischecked? 'visible' : 'invisible'}`} src={url} alt="" />
+          <img className={`${ischecked ? 'visible' : 'invisible'} Qrcode` } src={url} alt="" />
 
           <form className="max-w-sm mx-auto" onSubmit={onchange}>
-          <p
+            <p
               id="helper-text-explanation"
-              className={`mt-2 text-sm  -twof--part1 font-extrabold ${ischecked? 'visible' : 'invisible'} text-white dark:text-black`}
+              className={`mt-2 text-sm  -twof--part1 font-extrabold ${ischecked ? 'visible' : 'invisible'} text-white dark:text-black`}
             >
               Please introduce the 6 digit <br />
               code scanned by application
             </p>
-            <div className={`flex mt-8 space-x-2 rtl:space-x-reverse flex-row justify-center items-center ${ischecked? 'visible' : 'invisible'}`}>
+            <div className={`flex mt-8 space-x-2 rtl:space-x-reverse flex-row justify-center items-center ${ischecked ? 'visible' : 'invisible'}`}>
               <div className="flex flex-row justify-center items-center">
                 <label
                   htmlFor="code-1"
@@ -271,7 +291,7 @@ function SettingFunction(): JSX.Element {
                 />
               </div>
             </div>
-            
+
           </form>
           <li>
             <div className={`flex p-2 rounded border-green-600 ${ischecked ? 'bg-gradient-to-r from-green-500 via-green-400 to-green-600 border ' : 'bg-red-500'}`} onChange={FuncClick}>
@@ -300,7 +320,7 @@ function SettingFunction(): JSX.Element {
                   className="font-medium text-gray-900 dark:text-gray-300 "
                 >
                   <div className="--Enable-2fa FontAwesome font-medium flex flex-row justify-center items-center " >
-                    {ShowSignUp ? '2F-AUTHENTICATION-ATCIVE': '2F-AUTHENTICATION-DISACTIVE'}
+                    {ShowSignUp ? '2F-AUTHENTICATION-ATCIVE' : '2F-AUTHENTICATION-DISACTIVE'}
                   </div>
                   {/* <p id="helper-checkbox-text-2" className="text-xs font-normal text-gray-500 dark:text-gray-300">Some helpful instruction goes over here.</p> */}
                 </label>
@@ -311,8 +331,8 @@ function SettingFunction(): JSX.Element {
           {/* <h2 className='-twof--part1'>2FA-AUTHENTICATION</h2> */}
         </div>
       </div>
-      <div className="part2 flex flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full overflow-hidden Information justify-center items-center bg-white dark:bg-black ">
-        <form className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] overflow-hidden">
+      <div className="part2 flex flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center bg-white dark:bg-black ">
+        <form className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] ">
           <h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5">
             Information
           </h2>
@@ -327,32 +347,45 @@ function SettingFunction(): JSX.Element {
               <input
                 type="text"
                 id="first_name"
+                value={firstName}
+                onChange={handleFirstNameChange}
+                maxLength={15}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
               dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Mohamed"
                 required
               />
+              {!/^$|^[A-Za-z\s]+$/.test(firstName) && (
+                <p style={{ color: 'red' }}>Please enter a valid first name (only alphabets).</p>
+              )}
             </div>
             <div>
               <label
                 htmlFor="last_name"
                 className="block mb-2 text-sm   text-blue-600 font-bolder dark:text-white"
+                
               >
                 Last name
               </label>
               <input
                 type="text"
                 id="last_name"
+                value={SecondName}
+                onChange={handleSecondNameChange}
+                maxLength={10}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
               dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Darify"
                 required
               />
+              {!/^$|^[A-Za-z\s]+$/.test(SecondName) && (
+                <p style={{ color: 'red' }}>Please enter a valid first name (only alphabets).</p>
+              )}
             </div>
             <div>
               <label
                 htmlFor="company"
-                className="block mb-2 text-sm text-blue-600 font-bolder dark:text-white"
+                className="block mb-2 text-sm text-blue-600 font-bolder  dark:text-white"
               >
                 Company
               </label>
@@ -362,7 +395,7 @@ function SettingFunction(): JSX.Element {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
                dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="1337 Coding School"
-                required
+                required disabled
               />
             </div>
             <div>
@@ -473,7 +506,7 @@ function SettingFunction(): JSX.Element {
                 className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600
                  dark:focus:ring-blue-600 dark:ring-offset-gray-800"
                 required
-                
+
               />
             </div>
             <label

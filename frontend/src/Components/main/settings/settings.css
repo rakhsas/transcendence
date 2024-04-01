@@ -154,6 +154,10 @@
 } 
 /* onClick={changeBackgroundColor} style={{backgroundColor: backgroundColor}} */
 
+.Qrcode{
+    border: 5px solid #217441;
+    border-radius: 15px;
+}
 
 @media screen and (max-widht: 725px) {
     
