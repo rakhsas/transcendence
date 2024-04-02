@@ -103,19 +103,31 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 															YOU:
 															<span className="text-black dark:text-white rrrrr">
 																{
-																	message.length > 0 ? (
-																		message.length > 10 ? message.slice(0, 10) + ' ...' : message
+																	message.message.length > 0 ? (
+																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
 																	) : (
-																		message.img && message.img.length > 0 ? 'Picture' :
-																		message.audio && message.audio.length > 0 ? 'Audio' :
+																		message.message.img && message.message.img.length > 0 ? ' Picture' :
+																		message.message.audio && message.message.audio.length > 0 ? ' Audio' :
 																		null
 																	)
 																}
-																{/* {message.img.length > 0 ? ' Picture' : message.message.length > 10 ? message.message.slice(0, 10) + '...' : message.message} */}
 															</span>
 														</span>
 														:
-														message.img.length > 0 ? ' Picture' : message.message.length > 10 ? ' ' + message.message.slice(0, 10) + '...' : ' ' + message.message
+														<span className="font-poppins font-bold text-gray-700">
+															HIM:
+															<span className="text-black dark:text-white rrrrr">
+																{
+																	message.message.length > 0 ? (
+																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																	) : (
+																		message.message.img && message.message.img.length > 0 ? ' Picture' :
+																		message.message.audio && message.message.audio.length > 0 ? ' Audio' :
+																		null
+																	)
+																}
+															</span>
+														</span>
 												}
 											</span>
 											<span className="msg-date text-main-light-FERN text-sm ml-4">
@@ -129,6 +141,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 				<Tabs.Item title="Rooms" icon={RiWechatChannelsFill}>
 					{lstGroupMessages.map((item, index) => {
 						const channel = item.channel;
+						console.log("channel: ", baseAPIUrl + channel.picture);
 						return (
 							<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 								

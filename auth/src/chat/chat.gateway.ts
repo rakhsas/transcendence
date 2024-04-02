@@ -7,6 +7,8 @@ import { UserRole } from 'src/user/entities/channel_member.entity';
 import { ChannelService } from 'src/channel/channel.service';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/model/user.model';
+import { NotificationService } from 'src/notification/notification.service';
+import { NotificationType } from 'src/user/entities/notification.entity';
 // import cli from '@angular/cli';
 // import { Paths } from '../../../frontend/src/utils/types';
 
@@ -24,7 +26,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly chatService: ChatService,
 		private readonly authService: AuthService,
 		private readonly channelService: ChannelService,
-		private readonly userService: UserService
+		private readonly userService: UserService,
+		private readonly notificationService: NotificationService
 	) { }
 
 	handleConnection(client: Socket) {
@@ -70,12 +73,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					"audio": payload.audio,
 					// "isOwner": false
 				});
-				toUserSocket.emit('directMessageNotif', {
-					to: payload.to,
-					from: payload.from,
-					senderId: payload.senderId,
-					recieverId: payload.recieverId,
+				const notif = await this.notificationService.createNotification({
+					target: payload.to,
+					type: NotificationType.MESSAGE,
+					issuer: payload.from,
 					message: payload.message,
+					image: payload.image ? payload.image : null,
+					audio: payload.audio? payload.audio : null,
+				});
+				const lastnotif = await this.notificationService.getNotificationById(notif.id);
+				toUserSocket.emit('directMessageNotif', {
+					lastnotif
 				})
 				await this.chatService.addMessage(payload)
 			}
@@ -117,6 +125,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('acceptJoinChannel')
 	async handleAcceptJoinChannel(client: Socket, payload: any): Promise<void> {
+		console.log('acceptJoinChannel: ', payload)
 		const channel = await this.chatService.getChannel(payload.id);
 		if (channel.password !== null && channel.password !== "") {
 			console.log(channel.password, payload.password)
@@ -157,7 +166,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			else 
 			{
-				this.connectedUsers.get(payload.userName).emit('channelJoinNotif', payload);
+				const notif = await this.notificationService.createNotification({
+					target: payload.__owner__,
+					type: NotificationType.CHANNEL_INVITE,
+					issuer: payload.requestedUserId,
+					message: payload.channelName,
+					image: payload.image ? payload.image : null,
+					audio: payload.audio? payload.audio : null,
+				});
+				const lastnotif = await this.notificationService.getNotificationById(notif.id);
+				this.connectedUsers.get(payload.userName).emit('channelJoinNotif', {lastnotif, payload});
 			}
 		} catch (error) {
 			client.emit('channelError', error);
@@ -169,24 +187,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log('channelMessages: ', payload)
 		const channelMembers = await this.channelService.getMembersOfChannel(payload.cid);
 		const message = await this.chatService.addMessage(payload);
-		channelMembers.forEach((member: any) => {
+		channelMembers.forEach(async (member: any) => {
 			if (member.user.id !== payload.senderId) {
 				if (this.connectedUsers.has(member.user.username)) {
 					this.connectedUsers.get(member.user.username).emit('channelMessage', 
 					message);
-					this.connectedUsers.get(member.user.username).emit('roomMessageNotif', {
-						to: member.user.id,
-						from: payload.senderId,
-						senderId: payload.senderId,
-						recieverId: member.user.id,
+					const notif = await this.notificationService.createNotification({
+						target: member.user.id,
+						type: NotificationType.CHANNEL_MESSAGE,
+						issuer: payload.senderId,
 						message: payload.message,
-						image: payload.image,
-						audio: payload.audio,
-					})
+						image: payload.image ? payload.image : null,
+						audio: payload.audio? payload.audio : null,
+					});
+					const lastnotif = await this.notificationService.getNotificationById(notif.id);
+					this.connectedUsers.get(member.user.username).emit('roomMessageNotif', lastnotif);
+				}
+				else {
+					await this.notificationService.createNotification({
+						target: member.user.id,
+						type: NotificationType.CHANNEL_MESSAGE,
+						issuer: payload.senderId,
+						message: payload.message,
+						image: payload.image ? payload.image : null,
+						audio: payload.audio? payload.audio : null,
+					});
 				}
 			}
 		});
 	}
+	@SubscribeMessage('changeChannelType')
+	async handleChangeChannelType(payload: any): Promise<void> {
+		await this.chatService.changeChannelType(payload);
+	}
+	
+	// ====================== User function ===================================================
 
 	@SubscribeMessage('kickTheUser')
 	async handleKickUserFromChannel(socket: Socket, payload: any): Promise<void> {
@@ -196,9 +231,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		await this.chatService.kickUserFromChannel(payload);
 	}
 
-	@SubscribeMessage('changeChannelType')
-	async handleChangeChannelType(payload: any): Promise<void> {
-		await this.chatService.changeChannelType(payload);
+	/*
+	expected payload:
+	{
+		channelId: the channel from where the user will be banned.
+		userId: the user should be banned.
+	}
+	*/
+	@SubscribeMessage('banUser')
+	async handleBanUser(client: Socket ,payload: any): Promise<void> {
+		client.leave(payload.channelId);
+		await this.chatService.banUser(payload);
 	}
 
 	@SubscribeMessage('promoteUser')

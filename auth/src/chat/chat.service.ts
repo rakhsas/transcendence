@@ -1,5 +1,5 @@
 // src/chat/chat.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Msg } from './../user/entities/msg.entitiy';
 import { UUID, privateDecrypt } from 'crypto';
@@ -12,6 +12,7 @@ import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { UserRole } from '../user/entities/channel_member.entity';
 import { UserService } from 'src/user/user.service';
 import { ChannelService } from 'src/channel/channel.service';
+import { Banned } from 'src/user/entities/ban.entity';
 
 @Injectable()
 export class ChatService {
@@ -26,6 +27,8 @@ export class ChatService {
     private readonly muteRepository: Repository<Mute>,
     @InjectRepository(ChannelUser)
     private readonly channelUserRepository: Repository<ChannelUser>,
+    @InjectRepository(Banned)
+    private readonly BanRepository: Repository<Banned>,
     private userService: UserService,
     private channelService: ChannelService,
   ) {}
@@ -48,6 +51,14 @@ export class ChatService {
 
 
   // ================================= Users functions ================================================================================
+
+  async banUser(payload: any){
+    const newRecord = this.BanRepository.create({
+      user: {id: payload.userId},
+      channel: {id: payload.channelId}
+    });
+    this.BanRepository.save(newRecord);
+ }
 
   // async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
   //   const sender = await this.userRepository.findOne({ where: { id: IdSender }, select: { blocks: true } });
@@ -221,16 +232,23 @@ export class ChatService {
    */
   async kickUserFromChannel(payload: any)
   {
+    console.log("kickUserFromChannel: ", payload);
     const targetedEntity = await this.channelUserRepository.findOne({
-      where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
+      where: {
+        channel: {id: payload.channelId},
+        user: {
+          id: payload.userId
+        }
+      },
+      relations: ['user'],
     });
-
-    if (targetedEntity)
-    {
-      await this.channelUserRepository.delete(targetedEntity.id);
-    }
-    else
-      console.log("the user in channel-user relation is not found!!!");
+    console.log("targetedEntity: ", targetedEntity);
+    // if (targetedEntity)
+    // {
+    //   await this.channelUserRepository.delete(targetedEntity.id);
+    // }
+    // else
+    //   console.log("the user in channel-user relation is not found!!!");
   }
 
   async changeChannelType(payload: any)

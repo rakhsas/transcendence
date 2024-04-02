@@ -1,10 +1,12 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./user.entity";
 
-enum NotificationType {
+export enum NotificationType {
     MESSAGE = 'MESSAGE',
     FRIEND_REQUEST = 'FRIEND_REQUEST',
     CALL_REQUEST = 'CALL_REQUEST',
+    CHANNEL_MESSAGE = 'CHANNEL_MESSAGE',
+    CHANNEL_INVITE = 'CHANNEL_INVITE',
 }
 
 @Entity()
@@ -12,7 +14,7 @@ export class Notif {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { nullable: true })
     target: User;
   
     @Column({ type: 'enum', enum: NotificationType })
@@ -21,8 +23,14 @@ export class Notif {
     @ManyToOne(() => User, { nullable: true })
     issuer: User;
   
-    @Column()
+    @Column({ nullable: true})
     message: string;
+    
+    @Column({ nullable: true})
+    audio: string;
+
+    @Column({ nullable: true})
+    image: string;
   
     @Column({ default: false })
     seen: boolean;

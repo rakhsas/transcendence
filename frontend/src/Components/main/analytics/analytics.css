@@ -79,10 +79,16 @@
     flex-wrap: wrap-reverse;
     align-items: center;
     justify-content: space-around;
-    font-family: poppins !important;
+    font-family: theme('fontFamily.poppins') !important;
     height: 100%;
+    overflow-y: auto;
 }
 
+@media screen and (max-width: 800px) {
+    .container-analytics .leader-board{
+        height: auto !important;
+    }
+}
 
 .container-analytics .leader-board{
     /* background-color: orange; */
