@@ -28,7 +28,6 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
         scrollToBottom(messagesRef.current!);
     }, [channelId, userData, roomMessages, roomMembers, setRoomMessages]);
     const scrollToBottom = (element: HTMLElement) => {
-        console.log("element", element);
         element.scrollTop = element.scrollHeight;
     };
     if (!roomMessages || !userData || !channelId || !roomMembers)
@@ -40,7 +39,7 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
         scrollToBottom(messagesRef.current!);
     })
     return (
-        <div className="" ref={messagesRef}>
+        <div className="" key={Math.random()} ref={messagesRef}>
             {
                 roomMessages.length > 0 && roomMessages?.map((message: any, index) => {
                     const sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId))?.user;

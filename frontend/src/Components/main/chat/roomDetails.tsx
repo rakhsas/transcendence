@@ -35,6 +35,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 	roomMembers
 }) => {
 	const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
+	console.log(channelInfo)
 	if (!channelInfo) {
 		return null;
 	}
@@ -96,7 +97,8 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 					__owner__: user.id,
 					role: 'MEMBER',
 					requestedUserId: userData[0].id,
-					userName: user.username
+					userName: user.username,
+					channelName: channelInfo.name
 				});
 			}
 		  });
@@ -117,6 +119,12 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 	})
 	chatSocket?.on('joinedError', (payload: any) => {
 	})
+	const kickUser = (userId: string, channelId: number) => {
+		chatSocket?.emit('kickTheUser', {
+			userId,
+			channelId
+		});
+	}
 	useEffect(() => {
 		console.log(filtredUsers)
 	}, [filtredUsers, users, usersCopy])
@@ -131,61 +139,70 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 							</div>
 							<div className="font-onest text-xl capitalize text-black dark:text-white overflow-hidden">{channelInfo.name}</div>
 						</div>
-						<div className="flex flex-row justify-between items-center">
-							<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
-								<div className="item flex justify-between flex-col items-center space-y-1 cursor-pointer" onClick={() => setDropdownUsersStatus(!isdropdownUsersOpen)}>
-									<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-									</svg>
-									<span className="text-black dark:text-white font-onest text-xs capitalize"> Add Member </span>
-								</div>
-							</div>
-							<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
-								<div className="item flex justify-between flex-col items-center space-y-1 cursor-pointer" onClick={() => setmuteUsersDropdownStatus(!muteUsersDropdown)}>
-									<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-									</svg>
-									<span className="text-black dark:text-white font-onest text-xs capitalize"> Mute Member </span>
-								</div>
-							</div>
-						</div>
-						<div className={`w-auto max-w-xl h-auto ${isdropdownUsersOpen ? 'block' : 'hidden'} mx-auto`}>
-							<div className="z-10 bg-white rounded-lg shadow w-60 dark:bg-zinc-950" >
-								<div className="p-3">
-									<div className="flex max-w-md flex-col gap-4" id="checkbox">
-										<div className="flex items-center gap-2">
-											<TextInput type="text" theme={inputTheme} color="primary" rightIcon={search} value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
+						{
+							channelInfo.private === true &&
+							(
+								<>
+									<div className="flex flex-row justify-between items-center">
+										<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
+											<div className="item flex justify-between flex-col items-center space-y-1 cursor-pointer" onClick={() => setDropdownUsersStatus(!isdropdownUsersOpen)}>
+												<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+													<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+												</svg>
+												<span className="text-black dark:text-white font-onest text-xs capitalize"> Add Member </span>
+											</div>
+										</div>
+										<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
+											<div className="item flex justify-between flex-col items-center space-y-1 cursor-pointer" onClick={() => setmuteUsersDropdownStatus(!muteUsersDropdown)}>
+												<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+													<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+												</svg>
+												<span className="text-black dark:text-white font-onest text-xs capitalize"> Mute Member </span>
+											</div>
 										</div>
 									</div>
-								</div>
-								<ul className="h-auto flex flex-col gap-2 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200 w-full">
-									{
-										filtredUsers?.map((user, index) => (
-											<li key={index} className="mx-2 bg-zinc-800 rounded">
-												<div className="flex flex-row gap-2 w-full h-12 rounded justify-between items-center px-2">
-													<div className="pic">
-														<img src={user.picture} className="w-8 h-8 rounded-full" />
+									<div className={`w-auto max-w-xl h-auto ${isdropdownUsersOpen ? 'block' : 'hidden'} mx-auto`}>
+										<div className="z-10 bg-white rounded-lg shadow w-60 dark:bg-zinc-950" >
+											<div className="p-3">
+												<div className="flex max-w-md flex-col gap-4" id="checkbox">
+													<div className="flex items-center gap-2">
+														<TextInput type="text" theme={inputTheme} color="primary" rightIcon={search} value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder="Moha Ouhammo" />
 													</div>
-													<div className="info">
-														<span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
-													</div>
-													<Checkbox
-													 id={`user-${user.id}`}
-													 checked={usersCopy?.some(user1 => user1.id === user.id && user1.selected)}
-													 onChange={() => handleCheckboxChange(index, user)} />
 												</div>
-											</li>
-										))
-									}
-								</ul>
-								<a onClick={addUser} className="cursor-pointer flex justify-center items-center p-3 text-sm font-medium text-green-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-green-500 hover:underline">
-									<svg className="w-6 h-6 text-green-500 dark:text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-									</svg>
-									Add users
-								</a>
-							</div>
-						</div>
+											</div>
+											<ul className="h-auto flex flex-col gap-2 pb-3 overflow-y-auto text-sm text-gray-700 dark:text-gray-200 w-full">
+												{
+													filtredUsers?.map((user, index) => (
+														<li key={index} className="mx-2 bg-zinc-800 rounded">
+															<div className="flex flex-row gap-2 w-full h-12 rounded justify-between items-center px-2">
+																<div className="pic">
+																	<img src={user.picture} className="w-8 h-8 rounded-full" />
+																</div>
+																<div className="info">
+																	<span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
+																</div>
+																<Checkbox
+																id={`user-${user.id}`}
+																checked={usersCopy?.some(user1 => user1.id === user.id && user1.selected)}
+																onChange={() => handleCheckboxChange(index, user)} />
+															</div>
+														</li>
+													))
+												}
+											</ul>
+											<a onClick={addUser} className="cursor-pointer flex justify-center items-center p-3 text-sm font-medium text-green-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-green-500 hover:underline">
+												<svg className="w-6 h-6 text-green-500 dark:text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+													<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+												</svg>
+												Add users
+											</a>
+										</div>
+									</div>
+								</>
+							)
+						}
+							
+						
 						{/* <div className={`w-auto max-w-xl h-auto ${muteUsersDropdown ? 'block' : 'hidden'} mx-auto`}>
 							<div className="z-10 bg-white rounded-lg shadow w-60 dark:bg-zinc-950" >
 								<div className="p-3">
@@ -236,6 +253,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 								{
 									roomMembers?.map((member: any, index: number) => {
 										const user = member.user;
+										
 										return (
 											<div key={index} className="">
 												<a className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
@@ -260,7 +278,9 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 															<a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Earnings</a>
 														</li>
 													</ul>
-													<div className="py-2">
+													<div className="py-2" onClick={()=> {
+														kickUser(user.id, channelInfo.id);
+													}}>
 														<a className="cursor-pointer bg-inherit flex justify-center items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
 															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />

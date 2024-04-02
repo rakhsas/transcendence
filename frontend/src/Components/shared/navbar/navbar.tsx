@@ -8,6 +8,7 @@ import UserService from "../../../services/user.service";
 import User from "../../../model/user.model";
 import AuthService from "../../../services/auth.service";
 import { Message } from "@mui/icons-material";
+import { notificationInterface } from './../../../utils/types';
 
 const SearchIcon = () => (
     <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-black dark:stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -25,12 +26,21 @@ const colorSettings: CustomFlowbiteTheme['textInput'] = {
     }
 }
 
+// enum NotificationType {
+//     CallRequest = "CallRequest",
+//     DirectMessage = "DirectMessage",
+//     FriendRequest = "FriendRequest",
+//     ChannelInvite = "ChannelInvite",
+//     RoomMessage = "RoomMessage"
+// }
+
 enum NotificationType {
-    CallRequest = "CallRequest",
-    DirectMessage = "DirectMessage",
-    FriendRequest = "FriendRequest",
-    ChannelInvite = "ChannelInvite",
-    RoomMessage = "RoomMessage"
+    MESSAGE = 'MESSAGE',
+    FRIEND_REQUEST = 'FRIEND_REQUEST',
+    CALL_REQUEST = 'CALL_REQUEST',
+    CHANNEL_MESSAGE = 'CHANNEL_MESSAGE',
+    CHANNEL_INVITE = 'CHANNEL_INVITE',
+    ROOM_MESSAGE = 'ROOM_MESSAGE'
 }
 
 interface NotifMessage {
@@ -50,13 +60,14 @@ function NavbarComponent(): JSX.Element {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [theme, setTheme] = useState(localStorage.theme);
     const colorTheme = theme === 'dark' ? 'light' : 'dark';
-    const [notifications, setNotifications] = useState<notifItems[]>([]);
+    // const [notifications, setNotifications] = useState<notifItems[]>([]);
     const [notificationCount, setNotificationCount] = useState<boolean>(false);
     const [users, setUsers] = useState<User[]>([]);
     const [searchInput, setSearchInput] = useState('');
     const userService = new UserService();
     const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+	const [notifications, setNotifications] = useState<notificationInterface[]>([]);
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove(colorTheme);
@@ -67,13 +78,9 @@ function NavbarComponent(): JSX.Element {
     if (!userData)
         return <LoadingComponent />
     useEffect(() => {
-        const fetchData = async () => {
-            const authService = new AuthService();
-            await authService.getPayload();
-            const userService = new UserService();
-        };
-        fetchData();
         setUsers(userData[3]);
+        setNotifications(userData[6]);
+        console.log('Notifications: ', notifications);
     }, []);
     useEffect(() => {
         if (!searchInput) {
@@ -87,74 +94,86 @@ function NavbarComponent(): JSX.Element {
         setFilteredUsers(filtered);
     }, [searchInput]);
     const socket: Socket = userData[1];
-    const onRequestCall = async (data: any) => {
-        setChannelNotifPayload(data);
-        const sender: User = await userService.getUser(data.senderId);
-        const newItem: notifItems = {
-            from: data.from,
-            to: data.to,
-            message: {
-                message: ' Requested a call.',
-                image: '',
-                audio: ''
-            },
-            sender: sender,
-            type: NotificationType.CallRequest
-        }
-        const updatedItems: notifItems[] = [...notifications, newItem];
-        setNotifications(updatedItems);
-        setNotificationCount(true);
-    }
-    socket?.on("RequestCall", onRequestCall);
+    // const onRequestCall = async (data: any) => {
+    //     setChannelNotifPayload(data);
+    //     const sender: User = await userService.getUser(data.senderId);
+    //     const newItem: notifItems = {
+    //         from: data.from,
+    //         to: data.to,
+    //         message: {
+    //             message: ' Requested a call.',
+    //             image: '',
+    //             audio: ''
+    //         },
+    //         sender: sender,
+    //         type: NotificationType.CallRequest
+    //     }
+    //     const updatedItems: notifItems[] = [...notifications, newItem];
+    //     setNotifications(updatedItems);
+    //     setNotificationCount(true);
+    // }
+    // socket?.on("RequestCall", onRequestCall);
     const onDirectMessage = async (data: any) => {
-        setNotificationCount(true);
-        const sender: User = await userService.getUser(data.senderId);
-        const newItem: notifItems = {
-            from: data.from,
-            to: data.to,
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: data.type,
             message: data.message,
-            sender: sender,
-            type: NotificationType.DirectMessage
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt
         }
-        const updatedItems: notifItems[] = [...notifications, newItem];
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
         setNotifications(updatedItems);
+        setNotificationCount(true);
     }
     socket?.on("directMessageNotif", onDirectMessage);
-    socket?.on("roomMessageNotif", (data: any) => {
-        console.log('roomMessageNotif: ', data);
-        const sender: User = data.senderId && users.find(user => user.id === data.senderId);
-        const newItem: notifItems = {
-            from: data.from,
-            to: data.to,
-            message: {
-                message: data.message,
-                image: data.image,
-                audio: data.audio
-            },
-            sender: sender,
-            type: NotificationType.RoomMessage
+    socket?.on("roomMessageNotif", async (data: any) => {
+        console.log('roomMessageNotif: ', await data);
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: data.type,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt
         }
-        const updatedItems: notifItems[] = [...notifications, newItem];
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
         setNotifications(updatedItems);
         setNotificationCount(true);
     })
-    socket?.on("channelJoinNotif", (data: any) => {
-        setChannelNotifPayload(data);
-        console.log('Payload received from socket:', channelNotifPayload);
-        const sender: User = data.senderId && users.find(user => user.id === data.requestedUserId);
-        const newItem: notifItems = {
-            from: data.requestedUserId,
-            to: data.__owner__,
-            message: {
-                message: ' Requested to join the channel.',
-                image: '',
-                audio: ''
-            
-            },
-            sender: sender,
-            type: NotificationType.ChannelInvite
+    socket?.on("channelJoinNotif", async (data: any) => {
+        setChannelNotifPayload(data.payload);
+        console.log('Payload received from socket:', await channelNotifPayload);
+        const newItem: notificationInterface = {
+            id: data.lastnotif.id,
+            type: data.lastnotif.type,
+            message: data.lastnotif.message,
+            audio: data.lastnotif.audio,
+            image: data.lastnotif.image,
+            seen: false,
+            read: false,
+            issuer: data.lastnotif.issuer,
+            createdAt: data.lastnotif.createdAt,
+            updatedAt: data.lastnotif.updatedAt
         }
-        const updatedItems: notifItems[] = [...notifications, newItem];
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
         setNotifications(updatedItems);
         setNotificationCount(true);
     })
@@ -178,6 +197,9 @@ function NavbarComponent(): JSX.Element {
             setNotifIsOpen(false);
         }
     });
+    useEffect(() => {
+        console.log(notifications)
+    }, [notifications]);
     return (
         <div className="p-4 flex flex-col sm:flex-row sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
@@ -199,14 +221,14 @@ function NavbarComponent(): JSX.Element {
                             {
                                 notifications.length > 0
                                     ?
-                                    notifications.map((item, index) => {
-                                        if (item.type === NotificationType.DirectMessage) {
+                                    notifications.map((item: notificationInterface, index) => {
+                                        if (item.type === NotificationType.MESSAGE) {
                                             console.log(item.message)
                                             return (
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-12 h-12">
-                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Jese image" />
+                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Jese image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-main-light-FERN border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
@@ -218,13 +240,13 @@ function NavbarComponent(): JSX.Element {
                                                     <div className="w-full ps-3">
                                                     <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">
                                                         New message from <span className="font-semibold text-gray-900 dark:text-main-light-FERN">
-                                                            {item.sender.username}
+                                                            {item.issuer.username}
                                                         </span>: {
-                                                            item.message.message.length > 0 ? (
-                                                                item.message.message.length > 10 ? item.message.message.slice(0, 10) + ' ...' : item.message.message
+                                                            item.message.length > 0 ? (
+                                                                item.message.length > 10 ? item.message.slice(0, 10) + ' ...' : item.message
                                                             ) : (
-                                                                item.message.image.length > 0 ? 'Picture' :
-                                                                item.message.audio.length > 0 ? 'Audio' :
+                                                                item.image.length > 0 ? 'Picture' :
+                                                                item.audio.length > 0 ? 'Audio' :
                                                                 null
                                                             )
                                                         }
@@ -233,7 +255,8 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                 </a>
                                             )
-                                        } else if (item.type === NotificationType.FriendRequest) {
+                                        }
+                                        else if (item.type === NotificationType.FRIEND_REQUEST) {
                                             return (
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
@@ -253,12 +276,12 @@ function NavbarComponent(): JSX.Element {
                                                 </a>
                                             )
                                         }
-                                        else if (item.type === NotificationType.ChannelInvite) {
+                                        else if (item.type === NotificationType.CHANNEL_INVITE) {
                                             return (
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Robert image" />
+                                                            <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
@@ -268,7 +291,7 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                     <div className="w-fit px-2">
                                                         <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400 w-fit§">
-                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.sender.username}</span>: {item.message.length > 15 ? item.message.slice(0, 15) + ' ...' : item.message}
+                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>: invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.message}</span>
                                                         </div>
                                                         <div className="text-xs text-blue-600 dark:text-blue-500">few moments ago</div>
                                                     </div>
@@ -277,6 +300,7 @@ function NavbarComponent(): JSX.Element {
                                                             socket?.emit("acceptJoinChannel",
                                                                 channelNotifPayload
                                                             );
+                                                            console.log('Channel Notif Payload: ', channelNotifPayload);
                                                         }}>
                                                             Accept
                                                         </Button>
@@ -286,12 +310,13 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                 </a>
                                             )
-                                        } else if (item.type === NotificationType.RoomMessage) {
+                                        }
+                                        else if (item.type === NotificationType.CHANNEL_MESSAGE) {
                                             return (
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-12 h-12">
-                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Jese image" />
+                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Jese image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-main-light-FERN border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -300,13 +325,13 @@ function NavbarComponent(): JSX.Element {
                                                         </div>
                                                     </div>
                                                     <div className="w-full ps-3">
-                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">New message from <span className="font-semibold text-gray-900 dark:text-main-light-FERN">{item.sender.username}</span>:
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">New message from <span className="font-semibold text-gray-900 dark:text-main-light-FERN">{item.issuer.username}</span>:
                                                             {
-                                                                item.message.message.length > 0 ? (
-                                                                    item.message.message.length > 10 ? item.message.message.slice(0, 10) + ' ...' : item.message.message
+                                                                item.message.length > 0 ? (
+                                                                    item.message.length > 10 ? item.message.slice(0, 10) + ' ...' : item.message
                                                                 ) : (
-                                                                    item.message.image.length > 0 ? 'Picture' :
-                                                                    item.message.audio.length > 0 ? 'Audio' :
+                                                                    item.image && item.image.length > 0 ? 'Picture' :
+                                                                    item.audio && item.audio.length > 0 ? 'Audio' :
                                                                     null
                                                                 )
                                                             }
@@ -316,11 +341,11 @@ function NavbarComponent(): JSX.Element {
                                                 </a>
                                             )
                                         }
-                                        else if (item.type === NotificationType.CallRequest) {(
+                                        else if (item.type === NotificationType.CALL_REQUEST) {(
                                             <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                 <div className="flex-shrink-0">
                                                     <div className="pic rounded-full w-11 h-11">
-                                                        <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Robert image" />
+                                                        <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
                                                     </div>
                                                     <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
                                                         <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">

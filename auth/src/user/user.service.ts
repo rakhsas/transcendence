@@ -50,13 +50,14 @@ export class UserService {
 	/**
 	 * this function is used to find user by id from User Entity.
 	*/
-	async viewUser(id: string): Promise<User> {
-		// return await this.userRepository.findOne({ where:{
-		// 	id: Number(id)
-		// } });
-		return await this.userRepository.findOneBy({
-			id
-		})
+	async viewUser(id: string): Promise<User | null> {
+		try {
+			return await this.userRepository.findOne({ where: { id } });
+		} catch (error) {
+			// Handle error gracefully
+			console.error('Error fetching user:', error);
+			return null;
+		}
 	}
 
 	async getUserById(id: string): Promise<User> {

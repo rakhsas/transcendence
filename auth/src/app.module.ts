@@ -21,6 +21,8 @@ import express from 'express';
 import { join } from 'path';
 import { NotificationModule } from './notification/notification.module';
 import { Blocked } from './user/entities/blocked.entity';
+import { Notif } from './user/entities/notification.entity';
+import { Banned } from './user/entities/ban.entity';
 
 @Module({
   imports: [
@@ -36,7 +38,7 @@ import { Blocked } from './user/entities/blocked.entity';
       password: 'root',
       database: 'db1',
       synchronize: true,
-      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser, Blocked],
+      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser, Blocked, Notif, Banned],
     }),
     UserModule,
     AuthModule,

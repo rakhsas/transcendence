@@ -33,7 +33,6 @@ class MessageService {
     async getMessages(userId: string, friendId: string): Promise<any> {
         try {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
-            // const response = await fetch("https://10.13.249.229/api/messages", 
             const response = await fetch(APIURL + `messages/${userId}/${friendId}`, 
             {
                 method: 'GET',

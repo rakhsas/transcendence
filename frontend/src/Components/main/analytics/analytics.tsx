@@ -6,7 +6,7 @@ import './analytics.css';
 function AnalyticsComponent(): JSX.Element {
     return (
         <>
-            <div className="container-analytics font-poppins">
+            <div className="container-analytics font-poppins overflow-x-hidden">
                 <div className='leader-board'>
                     <div className='top3'>
                         <div className='dark:bg-black bg-white first-cards' id='one'>
