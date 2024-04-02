@@ -102,32 +102,35 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
   return (
     <div className="flex  flex-col  items-center justify-center  text-white  ">
       {roomId ? (
-        roomId === "win" ? (
-          <div className=" bg-[#FD0363] rounded-xl  flex flex-col gap-4 px-9  py-4 items-center ">
-            <div className="flex-1 text-center ">
-              <p className="text-xl pb-4">Game Over</p>
-              <p className="text-xl">You win</p>
+        <div className="border-2 rounded-2xl">
+          <GameStatus socket={socket} roomId={roomId} />
+
+          {roomId === "win" ? (
+            <div {...props } className="bg-red-600">
+              <div className=" bg-[#FD0363] rounded-xl  flex flex-col gap-4 px-9  py-4 items-center ">
+                <div className="flex-1 text-center ">
+                  <p className="text-xl pb-4">Game Over</p>
+                  <p className="text-xl">You win</p>
+                </div>
+                <Button
+                  onClick={handleClick}
+                  outline
+                  gradientDuoTone="greenToBlue"
+                  className="mb-0"
+                >
+                  Go back
+                  <HiOutlineArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
             </div>
-            <Button
-              onClick={handleClick}
-              outline
-              gradientDuoTone="greenToBlue"
-              className="mb-0"
-            >
-              Go back
-              <HiOutlineArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-        ) : (
-          <div className="border-2 rounded-2xl">
-            <GameStatus socket={socket} roomId={roomId} />
+          ) : (
             <canvas
               ref={ref}
               className="border-black  my-auto border-2 w-full max-w-2xl"
               {...props}
             />
-          </div>
-        )
+          )}
+        </div>
       ) : (
         <>
           <div className="flex flex-col items-center ">
