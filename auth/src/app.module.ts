@@ -12,7 +12,7 @@ import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { FreindsModule } from './friends/friends.module';
-import { GameGetwayModule } from './game-getway/game-getway.module';
+import { GameGetwayModule } from './game/game.module';
 import { ChannelModule } from './channel/channel.module';
 import { ChannelUser } from './user/entities/channel_member.entity';
 import { GameEntity } from './user/entities/game.entity';

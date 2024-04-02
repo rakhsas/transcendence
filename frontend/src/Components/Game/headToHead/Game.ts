@@ -79,7 +79,7 @@ class Game {
   computer: Computer;
   net: Net;
   ball: Ball;
-  socket: any;
+  socket: Socket;
   roomId: string;
   index: number;
 
@@ -99,22 +99,27 @@ class Game {
     this.computer = new Computer(canvas);
     this.ball = new Ball(canvas);
 
-    socket.on("message", (user, comp, ball) => {
-      this.user = user;
-      this.computer = comp;
+    socket.on("render", (userScore, compScore, ball) => {
       this.ball = ball;
+      if (index === 1) {
+        this.user.score = userScore;
+        this.computer.score = compScore;
+      } else {
+        this.user.score = compScore;
+        this.computer.score = userScore;
+        this.ball.x = this.canvas.width - ball.x;
+      }
       this.render();
       if (
-        (this.user.score == 5 && this.index === 1) ||
-        (this.computer.score == 5 && this.index === 2)
+        (userScore == 5 && this.index === 1) ||
+        (compScore == 5 && this.index === 2)
       )
         this.final("win");
-      else if (this.user.score == 5 || this.computer.score == 5)
-        this.final("lose");
+      else if (userScore == 5 || compScore == 5) this.final("lose");
     });
 
     socket.on("win", () => {
-      console.log('win event ')
+      console.log("win event ");
       this.drawRect(
         0,
         0,
@@ -128,15 +133,6 @@ class Game {
         this.canvas.height / 2,
         "#BFFF3C"
       );
-      // right click to go back to dashboard
-      this.canvas.addEventListener("contextmenu", (evt) => {
-        evt.preventDefault();
-        window.location.reload();
-      });
-      // left click to restart game
-      this.canvas.addEventListener("click", () => {
-        window.location.replace("/dashboard");
-      });
     });
 
     socket.on("lose", () => {
@@ -153,29 +149,20 @@ class Game {
         this.canvas.height / 2,
         "#BFFF3C"
       );
-      // right click to go back to dashboard
-      this.canvas.addEventListener("contextmenu", (evt) => {
-        evt.preventDefault();
-        window.location.reload();
-      });
-      // left click to restart game
-      this.canvas.addEventListener("click", (evt) => {
-        evt.preventDefault();
-        window.location.replace("/dashboard");
-      });
+    });
+
+    socket.on("move", (y) => {
+      this.computer.y = y;
+      this.render();
     });
 
     this.canvas.addEventListener("mousemove", (evt) => {
       const rect = canvas.getBoundingClientRect();
-      if (this.index === 1) {
-        this.user.y = evt.clientY - rect.top - this.user.height / 2;
-      } else {
-        this.computer.y = evt.clientY - rect.top - this.computer.height / 2;
-      }
-      socket.emit("message", {
-        uy: this.user.y,
-        cy: this.computer.y,
+      this.user.y = evt.clientY - rect.top - this.user.height / 2;
+      socket.emit("moves", {
+        y: this.user.y,
         id: this.roomId,
+        index: this.index,
       });
     });
   }
@@ -194,15 +181,10 @@ class Game {
       this.canvas.height / 2,
       "#BFFF3C"
     );
-    // right click to go back to dashboard
-    this.canvas.addEventListener("contextmenu", (evt) => {
-      evt.preventDefault();
-      window.location.reload();
-    });
-    // left click to restart game
-    this.canvas.addEventListener("click", () => {
-      window.location.replace("/dashboard");
-    });
+    // // left click to restart game
+    // this.canvas.addEventListener("click", () => {
+    //   window.location.replace("/dashboard");
+    // });
   }
 
   drawRect(x: number, y: number, w: number, h: number, color: string) {
