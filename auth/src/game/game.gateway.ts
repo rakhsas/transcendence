@@ -1,4 +1,5 @@
 import {
+    MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
@@ -48,13 +49,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.removePlayer(client.id);
   }
 
+  @SubscribeMessage('userData')
+  handleUserData(
+    client: any,
+    payload: { id: string; userData: any },
+  )
+  {
+    const {id, userData} =  payload;
+    client.broadcast.to(id).emit('userData', userData);
+    console.log('userdata', userData)
+  }
+
   @SubscribeMessage('moves')
   handleMoves(
     client: any,
     payload: { id: string; y: number; index: number },
   ): void {
     const { id, y, index } = payload;
-    console.log(1);
     if (!this.rooms[id]) return;
     client.broadcast.to(id).emit('move', y);
     if (index === 1) this.rooms[id].game.user.y = y;
@@ -70,7 +81,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       players.forEach((player) => {
         player.socket.join(roomId);
         this.me = index;
-        this.server.to(player.socket.id).emit('roomJoined', roomId, index);
+        this.server.to(player.socket.id).emit('roomJoined', roomId, index, players[index % 2].id);
         index++;
       });
       const game = new Game(this.server, roomId);

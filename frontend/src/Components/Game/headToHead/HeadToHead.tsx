@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from "react";
 import GameStatus from "../GameStatus";
 import { Button, Spinner } from "flowbite-react";
 import { HiOutlineArrowRight } from "react-icons/hi";
-import CallComponent from "../../call/call";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
 const CanvasHeadToHead = (props: { width: string; height: string }) => {
@@ -62,8 +61,10 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
   useEffect(() => {
     if (!socket) return;
     // Event listener for receiving roomJoined event
-    socket.on("roomJoined", (roomId, i) => {
+    socket.on("roomJoined", (roomId, i, id) => {
       console.log("Joined room");
+      console.log(id);
+
       index.current = i;
       setRoomId(roomId);
     });
@@ -75,8 +76,8 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
     socket.on("lose", () => {
       setRoomId("win");
     });
-    socket.on("gameOver",()=>{
-      setRoomId('win');
+    socket.on("gameOver", () => {
+      setRoomId("win");
     });
     socket.on("connect", () => console.log("Connected"));
     socket.on("disconnect", () => {
@@ -99,35 +100,34 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
     window.location.replace("/dashboard");
   }
   return (
-    <div className="flex relative flex-col  items-center justify-center  text-white  border-e border  ">
+    <div className="flex  flex-col  items-center justify-center  text-white  ">
       {roomId ? (
-        <>
-          <GameStatus socket={socket} />
-          <canvas
-            ref={ref}
-            className="border-black  my-auto border-2 w-full max-w-2xl"
-            {...props}
-          />
-          {/* { <p className=" border-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center overflow-hidden">go back </p>} */}
-          {roomId === "win" && (
-            <div className="absolute bg-[#FD0363] rounded-xl w-1/2 h-1/2 flex flex-col p-4  items-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <div className="flex-1 text-center ">
-                <p className="text-xl pb-4">Game Over</p>
-                <p className="text-xl">You win</p>
-              </div>
-              <Button
-                onClick={handleClick}
-                outline
-                gradientDuoTone="greenToBlue"
-                className="mb-0"
-              >
-                Go back
-                <HiOutlineArrowRight className="ml-2 h-5 w-5" />
-
-              </Button>
+        roomId === "win" ? (
+          <div className=" bg-[#FD0363] rounded-xl  flex flex-col gap-4 px-9  py-4 items-center ">
+            <div className="flex-1 text-center ">
+              <p className="text-xl pb-4">Game Over</p>
+              <p className="text-xl">You win</p>
             </div>
-          )}
-        </>
+            <Button
+              onClick={handleClick}
+              outline
+              gradientDuoTone="greenToBlue"
+              className="mb-0"
+            >
+              Go back
+              <HiOutlineArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </div>
+        ) : (
+          <div className="border-2 rounded-2xl">
+            <GameStatus socket={socket} roomId={roomId} />
+            <canvas
+              ref={ref}
+              className="border-black  my-auto border-2 w-full max-w-2xl"
+              {...props}
+            />
+          </div>
+        )
       ) : (
         <>
           <div className="flex flex-col items-center ">
