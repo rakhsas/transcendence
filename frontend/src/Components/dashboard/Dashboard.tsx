@@ -11,6 +11,8 @@ import DataContext from '../../services/data.context';
 import { Socket, io } from 'socket.io-client';
 import LoadingComponent from '../shared/loading/loading';
 import { ChannelService } from '../../services/channel.service';
+import { Channel, notificationInterface } from '../../utils/types';
+import { NotificationService } from '../../services/notification.service';
 // const url: string = "wss://10.12.249.229";
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
@@ -18,28 +20,10 @@ function DashboardComponent() {
 	const [socket, setSocket] = useState<Socket | null>(null);
 	const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
 	const [users, setUsers] = useState<User[]>([]);
-	const user = {
-		"id": "92ec84f8-33aa-4134-9f26-36bb12d68576",
-		"providerId": "95248",
-		"createdAt": "2024-03-07T19:29:22.895Z",
-		"updatedAt": "2024-03-07T19:29:22.895Z",
-		"firstName": "Rida",
-		"lastName": "Akhsas",
-		"picture": "https://cdn.intra.42.fr/users/1f8286f7d5687c6260fb6bca81d05853/rakhsas.JPG",
-		"provider": "42",
-		"coalition": "Pandora",
-		"coalitionPic": "https://cdn.intra.42.fr/coalition/image/77/Pandora-01.svg",
-		"coalitionCover": "https://cdn.intra.42.fr/coalition/cover/77/Pandora_BG.jpg",
-		"coalitionColor": "#b61282",
-		"email": "rakhsas@student.1337.ma",
-		"username": "rakhsas",
-		"adding": [],
-		"added": [],
-		"blocks": [],
-		"blocking": []
-	}
+	const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
+	const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
+	const [notifications, setNotifications] = useState<notificationInterface[]>([]);
 	useEffect(() => {
-		// setUserData(user);
 		const fetchData = async () => {
 			try {
 				const authService = new AuthService();
@@ -49,6 +33,14 @@ function DashboardComponent() {
 				setUserData(fetchedUserData);
 				const users = await userService.getAllUsersExcept(fetchedUserData.id);
 				setUsers(users);
+				const channelService = new ChannelService();
+				const protectedChannels = await channelService.getProtectedChannelsExpectUser(fetchedUserData?.id);
+				setProtectedChannels(protectedChannels);
+				const publicChannels = await channelService.getPublicChannels(fetchedPayloadData?.id);
+				setPublicChannels(publicChannels);
+				const notificationService = new NotificationService();
+				const notifications = await notificationService.getNotifications(fetchedUserData?.id);
+				setNotifications(notifications);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",
 					query: {
@@ -80,7 +72,7 @@ function DashboardComponent() {
 		return <LoadingComponent />;
 	}
 	return (
-		<DataContext.Provider value={[userData, socket, globalSocket, users]}>
+		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full">

@@ -1,14 +1,76 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Kenia&display=swap");
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
 
 :root{
     --green: #3DBDA7;
 }
 
+@media (prefers-color-scheme: dark) {
+
+    .dark .analytics .mini-profile{
+        background-color: black;
+    }
+
+    .dark .analytics .statistics{
+        background-color: black;
+        color: white !important;
+    }
+
+    .dark .analytics .mini-profile .midle-content .user-info .fullName{
+        color: white;
+    }
+
+    .dark .analytics .mini-profile .bottom-content .lastGame,
+    .dark .analytics .mini-profile .bottom-content .status,
+    .dark .analytics .mini-profile .bottom-content .score{
+        color: white !important;
+    }
+
+    .dark .container-analytics .leader-board .top3 .first-cards {
+        background-color: black; /* Change background color to black for dark mode */
+        color: white; /* Change text color to white for better contrast */
+    }
+
+    .dark .container-analytics .leader-board .top3 .first-cards .fullName{
+        color: white;
+    }
+
+    .dark .container-analytics .leader-board .top3 .first-cards .btn-profile{
+        color: black;
+    }
+
+    .dark .container-analytics .leader-board .top3 .first-cards .btn-profile:hover{
+        background-color: black;
+    }
+
+    .dark .container-analytics .leader-board .top3 .first-cards .rank{
+        color: black;
+    }
+
+    .dark .container-analytics .leader-board .other-players .row-cards{
+        background-color: black;
+    }
+
+    .dark .container-analytics .leader-board .other-players .row-cards .rank,
+    .dark .container-analytics .leader-board .other-players .row-cards .fullName,
+    .dark .container-analytics .leader-board .other-players .row-cards .score{
+        color: white;
+    }
+
+
+    .dark .container-analytics .leader-board .other-players .row-cards .btn-profile{
+        color: black;
+    }
+
+
+    .dark .container-analytics .leader-board .other-players .row-cards .btn-profile:hover{
+        background-color: black;
+    }
+}
 
 .container-analytics {
     width: 100%;
@@ -17,15 +79,26 @@
     flex-wrap: wrap-reverse;
     align-items: center;
     justify-content: space-around;
-    font-family: poppins !important;
+    font-family: theme('fontFamily.poppins') !important;
+    height: 100%;
+    overflow-y: auto;
 }
 
+@media screen and (max-width: 800px) {
+    .container-analytics .leader-board{
+        height: auto !important;
+    }
+}
 
 .container-analytics .leader-board{
     /* background-color: orange; */
     /* width: 45%; */
-    min-width: 500px;
+    /* min-width: 500px; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
     padding: 0 30px;
+    height: 100%;
 }
 
 
@@ -45,7 +118,7 @@
     /* width: 30%; */
     width: 220px;
     min-width: 220px;
-    background-color: white;
+    /* background-color: white; */
     padding: 35px;
     display: flex;
     align-items: center;
@@ -74,7 +147,7 @@
 .container-analytics .leader-board .top3 .first-cards .fullName,
 .container-analytics .leader-board .top3 .first-cards .login,
 .container-analytics .leader-board .top3 .first-cards .btn-profile{
-    color: black;
+    /* color: black; */
     text-align: center;
     /* font-family: sans-serif; */
 }
@@ -117,7 +190,6 @@
     left: 0;
     bottom: 0;
     text-align: center;
-    color: black;
     width: 100%;
     padding: 8px 0;
     border-top: 1px solid #3DBDA7;
@@ -128,6 +200,41 @@
 
 
 /* =================================== start the other players sections ==================================== */
+
+@media screen and (max-width: 535px) {
+    .container-analytics .leader-board .other-players .row-cards{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .container-analytics .leader-board .other-players .row-cards .rank{
+        padding-left: 0 !important;
+    }
+
+    .container-analytics .leader-board .other-players .row-cards .rank,
+    .container-analytics .leader-board .other-players .row-cards .image-wrappear,
+    .container-analytics .leader-board .other-players .row-cards .login,
+    .container-analytics .leader-board .other-players .row-cards .fullName,
+    .container-analytics .leader-board .other-players .row-cards .btn-profile{
+        margin-bottom: 10px;
+    }
+
+    .container-analytics .leader-board .other-players .row-cards .score{
+        border-left: none !important;
+    }
+
+    .container-analytics .leader-board .other-players .row-cards .image-wrappear{
+        display: block !important;
+        position: relative !important;
+        left: 0 !important;
+    }
+
+    .container-analytics .leader-board .other-players .row-cards .image-wrappear img{
+        display: block;
+    }
+}
 
 .container-analytics .leader-board .other-players{
     display: flex;
@@ -141,7 +248,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: white;
+    /* background-color: white; */
     padding: 8px 10px;
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
     transition: all 0.5s ease;
@@ -180,7 +287,8 @@
 .container-analytics .leader-board .other-players .row-cards span,
 .container-analytics .leader-board .other-players .row-cards button
 {
-    color: black;
+    /* color: black; */
+    color: none;
 }
 
 .container-analytics .leader-board .other-players .row-cards .rank{
@@ -224,7 +332,7 @@
 /* @media only screen and (max-width: 1413px)  */
 @media (max-width: 1413px) {
     .container-analytics .analytics{
-        height: auto;
+        height: auto !important;
     }
 }
 
@@ -247,6 +355,9 @@
         text-align: center;
     }
 
+    .analytics .mini-profile .midle-content .user-info img{
+        margin-right: 0;
+    }
     .analytics .mini-profile .bottom-content .separator::after{
         width: 0 !important;
         height: 0 !important;
@@ -256,7 +367,7 @@
 
 .container-analytics .analytics{
     /* width: 45%; */
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
     /* min-width: 500px; */
     display: flex;
     flex-direction: column;
@@ -278,7 +389,7 @@
     margin: 0 auto;
     padding: 10px 40px;
     position: relative;
-    background-color: white;
+    /* background-color: white; */
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
     margin-bottom: 25px;
 }
@@ -288,7 +399,7 @@
     padding: 15px 0;
     text-align: center;
     background-color: var(--green);
-    color: white;
+    /* color: white; */
     letter-spacing: 2px;
     position: absolute;
     top: 0;
@@ -313,10 +424,14 @@
     align-items: center;
 }
 
+/* .analytics .mini-profile .profile-title{
+    color: black;
+}
+
 .analytics .mini-profile .midle-content .user-info .fullName
 {
     color: black;
-}
+} */
 
 .analytics .mini-profile .midle-content .user-info .login
 {
@@ -354,7 +469,7 @@
 .analytics .mini-profile .bottom-content .score,
 .analytics .mini-profile .bottom-content .status
 {
-    color: black;
+    /* color: black; */
     text-align: center;
 }
 
@@ -369,8 +484,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 1px;
-    height: 40px;
+    width: 1px !important;
+    height: 40px !important;
     background-color: var(--green);
     /* color: black; */
 }
@@ -394,13 +509,22 @@
 
 /*  ====================== Start statistics ===================================== */
 
+@media screen and (max-width: 612px) {
+    .analytics .statistics{
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        min-width: auto !important;
+    }
+} 
+
 .analytics .statistics{
     /* background-color: gold; */
     min-width: 300px;
     min-height: 300px;
     width: 500px;
     height: 300px;
-    background-color: white;
+    /* background-color: white; */
     padding: 10px;
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
     border-radius: 20px;

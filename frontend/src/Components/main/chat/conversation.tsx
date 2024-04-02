@@ -37,6 +37,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
         const name = event.currentTarget.channelName.value;
         const type = event.currentTarget.types.value;
         const password = event.currentTarget.password?.value;
+		if (password && password.length !== 6) {
+			return;
+		}
 		const formData = new FormData();
 		formData.append('file', imagePath);
         if (name === '' || type === '') {
@@ -73,7 +76,8 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 								You have no messages
 							</div>
 						) : (
-							latestMessages.map((message, index) => (
+							latestMessages.map((message: any, index) => (
+								console.log(message),
 								<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 									handleSelectMessage(
 										index.toString(),
@@ -81,6 +85,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 										undefined
 									)
 								}}>
+									
 									<div className="msg-profile rounded-full mr-4 bg-rose-400 ">
 										<div className="msg-profile group" style={{ backgroundImage: `url(${userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture})` }}>
 										</div>
@@ -95,13 +100,34 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 													message.senderId === userData[0].id
 														?
 														<span className="font-poppins font-bold text-gray-700">
-															YOU :
-															<span className="text-black dark:text-white">
-																{message.img ? message.img.slice(7, 14) + '...' : message.message.length > 10 ? message.message.slice(0, 10) + '...' : message.message}
+															YOU:
+															<span className="text-black dark:text-white rrrrr">
+																{
+																	message.message.length > 0 ? (
+																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																	) : (
+																		message.message.img && message.message.img.length > 0 ? ' Picture' :
+																		message.message.audio && message.message.audio.length > 0 ? ' Audio' :
+																		null
+																	)
+																}
 															</span>
 														</span>
 														:
-														message.img ? message.img.slice(7, 14) + '...' : message.message.length > 10 ? ' ' + message.message.slice(0, 10) + '...' : ' ' + message.message
+														<span className="font-poppins font-bold text-gray-700">
+															HIM:
+															<span className="text-black dark:text-white rrrrr">
+																{
+																	message.message.length > 0 ? (
+																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																	) : (
+																		message.message.img && message.message.img.length > 0 ? ' Picture' :
+																		message.message.audio && message.message.audio.length > 0 ? ' Audio' :
+																		null
+																	)
+																}
+															</span>
+														</span>
 												}
 											</span>
 											<span className="msg-date text-main-light-FERN text-sm ml-4">
@@ -115,8 +141,10 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 				<Tabs.Item title="Rooms" icon={RiWechatChannelsFill}>
 					{lstGroupMessages.map((item, index) => {
 						const channel = item.channel;
+						console.log("channel: ", baseAPIUrl + channel.picture);
 						return (
 							<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
+								
 								handleSelectMessage(index.toString(), undefined, channel.id)
 							}}>
 								<div className="msg-profile rounded-full mr-4">
@@ -162,9 +190,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
 								<div>
 									<div className="mb-2 block">
-										<Label htmlFor="channelName" value="Your email" />
+										<Label htmlFor="channelName" value="Room Name" />
 									</div>
-									<TextInput id="channelName" type="text" placeholder="Give It a name" />
+									<TextInput id="channelName" type="text" autoComplete="OFF" placeholder="Give It a name" />
 								</div>
 								<div className="mb-2 block">
 									<div className="mb-2 block">
@@ -183,7 +211,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 												<div className="mb-2 block">
 													<Label htmlFor="password" value="Your password" />
 												</div>
-												<TextInput id="password" type="password" />
+												<TextInput id="password" type="password" maxLength={6} minLength={6} />
 											</div>
 										</div>
 									) :

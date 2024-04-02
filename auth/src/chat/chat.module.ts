@@ -14,14 +14,19 @@ import { AuthService } from 'src/auth/auth.service';
 import { UserModule } from 'src/user/user.module';
 import { ChannelModule } from 'src/channel/channel.module';
 import { ChannelService } from 'src/channel/channel.service';
+import { NotificationModule } from 'src/notification/notification.module';
+import { Notif } from 'src/user/entities/notification.entity';
+import { NotificationService } from 'src/notification/notification.service';
+import { Banned } from 'src/user/entities/ban.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser]),
+    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser, Notif, Banned]),
     UserModule,
+    NotificationModule
     // ChannelModule
   ],
-  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService,ChannelService],
+  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService, NotificationService],
   // providers: [ChatService, ChatGateway, Repository, MsgController, MsgRepository, UserRepository],
   controllers: [ChatController],
   // exports: [MsgRepository, UserRepository]

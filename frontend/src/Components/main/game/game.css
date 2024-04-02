@@ -1,7 +1,3 @@
-.gamesmodeCont {
-    width: 70rem;
-}
-
 .owl-item .outli{
     border: dashed 2px rgb(97, 92, 92);
 }
@@ -16,6 +12,7 @@
     
 .owl-item {
     filter: blur(calc(10px / 5));
+    /* width: fit-content !important; */
 }
 
 .center :hover {
@@ -33,8 +30,8 @@
       transform: rotate(360deg);
     }
   }
-  
-.center :hover .container-analytics4{
+
+.center :hover .container-rooms{
     transform-origin: bottom;
     transform: scale(1.05);
     transform: rotate(-6deg);
@@ -55,5 +52,13 @@
 }
 
 .owl-stage {
-    height: 350px;
+    display: flex;
 }
+
+/* .owl-stage-outer {
+    height: fit-content !important;
+
+} */
+/* .owl-item {
+    width: 330px !important;
+} */

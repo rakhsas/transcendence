@@ -1,12 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import "./navbar.css"
-import { CustomFlowbiteTheme, TextInput } from 'flowbite-react';
+import { Button, CustomFlowbiteTheme, TextInput } from 'flowbite-react';
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../loading/loading";
 import { Socket } from "socket.io-client";
 import UserService from "../../../services/user.service";
 import User from "../../../model/user.model";
 import AuthService from "../../../services/auth.service";
+import { Message } from "@mui/icons-material";
+import { notificationInterface } from './../../../utils/types';
 
 const SearchIcon = () => (
     <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-black dark:stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -24,16 +26,32 @@ const colorSettings: CustomFlowbiteTheme['textInput'] = {
     }
 }
 
+// enum NotificationType {
+//     CallRequest = "CallRequest",
+//     DirectMessage = "DirectMessage",
+//     FriendRequest = "FriendRequest",
+//     ChannelInvite = "ChannelInvite",
+//     RoomMessage = "RoomMessage"
+// }
+
 enum NotificationType {
-    CallRequest = "CallRequest",
-    DirectMessage = "DirectMessage",
-    FriendRequest = "FriendRequest",
-    ChannelInvite = "ChannelInvite"
+    MESSAGE = 'MESSAGE',
+    FRIEND_REQUEST = 'FRIEND_REQUEST',
+    CALL_REQUEST = 'CALL_REQUEST',
+    CHANNEL_MESSAGE = 'CHANNEL_MESSAGE',
+    CHANNEL_INVITE = 'CHANNEL_INVITE',
+    ROOM_MESSAGE = 'ROOM_MESSAGE'
+}
+
+interface NotifMessage {
+    message: string;
+    image: string;
+    audio: string;
 }
 type notifItems = {
     from: string;
     to: string;
-    message: string;
+    message: NotifMessage;
     sender: User;
     type: NotificationType;
 }
@@ -42,12 +60,14 @@ function NavbarComponent(): JSX.Element {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [theme, setTheme] = useState(localStorage.theme);
     const colorTheme = theme === 'dark' ? 'light' : 'dark';
-    const [notifications, setNotifications] = useState<notifItems[]>([]);
+    // const [notifications, setNotifications] = useState<notifItems[]>([]);
     const [notificationCount, setNotificationCount] = useState<boolean>(false);
     const [users, setUsers] = useState<User[]>([]);
     const [searchInput, setSearchInput] = useState('');
     const userService = new UserService();
+    const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+	const [notifications, setNotifications] = useState<notificationInterface[]>([]);
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove(colorTheme);
@@ -57,14 +77,10 @@ function NavbarComponent(): JSX.Element {
     const userData = useContext(DataContext);
     if (!userData)
         return <LoadingComponent />
-        useEffect(() => {
-            const fetchData = async () => {
-                const authService = new AuthService();
-                await authService.getPayload();
-                const userService = new UserService();
-            };
-        fetchData();
+    useEffect(() => {
         setUsers(userData[3]);
+        setNotifications(userData[6]);
+        console.log('Notifications: ', notifications);
     }, []);
     useEffect(() => {
         if (!searchInput) {
@@ -78,45 +94,86 @@ function NavbarComponent(): JSX.Element {
         setFilteredUsers(filtered);
     }, [searchInput]);
     const socket: Socket = userData[1];
-    const onRequestCall = async (data: any) => {
-        console.log(data.senderId)
-        const sender: User = await userService.getUser(data.senderId);
-        const newItem: notifItems = {
-            from: data.from,
-            to: data.to,
-            message: ' Requested a Call.',
-            sender: sender,
-            type: NotificationType.CallRequest
-        }
-        const updatedItems: notifItems[] = [...notifications, newItem];
-        setNotifications(updatedItems);
-        setNotificationCount(true);
-    }
-    socket?.on("RequestCall", onRequestCall);
+    // const onRequestCall = async (data: any) => {
+    //     setChannelNotifPayload(data);
+    //     const sender: User = await userService.getUser(data.senderId);
+    //     const newItem: notifItems = {
+    //         from: data.from,
+    //         to: data.to,
+    //         message: {
+    //             message: ' Requested a call.',
+    //             image: '',
+    //             audio: ''
+    //         },
+    //         sender: sender,
+    //         type: NotificationType.CallRequest
+    //     }
+    //     const updatedItems: notifItems[] = [...notifications, newItem];
+    //     setNotifications(updatedItems);
+    //     setNotificationCount(true);
+    // }
+    // socket?.on("RequestCall", onRequestCall);
     const onDirectMessage = async (data: any) => {
-        setNotificationCount(true);
-        const sender: User = await userService.getUser(data.senderId);
-        const newItem: notifItems = {
-            from: data.from,
-            to: data.to,
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: data.type,
             message: data.message,
-            sender: sender,
-            type: NotificationType.DirectMessage
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt
         }
-        const updatedItems: notifItems[] = [...notifications, newItem];
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
         setNotifications(updatedItems);
+        setNotificationCount(true);
     }
     socket?.on("directMessageNotif", onDirectMessage);
-    socket?.on("channelJoinNotif", (data: any)=> {
-        const sender: User = users.find(user => user.id === data.requestedUserId);
-        const newItem: notifItems = {
-            from: data.requestedUserId,
-            to: data.__owner__,
-            message: ' invited you to join the channel.',
-            sender: sender,
-            type: NotificationType.ChannelInvite
+    socket?.on("roomMessageNotif", async (data: any) => {
+        console.log('roomMessageNotif: ', await data);
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: data.type,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt
         }
-        const updatedItems: notifItems[] = [...notifications, newItem];
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    })
+    socket?.on("channelJoinNotif", async (data: any) => {
+        setChannelNotifPayload(data.payload);
+        console.log('Payload received from socket:', await channelNotifPayload);
+        const newItem: notificationInterface = {
+            id: data.lastnotif.id,
+            type: data.lastnotif.type,
+            message: data.lastnotif.message,
+            audio: data.lastnotif.audio,
+            image: data.lastnotif.image,
+            seen: false,
+            read: false,
+            issuer: data.lastnotif.issuer,
+            createdAt: data.lastnotif.createdAt,
+            updatedAt: data.lastnotif.updatedAt
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
         setNotifications(updatedItems);
         setNotificationCount(true);
     })
@@ -140,6 +197,9 @@ function NavbarComponent(): JSX.Element {
             setNotifIsOpen(false);
         }
     });
+    useEffect(() => {
+        console.log(notifications)
+    }, [notifications]);
     return (
         <div className="p-4 flex flex-col sm:flex-row sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
@@ -148,10 +208,10 @@ function NavbarComponent(): JSX.Element {
             <div className="max-w-md pl-4 flex flex-col md:sm:flex-row sm:space-x-4 xs:space-x-2 xs:flex-row">
                 <div className="relative h-10 flex items-center">
                     {/* <button> */}
-                        <svg  onClick={() => { toggleDropdown(), console.log("isNotifOpen: ", isNotifOpen) }} className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
-                            <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
-                        </svg>
-                        {notificationCount ? <div className="absolute block w-3 h-3 bg-red-500 border-2 border-white rounded-full top-1 start-2.5 dark:border-gray-900" /> : ''}
+                    <svg onClick={() => { toggleDropdown(), console.log("isNotifOpen: ", isNotifOpen) }} className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                        <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
+                    </svg>
+                    {notificationCount ? <div className="absolute block w-3 h-3 bg-red-500 border-2 border-white rounded-full top-1 start-2.5 dark:border-gray-900" /> : ''}
                     {/* </button> */}
                     <div className={`fixed z-50 -right-0 mx-2 top-14 mt-2 w-full max-w-md bg-slate-100 divide-y divide-gray-700 rounded-lg shadow dark:bg-zinc-900 dark:divide-gray-300 ${isNotifOpen ? 'block' : 'hidden'}`}>
                         <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-neutral-100 dark:bg-zinc-900 dark:text-white">
@@ -161,15 +221,14 @@ function NavbarComponent(): JSX.Element {
                             {
                                 notifications.length > 0
                                     ?
-                                    notifications.map((item, index) => {
-                                        if (item.type === NotificationType.DirectMessage)
-                                        {
+                                    notifications.map((item: notificationInterface, index) => {
+                                        if (item.type === NotificationType.MESSAGE) {
                                             console.log(item.message)
                                             return (
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-12 h-12">
-                                                            <img className="h-full w-full bject-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Jese image" />
+                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Jese image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-main-light-FERN border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
@@ -179,22 +238,35 @@ function NavbarComponent(): JSX.Element {
                                                         </div>
                                                     </div>
                                                     <div className="w-full ps-3">
-                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">New message from <span className="font-semibold text-gray-900 dark:text-main-light-FERN">{item.sender.username}</span>: {item.message.length > 10 ? item.message.slice(0, 10) + ' ...' : item.message}</div>
+                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">
+                                                        New message from <span className="font-semibold text-gray-900 dark:text-main-light-FERN">
+                                                            {item.issuer.username}
+                                                        </span>: {
+                                                            item.message.length > 0 ? (
+                                                                item.message.length > 10 ? item.message.slice(0, 10) + ' ...' : item.message
+                                                            ) : (
+                                                                item.image.length > 0 ? 'Picture' :
+                                                                item.audio.length > 0 ? 'Audio' :
+                                                                null
+                                                            )
+                                                        }
+                                                    </div>
                                                         <div className="text-xs text-main-light-FERN ">a few moments ago</div>
                                                     </div>
                                                 </a>
                                             )
-                                        } else if (item.type === NotificationType.FriendRequest) {
+                                        }
+                                        else if (item.type === NotificationType.FRIEND_REQUEST) {
                                             return (
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src="/docs/images/people/profile-picture-2.jpg" alt="Joseph image" />
+                                                            <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src="/docs/images/people/profile-picture-2.jpg" alt="Joseph image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-800">
-                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                                                            <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z"/>
-                                                        </svg>
+                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                                                <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z" />
+                                                            </svg>
                                                         </div>
                                                     </div>
                                                     <div className="w-full ps-3">
@@ -204,22 +276,37 @@ function NavbarComponent(): JSX.Element {
                                                 </a>
                                             )
                                         }
-                                        else if (item.type === NotificationType.ChannelInvite) {
+                                        else if (item.type === NotificationType.CHANNEL_INVITE) {
                                             return (
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Robert image" />
+                                                            <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
-                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
-                                                            <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
-                                                        </svg>
+                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                                                                <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z" />
+                                                            </svg>
                                                         </div>
                                                     </div>
-                                                    <div className="w-full ps-3">
-                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.sender.username}</span>: {item.message.length > 15 ? item.message.slice(0, 15) + ' ...' : item.message}</div>
+                                                    <div className="w-fit px-2">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400 w-fit§">
+                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>: invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.message}</span>
+                                                        </div>
                                                         <div className="text-xs text-blue-600 dark:text-blue-500">few moments ago</div>
+                                                    </div>
+                                                    <div className="flex gap-2 w-fit">
+                                                        <Button color="success" pill onClick={() => {
+                                                            socket?.emit("acceptJoinChannel",
+                                                                channelNotifPayload
+                                                            );
+                                                            console.log('Channel Notif Payload: ', channelNotifPayload);
+                                                        }}>
+                                                            Accept
+                                                        </Button>
+                                                        <Button color="failure" pill>
+                                                            Decline
+                                                        </Button>
                                                     </div>
                                                 </a>
                                             )
@@ -241,12 +328,60 @@ function NavbarComponent(): JSX.Element {
                                                 </div>
                                             </a>
                                         }
-                                    })
-                                                :
-                                                <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg dark:text-white">
-                                                    Notifications
+                                        else if (item.type === NotificationType.CHANNEL_MESSAGE) {
+                                            return (
+                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-12 h-12">
+                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Jese image" />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-main-light-FERN border border-white rounded-full dark:border-gray-800">
+                                                            <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path fillRule="evenodd" d="M12 6a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm-1.5 8a4 4 0 0 0-4 4 2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-3Zm6.82-3.096a5.51 5.51 0 0 0-2.797-6.293 3.5 3.5 0 1 1 2.796 6.292ZM19.5 18h.5a2 2 0 0 0 2-2 4 4 0 0 0-4-4h-1.1a5.503 5.503 0 0 1-.471.762A5.998 5.998 0 0 1 19.5 18ZM4 7.5a3.5 3.5 0 0 1 5.477-2.889 5.5 5.5 0 0 0-2.796 6.293A3.501 3.501 0 0 1 4 7.5ZM7.1 12H6a4 4 0 0 0-4 4 2 2 0 0 0 2 2h.5a5.998 5.998 0 0 1 3.071-5.238A5.505 5.505 0 0 1 7.1 12Z" clipRule="evenodd" />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">New message from <span className="font-semibold text-gray-900 dark:text-main-light-FERN">{item.issuer.username}</span>:
+                                                            {
+                                                                item.message.length > 0 ? (
+                                                                    item.message.length > 10 ? item.message.slice(0, 10) + ' ...' : item.message
+                                                                ) : (
+                                                                    item.image && item.image.length > 0 ? 'Picture' :
+                                                                    item.audio && item.audio.length > 0 ? 'Audio' :
+                                                                    null
+                                                                )
+                                                            }
+                                                        </div>
+                                                        <div className="text-xs text-main-light-FERN ">a few moments ago</div>
+                                                    </div>
+                                                </a>
+                                            )
+                                        }
+                                        else if (item.type === NotificationType.CALL_REQUEST) {(
+                                            <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <div className="flex-shrink-0">
+                                                    <div className="pic rounded-full w-11 h-11">
+                                                        <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                    </div>
+                                                    <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                                                            <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z" />
+                                                        </svg>
+                                                    </div>
                                                 </div>
-                                            }
+                                                <div className="w-full ps-3">
+                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
+                                                    <div className="text-xs text-blue-600 dark:text-blue-500">3 hours ago</div>
+                                                </div>
+                                            </a>
+                                        )}
+                                    })
+                            :
+                            <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg dark:text-white">
+                                Notifications
+                            </div>
+                            }
                         </div>
                     </div>
                 </div>

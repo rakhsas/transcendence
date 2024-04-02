@@ -727,3 +727,7 @@ body {
       display: block !important;
   }
 }
+
+.avatarImage .relative img {
+  object-fit: cover;
+}

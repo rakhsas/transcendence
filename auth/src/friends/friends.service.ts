@@ -7,8 +7,8 @@ import { Friendship } from 'src/user/entities/freindship.entity';
 import { Any, Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { CreateFriendshipDto } from './dto/create-friendship.dto';
-@Injectable()
 
+@Injectable()
 export class FriendService {
     constructor(
         @InjectRepository(Friendship) private readonly friendRepository: Repository<Friendship>,
