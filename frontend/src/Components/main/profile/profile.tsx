@@ -86,34 +86,21 @@ function FunctionProfileForm() {
             Setting"
         >
             <div className="Acheivementpart flex flex-col  items-center  gap-4 w-full md:min-w-[35%]  no-scrollbar min-h-full overflow-hidden Usredit--Achievements ">
-                <div className="w-[85%] p-2 update flex justify-center mt-4 items-center   h-[25vh] dark:bg-zinc-900 bg-[#F1F2FD] border-gray-200  no-scrollbar rounded-lg shadow  overflow-hidden">
-                    <div className="flex flex-col p-2 items-center overflow-hidden w-full h-full">
-                        <div className="flex justify-center items-center p-1 w-full overflow-hidden">
+                <div className="w-full md:w-[85%] p-4 flex justify-center mt-4 items-center dark:bg-zinc-900 bg-[#F1F2FD] border-gray-200 no-scrollbar rounded-lg shadow overflow-hidden">
+                    <div className="flex flex-col p-2 items-center w-full">
+                        <div className="flex justify-center items-center p-1 w-full">
                             <div className={`relative ring-2 rounded-full ring-[${user?.coalitionColor}]`}>
                                 <img alt={user?.username} src={user?.picture} className="w-20 h-20" />
                             </div>
                         </div>
-                        <div className="py-2 overflow-hidden">
-                            <h5 className=" text-xl overflow-hidden text-black dark:text-white font-bolder font-poppins">{user?.firstName + ' ' + user?.lastName}</h5>
+                        <div className="py-4">
+                            <h5 className="text-xl text-black dark:text-white font-bolder font-poppins">{user?.firstName + ' ' + user?.lastName}</h5>
                         </div>
-                        <div className="flex gap-4 px-8 py-2 w-full md:flex-wrap overflow-hidden">
-                            <button
-                                className="flex-1 rounded-full overflow-hidden bg-blue-600 dark:bg-blue-800 text-white dark:text-white antialiased font-bold hover:bg-blue-800 dark:hover:bg-blue-900 px-4 py-2">
-                                Add Friend
-                            </button>
-                            <button
-                                className="flex-1 rounded-full border-2 overflow-hidden border-gray-400 dark:border-gray-700 font-semibold text-black dark:text-white px-4 py-2">
-                                Message
-                            </button>
+                        <div className="flex flex-1 flex-wrap justify-center items-center w-full py-2">
+                            <button type="button" className="dark:text-white text-black bg-yellow-300 hover:bg-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:focus:ring-yellow-900">Send Friend Request</button>
+                            {/* <button type="button" className="dark:text-white text-black bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Friend</button> */}
+                            <button type="button" className="dark:text-white text-black bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Block</button>
                         </div>
-                        {/* <img className="w-24 h-24  shadow-lg picture-user" src={userData[0]?.picture || picture} alt="Bonnie image" style={{ border: `2px solid ${userData[0]?.coalitionColor} ` }} />
-                        <div className="flex gap-1 mt-2">
-                            <FunctionAddFriend />
-                            <a href="#" onClick={ButtonClick} className="inline-flex items-center px-4 py-2 text-sm h-auto overflow-hidden text-center text-black-950 font-bolder
-                             bg-red-600 rounded-lg  focus:ring-4   ">
-                                {BlockedFriend ? 'Blocked' : 'Block'}
-                            </a>
-                        </div> */}
                     </div>
                 </div>
                 <div className='w-[85%] flex flex-col gap-6 items-center h-[75vh] justify-center Achieve--Border dark:bg-zinc-900 bg-[#F1F2FD] no-scrollbar '>

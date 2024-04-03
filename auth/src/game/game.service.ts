@@ -41,8 +41,8 @@ export class GameService {
     );
     gameResult.player1 = pl1;
     gameResult.player2 = pl2;
-    gameResult.userScoore = payload.userScoore;
-    gameResult.playerScoore = payload.playerScoore;
+    gameResult.user_scoore = payload.userScoore;
+    gameResult.player_scoore = payload.playerScoore;
     gameResult.winner = winner;
 
     // console.log("players: ", pl1, pl2);
