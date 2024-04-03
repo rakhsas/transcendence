@@ -34,4 +34,11 @@ export class NotificationService {
             relations: ['issuer', 'target', 'channel']
         });
     }
+
+    async updateNotificationState(notifId: number, seen: { seen: boolean }) {
+        const notif = await this.notificationRepository.findOne({where: {id: notifId}});
+        
+        notif.seen = seen.seen;
+        return await this.notificationRepository.save(notif);
+    }
 }

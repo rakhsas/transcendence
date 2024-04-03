@@ -45,7 +45,7 @@ export interface NotificationMessage {
 }
 
 export interface notificationInterface {
-    id: string;
+    id: number;
     type: string;
     message: string;
     audio: string;
