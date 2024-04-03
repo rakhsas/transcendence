@@ -207,6 +207,8 @@ export class ChatService {
 
   async addNewMemberToChannel(payload: any, role: string) {
     // Load user and channel entities
+    console.log("payload.__owner__", payload.__owner__)
+    console.log("payload.id", payload.id)
     console.log("-----------------------------------------------> joined");
     const id = payload.__owner__;
     const user = await this.userService.viewUser(id);

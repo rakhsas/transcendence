@@ -324,7 +324,7 @@ const HomeComponent: React.FC = () => {
                                         return (
                                             <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
                                                 <div className="img p-2" key={index}>
-                                                    <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
+                                                    <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full object-cover ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
                                                 </div>
                                                 <div className="absolute top-0 right-2 mb-1 mr-[1px]">
                                                     <div className={`w-4 h-4 rounded-full ${friend.status === 'online' ? 'bg-green-500' : 'bg-[#A5BAA9]'}  border-2 border-main-dark-SPRUCE`}></div>

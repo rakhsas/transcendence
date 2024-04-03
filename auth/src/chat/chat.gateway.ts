@@ -71,6 +71,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					"message": payload.message,
 					"image": payload.image,
 					"audio": payload.audio,
+
 					// "isOwner": false
 				});
 				const notif = await this.notificationService.createNotification({
@@ -80,11 +81,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					message: payload.message,
 					image: payload.image ? payload.image : null,
 					audio: payload.audio? payload.audio : null,
+					channel: null
 				});
 				const lastnotif = await this.notificationService.getNotificationById(notif.id);
-				toUserSocket.emit('directMessageNotif', {
-					lastnotif
-				})
+				toUserSocket.emit('directMessageNotif', lastnotif)
 				await this.chatService.addMessage(payload)
 			}
 			else
@@ -127,6 +127,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleAcceptJoinChannel(client: Socket, payload: any): Promise<void> {
 		console.log('acceptJoinChannel: ', payload)
 		const channel = await this.chatService.getChannel(payload.id);
+		console.log("channel: ", channel)
 		if (channel.password !== null && channel.password !== "") {
 			console.log(channel.password, payload.password)
 			if ("password" in payload && channel.password === payload.password) {
@@ -137,7 +138,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				client.emit("channelPasswordInvalid", "Cannot join the room (incorrect password)");
 				return;
 			}
-		} else {
+		} else 
+		{
 			client.join(payload.channelId);
 			await this.chatService.addNewMemberToChannel(payload, "");
 		}
@@ -164,15 +166,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					userId: payload.__owner__,
 				})
 			}
-			else 
+			else
 			{
 				const notif = await this.notificationService.createNotification({
 					target: payload.__owner__,
 					type: NotificationType.CHANNEL_INVITE,
 					issuer: payload.requestedUserId,
-					message: payload.channelName,
+					message: "",
 					image: payload.image ? payload.image : null,
 					audio: payload.audio? payload.audio : null,
+					channel: payload.id
 				});
 				const lastnotif = await this.notificationService.getNotificationById(notif.id);
 				this.connectedUsers.get(payload.userName).emit('channelJoinNotif', {lastnotif, payload});
@@ -199,6 +202,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						message: payload.message,
 						image: payload.image ? payload.image : null,
 						audio: payload.audio? payload.audio : null,
+						channel: payload.channelId
 					});
 					const lastnotif = await this.notificationService.getNotificationById(notif.id);
 					this.connectedUsers.get(member.user.username).emit('roomMessageNotif', lastnotif);
@@ -211,6 +215,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 						message: payload.message,
 						image: payload.image ? payload.image : null,
 						audio: payload.audio? payload.audio : null,
+						channel: payload.channelId
 					});
 				}
 			}

@@ -67,7 +67,7 @@ function NavbarComponent(): JSX.Element {
     const userService = new UserService();
     const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-	const [notifications, setNotifications] = useState<notificationInterface[]>([]);
+    const [notifications, setNotifications] = useState<notificationInterface[]>([]);
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove(colorTheme);
@@ -80,8 +80,16 @@ function NavbarComponent(): JSX.Element {
     useEffect(() => {
         setUsers(userData[3]);
         setNotifications(userData[6]);
-        console.log('Notifications: ', notifications);
+        console.log('Notifications:', notifications);
     }, []);
+    useEffect(() => {
+        notifications.forEach(notif => {
+            if (!notif.seen) {
+                setNotificationCount(true);
+            }
+        });
+
+    }, [notifications]);
     useEffect(() => {
         if (!searchInput) {
             setFilteredUsers([]);
@@ -124,8 +132,10 @@ function NavbarComponent(): JSX.Element {
             read: false,
             issuer: data.issuer,
             createdAt: data.createdAt,
-            updatedAt: data.updatedAt
+            updatedAt: data.updatedAt,
+            channel: data.channel
         }
+        console.log('New Item:', newItem);
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -135,7 +145,6 @@ function NavbarComponent(): JSX.Element {
     }
     socket?.on("directMessageNotif", onDirectMessage);
     socket?.on("roomMessageNotif", async (data: any) => {
-        console.log('roomMessageNotif: ', await data);
         const newItem: notificationInterface = {
             id: data.id,
             type: data.type,
@@ -146,7 +155,8 @@ function NavbarComponent(): JSX.Element {
             read: false,
             issuer: data.issuer,
             createdAt: data.createdAt,
-            updatedAt: data.updatedAt
+            updatedAt: data.updatedAt,
+            channel: data.channel
         }
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
@@ -168,7 +178,8 @@ function NavbarComponent(): JSX.Element {
             read: false,
             issuer: data.lastnotif.issuer,
             createdAt: data.lastnotif.createdAt,
-            updatedAt: data.lastnotif.updatedAt
+            updatedAt: data.lastnotif.updatedAt,
+            channel: data.lastnotif.channel
         }
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
@@ -177,29 +188,24 @@ function NavbarComponent(): JSX.Element {
         setNotifications(updatedItems);
         setNotificationCount(true);
     })
-    const toggleDropdown = () => {
-        console.log("isNotifOpen: ", isNotifOpen)
-        setNotifIsOpen(!isNotifOpen);
-        setNotificationCount(false);
-        console.log("isNotifOpen: ", isNotifOpen)
-        // setNotifIsOpen(prevIsNotifOpen => !prevIsNotifOpen);
-        // console.log(isNotifOpen)
-    };
     const toogleSearchDropDown = () => {
         console.log("isSearchOpen: ", isSearchOpen)
         setIsSearchOpen(!isSearchOpen);
         console.log("isSearchOpen: ", isSearchOpen)
     };
-    const document = window.document.querySelector('#nav');
+    const document = window.document.querySelector('#dropdownNotification');
     document?.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.id !== 'dropdownDefaultButton') {
+        // const target = e.target as HTMLElement;
+        // if (target.id !== 'dropdownNotification') {
             setNotifIsOpen(false);
-        }
+        // }
     });
     useEffect(() => {
         console.log(notifications)
     }, [notifications]);
+    useEffect(() => {
+        console.log(isNotifOpen)
+    }, [isNotifOpen]);
     return (
         <div className="p-4 flex flex-col sm:flex-row sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
@@ -207,34 +213,47 @@ function NavbarComponent(): JSX.Element {
             </div>
             <div className="max-w-md pl-4 flex flex-col md:sm:flex-row sm:space-x-4 xs:space-x-2 xs:flex-row">
                 <div className="relative h-10 flex items-center">
-                    {/* <button> */}
-                    <svg onClick={() => { toggleDropdown(), console.log("isNotifOpen: ", isNotifOpen) }} className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
-                        <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
-                    </svg>
-                    {notificationCount ? <div className="absolute block w-3 h-3 bg-red-500 border-2 border-white rounded-full top-1 start-2.5 dark:border-gray-900" /> : ''}
-                    {/* </button> */}
-                    <div className={`fixed z-50 -right-0 mx-2 top-14 mt-2 w-full max-w-md bg-slate-100 divide-y divide-gray-700 rounded-lg shadow dark:bg-zinc-900 dark:divide-gray-300 ${isNotifOpen ? 'block' : 'hidden'}`}>
-                        <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-neutral-100 dark:bg-zinc-900 dark:text-white">
+                    <div className="svg" onClick={() =>  setNotifIsOpen(!isNotifOpen)}>
+                        <svg  className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                            <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
+                        </svg>
+                        {notificationCount ? <div className="absolute block w-3 h-3 bg-red-500 border-2 border-white rounded-full top-1 start-2.5 dark:border-gray-900" /> : ''}
+                    </div>
+                    <div id="dropdownNotification" className={`fixed z-50 -right-0 top-14 mt-2 w-full max-w-md bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-800 dark:divide-gray-700 ${isNotifOpen ? 'block' : 'hidden'}`} aria-labelledby="dropdownNotificationButton">
+                        <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-gray-50 dark:bg-gray-800 dark:text-white">
                             Notifications
                         </div>
                         <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                            {
-                                notifications.length > 0
+                        {
+                                notifications && notifications.length > 0
                                     ?
-                                    notifications.map((item: notificationInterface, index) => {
+                                    notifications.slice(0, 5).map((item: notificationInterface, index) => {
                                         if (item.type === NotificationType.MESSAGE) {
-                                            console.log(item.message)
                                             return (
-                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-12 h-12">
                                                             <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Jese image" />
                                                         </div>
-                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-main-light-FERN border border-white rounded-full dark:border-gray-800">
-                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 18">
-                                                                <path d="M1 18h16a1 1 0 0 0 1-1v-6h-4.439a.99.99 0 0 0-.908.6 3.978 3.978 0 0 1-7.306 0 .99.99 0 0 0-.908-.6H0v6a1 1 0 0 0 1 1Z" />
-                                                                <path d="M4.439 9a2.99 2.99 0 0 1 2.742 1.8 1.977 1.977 0 0 0 3.638 0A2.99 2.99 0 0 1 13.561 9H17.8L15.977.783A1 1 0 0 0 15 0H3a1 1 0 0 0-.977.783L.2 9h4.239Z" />
-                                                            </svg>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-green-400 border border-white rounded-full dark:border-gray-800">
+                                                            {
+                                                                item.message?.length > 0 ? (
+                                                                    <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                                                        <path d="M18 0H2a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2v4a1 1 0 0 0 1.707.707L10.414 13H18a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm-5 4h2a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2ZM5 4h5a1 1 0 1 1 0 2H5a1 1 0 0 1 0-2Zm2 5H5a1 1 0 0 1 0-2h2a1 1 0 0 1 0 2Zm9 0h-6a1 1 0 0 1 0-2h6a1 1 0 1 1 0 2Z" />
+                                                                    </svg>
+                                                                ) : item.image?.length > 0 ? (
+                                                                    <svg className="w-3 h-3 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                                        <path fill-rule="evenodd" d="M13 10a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H14a1 1 0 0 1-1-1Z" clip-rule="evenodd"/>
+                                                                        <path fill-rule="evenodd" d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12c0 .556-.227 1.06-.593 1.422A.999.999 0 0 1 20.5 20H4a2.002 2.002 0 0 1-2-2V6Zm6.892 12 3.833-5.356-3.99-4.322a1 1 0 0 0-1.549.097L4 12.879V6h16v9.95l-3.257-3.619a1 1 0 0 0-1.557.088L11.2 18H8.892Z" clip-rule="evenodd"/>
+                                                                    </svg>
+
+                                                                ) : (
+                                                                    <svg className="w-3 h-3 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                                        <path fill-rule="evenodd" d="M9 7V2.221a2 2 0 0 0-.5.365L4.586 6.5a2 2 0 0 0-.365.5H9Zm2 0V2h7a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9h5a2 2 0 0 0 2-2Zm2.318.052h-.002A1 1 0 0 0 12 8v5.293A4.033 4.033 0 0 0 10.5 13C8.787 13 7 14.146 7 16s1.787 3 3.5 3 3.5-1.146 3.5-3c0-.107-.006-.211-.017-.313A1.04 1.04 0 0 0 14 15.5V9.766c.538.493 1 1.204 1 2.234a1 1 0 1 0 2 0c0-1.881-.956-3.14-1.86-3.893a6.4 6.4 0 0 0-1.636-.985 4.009 4.009 0 0 0-.165-.063l-.014-.005-.005-.001-.002-.001ZM9 16c0-.356.452-1 1.5-1s1.5.644 1.5 1-.452 1-1.5 1S9 16.356 9 16Z" clip-rule="evenodd"/>
+                                                                    </svg>
+
+                                                                )
+                                                        }
                                                         </div>
                                                     </div>
                                                     <div className="w-full ps-3">
@@ -242,11 +261,11 @@ function NavbarComponent(): JSX.Element {
                                                         New message from <span className="font-semibold text-gray-900 dark:text-main-light-FERN">
                                                             {item.issuer.username}
                                                         </span>: {
-                                                            item.message.length > 0 ? (
-                                                                item.message.length > 10 ? item.message.slice(0, 10) + ' ...' : item.message
+                                                            item.message?.length > 0 ? (
+                                                                item.message?.length > 10 ? item.message.slice(0, 10) + ' ...' : item.message
                                                             ) : (
-                                                                item.image.length > 0 ? 'Picture' :
-                                                                item.audio.length > 0 ? 'Audio' :
+                                                                item.image?.length > 0 ? 'Picture' :
+                                                                item.audio?.length > 0 ? 'Audio' :
                                                                 null
                                                             )
                                                         }
@@ -258,14 +277,14 @@ function NavbarComponent(): JSX.Element {
                                         }
                                         else if (item.type === NotificationType.FRIEND_REQUEST) {
                                             return (
-                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
                                                             <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src="/docs/images/people/profile-picture-2.jpg" alt="Joseph image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                                                                <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z" />
+                                                                <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z"/>
                                                             </svg>
                                                         </div>
                                                     </div>
@@ -278,7 +297,7 @@ function NavbarComponent(): JSX.Element {
                                         }
                                         else if (item.type === NotificationType.CHANNEL_INVITE) {
                                             return (
-                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
                                                             <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
@@ -291,16 +310,28 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                     <div className="w-fit px-2">
                                                         <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400 w-fit§">
-                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>: invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.message}</span>
+                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>: invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.channel?.name + '.'}</span>
                                                         </div>
                                                         <div className="text-xs text-blue-600 dark:text-blue-500">few moments ago</div>
                                                     </div>
                                                     <div className="flex gap-2 w-fit">
                                                         <Button color="success" pill onClick={() => {
                                                             socket?.emit("acceptJoinChannel",
-                                                                channelNotifPayload
+                                                            {
+                                                                id: item.channel.id,
+                                                                channelId: item.channel.id,
+                                                                __owner__: userData[0].id,
+                                                                role: 'MEMBER',
+                                                                issuer: item.issuer,
+                                                                message: item.message,
+                                                                createdAt: new Date().toISOString(),
+                                                                updatedAt: new Date().toISOString(),
+                                                                seen: false,
+                                                                read: false,
+                                                                type: NotificationType.CHANNEL_INVITE,
+                                                                password: ''
+                                                            }
                                                             );
-                                                            console.log('Channel Notif Payload: ', channelNotifPayload);
                                                         }}>
                                                             Accept
                                                         </Button>
@@ -330,7 +361,7 @@ function NavbarComponent(): JSX.Element {
                                         }
                                         else if (item.type === NotificationType.CHANNEL_MESSAGE) {
                                             return (
-                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-12 h-12">
                                                             <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Jese image" />
@@ -359,7 +390,7 @@ function NavbarComponent(): JSX.Element {
                                             )
                                         }
                                         else if (item.type === NotificationType.CALL_REQUEST) {(
-                                            <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                            <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                 <div className="flex-shrink-0">
                                                     <div className="pic rounded-full w-11 h-11">
                                                         <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
@@ -378,9 +409,7 @@ function NavbarComponent(): JSX.Element {
                                         )}
                                     })
                             :
-                            <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg dark:text-white">
-                                Notifications
-                            </div>
+                            null
                             }
                         </div>
                     </div>
@@ -395,23 +424,27 @@ function NavbarComponent(): JSX.Element {
                 </div>
                 <div className="group" onClick={() => { toogleSearchDropDown() }}>
                     <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => setSearchInput(e.target.value)} />
-                    <div className={`absolute mt-2 z-10 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
-                        {filteredUsers.slice(0, 3).map((user, index) => (
-                            <div key={index} className="flex flex-col">
-                                <a className="flex justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-fit">
-                                    <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
-                                    <span>{user.firstName + ' ' + user.lastName}</span>
-                                </a>
+                    {
+                        filteredUsers.length > 0 ? (
+                            <div className={`absolute mt-2 z-40 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
+                                {filteredUsers.slice(0, 3).map((user, index) => (
+                                    <div key={index} className="flex flex-col">
+                                        <a className="flex justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-fit">
+                                            <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
+                                            <span>{user.firstName + ' ' + user.lastName}</span>
+                                        </a>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        ) : ''
+                    }
                 </div>
             </div>
         </div>
         // <header className="flex flex-wrap sm:justify-start sm:flex-nowrap z-50 w-full bg-white text-sm py-4 dark:bg-gray-800">
         //     <nav className="max-w-[85rem] w-full mx-auto px-4 sm:flex sm:items-center sm:justify-between" aria-label="Global">
         //         <div className="flex items-center justify-between">
-        //         <a className="flex-none" href="#">
+        //         <a className="flex-none" >
         //             <img className="w-10 h-auto" src="../assets/img/logo/logo-short.png" alt="Logo"/>
         //         </a>
         //         <div className="sm:hidden">
