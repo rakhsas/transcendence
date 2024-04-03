@@ -11,6 +11,7 @@ interface User {
     coalitionColor: string;
     providerId: string;
     createdAt: string;
+    isTwoFactorAuthenticationEnabled: boolean;
     updatedAt: string;
     provider: string;
 }

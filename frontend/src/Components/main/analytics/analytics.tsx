@@ -131,7 +131,7 @@ function AnalyticsComponent(): JSX.Element {
                             <div className="score text-black dark:text-white font-poppins">Score <br /> 200 pts</div>
                         </div>
                     </div>
-                    <div className="statistics bh-white dark:bg-black">
+                    <div className="statistics bg-white dark:bg-black">
                         <Bar 
                             data={{
                                 labels: ["Day 1", "Day2", "Day 3"],

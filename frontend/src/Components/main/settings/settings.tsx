@@ -1,41 +1,8 @@
 import "./settings.css";
-// import ValidInformation from '../../Info/Information';
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
-// import FourHundredFourComponent from "../../error/404.component";
-import { Route, Router, Routes } from "react-router-dom";
-import HomePageComponent from "../../HomePage";
-import { jsx } from "@emotion/react";
-import Morocco from './Morocoo.png'
-// import { Alert } from "flowbite-react";
-// import { AlertProps } from '@mui/material/Alert';
-
-
-/*
-
-import React, { useState } from 'react';
-
-function App() {
-  const [backgroundColor, setBackgroundColor] = useState("lightblue");
-
-  const changeBackgroundColor = () => {
-	setBackgroundColor(getRandomColor()); // Replace getRandomColor() with your color generation logic
-  }
-
-  return (
-	<div>
-	  <div style={{ backgroundColor: backgroundColor }} className="your-component-class">
-		Your component content here 
-		</div>
-		<button onClick={changeBackgroundColor}>Change Color</button>
-	  </div>
-	);
-  }
-  
-  export default App;
-*/
-
+import { TwoFA, TwoFaService } from "../../../services/twoFa.service";
 interface AlertProps {
 	message: string;
 }
@@ -87,71 +54,59 @@ function SettingFunction(): JSX.Element {
 	const [input, setInput] = useState("");
 	const [url, setUrl] = useState<string>("");
 	const userData = useContext(DataContext);
-	// if (! userData)
-	//   return <LoadingComponent />
+	const twoFaService = new TwoFaService();
 	useEffect(() => {
 		if (!userData) return;
 		const fetchData = async () => {
 			try {
-				console.log("Uf2wserId: -->", userData);
-				const Qrcode = await fetch(
-					APIURL + `2fa/generate/${userData[0].id}/${userData[0].email}`,
-					{
-						method: "GET",
-						credentials: "same-origin",
-					}
-				);
-				if (Qrcode.ok) {
-					const QRcode = await Qrcode.json();
-					setUrl(() => QRcode.url);
-					console.log("list li--> ", QRcode);
-				}
+				const Qrcode = await twoFaService.generateQrCode(userData[0].id, userData[0].email);
+				setUrl(Qrcode);
 			} catch (error) {
 				console.error("Error fetching user ", error);
 			}
 		};
 		fetchData();
+		setIsChecked(userData[0].isTwoFactorAuthenticationEnabled);
 	}, [userData]);
 	if (!userData) return <LoadingComponent />;
-	// console.log();
 	let TfCode: string = "";
-	function focusNextInput(
-		el: HTMLInputElement,
-		prevId: string | null,
-		nextId: string | null
-	) {
-		if (el.value.length === 0) {
-			if (prevId) {
-				const prevElement = document.getElementById(
-					prevId
-				) as HTMLInputElement | null;
-				if (prevElement) {
-					prevElement.focus();
-				}
-			}
-		} else {
-			if (nextId) {
-				const nextElement = document.getElementById(
-					nextId
-				) as HTMLInputElement | null;
-				if (nextElement) {
-					nextElement.focus();
-				}
-			}
-		}
-		TfCode = el.value;
-	}
-	document.querySelectorAll("[data-focus-input-init]").forEach((element) => {
-		element.addEventListener("keyup", function (this: HTMLElement) {
-			const prevId = this.getAttribute("data-focus-input-prev");
-			const nextId = this.getAttribute("data-focus-input-next");
-			if (this instanceof HTMLInputElement) {
-				focusNextInput(this, prevId, nextId);
-				// console.log(prevId, ' prve ', nextId);
-			}
-		});
-		// console.log(this instanceof HTMLInputElement);
-	});
+	// function focusNextInput(
+	// 	el: HTMLInputElement,
+	// 	prevId: string | null,
+	// 	nextId: string | null
+	// ) {
+	// 	if (el.value.length === 0) {
+	// 		if (prevId) {
+	// 			const prevElement = document.getElementById(
+	// 				prevId
+	// 			) as HTMLInputElement | null;
+	// 			if (prevElement) {
+	// 				prevElement.focus();
+	// 			}
+	// 		}
+	// 	} else {
+	// 		if (nextId) {
+	// 			const nextElement = document.getElementById(
+	// 				nextId
+	// 			) as HTMLInputElement | null;
+	// 			if (nextElement) {
+	// 				nextElement.focus();
+	// 			}
+	// 		}
+	// 	}
+	// 	TfCode = el.value;
+	// }
+	// document.querySelectorAll("[data-focus-input-init]").forEach((element) => {
+	// 	element.addEventListener("keyup", function (this: HTMLElement) {
+	// 		const prevId = this.getAttribute("data-focus-input-prev");
+	// 		const nextId = this.getAttribute("data-focus-input-next");
+	// 		if (this instanceof HTMLInputElement) {
+	// 			focusNextInput(this, prevId, nextId);
+	// 			// console.log(prevId, ' prve ', nextId);
+	// 		}
+	// 	});
+	// 	// console.log(this instanceof HTMLInputElement);
+	// });
 
 	const onchange = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -161,41 +116,16 @@ function SettingFunction(): JSX.Element {
 	}
 	const fetchQRcode = async () => {
 		try {
-			// console.log('Tfcode --> ', TfCode, 'userData --> ', userData[0].id, ' input', input);
 			const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
 				method: 'POST',
 				credentials: 'same-origin',
-				// redirect: 'follow'
 			})
-			console.log('status code1 --> : ', ValidQRcode)
 			if (ValidQRcode.status == 200) {
-				console.log("lisljsjfs -> ");
-				console.log('State Two valud 1 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
 				userData[0].isTwoFactorAuthenticationEnabled = true;
-				console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
-				console.log('valid UserDate --> ', userData);
-				console.log('status code2 --> : ', ValidQRcode);
-
-				// window.location.href = `https://10.12.13.6/`;
 			}
 			else {
-				console.log('invalid Qrcode --> : ', ValidQRcode)
-				console.log('State Two valud 1 --> : ', userData[0])
-				console.log('State Two valud 1 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
 				userData[0].isTwoFactorAuthenticationEnabled = false;
-				// <SuccessQRCODE/>;
-				// {!ShowSignUp && <Alert message="Valid QR code scanned!" />}
-				console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
-				console.log('valid UserDate --> ', userData[0]);
-				// window.location.href = `https://10.12.13.6/Error`;
 			}
-			// window.location.href = APIURL + `2fa/authenticate/${input}/${userData[0].id}`;
-			// window.location.href = `https://10.11.6.10/`;
-			// console.log(await ValidQRcode.json());
-
-			// if (ValidQRcode == true)
-			//   window.location.href = "http://localhost:4200";
-			// console.log("ValidQRcode: ", ValidQRcode);
 		}
 		catch (error) {
 			console.log('Invalid qrcode \n');
@@ -252,13 +182,12 @@ function SettingFunction(): JSX.Element {
 
 	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setUserEmail(event.target.value);
-		console.log(event.target.value, "===> value");
 		setIsEmailValid(isValidEmail(event.target.value));
 	}
 	return (
 		<div className="flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting p-8" >
 			<div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900 bg-[#F1F2FD]">
-				<div className="p-4  overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
+				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
 					<img src={userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl"/>
 					<label htmlFor="file" id="uploadbtn" className="gap-4">
 						<p onChange={handleFileChange} className="parPhoto dark:text-white text-black bolder font-extrabold font-900">

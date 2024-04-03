@@ -336,6 +336,10 @@
         width: 90% !important;
     }
 
+    .container-analytics .leader-board{
+        height: auto !important;
+    }
+
 }
 
 @media (max-width: 530px) {
@@ -373,7 +377,7 @@
     /* min-width: 500px; */
     display: flex;
     flex-direction: column;
-    /* height: 100%; */
+    height: 100%;
     justify-content: space-around;
     align-items: center;
     padding: 10px;

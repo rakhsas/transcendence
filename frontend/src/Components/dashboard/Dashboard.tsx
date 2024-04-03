@@ -31,6 +31,7 @@ function DashboardComponent() {
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
 				setUserData(fetchedUserData);
+				console.log(fetchedUserData)
 				const users = await userService.getAllUsersExcept(fetchedUserData.id);
 				setUsers(users);
 				const channelService = new ChannelService();

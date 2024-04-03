@@ -61,8 +61,6 @@ export class AnalyticsService {
         .andWhere("game.player_scoore = :scoore2", {scoore2: 0})
         .getCount();
 
-        // const gameWithMaxScoore = 0;
-
         return {
             "gamePlayed": gamePlayed,
             "gameWon": gameWon,
