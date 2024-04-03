@@ -73,6 +73,7 @@ const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 // "linear-gradient(to right, #d80909, #a02626, #610101)"
 
 function SettingFunction(): JSX.Element {
+
 	const [ShowSignUp, SetShowSignUp] = useState<boolean>(false);
 	const [ischecked, setIsChecked] = useState<boolean>(false);
 	const [backgroundColor, setBackgroundColor] = useState<string>("linear-gradient(to right, #217441, #207a3f, #22A34A)");
