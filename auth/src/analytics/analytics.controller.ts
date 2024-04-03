@@ -7,6 +7,12 @@ export class AnalyticsController {
     
     constructor(private readonly analyticsService: AnalyticsService) {}
 
+    @Get('allGame/:userId')
+    async getAllGame(@Param('userId') userId: string)
+    {
+        return this.analyticsService.getAllGame(userId);
+    }
+    
     @Get(':userId/:friendId')
     // @UseGuards(UserGuard)
     async getGameRecord(@Param('userId')userId: string, @Param('friendId')friendId: string,)
@@ -14,13 +20,14 @@ export class AnalyticsController {
         return this.analyticsService.getGameRecord(userId, friendId);
     }
 
-    @Get('userId')
-    async profileData(@Param('userId') userId: string)
+
+    @Get(':id')
+    async profileData(@Param('id') userId: string,)
     {
         return this.analyticsService.profileData(userId);
     }
 
-    
+
     // @Get('gameCount/:userId')
     // async gameCount(@Param('userId') userId: string){
     //     const count = this.analyticsService.gameCounts(userId);

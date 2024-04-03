@@ -30,7 +30,17 @@ export class AnalyticsService {
     //     return count;
     // }
 
+    async getAllGame(userId: string): Promise<GameEntity[]> {
+        const allGames = this.gameRepository.find(
+            {
+                where: {player1: {id: userId}},
+                relations: ['player1', 'player2', 'winner']
+            });
+        return allGames;
+    }
+
     async profileData(userId: string): Promise<{}> {
+        console.log("userId: ", userId);
         const gamePlayed = await this.gameRepository
         .createQueryBuilder('game')
         .leftJoin('game.player1', 'player1')
@@ -47,10 +57,11 @@ export class AnalyticsService {
         .createQueryBuilder('game')
         .leftJoin('game.player1', 'player1')
         .where('player1.id = :userId', {userId})
-        .where('game.user_scoore = :scoore', {scoore: 5})
-        .where("game.player_scoore = :scoore2", {scoore2: 0})
+        .andWhere('game.user_scoore = :scoore', {scoore: 5})
+        .andWhere("game.player_scoore = :scoore2", {scoore2: 0})
         .getCount();
 
+        // const gameWithMaxScoore = 0;
 
         return {
             "gamePlayed": gamePlayed,

@@ -37,4 +37,5 @@ export class GameEntity {
   how many match the user play,
   how many match win, 
   how many with max score, 5 - 0
+  user - openent score winner 
 */
