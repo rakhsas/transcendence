@@ -1,4 +1,4 @@
-import { Button, FileInput, Label, Modal, Select, Tabs, TextInput } from "flowbite-react";
+import { Avatar, Button, FileInput, Label, Modal, Select, Tabs, TextInput } from "flowbite-react";
 import { tabsTheme } from "../../../utils/themes";
 import { LiaUserFriendsSolid } from "react-icons/lia";
 import { RiWechatChannelsFill } from "react-icons/ri";
@@ -63,7 +63,6 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
             });
         });
         setLstGroupMessages(updatedChannels);
-        // setLstGroupMessages(await channelService.latestChannels(userData[0].id));
     }
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 	return (
@@ -76,7 +75,8 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 								You have no messages
 							</div>
 						) : (
-							latestMessages.map((message, index) => (
+							latestMessages.map((message: any, index) => (
+								console.log(message),
 								<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 									handleSelectMessage(
 										index.toString(),
@@ -84,6 +84,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 										undefined
 									)
 								}}>
+									
 									<div className="msg-profile rounded-full mr-4 bg-rose-400 ">
 										<div className="msg-profile group" style={{ backgroundImage: `url(${userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture})` }}>
 										</div>
@@ -98,13 +99,34 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 													message.senderId === userData[0].id
 														?
 														<span className="font-poppins font-bold text-gray-700">
-															YOU :
-															<span className="text-black dark:text-white">
-																{message.img ? message.img.slice(7, 14) + '...' : message.message.length > 10 ? message.message.slice(0, 10) + '...' : message.message}
+															YOU:
+															<span className="text-black dark:text-white rrrrr">
+																{
+																	message.message.length > 0 ? (
+																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																	) : (
+																		message.message.img && message.message.img.length > 0 ? ' Picture' :
+																		message.message.audio && message.message.audio.length > 0 ? ' Audio' :
+																		null
+																	)
+																}
 															</span>
 														</span>
 														:
-														message.img ? message.img.slice(7, 14) + '...' : message.message.length > 10 ? ' ' + message.message.slice(0, 10) + '...' : ' ' + message.message
+														<span className="font-poppins font-bold text-gray-700">
+															HIM:
+															<span className="text-black dark:text-white rrrrr">
+																{
+																	message.message.length > 0 ? (
+																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																	) : (
+																		message.message.img && message.message.img.length > 0 ? ' Picture' :
+																		message.message.audio && message.message.audio.length > 0 ? ' Audio' :
+																		null
+																	)
+																}
+															</span>
+														</span>
 												}
 											</span>
 											<span className="msg-date text-main-light-FERN text-sm ml-4">
@@ -118,34 +140,20 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 				<Tabs.Item title="Rooms" icon={RiWechatChannelsFill}>
 					{lstGroupMessages.map((item, index) => {
 						const channel = item.channel;
+						console.log("channel: ", baseAPIUrl + channel.picture);
 						return (
 							<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
+								
 								handleSelectMessage(index.toString(), undefined, channel.id)
 							}}>
 								<div className="msg-profile rounded-full mr-4">
-									<div className="msg-profile group" style={{ backgroundImage: `url(${baseAPIUrl + channel.picture})` }}>
+									<div className="msg-profile group" style={{ backgroundImage: `url(${encodeURI(baseAPIUrl + channel.picture)})` }}>
 									</div>
 								</div>
 								<div className="msg-detail overflow-hidden ml-2">
 									<div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base capitalize">
 										{channel.name}
 									</div>
-									{/* <div className="msg-content font-medium text-xs">
-										<span className="msg-message whitespace-nowrap overflow-hidden overflow-ellipsis text-main-dark-SIDEMESSAGE">
-
-											<span className="font-poppins font-bold text-gray-700">
-												{
-													latestMessage.senderId === userData[0].id ? 'You : ' : 'No One'
-												}
-											</span>
-											{
-												latestMessage.message.length > 0 ? latestMessage.message.length > 10 ? latestMessage.message.slice(7, 14) + '...' : latestMessage.message : latestMessage.img ? latestMessage.img.slice(0, 8) + '...' : latestMessage.audio ? 'Audio' : 'No message'
-											}
-										</span>
-										<span className="msg-date text-main-light-FERN text-sm ml-5">
-											{new Date(latestMessage.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}
-										</span>
-									</div> */}
 								</div>
 							</div>
 						)
@@ -160,7 +168,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 					<form className="flex flex-col gap-4 m-0" onSubmit={addChannel}>
 						<div className="conta flex flex-col">
 							<div className="flex justify-center">
-								<input type="file" onChange={(e) => setImagePath(e.target?.files[0])} />
+								<input type="file" onChange={(e) => setImagePath(e.target.files?.[0])} />
 							</div>
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
 								<div>

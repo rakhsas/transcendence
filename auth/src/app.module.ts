@@ -12,13 +12,18 @@ import { Mute } from './user/entities/mute.entity';
 import { User } from './user/entities/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import { FreindsModule } from './friends/friends.module';
-import { GameGetwayModule } from './game-getway/game-getway.module';
+import { GameGetwayModule } from './game/game.module';
 import { ChannelModule } from './channel/channel.module';
 import { ChannelUser } from './user/entities/channel_member.entity';
 import { GameEntity } from './user/entities/game.entity';
 import { UploadModule } from './upload/upload.module';
 import express from 'express';
 import { join } from 'path';
+import { NotificationModule } from './notification/notification.module';
+import { Blocked } from './user/entities/blocked.entity';
+import { Notif } from './user/entities/notification.entity';
+import { Banned } from './user/entities/ban.entity';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -34,8 +39,7 @@ import { join } from 'path';
       password: 'root',
       database: 'db1',
       synchronize: true,
-      // logging: true,
-      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser],
+      entities: [User, Msg, GameEntity, Channel, Mute, Friendship, ChannelUser, Blocked, Notif, Banned],
     }),
     UserModule,
     AuthModule,
@@ -44,6 +48,8 @@ import { join } from 'path';
     GameGetwayModule,
     ChannelModule,
     UploadModule,
+    NotificationModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

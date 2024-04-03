@@ -1,5 +1,5 @@
 
-import './list.css';
+// import './list.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import HomePageComponent from './Components/HomePage';
 import ValidInformation from './Components/Info/Information';
@@ -26,7 +26,6 @@ function App() {
       {/* <BrowserRouter> */}
       <Routes>
         <Route path="/" element={<HomePageComponent />} />
-        <Route path="/Error" element={< INVALIDQRCODEComponent/>} />
         <Route path="/dashboard/*" element={<DashboardComponent />}>
           <Route index element={<HomeComponent />} />
           <Route path="analytics" element={<AnalyticsComponent />} />
@@ -36,7 +35,7 @@ function App() {
           <Route path="profile/*" element={<ProfileComponent />} />
           <Route path="game" element={<Game />} />
           <Route path="HeadToHead" element={<HeadToHead />} />
-          {/* <Route path="profile" element={<ProfileComponent />} /> */}
+          <Route path="profile" element={<ProfileComponent />} />
           <Route path="*" element={<NotFoundComponent />} />
         </Route>
       </Routes>

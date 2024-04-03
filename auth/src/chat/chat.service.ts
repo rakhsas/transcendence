@@ -1,5 +1,5 @@
 // src/chat/chat.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Msg } from './../user/entities/msg.entitiy';
 import { UUID, privateDecrypt } from 'crypto';
@@ -12,6 +12,7 @@ import { ChannelUser } from 'src/user/entities/channel_member.entity';
 import { UserRole } from '../user/entities/channel_member.entity';
 import { UserService } from 'src/user/user.service';
 import { ChannelService } from 'src/channel/channel.service';
+import { Banned } from 'src/user/entities/ban.entity';
 
 @Injectable()
 export class ChatService {
@@ -26,6 +27,8 @@ export class ChatService {
     private readonly muteRepository: Repository<Mute>,
     @InjectRepository(ChannelUser)
     private readonly channelUserRepository: Repository<ChannelUser>,
+    @InjectRepository(Banned)
+    private readonly BanRepository: Repository<Banned>,
     private userService: UserService,
     private channelService: ChannelService,
   ) {}
@@ -49,30 +52,38 @@ export class ChatService {
 
   // ================================= Users functions ================================================================================
 
-  async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
-    const sender = await this.userRepository.findOne({ where: { id: IdSender }, select: { blocks: true } });
-    const receiver = await this.userRepository.findOne({ where: { id: idReceiver }, select: { blocks: true } });
+  async banUser(payload: any){
+    const newRecord = this.BanRepository.create({
+      user: {id: payload.userId},
+      channel: {id: payload.channelId}
+    });
+    this.BanRepository.save(newRecord);
+ }
 
-    const isReceiverBlocked = sender?.blocks.includes(idReceiver) ?? false;
-    const isSenderBlocker = receiver?.blocks.includes(IdSender) ?? false;
+  // async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
+  //   const sender = await this.userRepository.findOne({ where: { id: IdSender }, select: { blocks: true } });
+  //   const receiver = await this.userRepository.findOne({ where: { id: idReceiver }, select: { blocks: true } });
 
-    return isReceiverBlocked || isSenderBlocker;
-  }
+  //   const isReceiverBlocked = sender?.blocks.includes(idReceiver) ?? false;
+  //   const isSenderBlocker = receiver?.blocks.includes(IdSender) ?? false;
+
+  //   return isReceiverBlocked || isSenderBlocker;
+  // }
 
 
-  async BlockUser(userId: UUID, idOfBlockedUser: UUID): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+  // async BlockUser(userId: UUID, idOfBlockedUser: UUID): Promise<User> {
+  //   const user = await this.userRepository.findOne({ where: { id: userId } });
 
-    if (!user)
-      throw new Error("User Not Found!");
-    if (!user.blocks.includes(idOfBlockedUser)) {
-      user.blocks = [...user.blocks, idOfBlockedUser];
-      return this.userRepository.save(user);
-    }
-    else {
-      throw new Error("User already blocked!! :)");
-    }
-  }
+  //   if (!user)
+  //     throw new Error("User Not Found!");
+  //   if (!user.blocks.includes(idOfBlockedUser)) {
+  //     user.blocks = [...user.blocks, idOfBlockedUser];
+  //     return this.userRepository.save(user);
+  //   }
+  //   else {
+  //     throw new Error("User already blocked!! :)");
+  //   }
+  // }
 
   // ====================================== Messages function ==========================================================================
 
@@ -82,7 +93,7 @@ export class ChatService {
    * @param receiverId the receiver
    * @param content the content of the message
    */
-  async addMessage(payload: any): Promise<void> {
+  async addMessage(payload: any) {
     const directMessage = this.msgRepository.create({
       message: payload.message,
       recieverId: payload.recieverId ? payload.recieverId : null,
@@ -91,7 +102,7 @@ export class ChatService {
       img: (payload.image !== undefined) ? payload.image : null,
       audio: (payload.audio !== undefined) ? payload.audio : null
     });
-    await this.msgRepository.save(directMessage);
+    return await this.msgRepository.save(directMessage);
   }
 
   /**
@@ -196,6 +207,8 @@ export class ChatService {
 
   async addNewMemberToChannel(payload: any, role: string) {
     // Load user and channel entities
+    console.log("payload.__owner__", payload.__owner__)
+    console.log("payload.id", payload.id)
     console.log("-----------------------------------------------> joined");
     const id = payload.__owner__;
     const user = await this.userService.viewUser(id);
@@ -221,16 +234,23 @@ export class ChatService {
    */
   async kickUserFromChannel(payload: any)
   {
+    console.log("kickUserFromChannel: ", payload);
     const targetedEntity = await this.channelUserRepository.findOne({
-      where: {user: {id: payload.userId}, channel: {id: payload.channelId}},
+      where: {
+        channel: {id: payload.channelId},
+        user: {
+          id: payload.userId
+        }
+      },
+      relations: ['user'],
     });
-
-    if (targetedEntity)
-    {
-      await this.channelUserRepository.delete(targetedEntity.id);
-    }
-    else
-      console.log("the user in channel-user relation is not found!!!");
+    console.log("targetedEntity: ", targetedEntity);
+    // if (targetedEntity)
+    // {
+    //   await this.channelUserRepository.delete(targetedEntity.id);
+    // }
+    // else
+    //   console.log("the user in channel-user relation is not found!!!");
   }
 
   async changeChannelType(payload: any)
@@ -241,7 +261,7 @@ export class ChatService {
       throw new NotFoundException("The channel not found !");
 
     channelRecord.type = payload.channelType;
-    if (payload.channelType == ChannelTypes.PROTECTED)
+    if (payload.channelType === ChannelTypes.PROTECTED)
     {
       channelRecord.password = payload.password;
     }

@@ -26,6 +26,7 @@ const ModalComponent: React.FC<ModalProps> = ({isOpen, channelData, setOpenModal
     };
     const joinChannel = () => {
         const otp = inputRefs.map(inputRef => inputRef.current?.value).join('');
+        console.table(otp);
         socketChat?.emit('acceptJoinChannel', {
             id: channelData.id,
             __owner__: userData[0].id,
@@ -37,9 +38,11 @@ const ModalComponent: React.FC<ModalProps> = ({isOpen, channelData, setOpenModal
         socketChat?.on("channelPasswordInvalid", (data: any) => {
             console.log('channelPasswordInvalid: ', data)
             setIncorrectPassword(true);
+            setTimeout(() => {
+                setIncorrectPassword(false);
+            }, 2000);
         });
         socketChat?.on("channelJoined", (data: any) => {
-            console.log('channelJoined: ', data)
             setSuccess(true);
             setTimeout(() => {
                 setSuccess(false);
@@ -127,7 +130,11 @@ const ModalComponent: React.FC<ModalProps> = ({isOpen, channelData, setOpenModal
                                     ))}
                                     </div>
                                     <div className="flex flex-col space-y-2 px-4">
-                                    <div onClick={joinChannel}>
+                                    <div onClick={() => {
+                                        setIncorrectPassword(false)
+                                        setSuccess(false)
+                                        joinChannel()
+                                    }}>
                                         <button className="flex flex-row items-center justify-center text-center w-full border rounded-xl outline-none py-5 bg-main-light-FERN dark:bg-main-light-EGGSHELL border-none text-white text-sm shadow-sm">
                                         Verify Access
                                         </button>

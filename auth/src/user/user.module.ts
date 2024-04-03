@@ -13,12 +13,13 @@ import { Msg } from './entities/msg.entitiy';
 import { Friendship } from './entities/freindship.entity';
 import { MessageService } from '../msg/message.service';
 import { MessageController } from '../msg/message.controller';
+import { Notif } from './entities/notification.entity';
 import { TwoFactorAuthenticationService } from './2FA/twoFactorAuthentication.service';
 import { TwoFactorAuthenticationController } from './2FA/twoFactorAuthentication.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Msg, Channel, Mute, Friendship]),
+    TypeOrmModule.forFeature([User, Msg, Channel, Mute, Friendship, Notif]),
     HttpModule,
   ],
   providers: [UserService, UserGuard, AuthService, Repository, MessageService, TwoFactorAuthenticationService],
