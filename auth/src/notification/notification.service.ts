@@ -19,7 +19,7 @@ export class NotificationService {
     async getNotificationsByTargetId(targetId: string): Promise<Notif[]> {
         return await this.notificationRepository.find({
           where: { target: { id: targetId } },
-          relations: ['issuer'],
+          relations: ['issuer', 'channel'],
           order: { createdAt: 'DESC' }
         });
     }
@@ -31,7 +31,7 @@ export class NotificationService {
     async getNotificationById(id: number): Promise<Notif> {
         return await this.notificationRepository.findOne({
             where: { id },
-            relations: ['issuer', 'target']
+            relations: ['issuer', 'target', 'channel']
         });
     }
 }

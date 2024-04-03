@@ -52,6 +52,7 @@ export interface notificationInterface {
     image: string;
     seen: false;
     read: false;
+    channel: Channel;
     issuer: User;
     createdAt: Date;
     updatedAt: Date;

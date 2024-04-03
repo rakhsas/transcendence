@@ -23,6 +23,7 @@ import { NotificationModule } from './notification/notification.module';
 import { Blocked } from './user/entities/blocked.entity';
 import { Notif } from './user/entities/notification.entity';
 import { Banned } from './user/entities/ban.entity';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -47,7 +48,8 @@ import { Banned } from './user/entities/ban.entity';
     GameGetwayModule,
     ChannelModule,
     UploadModule,
-    NotificationModule
+    NotificationModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
