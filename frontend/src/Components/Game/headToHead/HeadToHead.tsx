@@ -22,14 +22,28 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
   //   };
   // }, [counter]);
 
+    function handleBeforeUnload(e) {
+      // Included for legacy support, e.g. Chrome/Edge < 119
+      if (!socket) return;
+      socket.close();
+    }
+  //window.addEventListener("beforeunload", handleBeforeUnload);
   useEffect(() => {
     const newSocket: Socket = io(url, {
       path: "/sogame",
       transports: ["polling"],
     });
+        const handleBeforeUnload = () => {
+      // Disconnect socket without asking for confirmation
+      newSocket.disconnect();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     setSocket(newSocket);
     return (): void => {
       newSocket.close(); // Close the WebSocket connection when component unmounts
+      // Clean up the event listener when the component unmounts
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
 
@@ -105,7 +119,7 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
         <div className="border-2 rounded-2xl flex flex-col w-full h-full ">
           <GameStatus socket={socket} roomId={roomId} />
           {roomId === "win" ? (
-            <div  className=" flex-1 flex justify-center items-center ">
+            <div className=" flex-1 flex justify-center items-center ">
               <div className="flex flex-col gap-4 px-9  py-4 items-center ">
                 <div className="flex-1 text-center ">
                   <p className="text-xl pb-4">Game Over</p>

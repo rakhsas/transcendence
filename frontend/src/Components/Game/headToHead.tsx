@@ -2,6 +2,7 @@ import { useState } from "react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 import CanvasHeadToHead from "./headToHead/HeadToHead";
+import img1 from "./images/table-tennis-ping-pong.jpg";
 
 const HeadToHead = () => {
   const [selectedMap, setSelectedMap] = useState("map1"); // State to track the selected map
@@ -10,9 +11,8 @@ const HeadToHead = () => {
   const handleChange = (event) => {
     setSelectedMap(event.target.value); // Update the selected map when a radio button is clicked
   };
-
   return (
-    <div className="flex justify-center w-full h-full items-center">
+    <div className="flex justify-center w-full h-full items-center" >
       <div className="flex justify-center w-[600px] h-[450px] border-2 border-red-600 rounded-xl">
         {isStarted ? (
           <CanvasHeadToHead width="600" height="400" />
@@ -21,7 +21,7 @@ const HeadToHead = () => {
             <h1 className="text-2xl font-bold">Customize your game</h1>
             <div className="flex gap-3 flex-wrap justify-center items-center">
               <div className="flex flex-col items-center">
-                <img src="https://via.placeholder.com/150" alt="map1" />
+                <img src={img1} width={200} alt="map1" />
                 <FormControlLabel
                   control={<Radio />}
                   value="map1"

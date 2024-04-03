@@ -1,4 +1,5 @@
 import { Socket } from "socket.io-client";
+import IMG from "../images/table-tennis-ping-pong.jpg";
 
 class User {
   x: number;
@@ -82,6 +83,7 @@ class Game {
   socket: Socket;
   roomId: string;
   index: number;
+  img: any;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -98,6 +100,8 @@ class Game {
     this.user = new User(canvas);
     this.computer = new Computer(canvas);
     this.ball = new Ball(canvas);
+    this.img = new Image();
+    this.img.src = IMG;
 
     socket.on("render", (userScore, compScore, ball) => {
       this.ball = ball;
@@ -186,6 +190,15 @@ class Game {
     //   window.location.replace("/dashboard");
     // });
   }
+  drawImage() {
+    console.log("draw image");
+    const img = new Image();
+    img.src = IMG;
+    img.onload = () => {
+      this.img = img;
+    };
+    this.img = img;
+  }
 
   drawRect(x: number, y: number, w: number, h: number, color: string) {
     this.ctx.fillStyle = color;
@@ -228,7 +241,9 @@ class Game {
   }
 
   render() {
-    this.drawRect(0, 0, this.canvas.width, this.canvas.height, "black");
+    // this.drawRect(0, 0, this.canvas.width, this.canvas.height, "black");
+    //this.drawImage();
+    this.ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
     this.drawText(
       this.user.score,
       this.canvas.width / 4,
