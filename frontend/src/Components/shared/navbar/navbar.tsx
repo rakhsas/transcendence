@@ -9,6 +9,8 @@ import User from "../../../model/user.model";
 import AuthService from "../../../services/auth.service";
 import { Message } from "@mui/icons-material";
 import { notificationInterface } from './../../../utils/types';
+import { ChannelService } from "../../../services/channel.service";
+import { NotificationService } from "../../../services/notification.service";
 
 const SearchIcon = () => (
     <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-black dark:stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -64,7 +66,6 @@ function NavbarComponent(): JSX.Element {
     const [notificationCount, setNotificationCount] = useState<boolean>(false);
     const [users, setUsers] = useState<User[]>([]);
     const [searchInput, setSearchInput] = useState('');
-    const userService = new UserService();
     const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [notifications, setNotifications] = useState<notificationInterface[]>([]);
@@ -83,8 +84,8 @@ function NavbarComponent(): JSX.Element {
         console.log('Notifications:', notifications);
     }, []);
     useEffect(() => {
-        notifications.forEach(notif => {
-            if (!notif.seen) {
+        notifications.slice(0, 5).forEach(notif => {
+            if (notif.seen === false) {
                 setNotificationCount(true);
             }
         });
@@ -206,6 +207,13 @@ function NavbarComponent(): JSX.Element {
     useEffect(() => {
         console.log(isNotifOpen)
     }, [isNotifOpen]);
+    const updateNotif = () => {
+        const notificationService = new NotificationService();
+        notifications.slice(0, 5).forEach(async (element: notificationInterface) => {
+            const test = await notificationService.returnSeenNotification(element.id);
+        })
+        setNotificationCount(false);
+    }
     return (
         <div className="p-4 flex flex-col sm:flex-row sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
@@ -213,7 +221,7 @@ function NavbarComponent(): JSX.Element {
             </div>
             <div className="max-w-md pl-4 flex flex-col md:sm:flex-row sm:space-x-4 xs:space-x-2 xs:flex-row">
                 <div className="relative h-10 flex items-center">
-                    <div className="svg" onClick={() =>  setNotifIsOpen(!isNotifOpen)}>
+                    <div className="svg" onClick={() =>  {setNotifIsOpen(!isNotifOpen); updateNotif()}}>
                         <svg  className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
                             <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
                         </svg>
@@ -243,13 +251,13 @@ function NavbarComponent(): JSX.Element {
                                                                     </svg>
                                                                 ) : item.image?.length > 0 ? (
                                                                     <svg className="w-3 h-3 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                                        <path fill-rule="evenodd" d="M13 10a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H14a1 1 0 0 1-1-1Z" clip-rule="evenodd"/>
-                                                                        <path fill-rule="evenodd" d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12c0 .556-.227 1.06-.593 1.422A.999.999 0 0 1 20.5 20H4a2.002 2.002 0 0 1-2-2V6Zm6.892 12 3.833-5.356-3.99-4.322a1 1 0 0 0-1.549.097L4 12.879V6h16v9.95l-3.257-3.619a1 1 0 0 0-1.557.088L11.2 18H8.892Z" clip-rule="evenodd"/>
+                                                                        <path fillRule="evenodd" d="M13 10a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H14a1 1 0 0 1-1-1Z" clipRule="evenodd"/>
+                                                                        <path fillRule="evenodd" d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12c0 .556-.227 1.06-.593 1.422A.999.999 0 0 1 20.5 20H4a2.002 2.002 0 0 1-2-2V6Zm6.892 12 3.833-5.356-3.99-4.322a1 1 0 0 0-1.549.097L4 12.879V6h16v9.95l-3.257-3.619a1 1 0 0 0-1.557.088L11.2 18H8.892Z" clipRule="evenodd"/>
                                                                     </svg>
 
                                                                 ) : (
                                                                     <svg className="w-3 h-3 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                                        <path fill-rule="evenodd" d="M9 7V2.221a2 2 0 0 0-.5.365L4.586 6.5a2 2 0 0 0-.365.5H9Zm2 0V2h7a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9h5a2 2 0 0 0 2-2Zm2.318.052h-.002A1 1 0 0 0 12 8v5.293A4.033 4.033 0 0 0 10.5 13C8.787 13 7 14.146 7 16s1.787 3 3.5 3 3.5-1.146 3.5-3c0-.107-.006-.211-.017-.313A1.04 1.04 0 0 0 14 15.5V9.766c.538.493 1 1.204 1 2.234a1 1 0 1 0 2 0c0-1.881-.956-3.14-1.86-3.893a6.4 6.4 0 0 0-1.636-.985 4.009 4.009 0 0 0-.165-.063l-.014-.005-.005-.001-.002-.001ZM9 16c0-.356.452-1 1.5-1s1.5.644 1.5 1-.452 1-1.5 1S9 16.356 9 16Z" clip-rule="evenodd"/>
+                                                                        <path fillRule="evenodd" d="M9 7V2.221a2 2 0 0 0-.5.365L4.586 6.5a2 2 0 0 0-.365.5H9Zm2 0V2h7a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9h5a2 2 0 0 0 2-2Zm2.318.052h-.002A1 1 0 0 0 12 8v5.293A4.033 4.033 0 0 0 10.5 13C8.787 13 7 14.146 7 16s1.787 3 3.5 3 3.5-1.146 3.5-3c0-.107-.006-.211-.017-.313A1.04 1.04 0 0 0 14 15.5V9.766c.538.493 1 1.204 1 2.234a1 1 0 1 0 2 0c0-1.881-.956-3.14-1.86-3.893a6.4 6.4 0 0 0-1.636-.985 4.009 4.009 0 0 0-.165-.063l-.014-.005-.005-.001-.002-.001ZM9 16c0-.356.452-1 1.5-1s1.5.644 1.5 1-.452 1-1.5 1S9 16.356 9 16Z" clipRule="evenodd"/>
                                                                     </svg>
 
                                                                 )
