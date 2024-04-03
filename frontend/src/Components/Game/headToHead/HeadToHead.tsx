@@ -100,14 +100,13 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
     window.location.replace("/dashboard");
   }
   return (
-    <div className="flex  flex-col  items-center justify-center  text-white  ">
+    <div className="flex  flex-col h-full w-full  items-center justify-center  text-white  ">
       {roomId ? (
-        <div className="border-2 rounded-2xl">
+        <div className="border-2 rounded-2xl flex flex-col w-full h-full ">
           <GameStatus socket={socket} roomId={roomId} />
-
           {roomId === "win" ? (
-            <div {...props } className="bg-red-600">
-              <div className=" bg-[#FD0363] rounded-xl  flex flex-col gap-4 px-9  py-4 items-center ">
+            <div  className=" flex-1 flex justify-center items-center ">
+              <div className="flex flex-col gap-4 px-9  py-4 items-center ">
                 <div className="flex-1 text-center ">
                   <p className="text-xl pb-4">Game Over</p>
                   <p className="text-xl">You win</p>
