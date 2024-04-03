@@ -86,8 +86,9 @@
 }
 
 #uploadbtn {
-   display: none;
-    /* display: flex; */
+   /* display: ; */
+    display: flex;
+    opacity: 0;
     width: 200px;
     height: auto;
     justify-content: center;
@@ -99,18 +100,15 @@
     background-color: #31304D;
     box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.644);
     position: absolute;
-    transition: all 0.5s ease;
+    transition: all 0.3s ease;
+    width: 200px;
+    height: 200px;
+    border-radius: 1.5rem;
 }
 
-.profile-image,
-.profile-image img{
-    transition: all 0.5s;
-}
-
-
-
-.profile-image img:hover #uploadbtn{
-    display: flex !important;
+.profile-image img:hover + .change-picture,
+.change-picture:hover{
+    opacity: 0.8 !important;
 }
 
 .click-function {
