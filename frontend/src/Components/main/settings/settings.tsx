@@ -7,6 +7,7 @@ import LoadingComponent from "../../shared/loading/loading";
 import { Route, Router, Routes } from "react-router-dom";
 import HomePageComponent from "../../HomePage";
 import { jsx } from "@emotion/react";
+import Morocco from './Morocoo.png'
 // import { Alert } from "flowbite-react";
 // import { AlertProps } from '@mui/material/Alert';
 
@@ -220,16 +221,49 @@ function SettingFunction(): JSX.Element {
       setSecondName(value);
     }
   };
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
 
+  const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCountry(event.target.value);
+  };
+  const isValidBirthday = (input: string): boolean => {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    return regex.test(input);
+  }
+  const [userInput, setUserInput] = React.useState('');
+  const [isValid, setIsValid] = React.useState(false);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUserInput(event.target.value);
+    setIsValid(isValidBirthday(event.target.value));
+  }
+
+  const [selectedCity, setSelectedCity] = useState<string>('');
+
+  const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCity(event.target.value);
+  };
+  const isValidEmail = (email: string): boolean => {
+    const regex = /^[a-zA-Z._%+-]+@student\.1337\.ma$/;
+    return regex.test(email);
+  }
+  const [userEmail, setUserEmail] = React.useState('');
+  const [isEmailValid, setIsEmailValid] = React.useState(false);
+
+  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUserEmail(event.target.value);
+    console.log(event.target.value, "===> value");
+    setIsEmailValid(isValidEmail(event.target.value));
+  }
   return (
     <div
       className="
             m-4 flex flex-col new:flex-row w-full h-[90vh] 
             justify-between gap-4 bg-inherit overflow-hidden 
-             no-scrollbar overflow-y-scroll 
+             no-scrollbar overflow-y-scroll
             Setting"
     >
-      <div className="part1   gap-4 w-full md:min-w-[35%]  min-h-full  Usredit bg-white dark:bg-black">
+      <div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900 bg-[#F1F2FD]">
         {/* <div className="titpr"></div> */}
         <div className="p-4  overflow-hidden flex flex-col   no-scrollbar w-full justify-center items-center gap-12 ">
           <img src={userData[0]?.picture || ''} id="list" alt="" />
@@ -255,15 +289,17 @@ function SettingFunction(): JSX.Element {
           >
             2FA-AUTHENTICATION
           </h2>
-          <img className={`${ischecked ? 'visible' : 'invisible'} Qrcode` } src={url} alt="" />
+          <img className={`${ischecked ? 'visible' : 'invisible'} Qrcode bg-gradient-to-r from-green-400 via-green-500 to-green-600`} src={url} alt="" />
 
           <form className="max-w-sm mx-auto" onSubmit={onchange}>
             <p
               id="helper-text-explanation"
-              className={`mt-2 text-sm  -twof--part1 font-extrabold ${ischecked ? 'visible' : 'invisible'} text-white dark:text-black`}
+              className={`mt-2 text-white dark:text-black bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br 
+              focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg
+             dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2  FontAwesome -twof--part1 ${ischecked ? 'visible' : 'invisible'}  `}
             >
-              Please introduce the 6 digit <br />
-              code scanned by application
+              ENTRY QRCODE SCANNED <br />
+              {/* code scanned by application */}
             </p>
             <div className={`flex mt-8 space-x-2 rtl:space-x-reverse flex-row justify-center items-center ${ischecked ? 'visible' : 'invisible'}`}>
               <div className="flex flex-row justify-center items-center">
@@ -314,7 +350,7 @@ function SettingFunction(): JSX.Element {
                   {/* <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Checked toggle</span> */}
                 </label>
               </div>
-              <div className="ms-2 text-sm flex flex-row justify-center items-center "  >
+              <div className="w-[250px] ms-2 text-sm flex flex-row justify-center items-center "  >
                 <label
                   htmlFor="helper-checkbox-2"
                   className="font-medium text-gray-900 dark:text-gray-300 "
@@ -331,9 +367,9 @@ function SettingFunction(): JSX.Element {
           {/* <h2 className='-twof--part1'>2FA-AUTHENTICATION</h2> */}
         </div>
       </div>
-      <div className="part2 flex flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center bg-white dark:bg-black ">
-        <form className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] ">
-          <h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5">
+      <div className="part2 flex rounded-3xl flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center dark:bg-zinc-900 bg-[#F1F2FD] ">
+        <form className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] flex flex-col ">
+          <h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5 ">
             Information
           </h2>
           <div className="grid gap-6 mb-6 mx:grid-cols-2">
@@ -350,8 +386,8 @@ function SettingFunction(): JSX.Element {
                 value={firstName}
                 onChange={handleFirstNameChange}
                 maxLength={15}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+              dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Mohamed"
                 required
               />
@@ -363,7 +399,7 @@ function SettingFunction(): JSX.Element {
               <label
                 htmlFor="last_name"
                 className="block mb-2 text-sm   text-blue-600 font-bolder dark:text-white"
-                
+
               >
                 Last name
               </label>
@@ -373,8 +409,8 @@ function SettingFunction(): JSX.Element {
                 value={SecondName}
                 onChange={handleSecondNameChange}
                 maxLength={10}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+              dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="Darify"
                 required
               />
@@ -392,30 +428,13 @@ function SettingFunction(): JSX.Element {
               <input
                 type="text"
                 id="company"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
-               dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
+               dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="1337 Coding School"
                 required disabled
               />
             </div>
-            <div>
-              <label
-                htmlFor="phone"
-                className="block mb-2 text-sm text-blue-600 font-bolder dark:text-white"
-              >
-                Phone number
-              </label>
 
-              <input
-                type="tel"
-                id="phone"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5
-               dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="+212"
-                pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
-                required
-              />
-            </div>
             <div>
               <label
                 htmlFor="website"
@@ -423,14 +442,23 @@ function SettingFunction(): JSX.Element {
               >
                 Country
               </label>
-              <input
-                type="url"
-                id="website"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Morocco"
+              <select
+                id="country"
+                value={selectedCountry}
+                onChange={handleCountryChange}
+                className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+              dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                // placeholder="Morocco"
                 required
-              />
+              >
+                <option value="">Select a country</option>
+                <option value="Canada">Morocco</option>
+                <option value="USA">Palestine</option>
+                <option value="USA">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="Canada">Canada</option>
+
+              </select>
             </div>
             <div>
               <label
@@ -439,14 +467,18 @@ function SettingFunction(): JSX.Element {
               >
                 Birth Day
               </label>
+             
               <input
-                type="text"
+                type="date" 
+                value={userInput} 
+                onChange={handleInputChange}
                 id="visitors"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+              dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="01-01-2000"
                 required
               />
+               {/* {isValid ? <p>Valid birth day format!</p> : <p>Invalid birth day format!</p>} */}
             </div>
             <div>
               <label
@@ -455,31 +487,28 @@ function SettingFunction(): JSX.Element {
               >
                 Birth City
               </label>
-              <input
-                type="text"
-                id="visitors"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="Casablanca"
+              <select
+                id="city"
+                // id="visitors"
+                value={selectedCity}
+                onChange={handleCityChange}
+                className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+              dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                // placeholder="Casablanca"
                 required
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="visitors"
-                className="block mb-2 text-sm text-blue-600  font-bolder dark:text-white"
               >
-                Zip Code
-              </label>
-              <input
-                type="number"
-                id="visitors"
-                className="bg-gray-50 border  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
-              dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="20200"
-                required
-              />
+                <option value="">Select a City</option>
+                <option value="Canada">Casablanca</option>
+                <option value="USA">Rabat</option>
+                <option value="USA">Tanger</option>
+                <option value="UK">Agadir</option>
+                <option value="Canada">Marrakech</option>
+                <option value="Canada">El-jadida</option>
+                <option value="Canada">Fes</option>
+                <option value="Canada">Tetouan</option>
+                </select>
             </div>
+
           </div>
           <div className="mb-6">
             <label
@@ -491,13 +520,16 @@ function SettingFunction(): JSX.Element {
             <input
               type="email"
               id="email"
+              value={userEmail}
+              onChange={handleEmailChange}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
-            dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="UserName@student.1337.ma"
               required
             />
+            {/* {isEmailValid ? `${handleEmailChange == handleEmailChange}`: <p>Invalid email format!</p>} */}
           </div>
-          <div className="flex items-start mb-6">
+          {/* <div className="flex items-start mb-6">
             <div className="flex items-center h-5">
               <input
                 id="remember"
@@ -520,12 +552,12 @@ function SettingFunction(): JSX.Element {
               >
                 Terms and conditions
               </a>
-              .
+              
             </label>
-          </div>
+          </div> */}
           <button
             type="submit"
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bolder rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            className="flex  flex-row justify-center items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bolder rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             Submit
           </button>

@@ -36,6 +36,9 @@
     /* width: ; */
 }
 
+.ch, .c{
+    border-radius: 12px;
+}
 .Achieve--Border{
     border-radius: 8px;
 }
@@ -49,7 +52,8 @@ h5.l5{
     /* transform: translateY(-50px); */
     background-color: var(--green);
     border-radius: 5px;
-    margin-top: -35px;
+    margin-top: -5px;
+    color: black;
 }
 
 
