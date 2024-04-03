@@ -1,13 +1,12 @@
-export class friendsService {
+export class FriendsService {
     async getFriends(userId: string): Promise<any> {
         try {
             const APIURL = import.meta.env.VITE_API_AUTH_KEY;
             const response = await fetch(APIURL + 'friends/' + userId, 
-                // {
-                //     method: 'GET',
-                //     credentials: 'include'
-                // }
-            );
+            {
+                method: 'GET',
+                credentials: 'include'
+            });
             if (response.ok) {
                 const friends = await response.json();
                 return friends;

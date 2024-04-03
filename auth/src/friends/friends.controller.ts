@@ -13,7 +13,7 @@ export class friendController {
     constructor(private readonly friendService: FriendService) {}
 
     @Get(':userId')
-    @UseGuards(UserGuard)
+    // @UseGuards(UserGuard)
     @ApiParam({ name: 'userId', description: 'ID of the user' })
     async getFriendsOfUser(@Param('userId')userId: string,)
     {

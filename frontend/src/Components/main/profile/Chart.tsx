@@ -21,7 +21,7 @@ Chartjs.register(
 
 export default function CreatChartDesign() {
     const userData = useContext(DataContext);
-    console.log(userData?.coalitionColor || '');
+    // console.log(userData?.coalitionColor || '');
     // if (!userData)
     //     return (<LoadingComponent/>);
     // const gp:string = 'GamesPlay 15'; 

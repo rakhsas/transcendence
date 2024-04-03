@@ -13,6 +13,7 @@ import LoadingComponent from '../shared/loading/loading';
 import { ChannelService } from '../../services/channel.service';
 import { Channel, notificationInterface } from '../../utils/types';
 import { NotificationService } from '../../services/notification.service';
+import { FriendsService } from '../../services/friend.service';
 // const url: string = "wss://10.12.249.229";
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
@@ -23,15 +24,16 @@ function DashboardComponent() {
 	const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
 	const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
 	const [notifications, setNotifications] = useState<notificationInterface[]>([]);
+	const [friends, setFriends] = useState<any>();
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const authService = new AuthService();
+				const friendsService = new FriendsService();
 				const fetchedPayloadData = await authService.getPayload();
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
 				setUserData(fetchedUserData);
-				console.log(fetchedUserData)
 				const users = await userService.getAllUsersExcept(fetchedUserData.id);
 				setUsers(users);
 				const channelService = new ChannelService();
@@ -42,6 +44,8 @@ function DashboardComponent() {
 				const notificationService = new NotificationService();
 				const notifications = await notificationService.getNotifications(fetchedUserData?.id);
 				setNotifications(notifications);
+				const fetchedFriends = await friendsService.getFriends(fetchedUserData?.id);
+				setFriends(fetchedFriends);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",
 					query: {
@@ -73,7 +77,7 @@ function DashboardComponent() {
 		return <LoadingComponent />;
 	}
 	return (
-		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications]}>
+		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full">

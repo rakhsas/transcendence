@@ -8,7 +8,7 @@ import fire from './../../../assets/Icon/fire.svg';
 import play from './../../../assets/img/Play.svg'
 import videoSource from './../../../assets/avatars/490488ec-2f13-402b-b203-951e4a4775cd.mp4';
 import Chart from 'chart.js/auto';
-import { friendsService } from '../../../services/friend.service';
+import { FriendsService } from '../../../services/friend.service';
 import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
 import { Channel } from '../../../utils/types';
@@ -62,7 +62,7 @@ const HomeComponent: React.FC = () => {
         setProtectedChannels(userData[4]);
         setPublicChannels(userData[5]);
         const fetchFriends = async () => {
-            const friendService = new friendsService();
+            const friendService = new FriendsService();
             const friends = await friendService.getFriends(userData[0].id);
             if (friends.length !== 0) {
                 setFriends(friends);
