@@ -81,11 +81,10 @@ function FunctionProfileForm() {
     return (
         <div className="
             body m-4 flex flex-col new:flex-row w-full h-[90vh] 
-            justify-between gap-4 bg-inherit overflow-hidden 
-            overflow-y-scroll no-scrollbar 
+            justify-between gap-4 bg-inherit overflow-visible
             Setting"
         >
-            <div className="Acheivementpart flex flex-col  items-center  gap-4 w-full md:min-w-[35%]  no-scrollbar min-h-full overflow-hidden Usredit--Achievements ">
+            <div className="Acheivementpart flex flex-col  items-center  gap-4 w-full md:min-w-[35%]  min-h-full overflow-hidden Usredit--Achievements ">
                 <div className="w-full md:w-[85%] p-4 flex justify-center mt-4 items-center dark:bg-zinc-900 bg-[#F1F2FD] border-gray-200 no-scrollbar rounded-lg shadow overflow-hidden">
                     <div className="flex flex-col p-2 items-center w-full">
                         <div className="flex justify-center items-center p-1 w-full">
