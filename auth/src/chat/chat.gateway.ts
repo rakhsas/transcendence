@@ -276,7 +276,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
 		const friends = await this.friendService.getFriendsOfUser(payload.friendId);
 		this.connectedUsers.get(lastnotif.target.username)?.emit('updatedFriends', friends);
-		this.connectedUsers.get(lastnotif.issuer.username)?.emit('friendRequestAcceptedNotif', lastnotif);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('friendRequestAcceptedNotif', lastnotif);
 	}
 
 	@SubscribeMessage('changeChannelType')

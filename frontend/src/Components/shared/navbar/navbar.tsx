@@ -221,10 +221,31 @@ function NavbarComponent(): JSX.Element {
     })
 
     socket?.on("friendRequestAcceptedNotif", async (data: any) => {
-        console.log('Friend request accepted', data);
         const newItem: notificationInterface = {
             id: data.id,
-            type: data.type,
+            type: NotificationType.FRIEND_REQUEST_ACCEPTED,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    });
+    socket?.on("friendRequestDecinedNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: NotificationType.FRIEND_REQUEST_DECLINED,
             message: data.message,
             audio: data.audio,
             image: data.image,
@@ -366,7 +387,7 @@ function NavbarComponent(): JSX.Element {
                                                         </div>
                                                     </div>
                                                     <div className="w-full ps-3">
-                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>sent you a friend request.</div>
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> sent you a friend request.</div>
                                                         <div className="text-xs text-blue-600 dark:text-blue-500">
                                                             {
                                                                 new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
@@ -412,7 +433,7 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                     <div className="w-fit px-2">
                                                         <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400 w-fit§">
-                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>: invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.channel?.name + '.'}</span>
+                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> : invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.channel?.name + '.'}</span>
                                                         </div>
                                                         <div className="text-xs text-blue-600 dark:text-blue-500">
                                                             {
@@ -525,30 +546,32 @@ function NavbarComponent(): JSX.Element {
                                                 </div>
                                             </a>
                                         )}
-                                        else if (item.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {(
-                                            <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                <div className="flex-shrink-0">
-                                                    <div className="pic rounded-full w-11 h-11">
-                                                        <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                        else if (item.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
+                                            return (
+                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-11 h-11">
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-yellow-300 border border-white rounded-full dark:border-gray-800">
+                                                            <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path fillRule="evenodd" d="M18 14a1 1 0 1 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 1 0 2 0v-2h2a1 1 0 1 0 0-2h-2v-2Z" clipRule="evenodd"/>
+                                                                <path fillRule="evenodd" d="M15.026 21.534A9.994 9.994 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2c2.51 0 4.802.924 6.558 2.45l-7.635 7.636L7.707 8.87a1 1 0 0 0-1.414 1.414l3.923 3.923a1 1 0 0 0 1.414 0l8.3-8.3A9.956 9.956 0 0 1 22 12a9.994 9.994 0 0 1-.466 3.026A2.49 2.49 0 0 0 20 14.5h-.5V14a2.5 2.5 0 0 0-5 0v.5H14a2.5 2.5 0 0 0 0 5h.5v.5c0 .578.196 1.11.526 1.534Z" clipRule="evenodd"/>
+                                                            </svg>
+                                                        </div>
                                                     </div>
-                                                    <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-yellow-300 border border-white rounded-full dark:border-gray-800">
-                                                        <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                                            <path fillRule="evenodd" d="M18 14a1 1 0 1 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 1 0 2 0v-2h2a1 1 0 1 0 0-2h-2v-2Z" clipRule="evenodd"/>
-                                                            <path fillRule="evenodd" d="M15.026 21.534A9.994 9.994 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2c2.51 0 4.802.924 6.558 2.45l-7.635 7.636L7.707 8.87a1 1 0 0 0-1.414 1.414l3.923 3.923a1 1 0 0 0 1.414 0l8.3-8.3A9.956 9.956 0 0 1 22 12a9.994 9.994 0 0 1-.466 3.026A2.49 2.49 0 0 0 20 14.5h-.5V14a2.5 2.5 0 0 0-5 0v.5H14a2.5 2.5 0 0 0 0 5h.5v.5c0 .578.196 1.11.526 1.534Z" clipRule="evenodd"/>
-                                                        </svg>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> accepted your friend request.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="w-full ps-3">
-                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> accepted your friend request.</div>
-                                                    <div className="text-xs text-blue-600 dark:text-blue-500">
-                                                        {
-                                                            new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        )}
-                                        else if (item.type === NotificationType.FRIEND_REQUEST_DECLINED ) {(
+                                                </a>
+                                            )
+                                        }
+                                        else if (item.type === NotificationType.FRIEND_REQUEST_DECLINED ) {return (
                                             <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                 <div className="flex-shrink-0">
                                                     <div className="pic rounded-full w-11 h-11">
@@ -561,7 +584,7 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                 </div>
                                                 <div className="w-full ps-3">
-                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
+                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> declined your friend request.</div>
                                                     <div className="text-xs text-blue-600 dark:text-blue-500">
                                                         {
                                                             new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]

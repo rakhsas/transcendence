@@ -18,41 +18,6 @@ function AnalyticsComponent(): JSX.Element {
     const gameService = new GameService();
     const analyticsService = new AnalyticsService();
     useEffect(() => {
-        // async function fetchTop3() {
-        //     try {
-        //         const response = await fetch('https://10.11.42.174/api/analytics/top3');
-        //         if (!response.ok) {
-        //             throw new Error('Failed to fetch users');
-        //         }
-        //         const data = await response.json();
-        //         setTop3(data);
-        //         // setLoading(false);
-        //     } catch (error) {
-        //         console.error('Error fetching users:', error);
-        //         // setError(error.message);
-        //         // setLoading(false);
-        //     }
-        // }
-
-        // async function theRestOfPlayers() {
-        //     try {
-        //         const response = await fetch('https://10.11.42.174/api/analytics/allPlayers');
-        //         if (!response.ok) {
-        //             throw new Error('Failed to fetch users');
-        //         }
-        //         const data = await response.json();
-        //         if (data.length > 3) {
-        //             data.splice(0, 3);
-        //             console.table(data);
-        //         }
-        //         setOtherPlayers(data);
-        //         // setLoading(false);
-        //     } catch (error) {
-        //         console.error('Error fetching users:', error);
-        //         // setError(error.message);
-        //         // setLoading(false);
-        //     }
-        // }
 
         const fetchTop3 = async () => {
             const result = await analyticsService.fetchTop3();

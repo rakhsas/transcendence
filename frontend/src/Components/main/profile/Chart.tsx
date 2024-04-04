@@ -25,6 +25,7 @@ interface gameProps {
 }
 
 const CreatChartDesign: React.FC<gameProps> = ({ user, totalGames }) => {
+    
     const data = {
         labels: [ `Played Games`, 'Win Games'],
         datasets: [{
