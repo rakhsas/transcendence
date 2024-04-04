@@ -44,6 +44,18 @@ export default {
   },
   plugins: [
     require('flowbite/plugin'),
+    function({ addUtilities }) {
+      const newUtilities = {
+        ".no-scrollbar::--webkit-scrollbar" :{
+          display: "none",
+        },
+        ".no-scrollbar" : {
+          "-ms-overflow-style": "none",
+          "scrollbar-with": "none",
+        },
+      };
+      addUtilities(newUtilities)
+    }
     // function({ addUtilities }) {
     //   const newUtilities = {
     //     '.border-gradient': {

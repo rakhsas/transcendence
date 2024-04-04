@@ -11,7 +11,7 @@ import Achei1 from '../../../assets/acheivements/poker1.png'
 import './updateprofile.css'
 import CreatChartDesign from './Chart';
 import picture from './mdarify.png'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import LoadingComponent from '../../shared/loading/loading';
 import User from '../../../model/user.model';
 import { gameScores, totalGames } from '../../../utils/types';
@@ -24,9 +24,11 @@ interface ButtonAttributes {
 	onClick?: () => void;
 }
 
+
+
 const FunctionProfileForm: React.FC = () => {
-	const [id, setId] = useState<string>('');
 	const userData = useContext(DataContext);
+	// const [id, setId] = useState<string>();
 	const [user, setUser] = useState<any>();
 	const [friends, setFriends] = useState<User[]>();
 	const [users, setUsers] = useState<User[]>();
@@ -71,28 +73,25 @@ const FunctionProfileForm: React.FC = () => {
 		if (!userData) {
 			return;
 		}
-		let routepath = window.location.pathname;
-		const idFromPath = routepath.split('/').findLast((item: any) => item) || '';
-		setId(idFromPath);
 		setUser(userData[0]);
 		setUsers(userData[3]);
 		setFriends(userData[7]);
 		setSocketChat(userData[1]);
 	}, [userData]);
-
+	const { userId } = useParams();
 	useEffect(() => {
-		if (id !== 'profile' && user && friends && users) {
-			const requestedUser = users.find((u) => u.id === id);
+		// if (id !== 'profile' && user && friends && users) {
+			const requestedUser = users?.find((u) => u.id === userId);
 			if (requestedUser) {
-				const isFriend = friends.some((friend) => friend.id === requestedUser.id);
+				const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
 				setUser((prevUser: User) => ({
 					...prevUser,
 					...requestedUser,
 					isFriend: isFriend
 				}));
 			}
-		}
-	}, [id, friends, users]);
+		// }
+	}, [friends, users, userId]);
 
 	useEffect(() => {
 		const fetchScores = async () => {
@@ -136,7 +135,7 @@ const FunctionProfileForm: React.FC = () => {
 							<h5 className="text-xl text-black dark:text-white font-bolder font-poppins">{user?.firstName + ' ' + user?.lastName}</h5>
 						</div>
 						{
-							id && id !== 'profile' && (
+							userId && userId !== 'profile' && (
 								<div className="flex flex-1 flex-wrap justify-center items-center w-full py-2">
 									{
 										user && user?.isFriend === false ? (
@@ -185,27 +184,27 @@ const FunctionProfileForm: React.FC = () => {
 				</div>
 			</div>
 			<div className="side2 flex flex-col gap-4 items-center w-full md:min-w-[65%] min-h-full overflow-hidden ">
-			<div className="w-full md:w-[85%] p-4 flex flex-col items-center dark:bg-zinc-900 bg-main-light-WHITE h-[65%] border-gray-200 rounded-3xl overflow-hidden">
+			<div className="w-full md:w-[85%] p-4 flex flex-col items-center dark:bg-zinc-900 bg-main-light-WHITE h-[75%] border-gray-200 rounded-3xl overflow-hidden">
 				<div className="header w-full overflow-hidden text-center py-2.5">
 					<h5 className='font-bolder dark:text-main-light-FERN text-main-light-EGGSHELL font-poppins uppercase'>Games History</h5>
 				</div>
-				<div className="history flex flex-col justify-around items-center gap-4 w-full h-full overflow-y-auto">
+				<div className="history  flex flex-col justify-around items-center gap-4 w-full h-full overflow-y-auto "> 
 					{
 						score?.map((object: gameScores, index) => (
-							<div key={index} className=' flex flex-row gap-8 justify-around items-center overflow-hidden w-full px-2'>
-									<div className="user flex flex-col items-center">
+							<div key={index} className=' flex flex-row gap-8 justify-around items-center overflow-hidden h-[15%]  w-full px-2 bg-cyan-500'>
+									<div className="user flex flex-col items-center ">
 										<div className={`rating flex flex-row ${object.winner.id === object.player1.id ? 'block' : 'hidden'}`}>
 											<svg className="w-4 h-4 mt-2 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
 												<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 											</svg>
-											<svg className="w-4 h-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+											<svg className="w-4 h-4 mt-1 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
 												<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 											</svg>
 											<svg className="w-4 h-4 mt-2 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
 												<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 											</svg>
 										</div>
-										<img src={object.player1.picture} alt="" className='w-20 h-20 object-cover rounded-full' style={{ border: `2px solid ${object?.player1?.coalitionColor} ` }} />
+										<img src={object.player1.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player1?.coalitionColor} ` }} />
 									</div>
 									<div className="flex flex-row gap-2">
 										<p className="w-8 h-8 flex justify-center items-center dark:text-white text-black font-bold text-2xl">{object?.user_score}</p>
@@ -217,21 +216,21 @@ const FunctionProfileForm: React.FC = () => {
 											<svg className="w-4 h-4 mt-2 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
 												<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 											</svg>
-											<svg className="w-4 h-4 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+											<svg className="w-4 h-4 mt-1 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
 												<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 											</svg>
 											<svg className="w-4 h-4 mt-2 text-yellow-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
 												<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 											</svg>
 										</div>
-										<img src={object.player2.picture} alt="" className='w-20 h-20 object-cover rounded-full' style={{ border: `2px solid ${object?.player2?.coalitionColor} ` }} />
+										<img src={object.player2.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player2?.coalitionColor} ` }} />
 									</div>
 								</div>
 							))
 						}
 					</div>
 				</div>
-				<div className="w-full md:w-[85%] p-4 flex flex-col justify-between items-center dark:bg-zinc-900  bg-main-light-WHITE h-[35%] rounded-3xl">
+				<div className="w-full md:w-[85%] p-4 flex flex-col justify-between items-center dark:bg-zinc-900  bg-main-light-WHITE h-[25%] rounded-3xl">
 					<div className="header w-full overflow-hidden text-center py-2.5">
 						<h5 className='font-bolder dark:text-main-light-FERN text-main-light-EGGSHELL font-poppins uppercase'>user progress</h5>
 					</div>

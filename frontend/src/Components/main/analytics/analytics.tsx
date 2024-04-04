@@ -29,7 +29,7 @@ function AnalyticsComponent(): JSX.Element {
             if (result.length > 3)
                 result.splice(0, 3);
             setOtherPlayers(result);
-            setOtherPlayers([]);
+            // setOtherPlayers([]);
 
         }
 
@@ -87,7 +87,7 @@ function AnalyticsComponent(): JSX.Element {
                                 </div>
                             ) : (
                             other_players.map((_user, index) => (
-                                <div className='bg-white row-cards dark:bg-black'>
+                                <div className='bg-white row-cards dark:bg-black' key={index}>
                                     <p className='rank text-black dark:text-white font-poppins'>{index + 3}</p>
                                     <div className="image-wrappear">
                                         <img className='profile-img' src={_user.picture} alt="" />

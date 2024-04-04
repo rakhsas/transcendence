@@ -27,7 +27,9 @@ function App() {
           <Route path="chat" Component={chatComponent} />
           <Route path="call" element={<CallComponent />} />
           <Route path="settings" element={<SettingFunction />} />
-          <Route path="profile/*" element={<ProfileComponent />} />
+          <Route path="profile">
+            <Route path=':userId' element={<ProfileComponent />} />
+          </Route>
           <Route path="game" element={<Game />} />
           <Route path="HeadToHead" element={<HeadToHead />} />
           <Route path="profile" element={<FunctionProfileForm />} />

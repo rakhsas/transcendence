@@ -103,6 +103,11 @@
     height: 100%;
 }
 
+@media screen and (max-width: 649px) {
+    .container-analytics .leader-board .top3 .first-cards{
+        width: 100% !important;
+    }
+}
 
 
 .container-analytics .leader-board .top3{

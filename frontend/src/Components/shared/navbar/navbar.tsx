@@ -4,14 +4,10 @@ import { Button, CustomFlowbiteTheme, TextInput } from 'flowbite-react';
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../loading/loading";
 import { Socket } from "socket.io-client";
-import UserService from "../../../services/user.service";
 import User from "../../../model/user.model";
-import AuthService from "../../../services/auth.service";
-import { Message } from "@mui/icons-material";
-import { notificationInterface } from './../../../utils/types';
-import { ChannelService } from "../../../services/channel.service";
+import { notificationInterface } from './../../../utils/types'
 import { NotificationService } from "../../../services/notification.service";
-import { Link, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SearchIcon = () => (
     <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-black dark:stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -74,6 +70,26 @@ function NavbarComponent(): JSX.Element {
     const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [notifications, setNotifications] = useState<notificationInterface[]>([]);
+    const [greeting, setGreeting] = useState<string>('');
+    const navigate = useNavigate();
+    useEffect(() => {
+        const updateGreeting = () => {
+            const now = new Date();
+            const hour = now.getHours();
+        
+            if (hour < 12) {
+                setGreeting('Good Morning,');
+            } else if (hour < 18) {
+                setGreeting('Good Afternoon,');
+            } else {
+                setGreeting('Good Evening,');
+            }
+        };
+        updateGreeting();
+        const intervalId = setInterval(updateGreeting, 60000);
+    
+        return () => clearInterval(intervalId);
+    }, []);
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove(colorTheme);
@@ -107,6 +123,9 @@ function NavbarComponent(): JSX.Element {
         });
         setFilteredUsers(filtered);
     }, [searchInput]);
+    const handleNavigate = (id: string) => {
+        navigate(`/dashboard/profile/${id}`);
+    }
     const socket: Socket = userData[1];
     // const onRequestCall = async (data: any) => {
     //     setChannelNotifPayload(data);
@@ -264,7 +283,6 @@ function NavbarComponent(): JSX.Element {
         setNotifications(updatedItems);
         setNotificationCount(true);
     });
-
     socket?.on("friendRequestNotif", async (data: any) => {
         const newItem: notificationInterface = {
             id: data.id,
@@ -304,7 +322,7 @@ function NavbarComponent(): JSX.Element {
     return (
         <div className="p-4 flex flex-col sm:flex-row sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
-                <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased font-poppins">Good Evening,<span className="dark:text-white text-black uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
+                <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased font-poppins">{greeting}<span className="dark:text-white text-black uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
             </div>
             <div className="max-w-md pl-4 flex flex-col md:sm:flex-row sm:space-x-4 xs:space-x-2 xs:flex-row">
                 <div className="relative h-10 flex items-center">
@@ -469,26 +487,28 @@ function NavbarComponent(): JSX.Element {
                                                 </a>
                                             )
                                         } else if (item.type === NotificationType.CALL_REQUEST) {
-                                            <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                <div className="flex-shrink-0">
-                                                    <div className="pic rounded-full w-11 h-11">
-                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                            return (
+                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-11 h-11">
+                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                                                            <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
+                                                        </svg>
+                                                        </div>
                                                     </div>
-                                                    <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
-                                                    <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
-                                                        <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
-                                                    </svg>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="w-full ps-3">
-                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
-                                                    <div className="text-xs text-blue-600 dark:text-blue-500">
-                                                        {
-                                                            new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </a>
+                                                </a>
+                                            )
                                         }
                                         else if (item.type === NotificationType.CHANNEL_MESSAGE) {
                                             return (
@@ -614,7 +634,7 @@ function NavbarComponent(): JSX.Element {
                         filteredUsers.length > 0 ? (
                             <div className={`absolute mt-2 z-40 rounded-md shadow-lg dark:bg-neutral-700 md:w-64 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
                                     {filteredUsers.slice(0, 3).map((user, index) => (
-                                        <a href={APIURL + `/dashboard/profile/${user.id}`} key={index} className="flex flex-col">
+                                        <div onClick={() => handleNavigate(user.id)} key={index} className="flex flex-col">
                                             <div className="flex px-4 py-2 hover:bg-gray-100 w-full dark:hover:bg-gray-600 dark:hover:text-white">
                                                 <div className="pic">
                                                     <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
@@ -623,7 +643,7 @@ function NavbarComponent(): JSX.Element {
                                                     <span>{user.firstName + ' ' + user.lastName}</span>
                                                 </div>
                                             </div>
-                                        </a>
+                                        </div>
                                     ))}
                                 </div>
                         ) : ''
