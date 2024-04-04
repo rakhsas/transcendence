@@ -239,10 +239,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				channel: null
 			});
 			const lastnotif = await this.notificationService.getNotificationById(notif.id);
-			const target = this.connectedUsers.get(lastnotif.target.username)
-			// target?.emit('friendRequestNotif', lastnotif);
+			const target = this.connectedUsers.get(lastnotif.target.username);
 			target.emit('friendRequestNotif', lastnotif);
 		}
+	}
+	
+	@SubscribeMessage('declineFriendRequest')
+	async handleDeclineFriendRequest(client: Socket, payload: any): Promise<void> {
+		const notif = await this.notificationService.createNotification({
+			target: payload.friendId,
+			type: NotificationType.FRIEND_REQUEST_DECLINED,
+			issuer: payload.userId,
+			message: "",
+			image: null,
+			audio: null,
+			channel: null
+		});
+		const lastnotif = await this.notificationService.getNotificationById(notif.id);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('friendRequestDecinedNotif', lastnotif);
 	}
 
 	@SubscribeMessage('acceptFriendRequest')
@@ -258,11 +272,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			channel: null,
 			
 		});
-		console.log('notif: ', payload.friendId)
-		console.log('notif: ', payload.userId)
 		const result = await this.friendService.createFriendship(payload.userId, payload.friendId);
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
-		this.connectedUsers.get(lastnotif.target.username)?.emit('friendRequestAcceptedNotif', lastnotif);
+		const friends = await this.friendService.getFriendsOfUser(payload.friendId);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('updatedFriends', friends);
+		this.connectedUsers.get(lastnotif.issuer.username)?.emit('friendRequestAcceptedNotif', lastnotif);
 	}
 
 	@SubscribeMessage('changeChannelType')

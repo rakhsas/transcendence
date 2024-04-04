@@ -10,12 +10,19 @@ export class AnalyticsController {
     
     constructor(private readonly analyticsService: AnalyticsService) {}
 
+
+
     @Get('allGame/:userId')
     async getAllGame(@Param('userId') userId: string)
     {
         return this.analyticsService.getAllGame(userId);
     }
     
+    @Get('top3')
+    async getPlayerByScore(): Promise<User[]> {
+        return this.analyticsService.getPlayerByScore();
+    }
+
     @Get('lastGame/:userId')
     async getLastGame(@Param('userId') userId: string)
     {
@@ -43,10 +50,7 @@ export class AnalyticsController {
 
    
 
-    @Get()
-    async getPlayerByScore(): Promise<User[]> {
-        return this.analyticsService.getPlayerByScore();
-    }
+    
 
     // @Get('gameCount/:userId')
     // async gameCount(@Param('userId') userId: string){

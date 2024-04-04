@@ -7,62 +7,79 @@ import { Link } from 'react-router-dom';
 import DataContext from '../../../services/data.context';
 import LoadingComponent from '../../shared/loading/loading';
 import { GameService } from '../../../services/game.service';
+import { AnalyticsService } from '../../../services/analytics.service';
 
 function AnalyticsComponent(): JSX.Element {
     const userData = useContext(DataContext);
 
     const [top3, setTop3] = useState<User[]>([]);
     const [other_players, setOtherPlayers] = useState<User[]>([]);
-    const [ikhan, setIkhan] = useState<[]>();
+    const [ikhan, setIkhan] = useState<any>(null);
     const gameService = new GameService();
+    const analyticsService = new AnalyticsService();
     useEffect(() => {
-        async function fetchTop3() {
-            try {
-                const response = await fetch('https://10.11.42.174/api/analytics');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch users');
-                }
-                const data = await response.json();
-                setTop3(data);
-                // setLoading(false);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-                // setError(error.message);
-                // setLoading(false);
-            }
+        // async function fetchTop3() {
+        //     try {
+        //         const response = await fetch('https://10.11.42.174/api/analytics/top3');
+        //         if (!response.ok) {
+        //             throw new Error('Failed to fetch users');
+        //         }
+        //         const data = await response.json();
+        //         setTop3(data);
+        //         // setLoading(false);
+        //     } catch (error) {
+        //         console.error('Error fetching users:', error);
+        //         // setError(error.message);
+        //         // setLoading(false);
+        //     }
+        // }
+
+        // async function theRestOfPlayers() {
+        //     try {
+        //         const response = await fetch('https://10.11.42.174/api/analytics/allPlayers');
+        //         if (!response.ok) {
+        //             throw new Error('Failed to fetch users');
+        //         }
+        //         const data = await response.json();
+        //         if (data.length > 3) {
+        //             data.splice(0, 3);
+        //             console.table(data);
+        //         }
+        //         setOtherPlayers(data);
+        //         // setLoading(false);
+        //     } catch (error) {
+        //         console.error('Error fetching users:', error);
+        //         // setError(error.message);
+        //         // setLoading(false);
+        //     }
+        // }
+
+        const fetchTop3 = async () => {
+            const result = await analyticsService.fetchTop3();
+            setTop3(result);
         }
 
-        async function theRestOfPlayers() {
-            try {
-                const response = await fetch('https://10.11.42.174/api/analytics/allPlayers');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch users');
-                }
-                const data = await response.json();
-                if (data.length > 3) {
-                    data.splice(0, 3);
-                    console.table(data);
-                }
-                setOtherPlayers(data);
-                // setLoading(false);
-            } catch (error) {
-                console.error('Error fetching users:', error);
-                // setError(error.message);
-                // setLoading(false);
-            }
+        const otherPlayer = async () => {
+            const result = await analyticsService.otherPlayers();
+            if (result.length > 3)
+                result.splice(0, 3);
+            setOtherPlayers(result);
+            setOtherPlayers([]);
+
         }
 
         fetchTop3();
-        theRestOfPlayers();
+        otherPlayer();
     }, []);
+
     useEffect(() => {
         if (!userData)
             return ;
         const fetchLastGame = async () => {
             const result = await gameService.getLastGame(userData[0].id);
-            console.log("the ressult is : ", result);
+            // console.log("the ressult is : ", result);
             setIkhan(result)
-            console.log("=-=--=-=-=-=-=-=-=-=>>> ", ikhan);
+            // console.log("=-=--=-=-=-=-=-=-=-=>>> ", ikhan);
         }
         fetchLastGame()
     }, [userData])
@@ -74,7 +91,11 @@ function AnalyticsComponent(): JSX.Element {
             <div className="container-analytics font-poppins overflow-x-hidden">
                 <div className='leader-board'>
                     <div className='top3'>
-                        {
+                        {top3.length === 0 ? (
+                                <div className='dark:bg-black bg-white p-9 w-full'>
+                                    <p>No users available</p>
+                                </div>
+                            ) : (
                             top3.map((user, index) => (
                                 <div className='dark:bg-black bg-white first-cards' id='one' key={index}>
                                     <img src={user.picture} alt="" />
@@ -90,12 +111,16 @@ function AnalyticsComponent(): JSX.Element {
                                     <div className='dark:text-white text-black score font-poppins'>Score: {user.score} Pts</div>
                                 </div>
                             ))
-                        }
+                        )}
                     </div>
                     {/* =========== other player part ================= */}
                     <div className='other-players'>
 
-                        {
+                        {other_players.length === 0 ? (
+                                <div className='dark:bg-black bg-white p-9 w-full'>
+                                    <p>No users available</p>
+                                </div>
+                            ) : (
                             other_players.map((_user, index) => (
                                 <div className='bg-white row-cards dark:bg-black'>
                                     <p className='rank text-black dark:text-white font-poppins'>{index + 3}</p>
@@ -110,61 +135,10 @@ function AnalyticsComponent(): JSX.Element {
                                     <Link className='btn-profile font-poppins' to={`https://10.11.42.174/dashboard/profile/${_user.id}`}>
                                         Profile
                                     </Link>
-                                    {/* <div className='score'>
-                                        <p>Score</p>
-                                    </div> */}
                                     <span className='text-black dark:text-white score font-poppins'>Score <br />{_user.score}</span>
                                 </div>
                             ))
-                        }
-
-                        {/* 
-                        <div className='row-cards'>
-                            <p className='rank font-poppins'>4th</p>
-                            <div className="image-wrappear">
-                                <img className='profile-img' src="/woumecht.jpg" alt="" />
-                            </div>
-                            <div className='info'>
-                                <h4 className='fullName font-poppins'>Walid Oumechtak</h4>
-                                <p className='login font-poppins'>woumecht</p>
-                            </div>
-                            <button className='btn-profile font-poppins'>profile</button>
-                           
-                            <span className='score font-poppins'>Score <br />400</span>
-                        </div>
-
-                        <div className='row-cards'>
-                            <p className='rank font-poppins'>4th</p>
-                            <div className="image-wrappear">
-                                <img className='profile-img' src="/woumecht.jpg" alt="" />
-                            </div>
-                            <div className='info'>
-                                <h4 className='fullName font-poppins'>Walid Oumechtak</h4>
-                                <p className='login font-poppins'>woumecht</p>
-                            </div>
-                            <button className='btn-profile font-poppins'>profile</button>
-                            
-                            <span className='score font-poppins'>Score <br />400</span>
-                        </div>
-
-                        <div className='row-cards'>
-                            <p className='rank font-poppins'>4th</p>
-                            <div className="image-wrappear">
-                                <img className='profile-img' src="/woumecht.jpg" alt="" />
-                            </div>
-                            <div className='info'>
-                                <h4 className='fullName font-poppins'>Walid Oumechtak</h4>
-                                <p className='login font-poppins'>woumecht</p>
-                            </div>
-                            <button className='btn-profile font-poppins'>profile</button>
-                         
-                            <span className='score font-poppins'>Score <br />400</span>
-                        </div> */}
-
-
-
-
-
+                        )}
                     </div>
                 </div>
                 {/* ======================== Ends of leader board ============================== */}
@@ -185,7 +159,7 @@ function AnalyticsComponent(): JSX.Element {
                             </div>
                         </div>
                         <div className="bottom-content">
-                            <div className="lastGame text-black dark:text-white font-poppins">Last Game <br /> </div>
+                            <div className="lastGame text-black dark:text-white font-poppins">Last Game <br />{ikhan !== null && ikhan[0].user_score > ikhan[0].player_score ? 'Won' : 'Lose'}</div>
                             <span className='separator font-poppins'></span>
                             <div className="status text-black dark:text-white font-poppins">Status <br /> Online</div>
                             <span className='separator font-poppins'></span>

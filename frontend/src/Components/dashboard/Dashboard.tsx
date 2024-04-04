@@ -1,4 +1,3 @@
-// import { Engine } from "@tsparticles/engine";
 import { Routes, Route, Outlet } from 'react-router-dom';
 import NavbarComponent from "../shared/navbar/navbar";
 import SidebarComponent from "../shared/sidebar/sidebar";
@@ -14,7 +13,6 @@ import { ChannelService } from '../../services/channel.service';
 import { Channel, notificationInterface } from '../../utils/types';
 import { NotificationService } from '../../services/notification.service';
 import { FriendsService } from '../../services/friend.service';
-// const url: string = "wss://10.12.249.229";
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
@@ -73,6 +71,10 @@ function DashboardComponent() {
 			globalSocket?.disconnect();
 		};
 	}, []);
+
+	socket?.on('updatedFriends', async (data: any) => {
+		setFriends(data);
+	})
 	if (!userData || !socket || !globalSocket || !users) {
 		return <LoadingComponent />;
 	}
