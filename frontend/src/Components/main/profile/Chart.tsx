@@ -9,7 +9,8 @@ import {
 
 import { Doughnut } from 'react-chartjs-2';
 import DataContext from '../../../services/data.context';
-// import LoadingComponent from '../../shared/loading/loading';
+import User from '../../../model/user.model';
+import { totalGames } from '../../../utils/types';
 
 
 Chartjs.register(
@@ -18,30 +19,31 @@ Chartjs.register(
     Legend
 );
 
+interface gameProps {
+    user: User,
+    totalGames: totalGames
+}
 
-export default function CreatChartDesign() {
-    const userData = useContext(DataContext);
-    // console.log(userData?.coalitionColor || '');
-    // if (!userData)
-    //     return (<LoadingComponent/>);
-    // const gp:string = 'GamesPlay 15'; 
+const CreatChartDesign: React.FC<gameProps> = ({ user, totalGames }) => {
     const data = {
-        labels: ['GamesPlay ', 'TotlaGames : 100'],
+        labels: [ `Played Games`, 'Win Games'],
         datasets: [{
             label: '',
-            data: [15, 100],
-            backgroundColor: ['#059669', userData[0]?.coalitionColor || ''],
+            data: [totalGames?.gamePlayed, totalGames?.gameWon],
+            backgroundColor: ['#059669', user?.coalitionColor || ''],
             fontWeight: 'bold'
-
-        }]
+        }],
     }
     const options ={
-
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
     }
     return (
         <div className='appChart  no-scrollbar'>
-            {/* <h1 style={{padding: '120px'}}> How To Creat ChartJs</h1> */}
-            <div style={{width: '250px', height: 'auto', left: '250px', display: 'flex', marginTop: '', flexDirection: 'row',}}>
+            <div className="w-full">
                 <Doughnut
                     data={data}
                     options={options}
@@ -51,3 +53,4 @@ export default function CreatChartDesign() {
         </div>
     )
 }
+export default CreatChartDesign;

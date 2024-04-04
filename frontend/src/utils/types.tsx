@@ -57,3 +57,20 @@ export interface notificationInterface {
     createdAt: Date;
     updatedAt: Date;
 }
+
+export interface gameScores {
+    id: number;
+    user_score: number;
+    player_score: number;
+    TotalScoore: number;
+    finishedAt: Date;
+    player1: User;
+    player2: User;
+    winner: User;
+}
+
+export interface totalGames {
+    gamePlayed: number;
+    gameWon: number;
+    gameWithMaxScore: number;
+}

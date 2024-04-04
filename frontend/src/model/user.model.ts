@@ -14,6 +14,7 @@ interface User {
     isTwoFactorAuthenticationEnabled: boolean;
     updatedAt: string;
     provider: string;
+    score: number;
 }
 
 

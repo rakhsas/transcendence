@@ -186,7 +186,7 @@ function SettingFunction(): JSX.Element {
 	}
 	return (
 		<div className="flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting p-8" >
-			<div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900 bg-[#F1F2FD]">
+			<div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900  bg-main-light-WHITE">
 				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
 					<img src={userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl"/>
 					<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture">
@@ -284,7 +284,7 @@ function SettingFunction(): JSX.Element {
 					{/* <h2 className='-twof--part1'>2FA-AUTHENTICATION</h2> */}
 				</div>
 			</div>
-			<div className="part2 flex rounded-3xl flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center dark:bg-zinc-900 bg-[#F1F2FD] ">
+			<div className="part2 flex rounded-3xl flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE ">
 				<form className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] flex flex-col ">
 					<h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5 ">
 						Information
@@ -303,7 +303,7 @@ function SettingFunction(): JSX.Element {
 								value={firstName}
 								onChange={handleFirstNameChange}
 								maxLength={15}
-								className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+								className=" bg-main-light-WHITE border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			  dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 								placeholder="Mohamed"
 								autoComplete="OFF"
@@ -319,7 +319,7 @@ function SettingFunction(): JSX.Element {
 							</label>
 							<input type="text"
 								id="last_name" value={SecondName} onChange={handleSecondNameChange} maxLength={10}
-								className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+								className=" bg-main-light-WHITE border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			  dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 								placeholder="Darify"
 								required

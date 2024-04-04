@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { GameEntity } from "src/user/entities/game.entity";
+import { User } from "src/user/entities/user.entity";
 import { Repository } from "typeorm";
 
 
@@ -8,7 +9,10 @@ import { Repository } from "typeorm";
 export class AnalyticsService {
     constructor(
         @InjectRepository(GameEntity)
-        private readonly gameRepository: Repository<GameEntity>
+        private readonly gameRepository: Repository<GameEntity>,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+        
     ) {}
 
     async getGameRecord(userId: string, friendId: string) {
@@ -39,6 +43,14 @@ export class AnalyticsService {
         return allGames;
     }
 
+    async getAllPlayers() {
+        return await this.userRepository.find({
+            order: {
+                ["score"]: 'DESC', // or 'DESC' depending on your requirement
+              },
+        });
+    }
+
     async profileData(userId: string): Promise<{}> {
         console.log("userId: ", userId);
         const gamePlayed = await this.gameRepository
@@ -53,19 +65,28 @@ export class AnalyticsService {
         .where('winner.id = :userId', {userId})
         .getCount();
 
-        const gameWithMaxScoore = await this.gameRepository
+        const gameWithMaxScore = await this.gameRepository
         .createQueryBuilder('game')
         .leftJoin('game.player1', 'player1')
         .where('player1.id = :userId', {userId})
-        .andWhere('game.user_scoore = :scoore', {scoore: 5})
-        .andWhere("game.player_scoore = :scoore2", {scoore2: 0})
+        .andWhere('game.user_score = :scoore', {scoore: 5})
+        .andWhere("game.player_score = :scoore2", {scoore2: 0})
         .getCount();
 
         return {
             "gamePlayed": gamePlayed,
             "gameWon": gameWon,
-            "gameWithMaxScoore": gameWithMaxScoore,
+            "gameWithMaxScore": gameWithMaxScore,
         };
 
+    }
+
+    async getPlayerByScore(){
+        return await this.userRepository.find({
+            order: {
+                ["score"]: 'DESC', // or 'DESC' depending on your requirement
+              },
+              take: 3, 
+        });
     }
 }

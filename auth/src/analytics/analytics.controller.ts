@@ -1,6 +1,7 @@
 import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { UserGuard } from "src/guards/user.guard";
 import { AnalyticsService } from "./analytics.service";
+import { User } from "src/user/entities/user.entity";
 
 @Controller('analytics')
 export class AnalyticsController {
@@ -11,6 +12,11 @@ export class AnalyticsController {
     async getAllGame(@Param('userId') userId: string)
     {
         return this.analyticsService.getAllGame(userId);
+    }
+    
+    @Get("allPlayers")
+    async getAllPlayers() {
+        return this.analyticsService.getAllPlayers();
     }
     
     @Get(':userId/:friendId')
@@ -27,6 +33,12 @@ export class AnalyticsController {
         return this.analyticsService.profileData(userId);
     }
 
+   
+
+    @Get()
+    async getPlayerByScore(): Promise<User[]> {
+        return this.analyticsService.getPlayerByScore();
+    }
 
     // @Get('gameCount/:userId')
     // async gameCount(@Param('userId') userId: string){

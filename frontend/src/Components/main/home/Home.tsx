@@ -304,7 +304,7 @@ const HomeComponent: React.FC = () => {
                 </section>
 
             </main>
-            <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit dark:bg-zinc-900 bg-[#F1F2FD]">
+            <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit dark:bg-zinc-900  bg-main-light-WHITE">
                 <div className="contain flex flex-col justify-between items-center mx-auto">
                     <div className="profile mt-2 w-12 h-12 bg-white">
                         <img src={userData[0].picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData[0].username} />

@@ -11,6 +11,7 @@ import { Message } from "@mui/icons-material";
 import { notificationInterface } from './../../../utils/types';
 import { ChannelService } from "../../../services/channel.service";
 import { NotificationService } from "../../../services/notification.service";
+import { Link, NavLink } from "react-router-dom";
 
 const SearchIcon = () => (
     <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-black dark:stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -58,6 +59,7 @@ type notifItems = {
     type: NotificationType;
 }
 function NavbarComponent(): JSX.Element {
+    const APIURL = import.meta.env.VITE_FRONT_URL;
     const [isNotifOpen, setNotifIsOpen] = useState<boolean>(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [theme, setTheme] = useState(localStorage.theme);
@@ -65,7 +67,7 @@ function NavbarComponent(): JSX.Element {
     // const [notifications, setNotifications] = useState<notifItems[]>([]);
     const [notificationCount, setNotificationCount] = useState<boolean>(false);
     const [users, setUsers] = useState<User[]>([]);
-    const [searchInput, setSearchInput] = useState('');
+    const [searchInput, setSearchInput] = useState<string>('');
     const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [notifications, setNotifications] = useState<notificationInterface[]>([]);
@@ -81,7 +83,6 @@ function NavbarComponent(): JSX.Element {
     useEffect(() => {
         setUsers(userData[3]);
         setNotifications(userData[6]);
-        console.log('Notifications:', notifications);
     }, []);
     useEffect(() => {
         notifications.slice(0, 5).forEach(notif => {
@@ -93,6 +94,7 @@ function NavbarComponent(): JSX.Element {
     }, [notifications]);
     useEffect(() => {
         if (!searchInput) {
+            console.log('test')
             setFilteredUsers([]);
             return;
         }
@@ -136,7 +138,6 @@ function NavbarComponent(): JSX.Element {
             updatedAt: data.updatedAt,
             channel: data.channel
         }
-        console.log('New Item:', newItem);
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -168,7 +169,6 @@ function NavbarComponent(): JSX.Element {
     })
     socket?.on("channelJoinNotif", async (data: any) => {
         setChannelNotifPayload(data.payload);
-        console.log('Payload received from socket:', await channelNotifPayload);
         const newItem: notificationInterface = {
             id: data.lastnotif.id,
             type: data.lastnotif.type,
@@ -190,23 +190,12 @@ function NavbarComponent(): JSX.Element {
         setNotificationCount(true);
     })
     const toogleSearchDropDown = () => {
-        console.log("isSearchOpen: ", isSearchOpen)
         setIsSearchOpen(!isSearchOpen);
-        console.log("isSearchOpen: ", isSearchOpen)
     };
     const document = window.document.querySelector('#dropdownNotification');
     document?.addEventListener('click', (e) => {
-        // const target = e.target as HTMLElement;
-        // if (target.id !== 'dropdownNotification') {
-            setNotifIsOpen(false);
-        // }
+        setNotifIsOpen(false);
     });
-    useEffect(() => {
-        console.log(notifications)
-    }, [notifications]);
-    useEffect(() => {
-        console.log(isNotifOpen)
-    }, [isNotifOpen]);
     const updateNotif = () => {
         const notificationService = new NotificationService();
         notifications.slice(0, 5).forEach(async (element: notificationInterface) => {
@@ -259,7 +248,6 @@ function NavbarComponent(): JSX.Element {
                                                                     <svg className="w-3 h-3 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                                                         <path fillRule="evenodd" d="M9 7V2.221a2 2 0 0 0-.5.365L4.586 6.5a2 2 0 0 0-.365.5H9Zm2 0V2h7a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9h5a2 2 0 0 0 2-2Zm2.318.052h-.002A1 1 0 0 0 12 8v5.293A4.033 4.033 0 0 0 10.5 13C8.787 13 7 14.146 7 16s1.787 3 3.5 3 3.5-1.146 3.5-3c0-.107-.006-.211-.017-.313A1.04 1.04 0 0 0 14 15.5V9.766c.538.493 1 1.204 1 2.234a1 1 0 1 0 2 0c0-1.881-.956-3.14-1.86-3.893a6.4 6.4 0 0 0-1.636-.985 4.009 4.009 0 0 0-.165-.063l-.014-.005-.005-.001-.002-.001ZM9 16c0-.356.452-1 1.5-1s1.5.644 1.5 1-.452 1-1.5 1S9 16.356 9 16Z" clipRule="evenodd"/>
                                                                     </svg>
-
                                                                 )
                                                         }
                                                         </div>
@@ -431,19 +419,23 @@ function NavbarComponent(): JSX.Element {
                     </svg>
                 </div>
                 <div className="group" onClick={() => { toogleSearchDropDown() }}>
-                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => setSearchInput(e.target.value)} />
+                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => {e.preventDefault(); setSearchInput(e.target.value)}} />
                     {
                         filteredUsers.length > 0 ? (
-                            <div className={`absolute mt-2 z-40 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
-                                {filteredUsers.slice(0, 3).map((user, index) => (
-                                    <div key={index} className="flex flex-col">
-                                        <a className="flex justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-fit">
-                                            <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
-                                            <span>{user.firstName + ' ' + user.lastName}</span>
+                            <div className={`absolute mt-2 z-40 rounded-md shadow-lg dark:bg-neutral-700 md:w-64 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
+                                    {filteredUsers.slice(0, 3).map((user, index) => (
+                                        <a href={APIURL + `/dashboard/profile/${user.id}`} key={index} className="flex flex-col">
+                                            <div className="flex px-4 py-2 hover:bg-gray-100 w-full dark:hover:bg-gray-600 dark:hover:text-white">
+                                                <div className="pic">
+                                                    <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
+                                                </div>
+                                                <div className="info">
+                                                    <span>{user.firstName + ' ' + user.lastName}</span>
+                                                </div>
+                                            </div>
                                         </a>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
                         ) : ''
                     }
                 </div>

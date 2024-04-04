@@ -1,57 +1,112 @@
-import Chart from 'chart.js/auto';
+// import Chart from 'chart.js/auto';
 import { Bar } from 'react-chartjs-2';
 import './analytics.css';
+import { useEffect, useState } from 'react';
+import User from '../../../model/user.model';
+import { Link } from 'react-router-dom';
 
 
 function AnalyticsComponent(): JSX.Element {
+    const [top3, setTop3] = useState<User[]>([]);
+    const [other_players, setOtherPlayers] = useState<User[]>([]);
+
+
+    useEffect(() => {
+        async function fetchTop3() {
+          try {
+            const response = await fetch('https://10.11.42.174/api/analytics');
+            if (!response.ok) {
+              throw new Error('Failed to fetch users');
+            }
+            const data = await response.json();
+            setTop3(data);
+            // setLoading(false);
+          } catch (error) {
+            console.error('Error fetching users:', error);
+            // setError(error.message);
+            // setLoading(false);
+          }
+        }
+
+        async function theRestOfPlayers() {
+            try {
+              const response = await fetch('https://10.11.42.174/api/analytics/allPlayers');
+              if (!response.ok) {
+                throw new Error('Failed to fetch users');
+              }
+              const data = await response.json();
+              if (data.length > 3)
+              {
+                  data.splice(0, 3);
+                  console.table(data);
+              }
+              setOtherPlayers(data);
+              // setLoading(false);
+            } catch (error) {
+              console.error('Error fetching users:', error);
+              // setError(error.message);
+              // setLoading(false);
+            }
+          }
+        
+        fetchTop3();
+        theRestOfPlayers();
+      }, []); 
+
+      console.log("top3: ", top3);
     return (
         <>
             <div className="container-analytics font-poppins overflow-x-hidden">
                 <div className='leader-board'>
                     <div className='top3'>
-                        <div className='dark:bg-black bg-white first-cards' id='one'>
-                            <img src="/woumecht.jpg" alt="" />
-                            <h3 className='dark:text-white text-black fullName font-poppins '>Walid oumechtak</h3>
-                            <p className='login font-poppins'>woumecht</p>
-                            <button className='btn-profile font-poppins'>Profile</button>
-                            <span className='dark:text-white!important rank font-poppins'>1st</span>
-                            <div className='dark:text-white text-black score font-poppins'>Score: 230 exp</div>
-                        </div>
-                        <div className='dark:bg-black first-cards' id='two'>
-                            <img src="/rakhsas.jpg" alt="" />
-                            <h4 className='fullName font-poppins'>Walid oumechtak</h4>
-                            <p className='login font-poppins'>woumecht</p>   
-                            <button className='btn-profile font-poppins'>Profile</button>
-                            <span className='rank'>2st</span>  
-                            <div className='score font-poppins'>Score: 230 exp</div>
-                        </div>
-                        <div className='dark:bg-black first-cards' id='three'>
-                            <img src="/hbenfadd.jpg" alt="" />
-                            <h3 className='fullName font-poppins'>Walid oumechtak</h3>
-                            <p className='login font-poppins'>woumecht</p>
-                            <button className='btn-profile font-poppins'>Profile</button>
-                            <span className='rank font-poppins'>3st</span>
-                            <div className='score font-poppins'>Score: 230 exp</div>
-                        </div>
+                        {
+                            top3.map((user, index) => (
+                                <div className='dark:bg-black bg-white first-cards' id='one'>
+                                    <img src={user.picture} alt="" />
+                                    <h3 className='dark:text-white text-black fullName font-poppins '>{user.firstName} {user.lastName}</h3>
+                                    <p className='login font-poppins'>{user.username}</p>
+                                    {/* <Link to="https://10.11.42.174/dashboard/"> */}
+                                    <Link className='btn-profile font-poppins' to={`https://10.11.42.174/dashboard/profile/${user.id}`}>
+                                        Profile
+                                    </Link>
+
+                                    {/* <button className='btn-profile font-poppins'>Profile</button> */}
+                                    <span className='dark:text-white!important rank font-poppins'>{index + 1}</span>
+                                    <div className='dark:text-white text-black score font-poppins'>Score: {user.score} Pts</div>
+                                </div> 
+                            ))
+                        }
                     </div>
                       {/* =========== other player part ================= */}
                     <div className='other-players'>
-                        <div className='bg-white row-cards dark:bg-black'>
-                            <p className='rank text-black dark:text-white font-poppins'>4th</p>
-                            <div className="image-wrappear">
-                                <img className='profile-img' src="/woumecht.jpg" alt="" />
-                            </div>
-                            <div className='info'>
-                                <h4 className='text-black dark:text-white fullName font-poppins'>Walid Oumechtak</h4>
-                                <p className='text-black dark:text-white login font-poppins'>woumecht</p>
-                            </div>
-                            <button className='btn-profile font-poppins'>profile</button>
-                            {/* <div className='score'>
-                                <p>Score</p>
-                            </div> */}
-                            <span className='text-black dark:text-white score font-poppins'>Score <br />400</span>
-                        </div>
+                        
+                        {
+                            other_players.map((_user, index) => (
+                                <div className='bg-white row-cards dark:bg-black'>
+                                    <p className='rank text-black dark:text-white font-poppins'>{index + 3}</p>
+                                    <div>
+                                        
+                                    </div>
+                                        <div className="image-wrappear">
+                                            <img className='profile-img' src={_user.picture} alt="" />
+                                        </div>
+                                        <div className='info'>
+                                            <h4 className='text-black dark:text-white fullName font-poppins'>{_user.firstName} {_user.lastName}</h4>
+                                            <p className='text-black dark:text-white login font-poppins'>{_user.username}</p>
+                                        </div>
+                                    {/* <button className='btn-profile font-poppins'>profile</button> */}
+                                    <Link className='btn-profile font-poppins' to={`https://10.11.42.174/dashboard/profile/${_user.id}`}>
+                                        Profile
+                                    </Link>
+                                    {/* <div className='score'>
+                                        <p>Score</p>
+                                    </div> */}
+                                    <span className='text-black dark:text-white score font-poppins'>Score <br />{_user.score}</span>
+                                </div>
+                            ))
+                        }
 
+{/* 
                         <div className='row-cards'>
                             <p className='rank font-poppins'>4th</p>
                             <div className="image-wrappear">
@@ -62,9 +117,7 @@ function AnalyticsComponent(): JSX.Element {
                                 <p className='login font-poppins'>woumecht</p>
                             </div>
                             <button className='btn-profile font-poppins'>profile</button>
-                            {/* <div className='score'>
-                                <p>Score</p>
-                            </div> */}
+                           
                             <span className='score font-poppins'>Score <br />400</span>
                         </div>
 
@@ -78,9 +131,7 @@ function AnalyticsComponent(): JSX.Element {
                                 <p className='login font-poppins'>woumecht</p>
                             </div>
                             <button className='btn-profile font-poppins'>profile</button>
-                            {/* <div className='score'>
-                                <p>Score</p>
-                            </div> */}
+                            
                             <span className='score font-poppins'>Score <br />400</span>
                         </div>
 
@@ -94,11 +145,9 @@ function AnalyticsComponent(): JSX.Element {
                                 <p className='login font-poppins'>woumecht</p>
                             </div>
                             <button className='btn-profile font-poppins'>profile</button>
-                            {/* <div className='score'>
-                                <p>Score</p>
-                            </div> */}
+                         
                             <span className='score font-poppins'>Score <br />400</span>
-                        </div>
+                        </div> */}
 
                        
 

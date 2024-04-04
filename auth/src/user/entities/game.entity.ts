@@ -14,10 +14,10 @@ export class GameEntity {
   
 
   @Column({ type: 'int' })
-  user_scoore: number;
+  user_score: number;
 
   @Column({ type: 'int' })
-  player_scoore: number;
+  player_score: number;
 
   // @Column()
   // winnerId: string

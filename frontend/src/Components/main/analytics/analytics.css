@@ -53,6 +53,7 @@
 
     .dark .container-analytics .leader-board .other-players .row-cards{
         background-color: black;
+        
     }
 
     .dark .container-analytics .leader-board .other-players .row-cards .rank,
@@ -64,6 +65,7 @@
 
     .dark .container-analytics .leader-board .other-players .row-cards .btn-profile{
         color: black;
+        
     }
 
 
@@ -309,6 +311,8 @@
     background-color: var(--green);
     border: 1px solid var(--green);
     transition: all 0.5s;
+    position: absolute !important;
+    right: 180px !important;
 }
 
 .container-analytics .leader-board .other-players .row-cards .btn-profile:hover{
