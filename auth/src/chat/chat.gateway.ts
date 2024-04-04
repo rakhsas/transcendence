@@ -9,6 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/model/user.model';
 import { NotificationService } from 'src/notification/notification.service';
 import { NotificationType } from 'src/user/entities/notification.entity';
+import { FriendService } from 'src/friends/friends.service';
 // import cli from '@angular/cli';
 // import { Paths } from '../../../frontend/src/utils/types';
 
@@ -27,7 +28,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly authService: AuthService,
 		private readonly channelService: ChannelService,
 		private readonly userService: UserService,
-		private readonly notificationService: NotificationService
+		private readonly notificationService: NotificationService,
+		private readonly friendService: FriendService
 	) { }
 
 	handleConnection(client: Socket) {
@@ -221,6 +223,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		});
 	}
+
+	@SubscribeMessage('friendRequest')
+	async handleFriendRequest(client: Socket, payload: any): Promise<void> {
+		const areFriends = await this.friendService.getFriendship(payload.userId, payload.friendId);
+		
+	}
+
 	@SubscribeMessage('changeChannelType')
 	async handleChangeChannelType(payload: any): Promise<void> {
 		await this.chatService.changeChannelType(payload);

@@ -52,7 +52,7 @@ export class AnalyticsService {
     }
 
     async profileData(userId: string): Promise<{}> {
-        console.log("userId: ", userId);
+        console.log("userId1: ", userId);
         const gamePlayed = await this.gameRepository
         .createQueryBuilder('game')
         .leftJoin('game.player1', 'player1')

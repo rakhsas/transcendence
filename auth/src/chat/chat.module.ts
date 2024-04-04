@@ -18,15 +18,19 @@ import { NotificationModule } from 'src/notification/notification.module';
 import { Notif } from 'src/user/entities/notification.entity';
 import { NotificationService } from 'src/notification/notification.service';
 import { Banned } from 'src/user/entities/ban.entity';
+import { FreindsModule } from 'src/friends/friends.module';
+import { FriendService } from 'src/friends/friends.service';
+import { Friendship } from 'src/user/entities/freindship.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser, Notif, Banned]),
+    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser, Notif, Banned, Friendship]),
     UserModule,
-    NotificationModule
+    NotificationModule,
+    FreindsModule
     // ChannelModule
   ],
-  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService, NotificationService],
+  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService, NotificationService, FriendService],
   // providers: [ChatService, ChatGateway, Repository, MsgController, MsgRepository, UserRepository],
   controllers: [ChatController],
   // exports: [MsgRepository, UserRepository]

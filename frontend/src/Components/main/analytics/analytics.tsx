@@ -84,16 +84,13 @@ function AnalyticsComponent(): JSX.Element {
                             other_players.map((_user, index) => (
                                 <div className='bg-white row-cards dark:bg-black'>
                                     <p className='rank text-black dark:text-white font-poppins'>{index + 3}</p>
-                                    <div>
-                                        
+                                    <div className="image-wrappear">
+                                        <img className='profile-img' src={_user.picture} alt="" />
                                     </div>
-                                        <div className="image-wrappear">
-                                            <img className='profile-img' src={_user.picture} alt="" />
-                                        </div>
-                                        <div className='info'>
-                                            <h4 className='text-black dark:text-white fullName font-poppins'>{_user.firstName} {_user.lastName}</h4>
-                                            <p className='text-black dark:text-white login font-poppins'>{_user.username}</p>
-                                        </div>
+                                    <div className='info absolute left-1/4'>
+                                        <h4 className='text-black dark:text-white fullName font-poppins'>{_user.firstName} {_user.lastName}</h4>
+                                        <p className='text-black dark:text-white login font-poppins'>{_user.username}</p>
+                                    </div>
                                     {/* <button className='btn-profile font-poppins'>profile</button> */}
                                     <Link className='btn-profile font-poppins' to={`https://10.11.42.174/dashboard/profile/${_user.id}`}>
                                         Profile

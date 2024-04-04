@@ -16,6 +16,7 @@ import LoadingComponent from '../../shared/loading/loading';
 import User from '../../../model/user.model';
 import { gameScores, totalGames } from '../../../utils/types';
 import { GameService } from '../../../services/game.service';
+import { Socket } from 'socket.io-client';
 
 interface ButtonAttributes {
 	className: string;
@@ -23,42 +24,16 @@ interface ButtonAttributes {
 	onClick?: () => void;
 }
 
-function FunctionAddFriend() {
-	const path = window.location.pathname
-
-	const handleButtonClick = () => {
-		// Update the attributes object when the button is clicked
-		setAttributes({
-			...attributes,
-			value: 'Friend',
-			onClick: undefined, // Assuming you want to remove the onClick handler after clicking
-		});
-	};
-
-	const [attributes, setAttributes] = useState<ButtonAttributes>({
-		className: 'inline-flex items-center px-4 py-2 text-sm h-auto overflow-hidden text-center text-black-950 font-bold bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800',
-		value: '+ Friend',
-		onClick: handleButtonClick, // assuming handleButtonClick function is defined elsewhere
-	});
-
-	return (
-		<button {...attributes}>
-			{attributes.value}
-		</button>
-	);
-}
-
-
-function FunctionProfileForm() {
+const FunctionProfileForm: React.FC = () => {
 	const [id, setId] = useState<string>('');
 	const userData = useContext(DataContext);
-	const navigate = useNavigate();
 	const [user, setUser] = useState<any>();
 	const [friends, setFriends] = useState<User[]>();
 	const [users, setUsers] = useState<User[]>();
 	const [BlockedFriend, SetBlocked] = useState<boolean>(false);
 	const [score, setScore] = useState<gameScores[]>([]);
 	const [totalGames, setTotalGames] = useState<any>();
+	const [socketChat, setSocketChat] = useState<Socket>();
 	const achievements = [
 		{
 			icon: Achei,
@@ -102,6 +77,7 @@ function FunctionProfileForm() {
 		setUser(userData[0]);
 		setUsers(userData[3]);
 		setFriends(userData[7]);
+		setSocketChat(userData[1]);
 	}, [userData]);
 
 	useEffect(() => {
@@ -128,7 +104,7 @@ function FunctionProfileForm() {
 			}
 		};
 		fetchScores();
-	}, [user, totalGames]);
+	}, [user]);
 
 	const ButtonClick = () => {
 		SetBlocked(!BlockedFriend);
@@ -137,7 +113,9 @@ function FunctionProfileForm() {
 		return <LoadingComponent />;
 	}
 	const sendFriendRequest = () => {
-		console.log(user)
+		if (socketChat && user) {
+			socketChat.emit('friendRequest', user.id);
+		}
 	}
 	return (
 		<div className="body m-4 flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting">
