@@ -22,12 +22,11 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
   //   };
   // }, [counter]);
 
-    function handleBeforeUnload(e) {
-      // Included for legacy support, e.g. Chrome/Edge < 119
-      if (!socket) return;
-      socket.close();
-    }
-  //window.addEventListener("beforeunload", handleBeforeUnload);
+  function handleBeforeUnload(e) {
+    // Included for legacy support, e.g. Chrome/Edge < 119
+    if (!socket) return;
+    socket.close();
+  }//window.addEventListener("beforeunload", handleBeforeUnload);
   useEffect(() => {
     const newSocket: Socket = io(url, {
       path: "/sogame",

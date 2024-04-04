@@ -24,8 +24,6 @@ interface Room {
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
-  myId: string;
-  me: number;
 
   rooms: { [id: string]: Room } = {};
   waitingPlayers: Player[] = [];
@@ -33,10 +31,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly gameService: GameService) {}
 
   async handleConnection(client: any): Promise<void> {
-    this.myId = await this.gameService.GuardsConsumer(client);
-    console.log('idGame: ', this.myId);
+    const id = await this.gameService.GuardsConsumer(client);
+    console.log('idGame: ', id);
     // if (this.waitingPlayers.find((player) => player.id === id)) return;
-    this.waitingPlayers.push({ id: this.myId, socket: client });
+    this.waitingPlayers.push({ id: id, socket: client });
     this.matchPlayers();
   }
 
@@ -52,7 +50,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleUserData(client: any, payload: { id: string; userData: any }) {
     const { id, userData } = payload;
     client.broadcast.to(id).emit('userData', userData);
-    console.log('userdata', userData);
   }
 
   @SubscribeMessage('moves')
@@ -75,7 +72,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       players.forEach((player) => {
         player.socket.join(roomId);
-        this.me = index;
         this.server
           .to(player.socket.id)
           .emit('roomJoined', roomId, index, players[index % 2].id);
@@ -86,10 +82,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         players,
         game,
       };
-      room.game.render();
-      setTimeout(() => {
-        this.rooms[roomId] = room;
-      }, 2000);
+      this.rooms[roomId] = room;
     }
   }
 
@@ -101,34 +94,37 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.rooms[id].game.computer.score === 5
       ) {
         this.server.to(id).emit('gameOver');
-        let myScore;
-        let playerScore;
-        let playerId;
-        let wineerId;
-        if (this.me === 1) {
-          myScore = this.rooms[id].game.user.score;
-          playerScore = this.rooms[id].game.computer.score;
-          playerId = this.rooms[id].players[1].id;
-          wineerId =
-            this.rooms[id].game.user.score === 5 ? this.myId : playerId;
-        } else {
-          myScore = this.rooms[id].game.computer.score;
-          playerScore = this.rooms[id].game.user.score;
-          playerId = this.rooms[id].players[0].id;
-          wineerId =
-            this.rooms[id].game.computer.score === 5 ? this.myId : playerId;
-        }
-        this.gameService.addGame({
-          userId: this.myId,
-          playerId: playerId,
-          userScoore: myScore,
-          playerScoore: playerScore,
-          winnerId: wineerId,
-        });
+        this.saveMatch(this.rooms[id], null);
         delete this.rooms[id];
       }
       this.rooms[id].game.render();
     }
+  }
+
+  private async saveMatch(room: Room, winer: string | null) {
+    const userId = room.players[0].id;
+    const compId = room.players[1].id;
+
+    const userScore = winer
+      ? room.players[0].socket.id === winer
+        ? 0
+        : 5
+      : room.game.user.score;
+    const compScore = winer
+      ? room.players[1].socket.id === winer
+        ? 0
+        : 5
+      : room.game.computer.score;
+
+    const winerId = userScore === 5 ? userId : compId;
+
+    this.gameService.addGame({
+      userId: userId,
+      playerId: compId,
+      userScoore: userScore,
+      playerScoore: compScore,
+      winnerId: winerId,
+    });
   }
 
   private getIdOfRoom(playerId: string): string | undefined {
@@ -157,7 +153,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // romove it from the room
 
     const id: string = this.getIdOfRoom(playerId);
+    console.log('room id is : ', id);
     if (id === undefined) return;
+    this.saveMatch(this.rooms[id], playerId);
     console.log('room id is removed : ', id);
     this.rooms[id].game.stop();
     // Remove object with id 2

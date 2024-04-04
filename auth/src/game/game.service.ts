@@ -27,18 +27,10 @@ export class GameService {
     // userScoore:,
     // playerScoore:,
     // winnerId:,
-    console.log("players: ");
     const gameResult = new GameEntity();
-    console.log("players: ", payload.userId, payload.playerId);
     const pl1 = await this.userService.viewUser(payload.userId);
     const pl2 = await this.userService.viewUser(payload.playerId);
-    console.log("players: ", pl1, pl2);
     const winner = await this.userService.viewUser(payload.winnerId);
-    console.log(
-      '-------------------------------------------------------i------------=-==============>>  player: ',
-      pl1.username,
-      payload.pl1Scoore,
-    );
     gameResult.player1 = pl1;
     gameResult.player2 = pl2;
     gameResult.userScoore = payload.userScoore;
