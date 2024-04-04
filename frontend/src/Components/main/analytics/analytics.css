@@ -203,7 +203,8 @@
 
 /* =================================== start the other players sections ==================================== */
 
-@media screen and (max-width: 535px) {
+/* @media screen and (max-width: 535px) { */
+@media screen and (max-width: 760px) {
     .container-analytics .leader-board .other-players .row-cards{
         display: flex;
         flex-direction: column;
@@ -235,6 +236,14 @@
 
     .container-analytics .leader-board .other-players .row-cards .image-wrappear img{
         display: block;
+    }
+
+    .container-analytics .leader-board .other-players .row-cards .btn-profile,
+    .container-analytics .leader-board .other-players .row-cards .info
+    {
+        position: relative !important;
+        right: 0px !important;
+        left: 0px !important;
     }
 }
 
@@ -311,8 +320,8 @@
     background-color: var(--green);
     border: 1px solid var(--green);
     transition: all 0.5s;
-    position: absolute !important;
-    right: 180px !important;
+    position: absolute;
+    right: 180px ;
 }
 
 .container-analytics .leader-board .other-players .row-cards .btn-profile:hover{

@@ -114,7 +114,10 @@ const FunctionProfileForm: React.FC = () => {
 	}
 	const sendFriendRequest = () => {
 		if (socketChat && user) {
-			socketChat.emit('friendRequest', user.id);
+			socketChat.emit('friendRequest', {
+				userId: userData[0].id,
+				friendId: user.id
+			});
 		}
 	}
 	return (

@@ -77,7 +77,6 @@ export class FriendService {
           { user: { id: friendId }, friend: { id: userId } },
         ],
       });
-      console.log("friendship: ", friendship)
       return friendship !== null;
     }
 

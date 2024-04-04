@@ -2,7 +2,9 @@ import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { UserGuard } from "src/guards/user.guard";
 import { AnalyticsService } from "./analytics.service";
 import { User } from "src/user/entities/user.entity";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('game')
 @Controller('analytics')
 export class AnalyticsController {
     
@@ -14,6 +16,12 @@ export class AnalyticsController {
         return this.analyticsService.getAllGame(userId);
     }
     
+    @Get('lastGame/:userId')
+    async getLastGame(@Param('userId') userId: string)
+    {
+        return this.analyticsService.getLastGame(userId);
+    }
+
     @Get("allPlayers")
     async getAllPlayers() {
         return this.analyticsService.getAllPlayers();

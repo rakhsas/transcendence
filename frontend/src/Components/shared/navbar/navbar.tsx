@@ -43,7 +43,8 @@ enum NotificationType {
     CALL_REQUEST = 'CALL_REQUEST',
     CHANNEL_MESSAGE = 'CHANNEL_MESSAGE',
     CHANNEL_INVITE = 'CHANNEL_INVITE',
-    ROOM_MESSAGE = 'ROOM_MESSAGE'
+    ROOM_MESSAGE = 'ROOM_MESSAGE',
+    FRIEND_REQUEST_ACCEPTED= 'FRIEND_REQUEST_ACCEPTED',
 }
 
 interface NotifMessage {
@@ -136,7 +137,8 @@ function NavbarComponent(): JSX.Element {
             issuer: data.issuer,
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
-            channel: data.channel
+            channel: data.channel,
+            target: data.target
         }
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
@@ -158,7 +160,8 @@ function NavbarComponent(): JSX.Element {
             issuer: data.issuer,
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
-            channel: data.channel
+            channel: data.channel,
+            target: data.target
         }
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
@@ -180,8 +183,33 @@ function NavbarComponent(): JSX.Element {
             issuer: data.lastnotif.issuer,
             createdAt: data.lastnotif.createdAt,
             updatedAt: data.lastnotif.updatedAt,
-            channel: data.lastnotif.channel
+            channel: data.lastnotif.channel,
+            target: data.lastnotif.target
         }
+
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    })
+    socket?.on("friendRequestNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: data.type,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        console.log('Friend Request Notif', data);
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -225,6 +253,7 @@ function NavbarComponent(): JSX.Element {
                                 notifications && notifications.length > 0
                                     ?
                                     notifications.slice(0, 5).map((item: notificationInterface, index) => {
+                                    // console.log('Notifications', item);
                                         if (item.type === NotificationType.MESSAGE) {
                                             return (
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -276,7 +305,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src="/docs/images/people/profile-picture-2.jpg" alt="Joseph image" />
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
@@ -285,8 +314,27 @@ function NavbarComponent(): JSX.Element {
                                                         </div>
                                                     </div>
                                                     <div className="w-full ps-3">
-                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Joseph Mcfall</span> and <span className="font-medium text-gray-900 dark:text-white">5 others</span> started following you.</div>
-                                                        <div className="text-xs text-blue-600 dark:text-blue-500">10 minutes ago</div>
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>sent you a friend request.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
+                                                        <div className="flex gap-2 w-fit">
+                                                        <Button color="success" pill onClick={() => {
+                                                            socket?.emit("acceptFriendRequest",
+                                                            {
+                                                                userId: userData[0].id,
+                                                                friendId: item.issuer.id
+                                                            }
+                                                            );
+                                                        }}>
+                                                            Accept
+                                                        </Button>
+                                                        <Button color="failure" pill>
+                                                            Decline
+                                                        </Button>
+                                                    </div>
                                                     </div>
                                                 </a>
                                             )
@@ -296,7 +344,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">

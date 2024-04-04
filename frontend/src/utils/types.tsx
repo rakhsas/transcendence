@@ -54,6 +54,7 @@ export interface notificationInterface {
     read: false;
     channel: Channel;
     issuer: User;
+    target: User;
     createdAt: Date;
     updatedAt: Date;
 }

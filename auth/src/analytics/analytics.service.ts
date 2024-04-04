@@ -34,6 +34,16 @@ export class AnalyticsService {
     //     return count;
     // }
 
+    async getLastGame(userId: string) {
+        return this.gameRepository.find({
+            where: {player1: {id: userId}},
+            order: {
+                ["finishedAt"]: 'DESC', // or 'DESC' depending on your requirement
+              },
+            take: 1,
+        });
+    }
+
     async getAllGame(userId: string): Promise<GameEntity[]> {
         const allGames = this.gameRepository.find(
             {
