@@ -133,13 +133,6 @@ class Game {
     this.canvas.addEventListener("mousedown", this.handleMouseDown);
     this.canvas.addEventListener("mousemove", this.handleMouseMove);
     this.canvas.addEventListener("mouseup", this.handleMouseUp);
-
-    console.log(
-      "canvas width",
-      this.canvas.width,
-      "canvas height",
-      this.canvas.height
-    );
   }
 
   adjustMouseCoordinates(evt) {
