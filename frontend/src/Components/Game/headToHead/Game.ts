@@ -83,10 +83,10 @@ class Game {
   socket: Socket;
   roomId: string;
   index: number;
-  img: any;
+  img: HTMLImageElement;
 
   constructor(
-    canvas: HTMLCanvasElement,
+    canvas: HTMLCanvasElement ,
     socket: Socket,
     roomId: string,
     index: number

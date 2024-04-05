@@ -93,7 +93,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.rooms[id].game.user.score === 5 ||
         this.rooms[id].game.computer.score === 5
       ) {
-        this.server.to(id).emit('gameOver');
+        this.server.to(id).emit('gameOver', {
+          index: this.rooms[id].game.user.score === 5 ? 1 : 2,
+        });
         this.saveMatch(this.rooms[id], null);
         delete this.rooms[id];
       }

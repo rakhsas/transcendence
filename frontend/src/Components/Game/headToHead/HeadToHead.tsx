@@ -9,6 +9,7 @@ const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of yo
 const CanvasHeadToHead = (props: { width: string; height: string }) => {
   const ref = useRef(null);
   const index = useRef(0);
+  const status = useRef('win')
   const [roomId, setRoomId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   // const [counter, setCounter] = useState<number>(0);
@@ -22,11 +23,6 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
   //   };
   // }, [counter]);
 
-  function handleBeforeUnload(e) {
-    // Included for legacy support, e.g. Chrome/Edge < 119
-    if (!socket) return;
-    socket.close();
-  }//window.addEventListener("beforeunload", handleBeforeUnload);
   useEffect(() => {
     const newSocket: Socket = io(url, {
       path: "/sogame",
@@ -50,10 +46,8 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
     if (!socket) return;
 
     const canvas = ref.current;
-
-    if (!canvas || !socket || !roomId) {
-      console.error("Canvas, socket, or roomId is not available.");
-      return () => socket.close();
+    if (!canvas || !roomId) {
+      console.error("Canvas, or roomId is not available.");
     }
 
     // Initialize the game
@@ -89,7 +83,8 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
     socket.on("lose", () => {
       setRoomId("win");
     });
-    socket.on("gameOver", () => {
+    socket.on("gameOver", (i) => {
+      status.current = i.index == index.current ? "win" : "lose";
       setRoomId("win");
     });
     socket.on("connect", () => console.log("Connected"));
@@ -122,7 +117,7 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
               <div className="flex flex-col gap-4 px-9  py-4 items-center ">
                 <div className="flex-1 text-center ">
                   <p className="text-xl pb-4">Game Over</p>
-                  <p className="text-xl">You win</p>
+                  <p className="text-xl">You {status.current}</p>
                 </div>
                 <Button
                   onClick={handleClick}
