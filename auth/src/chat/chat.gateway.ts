@@ -239,7 +239,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			const lastnotif = await this.notificationService.getNotificationById(notif.id);
 			const target = this.connectedUsers.get(lastnotif.target.username);
-			target.emit('friendRequestNotif', lastnotif);
+			target?.emit('friendRequestNotif', lastnotif);
 		}
 	}
 	

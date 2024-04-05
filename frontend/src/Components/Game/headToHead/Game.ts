@@ -84,9 +84,12 @@ class Game {
   roomId: string;
   index: number;
   img: HTMLImageElement;
+  rotation: number; // New property to store rotation angle
+  isDragging: boolean;
+  dragStartY = 0;
 
   constructor(
-    canvas: HTMLCanvasElement ,
+    canvas: HTMLCanvasElement,
     socket: Socket,
     roomId: string,
     index: number
@@ -102,7 +105,12 @@ class Game {
     this.ball = new Ball(canvas);
     this.img = new Image();
     this.img.src = IMG;
+    this.rotation = 0; // Initialize rotation angle to 0
+    this.isDragging = false;
+    // Mouse position when the drag starts
+    this.dragStartY = 0;
 
+    // this.rotateCanvas(-90);
     socket.on("render", (userScore, compScore, ball) => {
       this.ball = ball;
       if (index === 1) {
@@ -121,17 +129,72 @@ class Game {
       this.render();
     });
 
-    this.canvas.addEventListener("mousemove", (evt) => {
-      const rect = canvas.getBoundingClientRect();
-      this.user.y = evt.clientY - rect.top - this.user.height / 2;
-      socket.emit("moves", {
+    //    this.canvas.addEventListener("mousemove", this.handleMouseMove);
+    this.canvas.addEventListener("mousedown", this.handleMouseDown);
+    this.canvas.addEventListener("mousemove", this.handleMouseMove);
+    this.canvas.addEventListener("mouseup", this.handleMouseUp);
+
+    console.log(
+      "canvas width",
+      this.canvas.width,
+      "canvas height",
+      this.canvas.height
+    );
+  }
+
+  adjustMouseCoordinates(evt) {
+    const rect = this.canvas.getBoundingClientRect();
+    const mouseY = evt.clientY - rect.top;
+    const centerY = rect.height / 2;
+    // Adjust mouse coordinates based on canvas rotation
+    const rotatedMouseY =
+      Math.cos(-this.rotation) * (mouseY - centerY) + centerY;
+
+    return {
+      y: rotatedMouseY,
+    };
+  }
+
+  // Event listener for mousedown event
+  handleMouseDown = (evt) => {
+    const { y } = this.adjustMouseCoordinates(evt);
+    this.isDragging = true;
+    this.dragStartY = y;
+  };
+
+  // Event listener for mousemove event
+  handleMouseMove = (evt) => {
+    if (this.isDragging) {
+      const { y } = this.adjustMouseCoordinates(evt);
+
+      // Calculate the movement distance
+      const deltaY = y - this.dragStartY;
+
+      // Update user position based on the movement distance
+      this.user.y += deltaY;
+      this.dragStartY = y;
+
+      // Emit move event
+      this.socket.emit("moves", {
         y: this.user.y,
         id: this.roomId,
         index: this.index,
       });
-    });
-  }
+    }
+  };
 
+  // Event listener for mouseup event
+  handleMouseUp = () => {
+    this.isDragging = false;
+  };
+
+  rotateCanvas(angle: number) {
+    this.rotation += angle; // Update rotation angle
+    this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2); // Translate origin to canvas center
+    this.ctx.rotate((angle * Math.PI) / 180); // Rotate canvas
+    this.ctx.translate(-this.canvas.width / 2, -this.canvas.height / 2); // Translate origin back to top-left corner
+    this.render(); // Re-render game elements
+  }
   drawImage() {
     console.log("draw image");
     const img = new Image();
@@ -184,7 +247,7 @@ class Game {
 
   render() {
     this.drawRect(0, 0, this.canvas.width, this.canvas.height, "black");
-    this.ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
+    //this.ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
 
     this.drawText(
       this.user.score,
