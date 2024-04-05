@@ -21,5 +21,5 @@ export class Banned {
     reason: string;
   
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-    timestamp: Date;
+    BannedAt: Date;
 }

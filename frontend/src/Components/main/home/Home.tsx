@@ -8,11 +8,12 @@ import fire from './../../../assets/Icon/fire.svg';
 import play from './../../../assets/img/Play.svg'
 import videoSource from './../../../assets/avatars/490488ec-2f13-402b-b203-951e4a4775cd.mp4';
 import Chart from 'chart.js/auto';
-import { friendsService } from '../../../services/friend.service';
+import { FriendsService } from '../../../services/friend.service';
 import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
 import { Channel } from '../../../utils/types';
 import ModalComponent from '../../modal/modal';
+import { useNavigate } from 'react-router-dom';
 
 const group = () => {
     return (
@@ -42,6 +43,7 @@ type friend = {
 }
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const HomeComponent: React.FC = () => {
+    const navigate = useNavigate();
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const userData = useContext(DataContext);
@@ -62,7 +64,7 @@ const HomeComponent: React.FC = () => {
         setProtectedChannels(userData[4]);
         setPublicChannels(userData[5]);
         const fetchFriends = async () => {
-            const friendService = new friendsService();
+            const friendService = new FriendsService();
             const friends = await friendService.getFriends(userData[0].id);
             if (friends.length !== 0) {
                 setFriends(friends);
@@ -211,7 +213,7 @@ const HomeComponent: React.FC = () => {
                                         <div className="text-white font-semibold text-3xl leading-10">AI: The Next Frontier</div>
                                     </div>
                                 </div>
-                                <div className="w-fit p-4 bg-gradient-to-r from-slate-900 via-gray-900 to-zinc-600 rounded-full">
+                                <div className="w-fit p-4 bg-gradient-to-r from-slate-900 via-gray-900 to-zinc-600 rounded-full" onClick={() => navigate('/dashboard/game')}>
                                     <div className="bg-emerald-400 rounded-3xl flex flex-col justify-center hover:cursor-pointer px-4 py-2">
                                         <div className="text-white font-bold">Play Now</div>
                                     </div>
@@ -304,7 +306,7 @@ const HomeComponent: React.FC = () => {
                 </section>
 
             </main>
-            <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit dark:bg-zinc-900 bg-[#F1F2FD]">
+            <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit dark:bg-zinc-900  bg-main-light-WHITE">
                 <div className="contain flex flex-col justify-between items-center mx-auto">
                     <div className="profile mt-2 w-12 h-12 bg-white">
                         <img src={userData[0].picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData[0].username} />
@@ -324,7 +326,7 @@ const HomeComponent: React.FC = () => {
                                         return (
                                             <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
                                                 <div className="img p-2" key={index}>
-                                                    <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
+                                                    <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full object-cover ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
                                                 </div>
                                                 <div className="absolute top-0 right-2 mb-1 mr-[1px]">
                                                     <div className={`w-4 h-4 rounded-full ${friend.status === 'online' ? 'bg-green-500' : 'bg-[#A5BAA9]'}  border-2 border-main-dark-SPRUCE`}></div>

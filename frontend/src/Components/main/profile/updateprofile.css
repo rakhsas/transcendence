@@ -36,6 +36,9 @@
     /* width: ; */
 }
 
+.ch, .c{
+    border-radius: 12px;
+}
 .Achieve--Border{
     border-radius: 8px;
 }
@@ -49,7 +52,8 @@ h5.l5{
     /* transform: translateY(-50px); */
     background-color: var(--green);
     border-radius: 5px;
-    margin-top: -35px;
+    margin-top: -5px;
+    color: black;
 }
 
 
@@ -67,11 +71,11 @@ h5.l5{
     background-color: #31304D;
 }
 
-.picture--User{
+/* .picture--User{
     width: 55px;
     height: 55px;
     border-radius: 15px;
-}
+} */
 
 @media screen and (max-width: 750px) {
     .Achieve--Border, .math-info, .update{
@@ -81,3 +85,7 @@ h5.l5{
         width: 90%;
     }
 }
+/* .scrollBar-thumb
+{
+    background-color: red;
+} */

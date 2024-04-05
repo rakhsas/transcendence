@@ -70,4 +70,14 @@ export class FriendService {
       return friends;
     }
 
+    async getFriendship(userId, friendId): Promise<boolean> {
+      const friendship = await this.friendRepository.findOne({
+        where: [
+          { user: { id: userId }, friend: { id: friendId } },
+          { user: { id: friendId }, friend: { id: userId } },
+        ],
+      });
+      return friendship !== null;
+    }
+
 }

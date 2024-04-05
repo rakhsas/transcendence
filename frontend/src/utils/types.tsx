@@ -45,14 +45,42 @@ export interface NotificationMessage {
 }
 
 export interface notificationInterface {
-    id: string;
+    id: number;
     type: string;
     message: string;
     audio: string;
     image: string;
     seen: false;
     read: false;
+    channel: Channel;
     issuer: User;
+    target: User;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface gameScores {
+    id: number;
+    user_score: number;
+    player_score: number;
+    TotalScoore: number;
+    finishedAt: Date;
+    player1: User;
+    player2: User;
+    winner: User;
+}
+
+export interface totalGames {
+    gamePlayed: number;
+    gameWon: number;
+    gameWithMaxScore: number;
+}
+
+export interface MutedUsers {
+    id: number;
+    createdAt: Date;
+    finishedAt: Date;
+    finished: boolean;
+    userId: string;
+    cid: number;
 }

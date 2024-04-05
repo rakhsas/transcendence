@@ -7,10 +7,11 @@ import { NotificationController } from "./notification.controller";
 import { UserModule } from "src/user/user.module";
 import { AuthModule } from "src/auth/auth.module";
 import { HttpModule, HttpService } from "@nestjs/axios";
+import { Channel } from "src/user/entities/channel.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Notif]),
+        TypeOrmModule.forFeature([Notif, Channel]),
         UserModule,
         AuthModule,
         HttpModule

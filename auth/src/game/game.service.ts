@@ -6,6 +6,8 @@ import { UserService } from 'src/user/user.service';
 import { GameEntity } from 'src/user/entities/game.entity';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
+import { plainToClass } from 'class-transformer';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class GameService {
@@ -15,8 +17,8 @@ export class GameService {
     private readonly authService: AuthService,
     @InjectRepository(GameEntity)
     private readonly gameRepository: Repository<GameEntity>,
-    // @InjectRepository(User)
-    // private readonly userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private userService: UserService,
   ) {}
 
@@ -28,17 +30,48 @@ export class GameService {
     // playerScoore:,
     // winnerId:,
     const gameResult = new GameEntity();
+    const gameResult2 = new GameEntity();
+
     const pl1 = await this.userService.viewUser(payload.userId);
     const pl2 = await this.userService.viewUser(payload.playerId);
     const winner = await this.userService.viewUser(payload.winnerId);
+    console.log("inside add game service.........",payload.userScoore, payload.playerScoore);
+    // console.log(
+      //   '-------------------------------------------------------i------------=-==============>>  player: ',
+      //   pl1.username,
+      //   payload.pl1Scoore,
+      // );
+      // if (payload.userScoore > payload.playerScoore)
+      if (payload.userId === payload.winnerId)
+      {
+        const oldScore = pl1.score;
+        const newScore = oldScore + 10;
+
+        pl1["score"] = newScore;
+        await this.userRepository.save(pl1);
+      }
+      else
+      {
+        const oldScore = pl2.score;
+        const newScore = oldScore + 10;
+
+        pl2["score"] = newScore;
+        await this.userRepository.save(pl2);
+      }
     gameResult.player1 = pl1;
     gameResult.player2 = pl2;
-    gameResult.userScoore = payload.userScoore;
-    gameResult.playerScoore = payload.playerScoore;
+    gameResult.user_score = payload.userScoore;
+    gameResult.player_score = payload.playerScoore;
     gameResult.winner = winner;
 
-    // console.log("players: ", pl1, pl2);
+    gameResult2.player1 = pl2;
+    gameResult2.player2 = pl1;
+    gameResult2.user_score = payload.playerScoore;
+    gameResult2.player_score = payload.userScoore;
+    gameResult2.winner = winner;
+
     await this.gameRepository.save(gameResult);
+    await this.gameRepository.save(gameResult2);
   }
   /* ============================== end game functions ================================= */
 

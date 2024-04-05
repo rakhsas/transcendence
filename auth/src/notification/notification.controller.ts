@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
 import { NotificationService } from "./notification.service";
 import { ApiBody, ApiParam, ApiTags } from "@nestjs/swagger";
 import { Notif } from "src/user/entities/notification.entity";
@@ -27,9 +27,17 @@ export class NotificationController {
     }
 
     @Get('single/:id')
-    // @UseGuards(UserGuard)
+    @UseGuards(UserGuard)
     @ApiParam({ name: 'id', type: Number })
     async getNotificationById(@Param('id')id: number): Promise<Notif> {
         return await this.notificationService.getNotificationById(id);
     }
+
+    @Put(":notifyId")
+    @ApiBody({ type: {seen: Boolean} })
+    @UseGuards(UserGuard)
+    async updateNotificationState(@Param('notifyId') id: number, @Body() seen: {seen: boolean}) {
+        return this.notificationService.updateNotificationState(id, seen);
+    }
+
 }

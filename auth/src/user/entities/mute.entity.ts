@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
 } from 'typeorm';
 
 import { User } from './user.entity'; // Import the User entity
@@ -16,11 +17,23 @@ export class Mute {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ default: new Date() })
+  createdAt: Date;
+
   @Column()
-  finishAt: Date;
+  finishedAt: Date;
 
   @Column({ default: false })
   finished: boolean;
+
+  @BeforeInsert()
+  setFinishedAt() {
+    const now = new Date();
+    console.log(now);
+    now.setMinutes(now.getMinutes() + 1);
+    this.finishedAt = now;
+    // console.log(this.finishedAt);
+  }
 
   @ManyToOne(() => User, (user) => user.Muted, {lazy: true})
   @JoinColumn({ name: 'userId' })

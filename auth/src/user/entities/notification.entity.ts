@@ -1,5 +1,8 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { User } from "./user.entity";
+import { Channel } from "./channel.entity";
+import { join } from "path";
+
 
 export enum NotificationType {
     MESSAGE = 'MESSAGE',
@@ -7,6 +10,9 @@ export enum NotificationType {
     CALL_REQUEST = 'CALL_REQUEST',
     CHANNEL_MESSAGE = 'CHANNEL_MESSAGE',
     CHANNEL_INVITE = 'CHANNEL_INVITE',
+    FRIEND_REQUEST_ACCEPTED= 'FRIEND_REQUEST_ACCEPTED',
+    FRIEND_REQUEST_DECLINED= 'FRIEND_REQUEST_DECLINED',
+    KIKED = 'KIKED',
 }
 
 @Entity()
@@ -25,6 +31,9 @@ export class Notif {
   
     @Column({ nullable: true})
     message: string;
+
+    @ManyToOne(() => Channel, { nullable: true })
+    channel: Channel;
     
     @Column({ nullable: true})
     audio: string;

@@ -1,13 +1,18 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GameEntity } from 'src/user/entities/game.entity';
+import { AnalyticsController } from './analytics.controller';
+import { AnalyticsService } from './analytics.service';
+import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([]),
+    TypeOrmModule.forFeature([GameEntity, User]),
     // ChannelModule
   ],
-  providers: [],
+  providers: [AnalyticsService, Repository],
   // providers: [ChatService, ChatGateway, Repository, MsgController, MsgRepository, UserRepository],
-  controllers: [],
+  controllers: [AnalyticsController],
 })
 export class AnalyticsModule {}

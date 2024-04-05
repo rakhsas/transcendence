@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Timestamp } from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
@@ -11,16 +11,31 @@ export class GameEntity {
 
   @ManyToOne(() => User)
   player2: User;
+  
 
   @Column({ type: 'int' })
-  userScoore: number;
+  user_score: number;
 
   @Column({ type: 'int' })
-  playerScoore: number;
+  player_score: number;
 
   // @Column()
   // winnerId: string
 
+  @Column({type: 'int', nullable: true})
+  TotalScoore: number
+
   @ManyToOne(() => User)
   winner: User;
+
+  @Column({ type: 'date', default: () => 'CURRENT_DATE' })
+    finishedAt: Date;
 }
+
+
+/*
+  how many match the user play,
+  how many match win, 
+  how many with max score, 5 - 0
+  user - openent score winner 
+*/
