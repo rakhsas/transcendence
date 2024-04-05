@@ -1,4 +1,5 @@
 import { Socket } from "socket.io-client";
+import IMG from "../images/table-tennis-ping-pong.jpg";
 
 class User {
   x: number;
@@ -82,9 +83,10 @@ class Game {
   socket: Socket;
   roomId: string;
   index: number;
+  img: HTMLImageElement;
 
   constructor(
-    canvas: HTMLCanvasElement,
+    canvas: HTMLCanvasElement ,
     socket: Socket,
     roomId: string,
     index: number
@@ -98,6 +100,8 @@ class Game {
     this.user = new User(canvas);
     this.computer = new Computer(canvas);
     this.ball = new Ball(canvas);
+    this.img = new Image();
+    this.img.src = IMG;
 
     socket.on("render", (userScore, compScore, ball) => {
       this.ball = ball;
@@ -110,45 +114,6 @@ class Game {
         this.ball.x = this.canvas.width - ball.x;
       }
       this.render();
-      if (
-        (userScore == 5 && this.index === 1) ||
-        (compScore == 5 && this.index === 2)
-      )
-        this.final("win");
-      else if (userScore == 5 || compScore == 5) this.final("lose");
-    });
-
-    socket.on("win", () => {
-      console.log("win event ");
-      this.drawRect(
-        0,
-        0,
-        this.canvas.width,
-        this.canvas.height,
-        "rgba(0, 0, 0, 0.3)"
-      );
-      this.drawText(
-        "you_win",
-        this.canvas.width / 2.79,
-        this.canvas.height / 2,
-        "#BFFF3C"
-      );
-    });
-
-    socket.on("lose", () => {
-      this.drawRect(
-        0,
-        0,
-        this.canvas.width,
-        this.canvas.height,
-        "rgba(0, 0, 0, 0.3)"
-      );
-      this.drawText(
-        "you_lose",
-        this.canvas.width / 2.79,
-        this.canvas.height / 2,
-        "#BFFF3C"
-      );
     });
 
     socket.on("move", (y) => {
@@ -167,24 +132,14 @@ class Game {
     });
   }
 
-  final(s: string): void {
-    this.drawRect(
-      0,
-      0,
-      this.canvas.width,
-      this.canvas.height,
-      "rgba(0, 0, 0, 0.5)"
-    );
-    this.drawText(
-      "you_" + s,
-      this.canvas.width / 2.79,
-      this.canvas.height / 2,
-      "#BFFF3C"
-    );
-    // // left click to restart game
-    // this.canvas.addEventListener("click", () => {
-    //   window.location.replace("/dashboard");
-    // });
+  drawImage() {
+    console.log("draw image");
+    const img = new Image();
+    img.src = IMG;
+    img.onload = () => {
+      this.img = img;
+    };
+    this.img = img;
   }
 
   drawRect(x: number, y: number, w: number, h: number, color: string) {
@@ -229,6 +184,8 @@ class Game {
 
   render() {
     this.drawRect(0, 0, this.canvas.width, this.canvas.height, "black");
+    this.ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
+
     this.drawText(
       this.user.score,
       this.canvas.width / 4,

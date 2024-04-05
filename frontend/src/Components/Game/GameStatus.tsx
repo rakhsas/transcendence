@@ -31,7 +31,7 @@ const GameStatus = (props: { socket: Socket | null; roomId: string }) => {
   }, [socket]);
 
   return (
-    <div className="h-16 m-auto dark:text-white text-black  flex justify-between items-center gap-2 w-full max-w-5xl rounded rounded-s-md ">
+    <div className="h-16 m-auto border-b-2 dark:text-white text-black  flex justify-between items-center gap-2 w-full max-w-5xl rounded rounded-s-md ">
       {data ? (
         <>
           <div className="flex items-center gap-3 m-2">
