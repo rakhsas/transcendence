@@ -9,6 +9,8 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/model/user.model';
 import { NotificationService } from 'src/notification/notification.service';
 import { NotificationType } from 'src/user/entities/notification.entity';
+import { FriendService } from 'src/friends/friends.service';
+import { MuteService } from 'src/mute/mute.service';
 // import cli from '@angular/cli';
 // import { Paths } from '../../../frontend/src/utils/types';
 
@@ -27,7 +29,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly authService: AuthService,
 		private readonly channelService: ChannelService,
 		private readonly userService: UserService,
-		private readonly notificationService: NotificationService
+		private readonly notificationService: NotificationService,
+		private readonly friendService: FriendService,
+		private readonly mutedService: MuteService
 	) { }
 
 	handleConnection(client: Socket) {
@@ -98,10 +102,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// =============================== Handle Muted users from a channel ============================
 
-	@SubscribeMessage('muteUser')
-	async handleMuteEvent(payload: any): Promise<void> {
-		await this.chatService.muteUser(payload);
-	}
+	
 
 	// ================================ Channel hevents ====================================================================
 
@@ -221,6 +222,62 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		});
 	}
+
+	@SubscribeMessage('friendRequest')
+	async handleFriendRequest(client: Socket, payload: any): Promise<void> {
+		const areFriends = await this.friendService.getFriendship(payload.userId, payload.friendId);
+		if (!areFriends)
+		{
+			const notif = await this.notificationService.createNotification({
+				target: payload.friendId,
+				type: NotificationType.FRIEND_REQUEST,
+				issuer: payload.userId,
+				message: "",
+				image: null,
+				audio: null,
+				channel: null
+			});
+			const lastnotif = await this.notificationService.getNotificationById(notif.id);
+			const target = this.connectedUsers.get(lastnotif.target.username);
+			target.emit('friendRequestNotif', lastnotif);
+		}
+	}
+	
+	@SubscribeMessage('declineFriendRequest')
+	async handleDeclineFriendRequest(client: Socket, payload: any): Promise<void> {
+		const notif = await this.notificationService.createNotification({
+			target: payload.friendId,
+			type: NotificationType.FRIEND_REQUEST_DECLINED,
+			issuer: payload.userId,
+			message: "",
+			image: null,
+			audio: null,
+			channel: null
+		});
+		const lastnotif = await this.notificationService.getNotificationById(notif.id);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('friendRequestDecinedNotif', lastnotif);
+	}
+
+	@SubscribeMessage('acceptFriendRequest')
+	async handleAcceptFriendRequest(client: Socket, payload: any): Promise<void> {
+		console.log('acceptFriendRequest: ')
+		const notif = await this.notificationService.createNotification({
+			target: payload.friendId,
+			type: NotificationType.FRIEND_REQUEST_ACCEPTED,
+			issuer: payload.userId,
+			message: "",
+			image: null,
+			audio: null,
+			channel: null,
+			
+		});
+		await this.friendService.createFriendship(payload.userId, payload.friendId);
+		const lastnotif = await this.notificationService.getNotificationById(notif.id);
+		const friends = await this.friendService.getFriendsOfUser(payload.friendId);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('updatedFriends', friends);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('friendRequestAcceptedNotif', lastnotif);
+	}
+
 	@SubscribeMessage('changeChannelType')
 	async handleChangeChannelType(payload: any): Promise<void> {
 		await this.chatService.changeChannelType(payload);
@@ -228,14 +285,47 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	// ====================== User function ===================================================
 
+	/*
+		@SubscribeMessage('blockUser')
+		async handleBlockUse(payload: any): Promise<void>
+		{
+			// the userId and the id the user you want to block
+			const newRecord = this.blockRespository.create({
+				user: {id: payload.userId},
+				blockedUser: {id: payload.blockTargetedId}
+			});
+
+			return this.blockR
+		}
+	*/
 	@SubscribeMessage('kickTheUser')
 	async handleKickUserFromChannel(socket: Socket, payload: any): Promise<void> {
 		// in this event handler i am excpected to get the id of the user to
 		// kick and the id of the channe from where the user will be kicked.
 		socket.leave(payload.channelId);
 		await this.chatService.kickUserFromChannel(payload);
+		const members = await this.channelService.getMembersOfChannel(payload.channelId);
+		socket?.emit('userKicked', members);
+		const notif = await this.notificationService.createNotification({
+			target: payload.target,
+			type: NotificationType.KIKED,
+			issuer: payload.userId,
+			message: "",
+			image: null,
+			audio: null,
+			channel: payload.channelId,
+		});
+		const lastnotif = await this.notificationService.getNotificationById(notif.id);
+		console.log('lastnotif: ', lastnotif)
+		this.connectedUsers.get(lastnotif.target.username)?.emit('kickedNotif', lastnotif);
 	}
 
+	@SubscribeMessage('muteUser')
+	async handleMuteEvent(socket: Socket, payload: any): Promise<void> {
+		await this.chatService.muteUser(payload);
+		const mutedUsers = await this.mutedService.getMutedUsers(payload.channelId);
+		this.connectedUsers.get(payload.username)?.emit('userMuted', mutedUsers);
+	}
 	/*
 	expected payload:
 	{

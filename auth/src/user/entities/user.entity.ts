@@ -96,6 +96,9 @@ export class User {
      
   @Column({ default: false })
   public isTwoFactorAuthenticationEnabled: boolean;
+
+  @Column({default: 0})
+  score: number;
   // ======================
 
   // @ManyToMany(() => Channel, (channel) => channel.members)

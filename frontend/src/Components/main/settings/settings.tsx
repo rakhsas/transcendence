@@ -1,41 +1,8 @@
 import "./settings.css";
-// import ValidInformation from '../../Info/Information';
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
-// import FourHundredFourComponent from "../../error/404.component";
-import { Route, Router, Routes } from "react-router-dom";
-import HomePageComponent from "../../HomePage";
-import { jsx } from "@emotion/react";
-import Morocco from './Morocoo.png'
-// import { Alert } from "flowbite-react";
-// import { AlertProps } from '@mui/material/Alert';
-
-
-/*
-
-import React, { useState } from 'react';
-
-function App() {
-  const [backgroundColor, setBackgroundColor] = useState("lightblue");
-
-  const changeBackgroundColor = () => {
-	setBackgroundColor(getRandomColor()); // Replace getRandomColor() with your color generation logic
-  }
-
-  return (
-	<div>
-	  <div style={{ backgroundColor: backgroundColor }} className="your-component-class">
-		Your component content here 
-		</div>
-		<button onClick={changeBackgroundColor}>Change Color</button>
-	  </div>
-	);
-  }
-  
-  export default App;
-*/
-
+import { TwoFA, TwoFaService } from "../../../services/twoFa.service";
 interface AlertProps {
 	message: string;
 }
@@ -88,71 +55,59 @@ function SettingFunction(): JSX.Element {
 	const [input, setInput] = useState("");
 	const [url, setUrl] = useState<string>("");
 	const userData = useContext(DataContext);
-	// if (! userData)
-	//   return <LoadingComponent />
+	const twoFaService = new TwoFaService();
 	useEffect(() => {
 		if (!userData) return;
 		const fetchData = async () => {
 			try {
-				console.log("Uf2wserId: -->", userData);
-				const Qrcode = await fetch(
-					APIURL + `2fa/generate/${userData[0].id}/${userData[0].email}`,
-					{
-						method: "GET",
-						credentials: "same-origin",
-					}
-				);
-				if (Qrcode.ok) {
-					const QRcode = await Qrcode.json();
-					setUrl(() => QRcode.url);
-					console.log("list li--> ", QRcode);
-				}
+				const Qrcode = await twoFaService.generateQrCode(userData[0].id, userData[0].email);
+				setUrl(Qrcode);
 			} catch (error) {
 				console.error("Error fetching user ", error);
 			}
 		};
 		fetchData();
+		setIsChecked(userData[0].isTwoFactorAuthenticationEnabled);
 	}, [userData]);
 	if (!userData) return <LoadingComponent />;
-	// console.log();
 	let TfCode: string = "";
-	function focusNextInput(
-		el: HTMLInputElement,
-		prevId: string | null,
-		nextId: string | null
-	) {
-		if (el.value.length === 0) {
-			if (prevId) {
-				const prevElement = document.getElementById(
-					prevId
-				) as HTMLInputElement | null;
-				if (prevElement) {
-					prevElement.focus();
-				}
-			}
-		} else {
-			if (nextId) {
-				const nextElement = document.getElementById(
-					nextId
-				) as HTMLInputElement | null;
-				if (nextElement) {
-					nextElement.focus();
-				}
-			}
-		}
-		TfCode = el.value;
-	}
-	document.querySelectorAll("[data-focus-input-init]").forEach((element) => {
-		element.addEventListener("keyup", function (this: HTMLElement) {
-			const prevId = this.getAttribute("data-focus-input-prev");
-			const nextId = this.getAttribute("data-focus-input-next");
-			if (this instanceof HTMLInputElement) {
-				focusNextInput(this, prevId, nextId);
-				// console.log(prevId, ' prve ', nextId);
-			}
-		});
-		// console.log(this instanceof HTMLInputElement);
-	});
+	// function focusNextInput(
+	// 	el: HTMLInputElement,
+	// 	prevId: string | null,
+	// 	nextId: string | null
+	// ) {
+	// 	if (el.value.length === 0) {
+	// 		if (prevId) {
+	// 			const prevElement = document.getElementById(
+	// 				prevId
+	// 			) as HTMLInputElement | null;
+	// 			if (prevElement) {
+	// 				prevElement.focus();
+	// 			}
+	// 		}
+	// 	} else {
+	// 		if (nextId) {
+	// 			const nextElement = document.getElementById(
+	// 				nextId
+	// 			) as HTMLInputElement | null;
+	// 			if (nextElement) {
+	// 				nextElement.focus();
+	// 			}
+	// 		}
+	// 	}
+	// 	TfCode = el.value;
+	// }
+	// document.querySelectorAll("[data-focus-input-init]").forEach((element) => {
+	// 	element.addEventListener("keyup", function (this: HTMLElement) {
+	// 		const prevId = this.getAttribute("data-focus-input-prev");
+	// 		const nextId = this.getAttribute("data-focus-input-next");
+	// 		if (this instanceof HTMLInputElement) {
+	// 			focusNextInput(this, prevId, nextId);
+	// 			// console.log(prevId, ' prve ', nextId);
+	// 		}
+	// 	});
+	// 	// console.log(this instanceof HTMLInputElement);
+	// });
 
 	const onchange = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -162,41 +117,16 @@ function SettingFunction(): JSX.Element {
 	}
 	const fetchQRcode = async () => {
 		try {
-			// console.log('Tfcode --> ', TfCode, 'userData --> ', userData[0].id, ' input', input);
 			const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
 				method: 'POST',
 				credentials: 'same-origin',
-				// redirect: 'follow'
 			})
-			console.log('status code1 --> : ', ValidQRcode)
 			if (ValidQRcode.status == 200) {
-				console.log("lisljsjfs -> ");
-				console.log('State Two valud 1 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
 				userData[0].isTwoFactorAuthenticationEnabled = true;
-				console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
-				console.log('valid UserDate --> ', userData);
-				console.log('status code2 --> : ', ValidQRcode);
-
-				// window.location.href = `https://10.12.13.6/`;
 			}
 			else {
-				console.log('invalid Qrcode --> : ', ValidQRcode)
-				console.log('State Two valud 1 --> : ', userData[0])
-				console.log('State Two valud 1 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
 				userData[0].isTwoFactorAuthenticationEnabled = false;
-				// <SuccessQRCODE/>;
-				// {!ShowSignUp && <Alert message="Valid QR code scanned!" />}
-				console.log('State Two valud 2 --> : ', userData[0].isTwoFactorAuthenticationEnabled)
-				console.log('valid UserDate --> ', userData[0]);
-				// window.location.href = `https://10.12.13.6/Error`;
 			}
-			// window.location.href = APIURL + `2fa/authenticate/${input}/${userData[0].id}`;
-			// window.location.href = `https://10.11.6.10/`;
-			// console.log(await ValidQRcode.json());
-
-			// if (ValidQRcode == true)
-			//   window.location.href = "http://localhost:4200";
-			// console.log("ValidQRcode: ", ValidQRcode);
 		}
 		catch (error) {
 			console.log('Invalid qrcode \n');
@@ -253,21 +183,25 @@ function SettingFunction(): JSX.Element {
 
 	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setUserEmail(event.target.value);
-		console.log(event.target.value, "===> value");
 		setIsEmailValid(isValidEmail(event.target.value));
 	}
 	return (
 		<div className="flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting p-8" >
-			<div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900 bg-[#F1F2FD]">
-				<div className="p-4  overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
+			<div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900  bg-main-light-WHITE">
+				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
 					<img src={userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl"/>
-					<label htmlFor="file" id="uploadbtn" className="gap-4">
-						<p onChange={handleFileChange} className="parPhoto dark:text-white text-black bolder font-extrabold font-900">
+					<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture">
+						{/* <p onChange={handleFileChange} className="parPhoto dark:text-white text-black bolder font-extrabold font-900">
 							TAKE A PHOTO
-						</p>
-						<svg className="w-6 h-6 dark:text-black text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+						</p> */}
+						{/* <svg className="w-6 h-6  dark:text-black text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
 							<path fillRule="evenodd" d="M7.5 4.586A2 2 0 0 1 8.914 4h6.172a2 2 0 0 1 1.414.586L17.914 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1.086L7.5 4.586ZM10 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm2-4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" clipRule="evenodd" />
+						</svg> */}
+
+						<svg className="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+							<path fillRule="evenodd" d="M12 3a1 1 0 0 1 .78.375l4 5a1 1 0 1 1-1.56 1.25L13 6.85V14a1 1 0 1 1-2 0V6.85L8.78 9.626a1 1 0 1 1-1.56-1.25l4-5A1 1 0 0 1 12 3ZM9 14v-1H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-4v1a3 3 0 1 1-6 0Zm8 2a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H17Z" clipRule="evenodd"/>
 						</svg>
+
 
 					</label>
 				</div>
@@ -351,7 +285,7 @@ function SettingFunction(): JSX.Element {
 					{/* <h2 className='-twof--part1'>2FA-AUTHENTICATION</h2> */}
 				</div>
 			</div>
-			<div className="part2 flex rounded-3xl flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center dark:bg-zinc-900 bg-[#F1F2FD] ">
+			<div className="part2 flex rounded-3xl flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE ">
 				<form className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] flex flex-col ">
 					<h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5 ">
 						Information
@@ -370,7 +304,7 @@ function SettingFunction(): JSX.Element {
 								value={firstName}
 								onChange={handleFirstNameChange}
 								maxLength={15}
-								className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+								className=" bg-main-light-WHITE border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			  dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 								placeholder="Mohamed"
 								autoComplete="OFF"
@@ -386,7 +320,7 @@ function SettingFunction(): JSX.Element {
 							</label>
 							<input type="text"
 								id="last_name" value={SecondName} onChange={handleSecondNameChange} maxLength={10}
-								className="bg-[#F1F2FD] border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+								className=" bg-main-light-WHITE border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			  dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
 								placeholder="Darify"
 								required

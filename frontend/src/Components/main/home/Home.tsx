@@ -8,7 +8,7 @@ import fire from './../../../assets/Icon/fire.svg';
 import play from './../../../assets/img/Play.svg'
 import videoSource from './../../../assets/avatars/490488ec-2f13-402b-b203-951e4a4775cd.mp4';
 import Chart from 'chart.js/auto';
-import { friendsService } from '../../../services/friend.service';
+import { FriendsService } from '../../../services/friend.service';
 import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
 import { Channel } from '../../../utils/types';
@@ -62,7 +62,7 @@ const HomeComponent: React.FC = () => {
         setProtectedChannels(userData[4]);
         setPublicChannels(userData[5]);
         const fetchFriends = async () => {
-            const friendService = new friendsService();
+            const friendService = new FriendsService();
             const friends = await friendService.getFriends(userData[0].id);
             if (friends.length !== 0) {
                 setFriends(friends);
@@ -304,7 +304,7 @@ const HomeComponent: React.FC = () => {
                 </section>
 
             </main>
-            <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit dark:bg-zinc-900 bg-[#F1F2FD]">
+            <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit dark:bg-zinc-900  bg-main-light-WHITE">
                 <div className="contain flex flex-col justify-between items-center mx-auto">
                     <div className="profile mt-2 w-12 h-12 bg-white">
                         <img src={userData[0].picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData[0].username} />

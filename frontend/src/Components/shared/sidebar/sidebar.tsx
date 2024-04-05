@@ -23,6 +23,7 @@ const paths = {
 }
 function SidebarComponent(): JSX.Element {
 	const location = useLocation();
+	const userData = useContext(DataContext);
 	const [activeIndex, setActiveIndex] = useState<number>(0);
 	const handleIconClick = (index: number) => {
 		setActiveIndex(index);
@@ -40,8 +41,8 @@ function SidebarComponent(): JSX.Element {
 	const icons = [
 		{ icon: <HomeIcon activeIndex={activeIndex} />, label: 'Home', path: Paths.EMPTY },
 		{ icon: <ProfileIcon activeIndex={activeIndex} />, label: (Paths.PROFILE), path: Paths.PROFILE },
-		{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path: Paths.ANALYTICS },
 		{ icon: <ChatIcon activeIndex={activeIndex} />, label: 'Chat', path: Paths.CHAT},
+		{ icon: <AnalyticsIcon activeIndex={activeIndex} />, label: 'Analytics', path: Paths.ANALYTICS },
 		{ icon: <SettingsIcon activeIndex={activeIndex} />, label: 'Settings', path: Paths.SETTINGS }
 	];
 
@@ -51,7 +52,7 @@ function SidebarComponent(): JSX.Element {
 			<img src={logo} alt="Logo" className="mx-auto pt-10" />
 			<div className="flex flex-col justify-center flex-grow mx-auto">
 				{icons.map((icon, index) => (
-					<NavLink to={icon.path} key={index} className="w-full">
+					<NavLink to={icon.path === 'profile' ?  icon.path + '/' + userData[0].id : icon.path} key={index} className="w-full">
 						<div
 							key={index}
 							className="px-3 py-4 rounded-lg justify-start items-center gap-3 flex cursor-pointer"

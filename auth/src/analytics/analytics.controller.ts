@@ -1,16 +1,46 @@
-import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, UseGuards } from "@nestjs/common";
 import { UserGuard } from "src/guards/user.guard";
 import { AnalyticsService } from "./analytics.service";
+import { User } from "src/user/entities/user.entity";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('game')
 @Controller('analytics')
 export class AnalyticsController {
     
     constructor(private readonly analyticsService: AnalyticsService) {}
 
+
+
     @Get('allGame/:userId')
     async getAllGame(@Param('userId') userId: string)
     {
         return this.analyticsService.getAllGame(userId);
+    }
+    
+    @Get('lastSevenDays/:playerId')
+    async getGamesPlayedByPlayerInLastSevenDays(
+        @Param('playerId') playerId: string,
+    ): Promise<number[]> {
+        const gamesPlayed = await this.analyticsService.getGamesPlayedByPlayerInLastSevenDays(playerId);
+        return gamesPlayed;
+        // return null;
+    }
+
+    @Get('top3')
+    async getPlayerByScore(): Promise<User[]> {
+        return this.analyticsService.getPlayerByScore();
+    }
+
+    @Get('lastGame/:userId')
+    async getLastGame(@Param('userId') userId: string)
+    {
+        return this.analyticsService.getLastGame(userId);
+    }
+
+    @Get("allPlayers")
+    async getAllPlayers() {
+        return this.analyticsService.getAllPlayers();
     }
     
     @Get(':userId/:friendId')
@@ -27,6 +57,9 @@ export class AnalyticsController {
         return this.analyticsService.profileData(userId);
     }
 
+   
+
+    
 
     // @Get('gameCount/:userId')
     // async gameCount(@Param('userId') userId: string){

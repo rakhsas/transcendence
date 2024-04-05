@@ -14,22 +14,22 @@ export class GameEntity {
   
 
   @Column({ type: 'int' })
-  user_scoore: number;
+  user_score: number;
 
   @Column({ type: 'int' })
-  player_scoore: number;
+  player_score: number;
 
   // @Column()
   // winnerId: string
 
-  @Column({type: 'int'})
+  @Column({type: 'int', nullable: true})
   TotalScoore: number
 
   @ManyToOne(() => User)
   winner: User;
 
-  @Column()
-  finishedAt: Date
+  @Column({ type: 'date', default: () => 'CURRENT_DATE' })
+    finishedAt: Date;
 }
 
 

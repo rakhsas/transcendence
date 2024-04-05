@@ -71,11 +71,11 @@ h5.l5{
     background-color: #31304D;
 }
 
-.picture--User{
+/* .picture--User{
     width: 55px;
     height: 55px;
     border-radius: 15px;
-}
+} */
 
 @media screen and (max-width: 750px) {
     .Achieve--Border, .math-info, .update{
@@ -85,3 +85,7 @@ h5.l5{
         width: 90%;
     }
 }
+/* .scrollBar-thumb
+{
+    background-color: red;
+} */

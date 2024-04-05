@@ -10,7 +10,6 @@ import HeadToHead from './Components/Game/headToHead.tsx';
 import chatComponent from './Components/main/chat/chat';
 import CallComponent from './Components/call/call';
 import ProfileComponent from './Components/main/profile/profile.tsx';
-import NotFoundComponent from './Components/error/FourHunFour.tsx';
 import SettingFunction from './Components/main/settings/settings.tsx';
 import FunctionProfileForm from './Components/main/profile/profile.tsx';
 // const url: string = import.meta.env.VITE_API_AUTH_KEY;
@@ -28,11 +27,12 @@ function App() {
           <Route path="chat" Component={chatComponent} />
           <Route path="call" element={<CallComponent />} />
           <Route path="settings" element={<SettingFunction />} />
-          <Route path="profile/*" element={<ProfileComponent />} />
+          <Route path="profile">
+            <Route path=':userId' element={<ProfileComponent />} />
+          </Route>
           <Route path="game" element={<Game />} />
           <Route path="HeadToHead" element={<HeadToHead />} />
           <Route path="profile" element={<FunctionProfileForm />} />
-          <Route path="*" element={<NotFoundComponent />} />
         </Route>
       </Routes>
     </>

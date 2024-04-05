@@ -1,4 +1,3 @@
-// import { Engine } from "@tsparticles/engine";
 import { Routes, Route, Outlet } from 'react-router-dom';
 import NavbarComponent from "../shared/navbar/navbar";
 import SidebarComponent from "../shared/sidebar/sidebar";
@@ -13,7 +12,7 @@ import LoadingComponent from '../shared/loading/loading';
 import { ChannelService } from '../../services/channel.service';
 import { Channel, notificationInterface } from '../../utils/types';
 import { NotificationService } from '../../services/notification.service';
-// const url: string = "wss://10.12.249.229";
+import { FriendsService } from '../../services/friend.service';
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
@@ -23,10 +22,12 @@ function DashboardComponent() {
 	const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
 	const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
 	const [notifications, setNotifications] = useState<notificationInterface[]>([]);
+	const [friends, setFriends] = useState<any>();
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const authService = new AuthService();
+				const friendsService = new FriendsService();
 				const fetchedPayloadData = await authService.getPayload();
 				const userService = new UserService();
 				const fetchedUserData = await userService.getUser(fetchedPayloadData.id);
@@ -41,6 +42,8 @@ function DashboardComponent() {
 				const notificationService = new NotificationService();
 				const notifications = await notificationService.getNotifications(fetchedUserData?.id);
 				setNotifications(notifications);
+				const fetchedFriends = await friendsService.getFriends(fetchedUserData?.id);
+				setFriends(fetchedFriends);
 				const socketCHAT: Socket = io(url, {
 					path: "/chat",
 					query: {
@@ -68,11 +71,15 @@ function DashboardComponent() {
 			globalSocket?.disconnect();
 		};
 	}, []);
+
+	socket?.on('updatedFriends', async (data: any) => {
+		setFriends(data);
+	})
 	if (!userData || !socket || !globalSocket || !users) {
 		return <LoadingComponent />;
 	}
 	return (
-		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications]}>
+		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full">

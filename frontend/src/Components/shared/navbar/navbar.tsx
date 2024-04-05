@@ -4,13 +4,10 @@ import { Button, CustomFlowbiteTheme, TextInput } from 'flowbite-react';
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../loading/loading";
 import { Socket } from "socket.io-client";
-import UserService from "../../../services/user.service";
 import User from "../../../model/user.model";
-import AuthService from "../../../services/auth.service";
-import { Message } from "@mui/icons-material";
-import { notificationInterface } from './../../../utils/types';
-import { ChannelService } from "../../../services/channel.service";
+import { notificationInterface } from './../../../utils/types'
 import { NotificationService } from "../../../services/notification.service";
+import { useNavigate } from "react-router-dom";
 
 const SearchIcon = () => (
     <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-black dark:stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -42,7 +39,11 @@ enum NotificationType {
     CALL_REQUEST = 'CALL_REQUEST',
     CHANNEL_MESSAGE = 'CHANNEL_MESSAGE',
     CHANNEL_INVITE = 'CHANNEL_INVITE',
-    ROOM_MESSAGE = 'ROOM_MESSAGE'
+    ROOM_MESSAGE = 'ROOM_MESSAGE',
+    FRIEND_REQUEST_ACCEPTED= 'FRIEND_REQUEST_ACCEPTED',
+    FRIEND_REQUEST_DECLINED= 'FRIEND_REQUEST_DECLINED',
+    KIKED = 'KIKED',
+
 }
 
 interface NotifMessage {
@@ -58,6 +59,7 @@ type notifItems = {
     type: NotificationType;
 }
 function NavbarComponent(): JSX.Element {
+    const APIURL = import.meta.env.VITE_FRONT_URL;
     const [isNotifOpen, setNotifIsOpen] = useState<boolean>(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [theme, setTheme] = useState(localStorage.theme);
@@ -65,10 +67,30 @@ function NavbarComponent(): JSX.Element {
     // const [notifications, setNotifications] = useState<notifItems[]>([]);
     const [notificationCount, setNotificationCount] = useState<boolean>(false);
     const [users, setUsers] = useState<User[]>([]);
-    const [searchInput, setSearchInput] = useState('');
+    const [searchInput, setSearchInput] = useState<string>('');
     const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [notifications, setNotifications] = useState<notificationInterface[]>([]);
+    const [greeting, setGreeting] = useState<string>('');
+    const navigate = useNavigate();
+    useEffect(() => {
+        const updateGreeting = () => {
+            const now = new Date();
+            const hour = now.getHours();
+        
+            if (hour < 12) {
+                setGreeting('Good Morning,');
+            } else if (hour < 18) {
+                setGreeting('Good Afternoon,');
+            } else {
+                setGreeting('Good Evening,');
+            }
+        };
+        updateGreeting();
+        const intervalId = setInterval(updateGreeting, 60000);
+    
+        return () => clearInterval(intervalId);
+    }, []);
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove(colorTheme);
@@ -81,7 +103,6 @@ function NavbarComponent(): JSX.Element {
     useEffect(() => {
         setUsers(userData[3]);
         setNotifications(userData[6]);
-        console.log('Notifications:', notifications);
     }, []);
     useEffect(() => {
         notifications.slice(0, 5).forEach(notif => {
@@ -102,6 +123,9 @@ function NavbarComponent(): JSX.Element {
         });
         setFilteredUsers(filtered);
     }, [searchInput]);
+    const handleNavigate = (id: string) => {
+        navigate(`/dashboard/profile/${id}`);
+    }
     const socket: Socket = userData[1];
     // const onRequestCall = async (data: any) => {
     //     setChannelNotifPayload(data);
@@ -134,9 +158,9 @@ function NavbarComponent(): JSX.Element {
             issuer: data.issuer,
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
-            channel: data.channel
+            channel: data.channel,
+            target: data.target
         }
-        console.log('New Item:', newItem);
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -157,7 +181,8 @@ function NavbarComponent(): JSX.Element {
             issuer: data.issuer,
             createdAt: data.createdAt,
             updatedAt: data.updatedAt,
-            channel: data.channel
+            channel: data.channel,
+            target: data.target
         }
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
@@ -168,7 +193,6 @@ function NavbarComponent(): JSX.Element {
     })
     socket?.on("channelJoinNotif", async (data: any) => {
         setChannelNotifPayload(data.payload);
-        console.log('Payload received from socket:', await channelNotifPayload);
         const newItem: notificationInterface = {
             id: data.lastnotif.id,
             type: data.lastnotif.type,
@@ -180,7 +204,119 @@ function NavbarComponent(): JSX.Element {
             issuer: data.lastnotif.issuer,
             createdAt: data.lastnotif.createdAt,
             updatedAt: data.lastnotif.updatedAt,
-            channel: data.lastnotif.channel
+            channel: data.lastnotif.channel,
+            target: data.lastnotif.target
+        }
+
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    })
+    socket?.on("friendRequestNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: data.type,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    })
+    socket?.on("friendRequestAcceptedNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: NotificationType.FRIEND_REQUEST_ACCEPTED,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    });
+    socket?.on("friendRequestDecinedNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: NotificationType.FRIEND_REQUEST_DECLINED,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    });
+    socket?.on("friendRequestNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: data.type,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    })
+    socket?.on("kickedNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: NotificationType.KIKED,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
         }
         const updatedItems: notificationInterface[] = [...notifications, newItem];
         updatedItems.sort((a, b) => {
@@ -190,23 +326,12 @@ function NavbarComponent(): JSX.Element {
         setNotificationCount(true);
     })
     const toogleSearchDropDown = () => {
-        console.log("isSearchOpen: ", isSearchOpen)
         setIsSearchOpen(!isSearchOpen);
-        console.log("isSearchOpen: ", isSearchOpen)
     };
     const document = window.document.querySelector('#dropdownNotification');
     document?.addEventListener('click', (e) => {
-        // const target = e.target as HTMLElement;
-        // if (target.id !== 'dropdownNotification') {
-            setNotifIsOpen(false);
-        // }
+        setNotifIsOpen(false);
     });
-    useEffect(() => {
-        console.log(notifications)
-    }, [notifications]);
-    useEffect(() => {
-        console.log(isNotifOpen)
-    }, [isNotifOpen]);
     const updateNotif = () => {
         const notificationService = new NotificationService();
         notifications.slice(0, 5).forEach(async (element: notificationInterface) => {
@@ -217,7 +342,7 @@ function NavbarComponent(): JSX.Element {
     return (
         <div className="p-4 flex flex-col sm:flex-row sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
-                <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased font-poppins">Good Evening,<span className="dark:text-white text-black uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
+                <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased font-poppins">{greeting}<span className="dark:text-white text-black uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
             </div>
             <div className="max-w-md pl-4 flex flex-col md:sm:flex-row sm:space-x-4 xs:space-x-2 xs:flex-row">
                 <div className="relative h-10 flex items-center">
@@ -235,7 +360,11 @@ function NavbarComponent(): JSX.Element {
                         {
                                 notifications && notifications.length > 0
                                     ?
-                                    notifications.slice(0, 5).map((item: notificationInterface, index) => {
+                                    notifications
+                                        .filter((item: notificationInterface) => !item.seen) // Filter unseen notifications
+                                        .slice(0, 5) // Take the first 5 unseen notifications
+                                        .map((item: notificationInterface, index) => {
+                                    // console.log('Notifications', item);
                                         if (item.type === NotificationType.MESSAGE) {
                                             return (
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -259,7 +388,6 @@ function NavbarComponent(): JSX.Element {
                                                                     <svg className="w-3 h-3 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                                                         <path fillRule="evenodd" d="M9 7V2.221a2 2 0 0 0-.5.365L4.586 6.5a2 2 0 0 0-.365.5H9Zm2 0V2h7a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9h5a2 2 0 0 0 2-2Zm2.318.052h-.002A1 1 0 0 0 12 8v5.293A4.033 4.033 0 0 0 10.5 13C8.787 13 7 14.146 7 16s1.787 3 3.5 3 3.5-1.146 3.5-3c0-.107-.006-.211-.017-.313A1.04 1.04 0 0 0 14 15.5V9.766c.538.493 1 1.204 1 2.234a1 1 0 1 0 2 0c0-1.881-.956-3.14-1.86-3.893a6.4 6.4 0 0 0-1.636-.985 4.009 4.009 0 0 0-.165-.063l-.014-.005-.005-.001-.002-.001ZM9 16c0-.356.452-1 1.5-1s1.5.644 1.5 1-.452 1-1.5 1S9 16.356 9 16Z" clipRule="evenodd"/>
                                                                     </svg>
-
                                                                 )
                                                         }
                                                         </div>
@@ -288,7 +416,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src="/docs/images/people/profile-picture-2.jpg" alt="Joseph image" />
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
@@ -297,8 +425,33 @@ function NavbarComponent(): JSX.Element {
                                                         </div>
                                                     </div>
                                                     <div className="w-full ps-3">
-                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Joseph Mcfall</span> and <span className="font-medium text-gray-900 dark:text-white">5 others</span> started following you.</div>
-                                                        <div className="text-xs text-blue-600 dark:text-blue-500">10 minutes ago</div>
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> sent you a friend request.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
+                                                        <div className="flex gap-2 w-fit">
+                                                        <Button color="success" pill onClick={() => {
+                                                            socket?.emit("acceptFriendRequest",
+                                                            {
+                                                                userId: userData[0].id,
+                                                                friendId: item.issuer.id
+                                                            }
+                                                            );
+                                                        }}>
+                                                            Accept
+                                                        </Button>
+                                                        <Button color="failure" pill onClick={() => {
+                                                            socket?.emit("declineFriendRequest",
+                                                            {
+                                                                userId: userData[0].id,
+                                                                friendId: item.issuer.id
+                                                            });
+                                                        }}>
+                                                            Decline
+                                                        </Button>
+                                                    </div>
                                                     </div>
                                                 </a>
                                             )
@@ -308,7 +461,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
@@ -318,9 +471,13 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                     <div className="w-fit px-2">
                                                         <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400 w-fit§">
-                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>: invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.channel?.name + '.'}</span>
+                                                            <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> : invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.channel?.name + '.'}</span>
                                                         </div>
-                                                        <div className="text-xs text-blue-600 dark:text-blue-500">few moments ago</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
                                                     </div>
                                                     <div className="flex gap-2 w-fit">
                                                         <Button color="success" pill onClick={() => {
@@ -349,23 +506,29 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                 </a>
                                             )
-                                        } else if (item.type === NotificationType.CallRequest) {
-                                            <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                <div className="flex-shrink-0">
-                                                    <div className="pic rounded-full w-11 h-11">
-                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.sender.picture} alt="Robert image" />
+                                        } else if (item.type === NotificationType.CALL_REQUEST) {
+                                            return (
+                                                <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-11 h-11">
+                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                                                            <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
+                                                        </svg>
+                                                        </div>
                                                     </div>
-                                                    <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
-                                                    <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
-                                                        <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
-                                                    </svg>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="w-full ps-3">
-                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
-                                                    <div className="text-xs text-blue-600 dark:text-blue-500">3 hours ago</div>
-                                                </div>
-                                            </a>
+                                                </a>
+                                            )
                                         }
                                         else if (item.type === NotificationType.CHANNEL_MESSAGE) {
                                             return (
@@ -392,7 +555,11 @@ function NavbarComponent(): JSX.Element {
                                                                 )
                                                             }
                                                         </div>
-                                                        <div className="text-xs text-main-light-FERN ">a few moments ago</div>
+                                                        <div className="text-xs text-main-light-FERN ">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
                                                     </div>
                                                 </a>
                                             )
@@ -411,9 +578,82 @@ function NavbarComponent(): JSX.Element {
                                                 </div>
                                                 <div className="w-full ps-3">
                                                     <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
-                                                    <div className="text-xs text-blue-600 dark:text-blue-500">3 hours ago</div>
+                                                    <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                        {
+                                                            new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                        }
+                                                    </div>
                                                 </div>
                                             </a>
+                                        )}
+                                        else if (item.type === NotificationType.FRIEND_REQUEST_ACCEPTED) {
+                                            return (
+                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-11 h-11">
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-yellow-300 border border-white rounded-full dark:border-gray-800">
+                                                            <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path fillRule="evenodd" d="M18 14a1 1 0 1 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 1 0 2 0v-2h2a1 1 0 1 0 0-2h-2v-2Z" clipRule="evenodd"/>
+                                                                <path fillRule="evenodd" d="M15.026 21.534A9.994 9.994 0 0 1 12 22C6.477 22 2 17.523 2 12S6.477 2 12 2c2.51 0 4.802.924 6.558 2.45l-7.635 7.636L7.707 8.87a1 1 0 0 0-1.414 1.414l3.923 3.923a1 1 0 0 0 1.414 0l8.3-8.3A9.956 9.956 0 0 1 22 12a9.994 9.994 0 0 1-.466 3.026A2.49 2.49 0 0 0 20 14.5h-.5V14a2.5 2.5 0 0 0-5 0v.5H14a2.5 2.5 0 0 0 0 5h.5v.5c0 .578.196 1.11.526 1.534Z" clipRule="evenodd"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> accepted your friend request.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            )
+                                        }
+                                        else if (item.type === NotificationType.FRIEND_REQUEST_DECLINED ) {return (
+                                            <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <div className="flex-shrink-0">
+                                                    <div className="pic rounded-full w-11 h-11">
+                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                                    </div>
+                                                    <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-red-500 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path fillRule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z" clipRule="evenodd"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full ps-3">
+                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> declined your friend request.</div>
+                                                    <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                        {
+                                                            new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                        else if (item.type === NotificationType.KIKED ) {return (
+                                            <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <div className="flex-shrink-0">
+                                                    <div className="pic rounded-full w-11 h-11">
+                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                                    </div>
+                                                    <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-red-500 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full ps-3">
+                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> Kiked You From <span className="text-green-500 font-medium font-onest">{item.channel.name}</span>.</div>
+                                                    <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                        {
+                                                            new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
                                         )}
                                     })
                             :
@@ -431,19 +671,23 @@ function NavbarComponent(): JSX.Element {
                     </svg>
                 </div>
                 <div className="group" onClick={() => { toogleSearchDropDown() }}>
-                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => setSearchInput(e.target.value)} />
+                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => {e.preventDefault(); setSearchInput(e.target.value)}} />
                     {
                         filteredUsers.length > 0 ? (
-                            <div className={`absolute mt-2 z-40 rounded-md shadow-lg dark:bg-neutral-700 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
-                                {filteredUsers.slice(0, 3).map((user, index) => (
-                                    <div key={index} className="flex flex-col">
-                                        <a className="flex justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white w-fit">
-                                            <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
-                                            <span>{user.firstName + ' ' + user.lastName}</span>
-                                        </a>
-                                    </div>
-                                ))}
-                            </div>
+                            <div className={`absolute mt-2 z-40 rounded-md shadow-lg dark:bg-neutral-700 md:w-64 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
+                                    {filteredUsers.slice(0, 3).map((user, index) => (
+                                        <div onClick={() => handleNavigate(user.id)} key={index} className="flex flex-col">
+                                            <div className="flex px-4 py-2 hover:bg-gray-100 w-full dark:hover:bg-gray-600 dark:hover:text-white">
+                                                <div className="pic">
+                                                    <img className="w-6 h-6 me-2 rounded-full" src={user.picture} alt="Jese image" />
+                                                </div>
+                                                <div className="info">
+                                                    <span>{user.firstName + ' ' + user.lastName}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                         ) : ''
                     }
                 </div>
@@ -457,8 +701,8 @@ function NavbarComponent(): JSX.Element {
         //         </a>
         //         <div className="sm:hidden">
         //             <button type="button" className="hs-collapse-toggle p-2 inline-flex justify-center items-center gap-x-2 rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-transparent dark:border-gray-700 dark:text-white dark:hover:bg-white/10 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-collapse="#navbar-image-2" aria-controls="navbar-image-2" aria-label="Toggle navigation">
-        //             <svg className="hs-collapse-open:hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
-        //             <svg className="hs-collapse-open:block hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        //             <svg className="hs-collapse-open:hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+        //             <svg className="hs-collapse-open:block hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         //             </button>
         //         </div>
         //         </div>
