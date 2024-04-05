@@ -24,6 +24,24 @@ interface ButtonAttributes {
 	onClick?: () => void;
 }
 
+const levels = [
+	{ level: 1, minScore: 0, maxScore: 100 },
+	{ level: 1.5, minScore: 101, maxScore: 200 },
+	{ level: 2, minScore: 201, maxScore: 300 },
+	// Add more levels and score ranges as needed
+  ];
+  
+  function getProgress(score: number) {
+	for (let i = 0; i < levels.length; i++) {
+	  if (score >= levels[i].minScore && score <= levels[i].maxScore) {
+		const levelRange = levels[i].maxScore - levels[i].minScore;
+		const scoreWithinLevel = score - levels[i].minScore;
+		return (i + scoreWithinLevel / levelRange) / levels.length * 100;
+	  }
+	}
+	return 0;
+  }
+
 const validAchie: string[] = [Achei, Achei1, Achei2, Achei3, Achei4];
 const validName: string[] = [
 	'Play The First Game',
@@ -50,6 +68,8 @@ const FunctionProfileForm: React.FC = () => {
 	const [score, setScore] = useState<gameScores[]>([]);
 	const [totalGames, setTotalGames] = useState<any>();
 	const [socketChat, setSocketChat] = useState<Socket>();
+	const [progress, setProgress] = useState<number>(0);
+	// const progress = 22;
 	// console.log("--------> ", totalGames);
 	// console.log(totalGames.gamePlayed, "| -> totalgame <- | ");
 	const achievements = [
@@ -143,7 +163,7 @@ const FunctionProfileForm: React.FC = () => {
 	return (
 		<div className="body m-4 flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting">
 			<div className="side1 flex flex-col gap-4 items-center w-full md:min-w-[35%] min-h-full overflow-hidden">
-				<div className="w-full md:w-[85%] h-1/2 p-4 flex justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE border-gray-200 rounded-3xl shadow overflow-hidden">
+				<div className="w-full md:w-[85%] h-1/2 p-4 flex flex-col justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE border-gray-200 rounded-3xl shadow overflow-hidden">
 					<div className="flex flex-col p-2 items-center w-full">
 						<div className="flex justify-center items-center p-1 w-full">
 							<div className={`relative border-2 rounded-full `} style={{
@@ -173,6 +193,15 @@ const FunctionProfileForm: React.FC = () => {
 							)
 						}
 					</div>
+					
+						<div className="progress-bar-container">
+							<div
+								className="progress-bar"
+								style={{ width: `${progress}%` }}
+							/>
+							<span className="progress-label">{progress.toFixed(2)}%</span>
+						</div>
+					
 				</div>
 				<div className='w-full md:w-[85%] flex flex-col justify-between p-4 rounded-3xl items-center h-[75vh] dark:bg-zinc-900  bg-main-light-WHITE'>
 					<div className="header w-full overflow-hidden text-center py-2.5">

@@ -60,6 +60,7 @@ type notifItems = {
 }
 function NavbarComponent(): JSX.Element {
     const APIURL = import.meta.env.VITE_FRONT_URL;
+    const BASE_API_URL = import.meta.env.VITE_API_AUTH_KEY;
     const [isNotifOpen, setNotifIsOpen] = useState<boolean>(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [theme, setTheme] = useState(localStorage.theme);
@@ -102,6 +103,7 @@ function NavbarComponent(): JSX.Element {
         return <LoadingComponent />
     useEffect(() => {
         setUsers(userData[3]);
+        console.log('Users', userData[3]);
         setNotifications(userData[6]);
     }, []);
     useEffect(() => {
@@ -370,7 +372,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-12 h-12">
-                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Jese image" />
+                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={BASE_API_URL + item.issuer.picture} alt="Jese image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-green-400 border border-white rounded-full dark:border-gray-800">
                                                             {
@@ -412,11 +414,12 @@ function NavbarComponent(): JSX.Element {
                                             )
                                         }
                                         else if (item.type === NotificationType.FRIEND_REQUEST) {
+                                        console.log('Friend Request', item);
                                             return (
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={APIURL + BASE_API_URL + item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
@@ -461,7 +464,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={APIURL + BASE_API_URL + item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
@@ -511,7 +514,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={APIURL + BASE_API_URL + item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
                                                         <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
@@ -535,7 +538,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-12 h-12">
-                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Jese image" />
+                                                            <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={APIURL + BASE_API_URL + item.issuer.picture} alt="Jese image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-main-light-FERN border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -568,7 +571,7 @@ function NavbarComponent(): JSX.Element {
                                             <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                 <div className="flex-shrink-0">
                                                     <div className="pic rounded-full w-11 h-11">
-                                                        <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt="Robert image" />
+                                                        <img className="h-fullobject-cover bg-contain bg-no-repeat bg-center" src={APIURL + BASE_API_URL + item.issuer.picture} alt="Robert image" />
                                                     </div>
                                                     <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
                                                         <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
@@ -591,7 +594,7 @@ function NavbarComponent(): JSX.Element {
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={APIURL + BASE_API_URL + item.issuer.picture} alt={item.issuer.username} />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-yellow-300 border border-white rounded-full dark:border-gray-800">
                                                             <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -615,7 +618,7 @@ function NavbarComponent(): JSX.Element {
                                             <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                 <div className="flex-shrink-0">
                                                     <div className="pic rounded-full w-11 h-11">
-                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={APIURL + BASE_API_URL + item.issuer.picture} alt={item.issuer.username} />
                                                     </div>
                                                     <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-red-500 border border-white rounded-full dark:border-gray-800">
                                                         <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -637,7 +640,7 @@ function NavbarComponent(): JSX.Element {
                                             <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                 <div className="flex-shrink-0">
                                                     <div className="pic rounded-full w-11 h-11">
-                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={APIURL + BASE_API_URL + item.issuer.picture} alt={item.issuer.username} />
                                                     </div>
                                                     <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-red-500 border border-white rounded-full dark:border-gray-800">
                                                         <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
