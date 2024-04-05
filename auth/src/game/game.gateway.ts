@@ -39,21 +39,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleRandomMatch(client: any) {
     const id = await this.gameService.GuardsConsumer(client);
     console.log('idGame: ', id);
-    // if (this.waitingPlayers.find((player) => player.id === id)) {
-    //   this.server.to(client.id).emit('inGame');
-    //   return;
-    // }
-    // if (this.waitingFriend.find((player) => player.id === id)) {
-    //   this.server.to(client.id).emit('inGame');
-    //   return;
-    // }
-    // for (const id in this.rooms) {
-    //   const player = this.rooms[id].players.find((p) => p.id === id);
-    //   if (player) {
-    //     this.server.to(client.id).emit('inGame');
-    //     return;
-    //   }
-    // }
+    if (this.waitingPlayers.find((player) => player.id === id)) {
+      this.server.to(client.id).emit('inGame');
+      return;
+    }
+    if (this.waitingFriend.find((player) => player.id === id)) {
+      this.server.to(client.id).emit('inGame');
+      return;
+    }
+    for (const id in this.rooms) {
+      const player = this.rooms[id].players.find((p) => p.id === id);
+      if (player) {
+        this.server.to(client.id).emit('inGame');
+        return;
+      }
+    }
     this.waitingPlayers.push({ id: id, socket: client });
     this.matchPlayers();
   }
