@@ -92,7 +92,8 @@ class Game {
     canvas: HTMLCanvasElement,
     socket: Socket,
     roomId: string,
-    index: number
+    index: number,
+    map: string
   ) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
@@ -104,7 +105,7 @@ class Game {
     this.computer = new Computer(canvas);
     this.ball = new Ball(canvas);
     this.img = new Image();
-    this.img.src = IMG;
+    this.img.src = map;
     this.rotation = 0; // Initialize rotation angle to 0
     this.isDragging = false;
     // Mouse position when the drag starts
@@ -240,7 +241,7 @@ class Game {
 
   render() {
     this.drawRect(0, 0, this.canvas.width, this.canvas.height, "black");
-    //this.ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.drawImage(this.img, 0, 0, this.canvas.width, this.canvas.height);
 
     this.drawText(
       this.user.score,
