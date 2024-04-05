@@ -2,7 +2,7 @@ import Canvas from './Canvas/Canvas'
 
 const Game = () => {
   return (
-    <div className='h-lvh flex justify-center items-center'>
+      <div className="flex m-auto  border-2 border-red-600 rounded-xl">
       <Canvas
         width="600"
         height="400"
