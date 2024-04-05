@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { GameEntity } from "src/user/entities/game.entity";
 import { User } from "src/user/entities/user.entity";
-import { Repository } from "typeorm";
+import { Between, Repository } from "typeorm";
 
 
 @Injectable()
@@ -73,6 +73,7 @@ export class AnalyticsService {
         .createQueryBuilder('game')
         .leftJoin('game.winner', 'winner')
         .where('winner.id = :userId', {userId})
+        .andWhere('game.player1.id = :userId', {userId})
         .getCount();
 
         const gameWithMaxScore = await this.gameRepository
@@ -98,5 +99,39 @@ export class AnalyticsService {
               },
               take: 3, 
         });
+    }
+
+
+
+    async getGamesPlayedByPlayerInLastSevenDays(playerId: string): Promise<number[]> {
+        const currentDate = new Date();
+        const pastSevenDays = [];
+
+        // Generate past seven days
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(currentDate);
+            date.setDate(date.getDate() - i);
+            pastSevenDays.push(date);
+        }
+
+        const gamesPlayedPromises = pastSevenDays.map(async (date) => {
+            const startOfDay = new Date(date);
+            startOfDay.setHours(0, 0, 0, 0);
+
+            const endOfDay = new Date(date);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            const games = await this.gameRepository.count({
+                where: {
+                    player1:{id: playerId},
+                    finishedAt: Between(startOfDay, endOfDay),
+                },
+            });
+            console.log("------------>: " , games);
+            return games;
+        });
+
+        const gamesPlayed = await Promise.all(gamesPlayedPromises);
+        return gamesPlayed;
     }
 }

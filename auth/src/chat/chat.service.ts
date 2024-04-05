@@ -13,6 +13,7 @@ import { UserRole } from '../user/entities/channel_member.entity';
 import { UserService } from 'src/user/user.service';
 import { ChannelService } from 'src/channel/channel.service';
 import { Banned } from 'src/user/entities/ban.entity';
+import { Blocked } from 'src/user/entities/blocked.entity';
 
 @Injectable()
 export class ChatService {
@@ -30,6 +31,8 @@ export class ChatService {
     @InjectRepository(Banned)
     private readonly BanRepository: Repository<Banned>,
     private userService: UserService,
+    @InjectRepository(Blocked)
+    private readonly blockRepository: Repository<Blocked>,
     private channelService: ChannelService,
   ) {}
 
@@ -52,6 +55,17 @@ export class ChatService {
 
   // ================================= Users functions ================================================================================
 
+  // async handleBlockUse(payload: any): Promise<void>
+	// 	{
+	// 		// the userId and the id the user you want to block
+	// 		const newRecord = this.blockRepository.create({
+	// 			user: {id: payload.userId},
+	// 			blockedUser: {id: payload.blockTargetedId}
+	// 		});
+
+	// 		return this.blockRepository.save(newRecord);
+	// 	}
+
   async banUser(payload: any){
     const newRecord = this.BanRepository.create({
       user: {id: payload.userId},
@@ -60,6 +74,18 @@ export class ChatService {
     this.BanRepository.save(newRecord);
  }
 
+ async isBanned(payload: any) {
+  const newRecord = this.BanRepository.find({
+      // where: {id: payload.userId},
+      /*
+        where: {user: {id: payload.userId},
+                
+        }
+      */
+      
+  });
+  // this.BanRepository.save(newRecord);
+}
   // async areUsersBlocked(IdSender: UUID, idReceiver: UUID): Promise<boolean> {
   //   const sender = await this.userRepository.findOne({ where: { id: IdSender }, select: { blocks: true } });
   //   const receiver = await this.userRepository.findOne({ where: { id: idReceiver }, select: { blocks: true } });
@@ -234,23 +260,22 @@ export class ChatService {
    */
   async kickUserFromChannel(payload: any)
   {
-    console.log("kickUserFromChannel: ", payload);
+    console.log("payload", payload);
     const targetedEntity = await this.channelUserRepository.findOne({
       where: {
         channel: {id: payload.channelId},
         user: {
-          id: payload.userId
+          id: payload.target
         }
       },
       relations: ['user'],
     });
-    console.log("targetedEntity: ", targetedEntity);
-    // if (targetedEntity)
-    // {
-    //   await this.channelUserRepository.delete(targetedEntity.id);
-    // }
-    // else
-    //   console.log("the user in channel-user relation is not found!!!");
+    if (targetedEntity)
+    {
+      await this.channelUserRepository.delete(targetedEntity.id);
+    }
+    else
+      console.log("the user in channel-user relation is not found!!!");
   }
 
   async changeChannelType(payload: any)
@@ -285,7 +310,6 @@ export class ChatService {
   // =============================== Mute functions ================================================
   async muteUser(payload: any) {
     const newEntity = this.muteRepository.create({
-      finishAt: payload.endOfMute,
       userId: payload.userId,
       cid: payload.channelId
     })

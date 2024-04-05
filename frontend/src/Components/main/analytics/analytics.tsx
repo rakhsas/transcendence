@@ -1,5 +1,5 @@
 // import Chart from 'chart.js/auto';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import './analytics.css';
 import { useContext, useEffect, useState } from 'react';
 import User from '../../../model/user.model';
@@ -15,6 +15,7 @@ function AnalyticsComponent(): JSX.Element {
     const [top3, setTop3] = useState<User[]>([]);
     const [other_players, setOtherPlayers] = useState<User[]>([]);
     const [ikhan, setIkhan] = useState<any>(null);
+    const [lastSevenDays, setLastSevenDay] = useState<[]> ([]);
     const gameService = new GameService();
     const analyticsService = new AnalyticsService();
     useEffect(() => {
@@ -30,12 +31,37 @@ function AnalyticsComponent(): JSX.Element {
                 result.splice(0, 3);
             setOtherPlayers(result);
             // setOtherPlayers([]);
-
         }
+
+        
 
         fetchTop3();
         otherPlayer();
     }, []);
+
+
+
+    const currentDate = new Date();
+    const labels = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(currentDate);
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString()); // Format the date as desired
+    }
+
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Games Played',
+                data: lastSevenDays,
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+            },
+        ],
+    };
+
 
     useEffect(() => {
         if (!userData)
@@ -44,8 +70,11 @@ function AnalyticsComponent(): JSX.Element {
             const result = await gameService.getLastGame(userData[0].id);
             // console.log("the ressult is : ", result);
             setIkhan(result)
-            // console.log("=-=--=-=-=-=-=-=-=-=>>> ", ikhan);
+            const result1 = await analyticsService.lastSevenDays(userData[0].id);
+            setLastSevenDay(result1);
         }
+
+        // fetchSevenDays()
         fetchLastGame()
     }, [userData])
     if (!userData)
@@ -88,7 +117,7 @@ function AnalyticsComponent(): JSX.Element {
                             ) : (
                             other_players.map((_user, index) => (
                                 <div className='bg-white row-cards dark:bg-black' key={index}>
-                                    <p className='rank text-black dark:text-white font-poppins'>{index + 3}</p>
+                                    <p className='rank text-black dark:text-white font-poppins'>{index + 4}</p>
                                     <div className="image-wrappear">
                                         <img className='profile-img' src={_user.picture} alt="" />
                                     </div>
@@ -132,15 +161,19 @@ function AnalyticsComponent(): JSX.Element {
                         </div>
                     </div>
                     <div className="statistics bg-white dark:bg-black">
-                        <Bar
+                        <Line data={data} />
+                        {/* <Line
                             data={{
                                 labels: ["Day 1", "Day2", "Day 3"],
                                 datasets: [{
                                     label: "games played in each Day",
                                     data: [5, 3, 7],
+                                    fill: false,
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    tension: 0.1,
                                     backgroundColor: '#3DBDA7',
                                 }]
-                            }} />
+                            }} /> */}
                     </div>
                 </div>
             </div>

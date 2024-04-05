@@ -21,18 +21,24 @@ import { Banned } from 'src/user/entities/ban.entity';
 import { FreindsModule } from 'src/friends/friends.module';
 import { FriendService } from 'src/friends/friends.service';
 import { Friendship } from 'src/user/entities/freindship.entity';
+import { MuteController } from 'src/mute/mute.controller';
+import { MuteService } from 'src/mute/mute.service';
+import { BannedController } from 'src/banned/banned.controller';
+import { BannedService } from 'src/banned/banned.service';
+import { Blocked } from 'src/user/entities/blocked.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser, Notif, Banned, Friendship]),
+    TypeOrmModule.forFeature([Msg, User, Channel, Mute, ChannelUser, Notif, Banned, Friendship, Blocked]),
     UserModule,
     NotificationModule,
-    FreindsModule
+    FreindsModule,
+
     // ChannelModule
   ],
-  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService, NotificationService, FriendService],
+  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService, NotificationService, BannedService, FriendService, MuteService],
   // providers: [ChatService, ChatGateway, Repository, MsgController, MsgRepository, UserRepository],
-  controllers: [ChatController],
+  controllers: [ChatController, MuteController, BannedController],
   // exports: [MsgRepository, UserRepository]
 })
 export class ChatModule {}

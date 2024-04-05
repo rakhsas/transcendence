@@ -28,8 +28,8 @@ export class GameEntity {
   @ManyToOne(() => User)
   winner: User;
 
-  @Column({nullable: true})
-  finishedAt: Date
+  @Column({ type: 'date', default: () => 'CURRENT_DATE' })
+    finishedAt: Date;
 }
 
 

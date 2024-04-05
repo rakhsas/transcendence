@@ -42,6 +42,7 @@ enum NotificationType {
     ROOM_MESSAGE = 'ROOM_MESSAGE',
     FRIEND_REQUEST_ACCEPTED= 'FRIEND_REQUEST_ACCEPTED',
     FRIEND_REQUEST_DECLINED= 'FRIEND_REQUEST_DECLINED',
+    KIKED = 'KIKED',
 
 }
 
@@ -113,7 +114,6 @@ function NavbarComponent(): JSX.Element {
     }, [notifications]);
     useEffect(() => {
         if (!searchInput) {
-            console.log('test')
             setFilteredUsers([]);
             return;
         }
@@ -215,7 +215,6 @@ function NavbarComponent(): JSX.Element {
         setNotifications(updatedItems);
         setNotificationCount(true);
     })
-
     socket?.on("friendRequestNotif", async (data: any) => {
         const newItem: notificationInterface = {
             id: data.id,
@@ -238,7 +237,6 @@ function NavbarComponent(): JSX.Element {
         setNotifications(updatedItems);
         setNotificationCount(true);
     })
-
     socket?.on("friendRequestAcceptedNotif", async (data: any) => {
         const newItem: notificationInterface = {
             id: data.id,
@@ -287,6 +285,28 @@ function NavbarComponent(): JSX.Element {
         const newItem: notificationInterface = {
             id: data.id,
             type: data.type,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    })
+    socket?.on("kickedNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: NotificationType.KIKED,
             message: data.message,
             audio: data.audio,
             image: data.image,
@@ -613,6 +633,28 @@ function NavbarComponent(): JSX.Element {
                                                 </div>
                                             </div>
                                         )}
+                                        else if (item.type === NotificationType.KIKED ) {return (
+                                            <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <div className="flex-shrink-0">
+                                                    <div className="pic rounded-full w-11 h-11">
+                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={item.issuer.picture} alt={item.issuer.username} />
+                                                    </div>
+                                                    <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-red-500 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full ps-3">
+                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> Kiked You From <span className="text-green-500 font-medium font-onest">{item.channel.name}</span>.</div>
+                                                    <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                        {
+                                                            new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     })
                             :
                             null
@@ -659,8 +701,8 @@ function NavbarComponent(): JSX.Element {
         //         </a>
         //         <div className="sm:hidden">
         //             <button type="button" className="hs-collapse-toggle p-2 inline-flex justify-center items-center gap-x-2 rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-transparent dark:border-gray-700 dark:text-white dark:hover:bg-white/10 dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" data-hs-collapse="#navbar-image-2" aria-controls="navbar-image-2" aria-label="Toggle navigation">
-        //             <svg className="hs-collapse-open:hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" stroke-linecap="round" strokeLinejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
-        //             <svg className="hs-collapse-open:block hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" stroke-linecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        //             <svg className="hs-collapse-open:hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
+        //             <svg className="hs-collapse-open:block hidden flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         //             </button>
         //         </div>
         //         </div>

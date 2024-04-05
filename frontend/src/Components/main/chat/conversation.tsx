@@ -76,7 +76,6 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 							</div>
 						) : (
 							latestMessages.map((message: any, index) => (
-								console.log(message),
 								<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 									handleSelectMessage(
 										index.toString(),
@@ -140,7 +139,6 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 				<Tabs.Item title="Rooms" icon={RiWechatChannelsFill}>
 					{lstGroupMessages.map((item, index) => {
 						const channel = item.channel;
-						console.log("channel: ", baseAPIUrl + channel.picture);
 						return (
 							<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 								

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, UseGuards } from "@nestjs/common";
 import { UserGuard } from "src/guards/user.guard";
 import { AnalyticsService } from "./analytics.service";
 import { User } from "src/user/entities/user.entity";
@@ -18,6 +18,15 @@ export class AnalyticsController {
         return this.analyticsService.getAllGame(userId);
     }
     
+    @Get('lastSevenDays/:playerId')
+    async getGamesPlayedByPlayerInLastSevenDays(
+        @Param('playerId') playerId: string,
+    ): Promise<number[]> {
+        const gamesPlayed = await this.analyticsService.getGamesPlayedByPlayerInLastSevenDays(playerId);
+        return gamesPlayed;
+        // return null;
+    }
+
     @Get('top3')
     async getPlayerByScore(): Promise<User[]> {
         return this.analyticsService.getPlayerByScore();

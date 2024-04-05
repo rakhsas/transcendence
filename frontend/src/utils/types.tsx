@@ -75,3 +75,12 @@ export interface totalGames {
     gameWon: number;
     gameWithMaxScore: number;
 }
+
+export interface MutedUsers {
+    id: number;
+    createdAt: Date;
+    finishedAt: Date;
+    finished: boolean;
+    userId: string;
+    cid: number;
+}

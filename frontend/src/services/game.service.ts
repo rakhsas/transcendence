@@ -25,6 +25,7 @@ export class GameService {
             throw error;
         }
     }
+
     async getTotalMatches(userId: string): Promise<any> {
         try {
             const APIURL = import.meta.env.VITE_API_AUTH_KEY;
@@ -51,6 +52,9 @@ export class GameService {
             throw error;
         }
     }
+
+
+    
 
     async getLastGame(userId: string): Promise<any> {
         try {

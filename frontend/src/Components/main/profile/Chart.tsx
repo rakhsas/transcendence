@@ -30,7 +30,7 @@ const CreatChartDesign: React.FC<gameProps> = ({ user, totalGames }) => {
         labels: [ `Played Games`, 'Win Games'],
         datasets: [{
             label: '',
-            data: [totalGames?.gamePlayed, totalGames?.gameWon],
+            data: [totalGames?.gamePlayed || 0, totalGames?.gameWon || 0],
             backgroundColor: ['#059669', user?.coalitionColor || ''],
             fontWeight: 'bold'
         }],
@@ -40,17 +40,17 @@ const CreatChartDesign: React.FC<gameProps> = ({ user, totalGames }) => {
             legend: {
                 display: false
             }
-        }
+        },
+        mainAspectRatio: false,
+        responsive: true,
     }
     return (
-        <div className='appChart  no-scrollbar'>
-            <div className="w-full">
+        <div className='h-full w-full'>
                 <Doughnut
                     data={data}
                     options={options}
                 >
                 </Doughnut>
-            </div>
         </div>
     )
 }
