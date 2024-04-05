@@ -113,7 +113,7 @@ h5.l5{
     left: 50%;
     transform: translateX(-50%);
     line-height: 20px;
-    color: white;
+    /* color: white; */
     font-size: 12px;
   }
   

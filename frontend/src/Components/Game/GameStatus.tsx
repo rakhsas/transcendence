@@ -7,8 +7,9 @@ interface Data {
     username: string;
     picture: string;
 }
-
+import "./game.css"
 const GameStatus = (props: { socket: Socket | null; roomId: string }) => {
+  const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
   const { socket, roomId } = props;
   const userData = useContext(DataContext);
   if (!userData) <LoadingComponent />;
@@ -35,13 +36,13 @@ const GameStatus = (props: { socket: Socket | null; roomId: string }) => {
       {data ? (
         <>
           <div className="flex items-center gap-3 m-2">
-            <Avatar img={userData[0].picture} rounded alt="player photo" />
+            <Avatar img={baseAPIUrl + userData[0].picture} className="object-cover" rounded alt="player photo" />
             <span className="hidden sm:block ">{userData[0].username}</span>
           </div>
           <p>VS</p>
           <div className="flex items-center gap-3 m-2">
             <span className="hidden sm:block ">{data.username}</span>
-            <Avatar img={data.picture} alt="player photo" rounded />
+            <Avatar img={baseAPIUrl + data.picture} className="object-cover"  alt="player photo" rounded />
           </div>
         </>
       ) : (

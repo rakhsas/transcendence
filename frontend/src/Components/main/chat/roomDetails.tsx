@@ -203,7 +203,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 														<li key={index} className="mx-2 bg-zinc-800 rounded">
 															<div className="flex flex-row gap-2 w-full h-12 rounded justify-between items-center px-2">
 																<div className="pic">
-																	<img src={user.picture} className="w-8 h-8 rounded-full" />
+																	<img src={baseAPIUrl + user.picture} className="w-8 h-8 rounded-full" />
 																</div>
 																<div className="info">
 																	<span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
@@ -242,7 +242,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 												<div key={index} className="">
 													<a className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
 														<div className="flex-shrink-0">
-															<img className="rounded-full w-11 h-11" src={user.picture} alt={user.firstName + ' ' + user.lastName} />
+															<img className="rounded-full w-11 h-11" src={baseAPIUrl + user.picture} alt={user.firstName + ' ' + user.lastName} />
 														</div>
 														<div className="w-full ps-3">
 															<div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">

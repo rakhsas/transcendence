@@ -3,7 +3,7 @@ import { Bar, Line } from 'react-chartjs-2';
 import './analytics.css';
 import { useContext, useEffect, useState } from 'react';
 import User from '../../../model/user.model';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import DataContext from '../../../services/data.context';
 import LoadingComponent from '../../shared/loading/loading';
 import { GameService } from '../../../services/game.service';
@@ -11,7 +11,8 @@ import { AnalyticsService } from '../../../services/analytics.service';
 
 function AnalyticsComponent(): JSX.Element {
     const userData = useContext(DataContext);
-
+	const BASE_API_URL = import.meta.env.VITE_API_AUTH_KEY;
+    const navigate = useNavigate();
     const [top3, setTop3] = useState<User[]>([]);
     const [other_players, setOtherPlayers] = useState<User[]>([]);
     const [ikhan, setIkhan] = useState<any>(null);
@@ -53,7 +54,7 @@ function AnalyticsComponent(): JSX.Element {
         labels.push(date.toLocaleDateString()); // Format the date as desired
     }
 
-    const data = {
+    const data1 = {
         labels: labels,
         datasets: [
             {
@@ -101,13 +102,13 @@ function AnalyticsComponent(): JSX.Element {
                             ) : (
                             top3.map((user, index) => (
                                 <div className='dark:bg-black bg-white first-cards' id='one' key={index}>
-                                    <img src={user.picture} alt="" />
+                                    <img src={BASE_API_URL + user.picture} alt="" />
                                     <h3 className='dark:text-white text-black fullName font-poppins '>{user.firstName} {user.lastName}</h3>
                                     <p className='login font-poppins'>{user.username}</p>
                                     {/* <Link to="https://10.11.42.174/dashboard/"> */}
-                                    <Link className='btn-profile font-poppins' to={`https://10.11.42.174/dashboard/profile/${user.id}`}>
+                                    <div className='btn-profile font-poppins' onClick={() => navigate(`/dashboard/profile/${user.id}`)}>
                                         Profile
-                                    </Link>
+                                    </div>
 
                                     {/* <button className='btn-profile font-poppins'>Profile</button> */}
                                     <span className='dark:text-white!important rank font-poppins'>{index + 1}</span>
@@ -128,16 +129,17 @@ function AnalyticsComponent(): JSX.Element {
                                 <div className='bg-white row-cards dark:bg-black' key={index}>
                                     <p className='rank text-black dark:text-white font-poppins'>{index + 4}</p>
                                     <div className="image-wrappear">
-                                        <img className='profile-img' src={_user.picture} alt="" />
+                                        <img className='profile-img' src={BASE_API_URL + _user.picture} alt="" />
                                     </div>
                                     <div className='info absolute left-1/4'>
                                         <h4 className='text-black dark:text-white fullName font-poppins'>{_user.firstName} {_user.lastName}</h4>
                                         <p className='text-black dark:text-white login font-poppins'>{_user.username}</p>
                                     </div>
                                     {/* <button className='btn-profile font-poppins'>profile</button> */}
-                                    <Link className='btn-profile font-poppins' to={`https://10.11.42.174/dashboard/profile/${_user.id}`}>
+                                    <div className='btn-profile font-poppins' onClick={() => navigate(`/dashboard/profile/${_user.id}`)}>
                                         Profile
-                                    </Link>
+                                    </div>
+
                                     <span className='text-black dark:text-white score font-poppins'>Score <br />{_user.score}</span>
                                 </div>
                             ))
@@ -151,7 +153,7 @@ function AnalyticsComponent(): JSX.Element {
                         <div className="profile-title text-black dark:text-white font-poppins">Profile</div>
                         <div className="midle-content">
                             <div className="user-info">
-                                <img className='profile-img' src={userData[0].picture} alt="" />
+                                <img className='profile-img' src={BASE_API_URL + userData[0].picture} alt="" />
                                 <div className="info">
                                     <h4 className='fullName text-black dark:text-white font-poppins'>{userData[0].firstName} {userData[0].lastName}</h4>
                                     <p className='login text-black dark:text-white font-poppins'>{userData[0].username}</p>
@@ -170,7 +172,7 @@ function AnalyticsComponent(): JSX.Element {
                         </div>
                     </div>
                     <div className="statistics bg-white dark:bg-black">
-                        <Line data={data} />
+                        {/* <Line data={data1} /> */}
                         {/* <Line
                             data={{
                                 labels: ["Day 1", "Day2", "Day 3"],

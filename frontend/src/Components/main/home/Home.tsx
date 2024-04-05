@@ -14,6 +14,8 @@ import User from '../../../model/user.model';
 import { Channel } from '../../../utils/types';
 import ModalComponent from '../../modal/modal';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import InfoModal from '../../modal/Info.modal';
 
 const group = () => {
     return (
@@ -54,9 +56,7 @@ const HomeComponent: React.FC = () => {
     const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
     const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    let chartInstance: Chart | null = null;
-    // if (!userData[0])
-    //     return <LoadingComponent />;
+    const firstLogin = Cookies.get('firstLogin');
     useEffect(() => {
         if (!userData) {
             return;
@@ -85,62 +85,7 @@ const HomeComponent: React.FC = () => {
             setGlobalSocket(globalSocket);
         };
         fetchFriends();
-        if (chartRef.current) {
-            const ctx = chartRef.current.getContext('2d');
-            if (ctx) {
-                chartInstance = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: [
-                            'Eating',
-                            'Drinking',
-                            'Sleeping',
-                            'Designing',
-                            'Coding',
-                        ],
-                        datasets: [{
-                            label: 'My First Dataset',
-                            data: [65, 59, 90, 81, 56],
-                            fill: true,
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderColor: 'rgb(255, 99, 132)',
-                            pointBackgroundColor: 'rgb(255, 99, 132)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(255, 99, 132)',
-                            pointBorderWidth: 0,
-                        }, {
-                            label: 'My Second Dataset',
-                            data: [28, 48, 40, 19, 96],
-                            fill: true,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgb(54, 162, 235)',
-                            pointBackgroundColor: 'rgb(54, 162, 235)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(54, 162, 235)'
-                        },]
-                    },
-                    options: {
-                        elements: {
-                            line: {
-                                borderWidth: 3,
-                            }
-                        },
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false,
-                            }
-                        }
-                    },
-                });
-            }
-        }
         return () => {
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
             globalSocket?.disconnect();
         };
     }, [chartRef, userData]);
@@ -192,6 +137,11 @@ const HomeComponent: React.FC = () => {
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
+                {
+                    firstLogin === 'false' && (
+                        <InfoModal userData={userData}/>
+                    )
+                }
                 <section className="min-h-2/3 flex items-center justify-center p-2 flex-wrap lg:flex-nowrap">
                     <div className="w-full relative overflow-hidden p-4">
                         <div className="relative flex justify-between flex-col mt-8">
@@ -326,7 +276,7 @@ const HomeComponent: React.FC = () => {
                                         return (
                                             <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
                                                 <div className="img p-2" key={index}>
-                                                    <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full object-cover ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
+                                                    <img src={baseAPIUrl + friend.user.picture} className={`w-10 h-10 mx-auto rounded-full object-cover ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
                                                 </div>
                                                 <div className="absolute top-0 right-2 mb-1 mr-[1px]">
                                                     <div className={`w-4 h-4 rounded-full ${friend.status === 'online' ? 'bg-green-500' : 'bg-[#A5BAA9]'}  border-2 border-main-dark-SPRUCE`}></div>

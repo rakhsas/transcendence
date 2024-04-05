@@ -55,16 +55,23 @@ export class ChatService {
 
   // ================================= Users functions ================================================================================
 
-  // async handleBlockUse(payload: any): Promise<void>
-	// 	{
-	// 		// the userId and the id the user you want to block
-	// 		const newRecord = this.blockRepository.create({
-	// 			user: {id: payload.userId},
-	// 			blockedUser: {id: payload.blockTargetedId}
-	// 		});
+  async blockUser(payload: any): Promise<Blocked>
+  {
+        // the userId and the id the user you want to block
+      const user = this.userService.viewUser(payload.userId);
+      const BlockedUser = this.userService.viewUser(payload.blockedUserId);
+      
+      const blocked = new Blocked();
+      const reverseBlocked = new Blocked();
 
-	// 		return this.blockRepository.save(newRecord);
-	// 	}
+      blocked.user = user;
+      blocked.blockedUser = BlockedUser;
+
+      reverseBlocked.user = BlockedUser;
+      reverseBlocked.blockedUser = user;
+
+      return this.blockRepository.save(blocked);
+  }
 
   async banUser(payload: any){
     const newRecord = this.BanRepository.create({
@@ -161,6 +168,13 @@ export class ChatService {
   // ============================= Channel function =================================================================
   getId(userObject: any) {
     return userObject.user.id; // Access the id property within the nested user object
+  }
+
+  async leaveFromChannel(payload: any) {
+      await this.channelUserRepository.delete({
+        user: {id: payload.userId},
+        channel: {id: payload.channelId}
+      });
   }
 
   async isJoined(channelId: number, userId: string): Promise<boolean>{

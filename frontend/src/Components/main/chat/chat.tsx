@@ -390,7 +390,7 @@ function chatComponent(): JSX.Element {
 											<div
 												className="msg-profile group bg-white"
 												style={{
-													backgroundImage: `url(${getMessageFriend(MESSAGES[selectedMessageIndex])
+													backgroundImage: `url(${baseAPIUrl + getMessageFriend(MESSAGES[selectedMessageIndex])
 															.picture
 														})`,
 												}}
@@ -484,7 +484,7 @@ function chatComponent(): JSX.Element {
 											<Avatar.Group className="justify-around w-fit h-full">
 												{roomMembers.map((member, index) => (
 													<Avatar className="avatarImage"
-														img={member.user.picture}
+														img={baseAPIUrl + member.user.picture}
 														rounded
 														stacked
 														key={index}

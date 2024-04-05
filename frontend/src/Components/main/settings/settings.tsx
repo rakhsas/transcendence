@@ -2,19 +2,8 @@ import "./settings.css";
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
-import { TwoFA, TwoFaService } from "../../../services/twoFa.service";
-interface AlertProps {
-	message: string;
-}
-
-const Alert: React.FC<AlertProps> = ({ message }) => {
-	return (
-		<div className="alert success">
-			<span className="closebtn">&times;</span>
-			<strong>Success!</strong> {message}
-		</div>
-	);
-};
+import { TwoFaService } from "../../../services/twoFa.service";
+import ModalComponent from "../../modal/modal";
 
 const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 	const fileInput = event.target;
@@ -32,24 +21,19 @@ const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		};
 		reader.readAsDataURL(chosenFile);
 	}
+	
 };
 
 
 
 
-// "linear-gradient(to right, #d80909, #a02626, #610101)"
 
 function SettingFunction(): JSX.Element {
-
 	const [ShowSignUp, SetShowSignUp] = useState<boolean>(false);
 	const [ischecked, setIsChecked] = useState<boolean>(false);
-	const [backgroundColor, setBackgroundColor] = useState<string>("linear-gradient(to right, #217441, #207a3f, #22A34A)");
 	const FuncClick = () => {
 		SetShowSignUp(!ShowSignUp);
 		setIsChecked(!ischecked);
-	}
-	const changeBackgroundColor = () => {
-		setBackgroundColor("linear-gradient(to right, #217441, #207a3f, #22A34A)"); // Replace getRandomColor() with your color generation logic
 	}
 	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 	const [input, setInput] = useState("");
@@ -70,44 +54,6 @@ function SettingFunction(): JSX.Element {
 		setIsChecked(userData[0].isTwoFactorAuthenticationEnabled);
 	}, [userData]);
 	if (!userData) return <LoadingComponent />;
-	let TfCode: string = "";
-	// function focusNextInput(
-	// 	el: HTMLInputElement,
-	// 	prevId: string | null,
-	// 	nextId: string | null
-	// ) {
-	// 	if (el.value.length === 0) {
-	// 		if (prevId) {
-	// 			const prevElement = document.getElementById(
-	// 				prevId
-	// 			) as HTMLInputElement | null;
-	// 			if (prevElement) {
-	// 				prevElement.focus();
-	// 			}
-	// 		}
-	// 	} else {
-	// 		if (nextId) {
-	// 			const nextElement = document.getElementById(
-	// 				nextId
-	// 			) as HTMLInputElement | null;
-	// 			if (nextElement) {
-	// 				nextElement.focus();
-	// 			}
-	// 		}
-	// 	}
-	// 	TfCode = el.value;
-	// }
-	// document.querySelectorAll("[data-focus-input-init]").forEach((element) => {
-	// 	element.addEventListener("keyup", function (this: HTMLElement) {
-	// 		const prevId = this.getAttribute("data-focus-input-prev");
-	// 		const nextId = this.getAttribute("data-focus-input-next");
-	// 		if (this instanceof HTMLInputElement) {
-	// 			focusNextInput(this, prevId, nextId);
-	// 			// console.log(prevId, ' prve ', nextId);
-	// 		}
-	// 	});
-	// 	// console.log(this instanceof HTMLInputElement);
-	// });
 
 	const onchange = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -123,6 +69,7 @@ function SettingFunction(): JSX.Element {
 			})
 			if (ValidQRcode.status == 200) {
 				userData[0].isTwoFactorAuthenticationEnabled = true;
+				// ModalComponent
 			}
 			else {
 				userData[0].isTwoFactorAuthenticationEnabled = false;
@@ -132,13 +79,13 @@ function SettingFunction(): JSX.Element {
 			console.log('Invalid qrcode \n');
 		}
 	};
+	// console.log()
 	useEffect(() => { }, [ischecked]);
 	const [firstName, setFirstName] = useState<string>('');
 	const [SecondName, setSecondName] = useState<string>('');
 
 	const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
-		// Regular expression for validating first name (only alphabets, no special characters)
 		const isValidFirstName = /^[A-Za-z\s]+$/.test(value);
 		if (isValidFirstName || value === '') {
 			setFirstName(value);
@@ -146,33 +93,10 @@ function SettingFunction(): JSX.Element {
 	};
 	const handleSecondNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
-		// Regular expression for validating first name (only alphabets, no special characters)
 		const isValidSecond = /^[A-Za-z\s]+$/.test(value);
 		if (isValidSecond || value === '') {
 			setSecondName(value);
 		}
-	};
-	const [selectedCountry, setSelectedCountry] = useState<string>('');
-
-	const handleCountryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		setSelectedCountry(event.target.value);
-	};
-	const isValidBirthday = (input: string): boolean => {
-		const regex = /^\d{4}-\d{2}-\d{2}$/;
-		return regex.test(input);
-	}
-	const [userInput, setUserInput] = React.useState('');
-	const [isValid, setIsValid] = React.useState(false);
-
-	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setUserInput(event.target.value);
-		setIsValid(isValidBirthday(event.target.value));
-	}
-
-	const [selectedCity, setSelectedCity] = useState<string>('');
-
-	const handleCityChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		setSelectedCity(event.target.value);
 	};
 	const isValidEmail = (email: string): boolean => {
 		const regex = /^[a-zA-Z._%+-]+@student\.1337\.ma$/;
@@ -183,13 +107,14 @@ function SettingFunction(): JSX.Element {
 
 	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setUserEmail(event.target.value);
-		setIsEmailValid(isValidEmail(event.target.value));
+		if (isEmailValid)
+			setIsEmailValid(isValidEmail(event.target.value));
 	}
 	return (
 		<div className="flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting p-8" >
 			<div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900  bg-main-light-WHITE">
 				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
-					<img src={userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl"/>
+					<img src={APIURL + userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl"/>
 					<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture">
 						{/* <p onChange={handleFileChange} className="parPhoto dark:text-white text-black bolder font-extrabold font-900">
 							TAKE A PHOTO

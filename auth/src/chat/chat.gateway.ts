@@ -106,6 +106,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// ================================ Channel hevents ====================================================================
 
+	@SubscribeMessage('leavChannel')
+	async handleLeaveChannel(socket: Socket, payload: any): Promise<void> {
+		socket.leave(payload.channelId);
+		await this.chatService.leaveFromChannel(payload);
+	}
+
+
+
 	@SubscribeMessage('createChannel')
 	async handleCreateChannel(socket: Socket, payload: any): Promise<void> {
 		socket.join(payload.channelId);
@@ -285,9 +293,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	// ====================== User function ===================================================
 
+	@SubscribeMessage('blockUser')
+	async handleBlockUser(payload: any): Promise<void>
+	{
+		await this.chatService.blockUser(payload);
+	}
 	/*
-		@SubscribeMessage('blockUser')
-		async handleBlockUse(payload: any): Promise<void>
+	  	async blockUser(userId: string , blockedUserId: string): Promise<Blocked>
 		{
 			// the userId and the id the user you want to block
 			const newRecord = this.blockRespository.create({

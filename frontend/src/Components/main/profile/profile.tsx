@@ -25,9 +25,14 @@ interface ButtonAttributes {
 }
 
 const levels = [
-	{ level: 1, minScore: 0, maxScore: 100 },
-	{ level: 1.5, minScore: 101, maxScore: 200 },
-	{ level: 2, minScore: 201, maxScore: 300 },
+	{ level: 1, minScore: 0, maxScore: 50 },
+	{ level: 1.5, minScore: 51, maxScore: 100 },
+	{ level: 2.5, minScore: 101, maxScore: 150 },
+	{ level: 3, minScore: 151, maxScore: 200 },
+	{ level: 3.5, minScore: 201, maxScore: 250 },
+	{ level: 4, minScore: 251, maxScore: 300 },
+	{ level: 4.5, minScore: 301, maxScore: 350 },
+	{ level: 5, minScore: 351, maxScore: 400 },
 	// Add more levels and score ranges as needed
   ];
   
@@ -60,7 +65,7 @@ const validName: string[] = [
 
 const FunctionProfileForm: React.FC = () => {
 	const userData = useContext(DataContext);
-	// const [id, setId] = useState<string>();
+	const BASE_API_URL = import.meta.env.VITE_API_AUTH_KEY;
 	const [user, setUser] = useState<any>();
 	const [friends, setFriends] = useState<User[]>();
 	const [users, setUsers] = useState<User[]>();
@@ -142,6 +147,7 @@ const FunctionProfileForm: React.FC = () => {
 			}
 		};
 		fetchScores();
+		console.log("user other: ", user);
 	}, [user]);
 	
 	const ButtonClick = () => {
@@ -159,7 +165,11 @@ const FunctionProfileForm: React.FC = () => {
 		}
 	}
 	// console.log('sdfsdf --> ', getTo);
-	
+	useEffect(() => {
+		setProgress(getProgress(user?.score));
+		// setProgress(getProgress(5));
+		console.log("==========-==-==-==-=-=-=-=-=-=-=-=-=-=-=->>> ", user?.score);
+	}, [user])
 	return (
 		<div className="body m-4 flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting">
 			<div className="side1 flex flex-col gap-4 items-center w-full md:min-w-[35%] min-h-full overflow-hidden">
@@ -169,7 +179,7 @@ const FunctionProfileForm: React.FC = () => {
 							<div className={`relative border-2 rounded-full `} style={{
 								borderColor: user?.coalitionColor,
 							}}>
-								<img alt={user?.username} src={user?.picture} className="w-24 h-24 object-cover" />
+								<img alt={user?.username} src={BASE_API_URL + user?.picture} className="w-24 h-24 object-cover" />
 							</div>
 						</div>
 						<div className="py-4">
@@ -194,12 +204,12 @@ const FunctionProfileForm: React.FC = () => {
 						}
 					</div>
 					
-						<div className="progress-bar-container">
+						<div className="progress-bar-container text-black dark:text-white">
 							<div
-								className="progress-bar"
+								className="progress-bar text-black dark:text-white"
 								style={{ width: `${progress}%` }}
 							/>
-							<span className="progress-label">{progress.toFixed(2)}%</span>
+							<span className="progress-label text-black dark:text-white">{progress.toFixed(2)}%</span>
 						</div>
 					
 				</div>
@@ -290,7 +300,7 @@ const FunctionProfileForm: React.FC = () => {
 														<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 													</svg>
 												</div>
-												<img src={object.player1.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player1?.coalitionColor} ` }} />
+												<img src={BASE_API_URL + object.player1.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player1?.coalitionColor} ` }} />
 											</div>
 											<div className="flex flex-row gap-2">
 												<p className="w-8 h-8 flex justify-center items-center dark:text-white text-black font-bold text-2xl">{object?.user_score}</p>
@@ -309,7 +319,7 @@ const FunctionProfileForm: React.FC = () => {
 														<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 													</svg>
 												</div>
-												<img src={object.player2.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player2?.coalitionColor} ` }} />
+												<img src={BASE_API_URL + object.player2.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player2?.coalitionColor} ` }} />
 											</div>
 										</div>
 									</li>
