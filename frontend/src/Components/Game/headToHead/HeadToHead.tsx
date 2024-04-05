@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from "react";
 import GameStatus from "../GameStatus";
 import { Button, Spinner } from "flowbite-react";
 import { HiOutlineArrowRight } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
 const CanvasHeadToHead = (props: {
@@ -17,6 +18,7 @@ const CanvasHeadToHead = (props: {
   const [roomId, setRoomId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [inGame, setInGame] = useState<boolean>(false);
+  const navigate = useNavigate();
   // const [counter, setCounter] = useState<number>(0);
 
   // // Third Attempts
@@ -114,10 +116,8 @@ const CanvasHeadToHead = (props: {
       socket.off("inGame");
     };
   }, [socket]);
-  function handleClick(e: React.MouseEvent) {
-    e.preventDefault();
-    console.log("You clicked submit.");
-    window.location.replace("/dashboard");
+  function handleClick() {
+    navigate("/dashboard")
   }
   return (
     <div className="flex  flex-col h-full w-full  items-center justify-center text-black  dark:text-white  ">

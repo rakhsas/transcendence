@@ -13,6 +13,7 @@ import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
 import { Channel } from '../../../utils/types';
 import ModalComponent from '../../modal/modal';
+import { useNavigate } from 'react-router-dom';
 
 const group = () => {
     return (
@@ -42,6 +43,7 @@ type friend = {
 }
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const HomeComponent: React.FC = () => {
+    const navigate = useNavigate();
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const userData = useContext(DataContext);
@@ -211,7 +213,7 @@ const HomeComponent: React.FC = () => {
                                         <div className="text-white font-semibold text-3xl leading-10">AI: The Next Frontier</div>
                                     </div>
                                 </div>
-                                <div className="w-fit p-4 bg-gradient-to-r from-slate-900 via-gray-900 to-zinc-600 rounded-full">
+                                <div className="w-fit p-4 bg-gradient-to-r from-slate-900 via-gray-900 to-zinc-600 rounded-full" onClick={() => navigate('/dashboard/game')}>
                                     <div className="bg-emerald-400 rounded-3xl flex flex-col justify-center hover:cursor-pointer px-4 py-2">
                                         <div className="text-white font-bold">Play Now</div>
                                     </div>
