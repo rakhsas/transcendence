@@ -27,8 +27,12 @@ function AnalyticsComponent(): JSX.Element {
 
         const otherPlayer = async () => {
             const result = await analyticsService.otherPlayers();
-            if (result.length > 3)
+            if (result.length > 3 || result.length === 3)
                 result.splice(0, 3);
+            else if (result.length < 3){
+                result.splice(0, result.lenght);
+            }
+            console.log("other player are: ", result);
             setOtherPlayers(result);
             // setOtherPlayers([]);
         }
@@ -67,9 +71,14 @@ function AnalyticsComponent(): JSX.Element {
         if (!userData)
             return ;
         const fetchLastGame = async () => {
+            console.log("user data is: ", userData[0]);
             const result = await gameService.getLastGame(userData[0].id);
-            // console.log("the ressult is : ", result);
+            if (result.length === 0)
+            setIkhan([]);
+        else
             setIkhan(result)
+        console.log("the ikhan is : ", ikhan);
+    
             const result1 = await analyticsService.lastSevenDays(userData[0].id);
             setLastSevenDay(result1);
         }
@@ -79,7 +88,7 @@ function AnalyticsComponent(): JSX.Element {
     }, [userData])
     if (!userData)
         return <LoadingComponent />
-    // console.log("top3: ", top3);
+    console.log("top3: ", top3);
     return (
         <>
             <div className="container-analytics font-poppins overflow-x-hidden">
@@ -153,7 +162,7 @@ function AnalyticsComponent(): JSX.Element {
                             </div>
                         </div>
                         <div className="bottom-content">
-                            <div className="lastGame text-black dark:text-white font-poppins">Last Game <br />{ikhan !== null && ikhan[0].user_score > ikhan[0].player_score ? 'Won' : 'Lose'}</div>
+                            <div className="lastGame text-black dark:text-white font-poppins">Last Game <br />{ikhan && ikhan.lenght > 0 && ikhan?.[0].user_score > ikhan?.[0].player_score ? 'Won' : 'Lose'}</div>
                             <span className='separator font-poppins'></span>
                             <div className="status text-black dark:text-white font-poppins">Status <br /> Online</div>
                             <span className='separator font-poppins'></span>

@@ -14,6 +14,7 @@ import { Channel, notificationInterface } from '../../utils/types';
 import { NotificationService } from '../../services/notification.service';
 import { FriendsService } from '../../services/friend.service';
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
+const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 function DashboardComponent() {
 	const [userData, setUserData] = useState<User | null>(null);
 	const [socket, setSocket] = useState<Socket | null>(null);

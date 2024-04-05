@@ -237,3 +237,30 @@ img.im-list{
     border-radius: 5px;
     background-color: #202026bf;
 }
+
+
+/* ==================== progress bar ====================== */
+
+.progress-bar-container {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-bar {
+    height: 20px;
+    background-color: #4caf50;
+    transition: width 0.3s ease-in-out;
+  }
+  
+  .progress-label {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    line-height: 20px;
+    color: white;
+    font-size: 12px;
+  }
+  

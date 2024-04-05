@@ -5,6 +5,7 @@ import { map } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
+import { response } from "express";
 @Injectable()
 
 export class UserService {
@@ -120,13 +121,26 @@ export class UserService {
 				))
 				.toPromise();
 				return coalition;
-			// console.log(coalition);
-			return coalition;
 		} catch (error) {
 			console.error(error);
 		}
 	}
+	async getPicture(picture: string, providerAccessToken: string): Promise<File> {
+        const headers = {
+            'Authorization': `Bearer ${providerAccessToken}`
+        };
 
+        try {
+			const response: AxiosResponse<ArrayBuffer> = await this.http.get(picture, { headers, responseType: 'arraybuffer' }).toPromise();
+			const fileType = picture.split('.').pop() || 'jpg';
+			const mimeType = `image/${fileType}`;
+			const file = new File([response.data], `picture.${fileType}`, { type: mimeType });
+			return file;
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+    }
 	async findAllUsersExcept(id: string): Promise<User[]> {
 		return await this.userRepository.find({
 		where: {
