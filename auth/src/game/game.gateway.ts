@@ -27,15 +27,60 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   rooms: { [id: string]: Room } = {};
   waitingPlayers: Player[] = [];
+  waitingFriend: Player[] = [];
 
   constructor(private readonly gameService: GameService) {}
 
   async handleConnection(client: any): Promise<void> {
+    console.log('client connected');
+  }
+
+  @SubscribeMessage('playRandomMatch')
+  async handleRandomMatch(client: any) {
     const id = await this.gameService.GuardsConsumer(client);
     console.log('idGame: ', id);
-    // if (this.waitingPlayers.find((player) => player.id === id)) return;
+    if (this.waitingPlayers.find((player) => player.id === id)) {
+      this.server.to(client.id).emit('inGame');
+      return;
+    }
+    if (this.waitingFriend.find((player) => player.id === id)) {
+      this.server.to(client.id).emit('inGame');
+      return;
+    }
+    for (const id in this.rooms) {
+      const player = this.rooms[id].players.find((p) => p.id === id);
+      if (player) {
+        this.server.to(client.id).emit('inGame');
+        return;
+      }
+    }
     this.waitingPlayers.push({ id: id, socket: client });
     this.matchPlayers();
+  }
+
+  @SubscribeMessage('playWithFriend')
+  handlePlayWithFriend(client: any, payload: { id: string }) {
+    const { id } = payload;
+    const friend = this.waitingFriend.find((player) => player.id === id);
+    if (!friend) {
+      client.emit('friendNotFound');
+      this.waitingFriend.push({ id: client.id, socket: client });
+      return;
+    }
+    const roomId = Math.random().toString(36).substring(7);
+    client.join(roomId);
+    friend.socket.join(roomId);
+    client.emit('roomJoined', roomId, 1, friend.id);
+    friend.socket.emit('roomJoined', roomId, 2, client.id);
+    const game = new Game(this.server, roomId);
+    const room: Room = {
+      players: [
+        { id: client.id, socket: client },
+        { id: friend.id, socket: friend.socket },
+      ],
+      game,
+    };
+    this.rooms[roomId] = room;
   }
 
   handleDisconnect(client: any): void {

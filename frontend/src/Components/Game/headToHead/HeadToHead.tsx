@@ -6,12 +6,17 @@ import { Button, Spinner } from "flowbite-react";
 import { HiOutlineArrowRight } from "react-icons/hi";
 const url: string = "wss://" + import.meta.env.VITE_API_SOCKET_URL; // URL of your backend
 
-const CanvasHeadToHead = (props: { width: string; height: string }) => {
+const CanvasHeadToHead = (props: {
+  width: string;
+  height: string;
+  map: string | undefined;
+}) => {
   const ref = useRef(null);
   const index = useRef(0);
-  const status = useRef('win')
+  const status = useRef("win");
   const [roomId, setRoomId] = useState<string | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [inGame, setInGame] = useState<boolean>(false);
   // const [counter, setCounter] = useState<number>(0);
 
   // // Third Attempts
@@ -28,22 +33,22 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
       path: "/sogame",
       transports: ["polling"],
     });
-        const handleBeforeUnload = () => {
+    const handleBeforeUnload = () => {
       // Disconnect socket without asking for confirmation
       newSocket.disconnect();
     };
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     setSocket(newSocket);
     return (): void => {
       newSocket.close(); // Close the WebSocket connection when component unmounts
       // Clean up the event listener when the component unmounts
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !roomId || roomId === "win") return;
 
     const canvas = ref.current;
     if (!canvas || !roomId) {
@@ -62,7 +67,6 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
     return () => {
       gameInstance = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   useEffect(() => {
@@ -87,9 +91,16 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
       status.current = i.index == index.current ? "win" : "lose";
       setRoomId("win");
     });
-    socket.on("connect", () => console.log("Connected"));
+    socket.on("connect", () => {
+      console.log("Connected")
+      socket.emit('playRandomMatch')
+    }
+      );
     socket.on("disconnect", () => {
       console.log("Disconnected");
+    });
+    socket.on("inGame", () => {
+      setInGame(true);
     });
 
     return () => {
@@ -100,6 +111,7 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
       socket.off("gameOver");
       socket.off("connect");
       socket.off("disconnect");
+      socket.off("inGame");
     };
   }, [socket]);
   function handleClick(e: React.MouseEvent) {
@@ -108,7 +120,7 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
     window.location.replace("/dashboard");
   }
   return (
-    <div className="flex  flex-col h-full w-full  items-center justify-center  text-white  ">
+    <div className="flex  flex-col h-full w-full  items-center justify-center text-black  dark:text-white  ">
       {roomId ? (
         <div className="border-2 rounded-2xl flex flex-col w-full h-full ">
           <GameStatus socket={socket} roomId={roomId} />
@@ -143,8 +155,7 @@ const CanvasHeadToHead = (props: { width: string; height: string }) => {
           <div className="flex flex-col items-center ">
             {" "}
             <h2 className=" md:text-3xl text-center  lg:text-4xl sm:text-xl text-sm font-extrabold text-black dark:text-white">
-              {" "}
-              Waiting for another player to join...{" "}
+              {inGame ? "You already in a game" : "Waiting for another player to join..."}
             </h2>
             <div className="w-10 h-10 o text-center">
               <Spinner
