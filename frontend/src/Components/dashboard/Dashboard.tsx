@@ -72,7 +72,10 @@ function DashboardComponent() {
 			globalSocket?.disconnect();
 		};
 	}, []);
-
+	socket?.on("usernameUpdated", async (data: any) => {
+        // userData[0] = data;
+        setUserData(data);
+    })
 	socket?.on('updatedFriends', async (data: any) => {
 		setFriends(data);
 	})

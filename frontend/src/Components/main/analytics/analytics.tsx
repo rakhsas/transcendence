@@ -1,4 +1,4 @@
-// import Chart from 'chart.js/auto';
+import {Chart, registerables} from 'chart.js/auto';
 import { Bar, Line } from 'react-chartjs-2';
 import './analytics.css';
 import { useContext, useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { GameService } from '../../../services/game.service';
 import { AnalyticsService } from '../../../services/analytics.service';
 
 function AnalyticsComponent(): JSX.Element {
+    Chart.register(...registerables);
     const userData = useContext(DataContext);
 	const BASE_API_URL = import.meta.env.VITE_API_AUTH_KEY;
     const navigate = useNavigate();
@@ -67,6 +68,14 @@ function AnalyticsComponent(): JSX.Element {
         ],
     };
 
+      const options = {
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      };
+
 
     useEffect(() => {
         if (!userData)
@@ -81,6 +90,7 @@ function AnalyticsComponent(): JSX.Element {
         console.log("the ikhan is : ", ikhan);
     
             const result1 = await analyticsService.lastSevenDays(userData[0].id);
+            console.log("last seven days", result1);
             setLastSevenDay(result1);
         }
 
@@ -172,19 +182,7 @@ function AnalyticsComponent(): JSX.Element {
                         </div>
                     </div>
                     <div className="statistics bg-white dark:bg-black">
-                        {/* <Line data={data1} /> */}
-                        {/* <Line
-                            data={{
-                                labels: ["Day 1", "Day2", "Day 3"],
-                                datasets: [{
-                                    label: "games played in each Day",
-                                    data: [5, 3, 7],
-                                    fill: false,
-                                    borderColor: 'rgb(75, 192, 192)',
-                                    tension: 0.1,
-                                    backgroundColor: '#3DBDA7',
-                                }]
-                            }} /> */}
+                        <Line data={data1} />
                     </div>
                 </div>
             </div>

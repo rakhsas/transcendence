@@ -105,6 +105,7 @@ h5.l5{
     height: 20px;
     background-color: #4caf50;
     transition: width 0.3s ease-in-out;
+    animation: fillAnimation 2s ease-in-out forwards;
   }
   
   .progress-label {
@@ -117,3 +118,12 @@ h5.l5{
     font-size: 12px;
   }
   
+
+  @keyframes fillAnimation {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }

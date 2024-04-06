@@ -18,12 +18,13 @@ export class BlockedService {
     ) {}
     
 
-    async checkBlocked(userId: string, blockedUserId: string) {
-        return this.blockedRepository.find({
+    async checkBlocked(userId: string, blockedUserId: string): Promise<Blocked> {
+        return await this.blockedRepository.findOne({
             where: {
                 user: {id: userId},
                 blockedUser: {id: blockedUserId}
-            }
+            },
+            relations: ['user', 'blockedUser']
         });
     }
 

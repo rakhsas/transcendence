@@ -268,7 +268,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('acceptFriendRequest')
 	async handleAcceptFriendRequest(client: Socket, payload: any): Promise<void> {
-		console.log('acceptFriendRequest: ')
 		const notif = await this.notificationService.createNotification({
 			target: payload.friendId,
 			type: NotificationType.FRIEND_REQUEST_ACCEPTED,
@@ -277,13 +276,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			image: null,
 			audio: null,
 			channel: null,
-			
 		});
 		await this.friendService.createFriendship(payload.userId, payload.friendId);
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
 		const friends = await this.friendService.getFriendsOfUser(payload.friendId);
 		this.connectedUsers.get(lastnotif.target.username)?.emit('updatedFriends', friends);
 		this.connectedUsers.get(lastnotif.target.username)?.emit('friendRequestAcceptedNotif', lastnotif);
+		// await this.notificationService.updateNotificationState(notif.id, {seen: true});
+		
 	}
 
 	@SubscribeMessage('changeChannelType')
@@ -294,9 +294,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// ====================== User function ===================================================
 
 	@SubscribeMessage('blockUser')
-	async handleBlockUser(payload: any): Promise<void>
+	async handleBlockUser(client: Socket, payload: any): Promise<void>
 	{
+		console.log('blockUser: ', payload)
 		await this.chatService.blockUser(payload);
+		client.emit('userBlocked', payload);
 	}
 	/*
 	  	async blockUser(userId: string , blockedUserId: string): Promise<Blocked>
@@ -328,9 +330,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			channel: payload.channelId,
 		});
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
-		console.log('lastnotif: ', lastnotif)
 		this.connectedUsers.get(lastnotif.target.username)?.emit('kickedNotif', lastnotif);
 	}
+
+	@SubscribeMessage('checkUsername')
+	async handleCheckUsername(client: Socket, payload: any): Promise<void> {
+		const user = await this.userService.findByUserName(payload.username);
+		console.timeLog('user: ', user)
+		if (user) {
+			client.emit('usernameExist', "Exist");
+		}
+		else {
+			client.emit('usernameNotExist', null);
+		}
+	}
+	@SubscribeMessage('updateUsername')
+	async handleUpdateUsername(client: Socket, payload: any) {
+		console.log('updateUsername: ', payload)
+		const newUser = await this.userService.updateUsername(payload.username, payload.userId);
+		client.emit('usernameUpdated', newUser);
+	}
+
 
 	@SubscribeMessage('muteUser')
 	async handleMuteEvent(socket: Socket, payload: any): Promise<void> {

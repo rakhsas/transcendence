@@ -1,13 +1,14 @@
-import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters, Put } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update.user';
 import { CreateUserDto } from './dto/create.user';
-import { ApiBody, ApiExtraModels, ApiOkResponse, ApiResponse, getSchemaPath, refs } from '@nestjs/swagger';
+import { ApiBody, ApiExtraModels, ApiOkResponse, ApiResponse, ApiTags, getSchemaPath, refs } from '@nestjs/swagger';
 import { ValidationPipe } from './validators/validation.pipe';
 import { ValidationFilter } from './validators/validation.pipe';
 import { UserGuard } from '../guards/user.guard';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
@@ -40,6 +41,14 @@ export class UserController {
 	async getAllUsersExcept(@Param('id') id: string) {
 		return await this.userService.findAllUsersExcept(id);
 	}
+
+	@Put(':username/:userId')
+	// @UseGuards(UserGuard)
+	async updateUsername(@Param('username') username: string, @Param('userId') userId: string) {
+		return await this.userService.updateUsername(username, userId);
+	}
+
+	
 	// @Patch(':id')
 	// @UseGuards(UserGuard)
 	// UpdateUser(@Param('id') id: string, @Body() updatedUser: UpdateUserDto) {

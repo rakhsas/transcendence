@@ -442,6 +442,8 @@ function NavbarComponent(): JSX.Element {
                                                                 friendId: item.issuer.id
                                                             }
                                                             );
+                                                            setNotifIsOpen(false);
+                                                            item.seen = true;
                                                         }}>
                                                             Accept
                                                         </Button>

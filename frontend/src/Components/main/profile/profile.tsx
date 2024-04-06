@@ -17,6 +17,7 @@ import User from '../../../model/user.model';
 import { gameScores, totalGames } from '../../../utils/types';
 import { GameService } from '../../../services/game.service';
 import { Socket } from 'socket.io-client';
+import MessageService from '../../../services/message.service';
 
 interface ButtonAttributes {
 	className: string;
@@ -47,6 +48,16 @@ const levels = [
 	return 0;
   }
 
+  function calculateLevel(score: number) {
+	// Define the score threshold for each level
+	const levelThreshold = 100; // Increase this value if you want higher levels to require more score
+  
+	// Calculate the level based on the score
+	const level = (score / levelThreshold); // Adding 1 because levels start from 1
+  
+	return level;
+  }
+
 const validAchie: string[] = [Achei, Achei1, Achei2, Achei3, Achei4];
 const validName: string[] = [
 	'Play The First Game',
@@ -74,6 +85,18 @@ const FunctionProfileForm: React.FC = () => {
 	const [totalGames, setTotalGames] = useState<any>();
 	const [socketChat, setSocketChat] = useState<Socket>();
 	const [progress, setProgress] = useState<number>(0);
+	const [isBlocked, setIsBlocked] = useState<boolean>(false);
+	const messageService = new MessageService();
+	const fillAnimationKeyframes = `
+    @keyframes fillAnimation {
+      from {
+        width: 0%;
+      }
+      to {
+        width: ${progress}%;
+      }
+    }
+  `;
 	// const progress = 22;
 	// console.log("--------> ", totalGames);
 	// console.log(totalGames.gamePlayed, "| -> totalgame <- | ");
@@ -143,10 +166,16 @@ const FunctionProfileForm: React.FC = () => {
 				setScore(result);
 				const totalGames = await gameService.getTotalMatches(user.id);
 				console.log("inside use effect: ", totalGames);
-				 setTotalGames(totalGames);
+				setTotalGames(totalGames);
+				const blockedResult = await messageService.BlockedUsers(userData[0].id, user.id); // need blockedFriendId
+				console.log("blocked result: ", blockedResult);
 			}
 		};
-		fetchScores();
+		try {
+			fetchScores();
+		} catch (error) {
+			console.log("error: ", error);
+		}
 		console.log("user other: ", user);
 	}, [user]);
 	
@@ -164,9 +193,21 @@ const FunctionProfileForm: React.FC = () => {
 			});
 		}
 	}
+	const blockFriend = () => {
+		if (socketChat && user) {
+			socketChat.emit('blockUser', {
+				userId: userData[0].id,
+				blockedUserId: user.id
+			});
+		}
+	}
+	socketChat?.on('userBlocked', (data: any) => {
+		setIsBlocked(true);
+	})
 	// console.log('sdfsdf --> ', getTo);
 	useEffect(() => {
-		setProgress(getProgress(user?.score));
+		// setProgress(getProgress(user?.score));
+		setProgress(calculateLevel(user?.score));
 		// setProgress(getProgress(5));
 		console.log("==========-==-==-==-=-=-=-=-=-=-=-=-=-=-=->>> ", user?.score);
 	}, [user])
@@ -187,7 +228,7 @@ const FunctionProfileForm: React.FC = () => {
 						</div>
 						{
 							userId && userId !== userData[0].id && (
-								<div className="flex flex-1 flex-wrap justify-center items-center w-full py-2">
+								<div className="flex flex-1 flex-wrap justify-center items-center w-full overflow-hidden py-2">
 									{
 										user && user?.isFriend === false ? (
 											<button type="button" className="dark:text-white text-black bg-yellow-300 hover:bg-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:focus:ring-yellow-900" onClick={
@@ -196,7 +237,15 @@ const FunctionProfileForm: React.FC = () => {
 												Send Friend Request
 											</button>
 										) : (
-											<button type="button" className="dark:text-white text-black bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Block</button>
+											!isBlocked ? (
+												<button type="button" className="dark:text-white text-black bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" onClick={
+													() => blockFriend()
+												}>
+													Block
+												</button>
+											) : (
+												<button type="button" className="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Blocked</button>
+											)
 										)
 									}
 								</div>
@@ -205,9 +254,11 @@ const FunctionProfileForm: React.FC = () => {
 					</div>
 					
 						<div className="progress-bar-container text-black dark:text-white">
+							<style>{fillAnimationKeyframes}</style>
 							<div
-								className="progress-bar text-black dark:text-white"
-								style={{ width: `${progress}%` }}
+								className="progress-bar text-black dark:text-white" 
+								// style={fillAnimationKeyframes}
+								// style={{ width: `${progress}%`}}
 							/>
 							<span className="progress-label text-black dark:text-white">{progress.toFixed(2)}%</span>
 						</div>

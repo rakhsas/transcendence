@@ -57,18 +57,17 @@ export class ChatService {
 
   async blockUser(payload: any): Promise<Blocked>
   {
-        // the userId and the id the user you want to block
-      const user = this.userService.viewUser(payload.userId);
-      const BlockedUser = this.userService.viewUser(payload.blockedUserId);
-      
+      // the userId and the id the user you want to block
+      const user = await this.userService.viewUser(payload.userId);
+      const BlockedUser = await this.userService.viewUser(payload.blockedUserId);
       const blocked = new Blocked();
       const reverseBlocked = new Blocked();
 
-      blocked.user = user;
-      blocked.blockedUser = BlockedUser;
+      blocked.user = Promise.resolve(user);
+      blocked.blockedUser = Promise.resolve(BlockedUser);
 
-      reverseBlocked.user = BlockedUser;
-      reverseBlocked.blockedUser = user;
+      reverseBlocked.user = Promise.resolve(BlockedUser);
+      reverseBlocked.blockedUser = Promise.resolve(user);
 
       return this.blockRepository.save(blocked);
   }

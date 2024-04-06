@@ -89,7 +89,7 @@ const HomeComponent: React.FC = () => {
             globalSocket?.disconnect();
         };
     }, [chartRef, userData]);
-    if (!userData[0] || !friends.length)
+    if (!userData || userData.length === 0 || !friends.length)
         return <LoadingComponent />;
     const socket: Socket = userData[1];
     socket?.on('protectedChannels', async (data: any) => {
@@ -138,8 +138,8 @@ const HomeComponent: React.FC = () => {
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
                 {
-                    firstLogin === 'false' && (
-                        <InfoModal userData={userData}/>
+                    firstLogin === 'true' && (
+                        <InfoModal userData={userData} socketChat={socket}/>
                     )
                 }
                 <section className="min-h-2/3 flex items-center justify-center p-2 flex-wrap lg:flex-nowrap">

@@ -3,7 +3,7 @@ import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
 import { TwoFaService } from "../../../services/twoFa.service";
-import ModalComponent from "../../modal/modal";
+
 
 const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 	const fileInput = event.target;
@@ -27,6 +27,7 @@ const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 
 
 
+// "linear-gradient(to right, #d80909, #a02626, #610101)"
 
 function SettingFunction(): JSX.Element {
 	const [ShowSignUp, SetShowSignUp] = useState<boolean>(false);
@@ -53,39 +54,41 @@ function SettingFunction(): JSX.Element {
 		fetchData();
 		setIsChecked(userData[0].isTwoFactorAuthenticationEnabled);
 	}, [userData]);
-	if (!userData) return <LoadingComponent />;
+	if (!userData) 
+	return <LoadingComponent />;
 
-	const onchange = async (event: React.FormEvent<HTMLFormElement>) => {
+		const fetchQRcode = async () => {
+			try {
+				console.log(APIURL + `2fa/authenticate/${input}/${userData[0].id}`)
+				const ValidQRcode = await fetch(`https://10.11.42.174/api/2fa/authenticate/${input}/${userData[0].id}`, {
+					method: 'POST',
+					credentials: 'same-origin',
+				})
+				if (ValidQRcode.status == 200) {
+					userData[0].isTwoFactorAuthenticationEnabled = true;
+				}
+				else {
+					userData[0].isTwoFactorAuthenticationEnabled = false;
+				}
+			}
+			catch (error) {
+				console.log('Invalid qrcode \n', error);
+			}
+		};
+	const onchange1 = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (input.length != 6)
 			return;
-		await fetchQRcode();
+		fetchQRcode();
 	}
-	const fetchQRcode = async () => {
-		try {
-			const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
-				method: 'POST',
-				credentials: 'same-origin',
-			})
-			if (ValidQRcode.status == 200) {
-				userData[0].isTwoFactorAuthenticationEnabled = true;
-				// ModalComponent
-			}
-			else {
-				userData[0].isTwoFactorAuthenticationEnabled = false;
-			}
-		}
-		catch (error) {
-			console.log('Invalid qrcode \n');
-		}
-	};
-	// console.log()
+	console.log(input , "--> input" , userData[0], "usesr\n");
 	useEffect(() => { }, [ischecked]);
 	const [firstName, setFirstName] = useState<string>('');
 	const [SecondName, setSecondName] = useState<string>('');
 
 	const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
+		// Regular expression for validating first name (only alphabets, no special characters)
 		const isValidFirstName = /^[A-Za-z\s]+$/.test(value);
 		if (isValidFirstName || value === '') {
 			setFirstName(value);
@@ -93,6 +96,7 @@ function SettingFunction(): JSX.Element {
 	};
 	const handleSecondNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
+		// Regular expression for validating first name (only alphabets, no special characters)
 		const isValidSecond = /^[A-Za-z\s]+$/.test(value);
 		if (isValidSecond || value === '') {
 			setSecondName(value);
@@ -108,7 +112,7 @@ function SettingFunction(): JSX.Element {
 	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setUserEmail(event.target.value);
 		if (isEmailValid)
-			setIsEmailValid(isValidEmail(event.target.value));
+		setIsEmailValid(isValidEmail(event.target.value));
 	}
 	return (
 		<div className="flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting p-8" >
@@ -116,18 +120,9 @@ function SettingFunction(): JSX.Element {
 				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
 					<img src={APIURL + userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl"/>
 					<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture">
-						{/* <p onChange={handleFileChange} className="parPhoto dark:text-white text-black bolder font-extrabold font-900">
-							TAKE A PHOTO
-						</p> */}
-						{/* <svg className="w-6 h-6  dark:text-black text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-							<path fillRule="evenodd" d="M7.5 4.586A2 2 0 0 1 8.914 4h6.172a2 2 0 0 1 1.414.586L17.914 6H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1.086L7.5 4.586ZM10 12a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm2-4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" clipRule="evenodd" />
-						</svg> */}
-
 						<svg className="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
 							<path fillRule="evenodd" d="M12 3a1 1 0 0 1 .78.375l4 5a1 1 0 1 1-1.56 1.25L13 6.85V14a1 1 0 1 1-2 0V6.85L8.78 9.626a1 1 0 1 1-1.56-1.25l4-5A1 1 0 0 1 12 3ZM9 14v-1H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-4v1a3 3 0 1 1-6 0Zm8 2a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H17Z" clipRule="evenodd"/>
 						</svg>
-
-
 					</label>
 				</div>
 				<input type="file" id="file" onChange={handleFileChange} />
@@ -136,7 +131,7 @@ function SettingFunction(): JSX.Element {
 						2FA-AUTHENTICATION
 					</h2>
 					<img className={`${ischecked ? 'visible' : 'invisible'} Qrcode bg-gradient-to-r from-green-400 via-green-500 to-green-600`} src={url} alt="" />
-					<form className="max-w-sm mx-auto flex flex-col gap-2 p-4 space-y-2" onSubmit={onchange}>
+					<form className="max-w-sm mx-auto flex flex-col gap-2 p-4 space-y-2" onSubmit={onchange1}>
 						<p
 							id="helper-text-explanation"
 							className={`dark:text-white text-black bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br 
@@ -147,11 +142,7 @@ function SettingFunction(): JSX.Element {
 						</p>
 						<div className={`flex space-x-2 flex-row justify-center items-center ${ischecked ? 'block' : 'hidden'}`}>
 							<div className="flex flex-row justify-center items-center">
-								<label
-									htmlFor="code-1"
-									className="sr-only"
-									onClick={SettingFunction}
-								>
+								<label htmlFor="code-1" className="sr-only" onClick={SettingFunction} >
 									First code
 								</label>
 								<input
@@ -179,19 +170,11 @@ function SettingFunction(): JSX.Element {
 									id="helper-checkbox-2"
 									aria-describedby="helper-checkbox-text-2 "
 									type="checkbox"
-									checked={ischecked}
+									// checked={ischecked}
 									className="w-4 h-4  bg-gray-100 border-gray-300 rounded border-y-2"
 								/>
-								<label className="inline-flex items-center cursor-pointer">
-									<input
-										type="checkbox"
-										value=""
-										className="sr-only peer"
-										checked
-									/>
 
 									{/* <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Checked toggle</span> */}
-								</label>
 							</div>
 							<div className="w-[250px] ms-2 text-sm flex flex-row justify-center items-center "  >
 								<label
@@ -314,3 +297,4 @@ function SettingFunction(): JSX.Element {
 }
 
 export default SettingFunction;
+

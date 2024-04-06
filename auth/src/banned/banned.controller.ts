@@ -13,7 +13,7 @@ export class BannedController {
     }
 
     @Get(':userId/:channelId')
-    async checkMute(@Param('userId')userId: string, @Param('channelId') channelId: number): Promise<Mute[]> {
+    async checkBan(@Param('userId')userId: string, @Param('channelId') channelId: number): Promise<Mute[]> {
         return await this.muteService.checkBanned(userId, channelId);
     }
 }

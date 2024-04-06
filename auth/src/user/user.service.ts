@@ -160,4 +160,20 @@ export class UserService {
 		  isTwoFactorAuthenticationEnabled: false
 		});
 	}
+
+	async findByUserName(username: string): Promise<User> {
+		console.log(username);
+		return await this.userRepository.findOne({
+			where: {
+				username: username
+			}
+		})
+	}
+
+	async updateUsername(username: string, userId: string) : Promise<User>{
+		await this.userRepository.update(userId, {
+			username: username
+		})
+		return await this.viewUser(userId);
+	}
 }

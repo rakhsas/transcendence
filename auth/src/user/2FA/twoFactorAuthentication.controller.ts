@@ -53,6 +53,7 @@ export class TwoFactorAuthenticationController {
         code,
         user,
       );
+      console.log(isCodeValid,'--> : user --> ' ,user );
       if (!isCodeValid) {
         //  return res.redirect(`https://localhost/dashboard/settings?invalid`);
         throw new BadRequestException('invalide code --> :');
