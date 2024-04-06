@@ -62,7 +62,8 @@ const CanvasHeadToHead = (props: {
       canvas,
       socket,
       roomId,
-      index.current
+      index.current,
+      props.map
     );
     gameInstance.render();
 
@@ -146,7 +147,8 @@ const CanvasHeadToHead = (props: {
             <canvas
               ref={ref}
               className="border-black  my-auto border-2 w-full max-w-2xl"
-              {...props}
+              width={props.width}
+              height={props.height}
             />
           )}
         </div>
