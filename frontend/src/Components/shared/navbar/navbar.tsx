@@ -103,7 +103,7 @@ function NavbarComponent(): JSX.Element {
         return <LoadingComponent />
     useEffect(() => {
         setUsers(userData[3]);
-        console.log('Users', userData[3]);
+        //console.log('Users', userData[3]);
         setNotifications(userData[6]);
     }, []);
     useEffect(() => {
@@ -388,7 +388,7 @@ function NavbarComponent(): JSX.Element {
                                         .filter((item: notificationInterface) => !item.seen) // Filter unseen notifications
                                         .slice(0, 5) // Take the first 5 unseen notifications
                                         .map((item: notificationInterface, index) => {
-                                    // console.log('Notifications', item);
+                                    // //console.log('Notifications', item);
                                         if (item.type === NotificationType.MESSAGE) {
                                             return (
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -436,7 +436,7 @@ function NavbarComponent(): JSX.Element {
                                             )
                                         }
                                         else if (item.type === NotificationType.FRIEND_REQUEST) {
-                                        console.log('Friend Request', item);
+                                        //console.log('Friend Request', item);
                                             return (
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">

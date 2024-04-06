@@ -41,7 +41,7 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
         const otp = inputRefs.map(inputRef => inputRef.current?.value).join('');
         console.table(otp);
         try {
-			console.log(baseAPIUrl + `2fa/authenticate/${otp}/${userData[0].id}`)
+			//console.log(baseAPIUrl + `2fa/authenticate/${otp}/${userData[0].id}`)
 			const ValidQRcode = await fetch(baseAPIUrl + `2fa/authenticate/${otp}/${userData[0].id}`, {
 				method: 'POST',
 				credentials: 'same-origin',
@@ -57,7 +57,7 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
 			}
 		}
 		catch (error) {
-			console.log('Invalid qrcode \n', error);
+			//console.log('Invalid qrcode \n', error);
 		}
     }
     useEffect(() => {}, [incorrectPassword])

@@ -53,7 +53,7 @@ export class TwoFactorAuthenticationController {
         throw new BadRequestException('invalide code --> :');
       }
       await this.usersService.turnOnTwoFactorAuthentication(user.id);
-      console.log('code --> list',code);
+      //console.log('code --> list',code);
       return  res.redirect(process.env.FRONT_URL);
     } catch (error) {
       throw new UnauthorizedException(`hna fin kayn ${error}`);

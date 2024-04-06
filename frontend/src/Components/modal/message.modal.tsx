@@ -12,12 +12,12 @@ interface MessageProps {
     recieverName: string;
 }
 const MessageModal: React.FC<MessageProps> = ({ senderId,recieverName, recieverId, isOpen, setNewMessageOpen, socketChat }) => {
-    console.log(socketChat)
-    console.log(recieverName)
+    //console.log(socketChat)
+    //console.log(recieverName)
 
     const [message, setMessage] = useState("");
     const sendMessage = () => {
-        console.log("message", message);
+        //console.log("message", message);
         socketChat?.emit("message", {
             senderId,
             recieverId,

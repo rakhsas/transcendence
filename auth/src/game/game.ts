@@ -166,6 +166,6 @@ export class Game {
   }
 
   stop(): void {
-    console.log('stop');
+    //console.log('stop');
   }
 }

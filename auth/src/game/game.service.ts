@@ -35,8 +35,8 @@ export class GameService {
     const pl1 = await this.userService.viewUser(payload.userId);
     const pl2 = await this.userService.viewUser(payload.playerId);
     const winner = await this.userService.viewUser(payload.winnerId);
-    console.log("inside add game service.........",payload.userScoore, payload.playerScoore);
-    // console.log(
+    //console.log("inside add game service.........",payload.userScoore, payload.playerScoore);
+    // //console.log(
       //   '-------------------------------------------------------i------------=-==============>>  player: ',
       //   pl1.username,
       //   payload.pl1Scoore,

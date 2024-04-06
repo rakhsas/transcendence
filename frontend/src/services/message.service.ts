@@ -8,10 +8,10 @@ class MessageService {
                 credentials: 'same-origin'
             }
             );
-            // console.log(response);
+            // //console.log(response);
             if (response.ok) {
                 const messages = await response.json();
-                // console.log(response)
+                // //console.log(response)
                 return messages;
             }
             else if (response.status === 401 || response.status === 403)
@@ -63,7 +63,7 @@ class MessageService {
     async BlockedUsers(userId: string, friendId: string): Promise<any> {
         try {
         	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
-            console.log(APIURL + `Blocked/${userId}/${friendId}`);
+            //console.log(APIURL + `Blocked/${userId}/${friendId}`);
             const response = await fetch(APIURL + `Blocked/${userId}/${friendId}`,
             {
                 method: 'GET',
@@ -72,7 +72,7 @@ class MessageService {
             );
             if (response.ok) {
                 const messages = await response.json();
-                console.log(messages);
+                //console.log(messages);
                 return messages;
             }
             // else if (response.status === 401 || response.status === 403)

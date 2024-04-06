@@ -51,8 +51,8 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
   
   @SubscribeMessage('inGame')
   async handleInGame(client: Socket, payload: any) {
-    console.log('inGame');
-    console.log(payload);
+    //console.log('inGame');
+    //console.log(payload);
     this.playingUsers.set(payload.username, client);
     this.playinUserIds.add(payload.username);
     this.updatePlayingUsers();
@@ -66,12 +66,12 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
   private async updatePlayingUsers() {
     this.playingUserIdsArray = Array.from(this.playinUserIds);
-    console.log(this.playingUserIdsArray);
+    //console.log(this.playingUserIdsArray);
   }
 
   @SubscribeMessage('acceptCall')
   async handleAcceptCall(client: Socket, payload: any) {
-    console.log('acceptCall');
+    //console.log('acceptCall');
     client.to(payload.to).emit('AcceptCall', {
       answer: payload.answer,
       from: payload.from,

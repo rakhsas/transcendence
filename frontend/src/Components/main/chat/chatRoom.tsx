@@ -113,11 +113,11 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
                                                 } else {
                                                     audioRefs[index].pause();
                                                 }
-                                                console.log("isPlaying[index] before update", isPlaying[index]);
+                                                //console.log("isPlaying[index] before update", isPlaying[index]);
                                                 setIsPlaying((prevIsPlaying: boolean[]) => {
                                                     const temp = [...prevIsPlaying];
                                                     temp[index] = !temp[index];
-                                                    console.log("temp[index]", temp[index]);
+                                                    //console.log("temp[index]", temp[index]);
                                                     return temp;
                                                 });
 

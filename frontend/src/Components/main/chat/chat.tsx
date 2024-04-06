@@ -72,7 +72,7 @@ function chatComponent(): JSX.Element {
 		const mutedUser = mutedUsers.find((object) => {
 		  return object.userId === userData[0].id && new Date(object.finishedAt) > new Date();
 		});
-		console.log(mutedUser);
+		//console.log(mutedUser);
 		if (mutedUser) {
 		  const timeRemaining = new Date(mutedUser.finishedAt).getTime() - new Date().getTime();
 		  if (timeRemaining > 0) {
@@ -121,7 +121,7 @@ function chatComponent(): JSX.Element {
 		e.preventDefault();
 		const messageValue = message;
 		if (!messageValue || isDisabled) {
-			console.log('Message is empty');
+			//console.log('Message is empty');
 			return;
 		}
 		if (friendId != '') {
@@ -230,7 +230,7 @@ function chatComponent(): JSX.Element {
 		if (friendId) {
 			setFriendId(friendId);
 			setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
-			// console.log(MESSAGES);
+			// //console.log(MESSAGES);
 			setRoomMessages(null);
 			setRoomMembers([]);
 			setMutedUsers([]);
@@ -253,7 +253,7 @@ function chatComponent(): JSX.Element {
 			await muteService.MutedUsers(cid).then(
 				(data: any) => {
 					setMutedUsers(data);
-					console.log(data);
+					//console.log(data);
 				}
 			)
 		}

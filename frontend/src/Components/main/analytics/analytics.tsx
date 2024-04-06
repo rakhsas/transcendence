@@ -34,7 +34,7 @@ function AnalyticsComponent(): JSX.Element {
             else if (result.length < 3){
                 result.splice(0, result.lenght);
             }
-            console.log("other player are: ", result);
+            //console.log("other player are: ", result);
             setOtherPlayers(result);
             // setOtherPlayers([]);
         }
@@ -81,16 +81,16 @@ function AnalyticsComponent(): JSX.Element {
         if (!userData)
             return ;
         const fetchLastGame = async () => {
-            console.log("user data is: ", userData[0]);
+            //console.log("user data is: ", userData[0]);
             const result = await gameService.getLastGame(userData[0].id);
             if (result.length === 0)
             setIkhan([]);
         else
             setIkhan(result)
-        console.log("the ikhan is : ", ikhan);
+        //console.log("the ikhan is : ", ikhan);
     
             const result1 = await analyticsService.lastSevenDays(userData[0].id);
-            console.log("last seven days", result1);
+            //console.log("last seven days", result1);
             setLastSevenDay(result1);
         }
 
@@ -99,7 +99,7 @@ function AnalyticsComponent(): JSX.Element {
     }, [userData])
     if (!userData)
         return <LoadingComponent />
-    console.log("top3: ", top3);
+    //console.log("top3: ", top3);
     return (
         <>
             <div className="container-analytics font-poppins overflow-x-hidden">

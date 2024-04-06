@@ -37,8 +37,8 @@ function DetailsArea({
     }
     const navigate = useNavigate();
     const messageData = getMessageFriend(MESSAGES[selectedMessageIndex]);
-    // console.log("messageData222: ", MESSAGES[selectedMessageIndex]);
-    // console.log(isModalOpen, modalPicPath, selectedMessageIndex, latestMessages[selectedMessageIndex])
+    // //console.log("messageData222: ", MESSAGES[selectedMessageIndex]);
+    // //console.log(isModalOpen, modalPicPath, selectedMessageIndex, latestMessages[selectedMessageIndex])
     return (
         <>
             {
@@ -134,7 +134,7 @@ function DetailsArea({
                             </div>
                             <div className="detail-photo-grid">
                                 {/* {
-                                    console.log("messagedetails: ", message),
+                                    //console.log("messagedetails: ", message),
                                     MESSAGES[selectedMessageIndex].map((message, index) => (
                                         (message.img! && message.img != "") ?
                                             <div key={index} className="detail-photo"

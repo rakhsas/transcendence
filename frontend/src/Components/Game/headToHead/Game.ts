@@ -190,7 +190,7 @@ class Game {
     this.render(); // Re-render game elements
   }
   drawImage() {
-    console.log("draw image");
+    //console.log("draw image");
     const img = new Image();
     img.src = IMG;
     img.onload = () => {

@@ -63,19 +63,19 @@ export class UserService {
 	}
 
 	async updateUserSetting(userId: string, payload: SettingProfileDto) {
-		console.log("the user id is absolutly: ", userId);
+		//console.log("the user id is absolutly: ", userId);
 		const existingData = await this.viewUser(userId);
 		if (!existingData) {
 			throw new Error('Data not found');
 		}
 		
-		// console.log("existing data: --------> ", existingData);
+		// //console.log("existing data: --------> ", existingData);
 		existingData.firstName = payload.firstName;
 		existingData.lastName = payload.lastName;
 		existingData.email = payload.email;
-		// console.log("after existing data: --------> ", existingData);
+		// //console.log("after existing data: --------> ", existingData);
 
-		// console.log("*-*-*-*-*-**> : ", existingData);
+		// //console.log("*-*-*-*-*-**> : ", existingData);
 		return await this.userRepository.save(existingData);
 	}
 
@@ -133,7 +133,7 @@ export class UserService {
 			const coalition = this.http.get(process.env.INTRA_USERS + id + '/coalitions', { headers })
 				.pipe(map(
 					(response: AxiosResponse) => {
-						// console.log(response.data);
+						// //console.log(response.data);
 						return response.data
 					}
 				))
@@ -180,7 +180,7 @@ export class UserService {
 	}
 
 	async findByUserName(username: string): Promise<User> {
-		console.log(username);
+		//console.log(username);
 		return await this.userRepository.findOne({
 			where: {
 				username: username
@@ -197,12 +197,12 @@ export class UserService {
 
 
 	async update2FAState(userId: string) {
-		console.log("userId: ", userId);
+		//console.log("userId: ", userId);
 		const user = await this.viewUser(userId);
 		if (!user) {
 			throw new Error('User not found');
 		}
-		console.log("user: ", user);
+		//console.log("user: ", user);
 		user.isTwoFactorAuthenticationEnabled = !user.isTwoFactorAuthenticationEnabled;
 		return await this.userRepository.save(user);
 	}

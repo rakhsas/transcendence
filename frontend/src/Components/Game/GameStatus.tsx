@@ -1,5 +1,5 @@
 import { Avatar } from "flowbite-react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import LoadingComponent from "../shared/loading/loading";
 import DataContext from "../../services/data.context";
@@ -10,30 +10,30 @@ interface Data {
 import "./game.css"
 const GameStatus = (props: { socket: Socket | null; roomId: string }) => {
   const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
-  const [globalSocket, setGlobalSocket] = useState<Socket>();
+  const globalSocket = useRef<Socket>();
   const { socket, roomId } = props;
   const userData = useContext(DataContext);
   if (!userData) <LoadingComponent />;
 
   useEffect(() => {
     if (!userData) return;
-    setGlobalSocket(userData[2]);
+    globalSocket.current=userData[2];
   }, [userData]);
   const [data, setData] = useState<Data | null>(null);
   useEffect(() => {
     if (!socket || !globalSocket) return;
     socket.on("userData", (userdata) => {
-      console.log("Joined event from status game");
-      console.log(globalSocket)
+      //console.log("Joined event from status game");
+      //console.log(globalSocket)
       setData(userdata);
-      globalSocket?.emit("inGame", userdata);
+      globalSocket.current?.emit("inGame", userdata);
     });
     socket?.emit("userData", { id: roomId, userData: userData[0] });
     return () => {
       socket?.off("userData");
-      globalSocket?.emit("offGame", { userData });
+      globalSocket.current?.emit("offGame", { userData });
     };
-  }, [socket, globalSocket]);
+  }, [socket]);
 
   return (
     <div className="h-16 m-auto border-b-2 dark:text-white text-black  flex justify-between items-center gap-2 w-full max-w-5xl rounded rounded-s-md ">

@@ -67,9 +67,9 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            console.log('Uploading file...');
-            console.log('File:', file);
-            console.log('this.UPLOAD_API_URL:', this.UPLOAD_API_URL);
+            //console.log('Uploading file...');
+            //console.log('File:', file);
+            //console.log('this.UPLOAD_API_URL:', this.UPLOAD_API_URL);
             const response = await axios.post(this.UPLOAD_API_URL, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'

@@ -10,10 +10,10 @@ class MuteService {
                 credentials: 'same-origin'
             }
             );
-            // console.log(response);
+            // //console.log(response);
             if (response.ok) {
                 const messages = await response.json();
-                // console.log(response)
+                // //console.log(response)
                 return messages;
             }
             else if (response.status === 401 || response.status === 403)

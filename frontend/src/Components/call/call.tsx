@@ -13,7 +13,7 @@ function CallComponent() {
     const socket = userData[1];
     // var selectedUser: string;
     const onUpdateUserList = ({ userIds }: any) => {
-        // console.log(userIds);
+        // //console.log(userIds);
         const usersList = document.getElementById("usersList");
         const usersToDisplay = userIds.filter(
             (userId: any) => userId !== socket?.id
@@ -23,19 +23,19 @@ function CallComponent() {
         usersToDisplay.forEach((user: string) => {
             const userItem = document.createElement("button", { is: "user-button" });
             userItem.textContent = user;
-            // console.log(user)
+            // //console.log(user)
             userItem.className = "user-button mb-1 bg-red-900";
             userItem.addEventListener("click", () => {
                 setSelectedUser(user);
-                // console.log("selectedUser: ", selectedUser)
+                // //console.log("selectedUser: ", selectedUser)
             });
             usersList?.appendChild(userItem);
         });
     };
     socket?.on("update-user-list", onUpdateUserList);
     const onUserCall = (data: any) => {
-        console.log("data.from", data.from);
-        console.log("data.to", data.to);
+        //console.log("data.from", data.from);
+        //console.log("data.to", data.to);
     }
     socket?.on("RequestCall", onUserCall)
     const createPeerConnection = () => {
@@ -72,7 +72,7 @@ function CallComponent() {
     };
     socket?.on("connect", onSocketConnect);
     const call = async () => {
-        console.log("selectedUser: 1111", selectedUser)
+        //console.log("selectedUser: 1111", selectedUser)
         socket?.emit("callUser", {
             from: socket?.id,
             to: selectedUser,
@@ -85,10 +85,10 @@ function CallComponent() {
             from: socket?.id,
             to: selectedUser,
         });
-        console.log(`mediaOffer is emitted`);
+        //console.log(`mediaOffer is emitted`);
         const onMediaOffer = async (data: any) => {
             try {
-                console.log("Received media offer:", data.offer);
+                //console.log("Received media offer:", data.offer);
                 await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
                 const peerAnswer = await peer.createAnswer();
                 await peer.setLocalDescription(new RTCSessionDescription(peerAnswer));
@@ -105,7 +105,7 @@ function CallComponent() {
         socket?.on("mediaOffer", onMediaOffer);
         const onMediaAnswer = async (data: any) => {
             try {
-                console.log("Received media answer:", data.answer);
+                //console.log("Received media answer:", data.answer);
                 await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
             } catch (error) {
                 console.error("Error setting remote description:", error);
@@ -129,7 +129,7 @@ function CallComponent() {
         socket?.on("remotePeerIceCandidate", onRemotePeerIceCandidate);
         const gotRemoteStream = (event: any) => {
             const [stream] = event.streams;
-            console.log("Got remote stream:", stream);
+            //console.log("Got remote stream:", stream);
             const remoteVideo =
                 document.querySelector<HTMLVideoElement>("#remoteVideo");
             if (remoteVideo) {

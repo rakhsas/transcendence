@@ -35,8 +35,8 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
         setSocketChat(userData[1]);
     }, [userData]);
     const handleInviteOneVsOne = (friendId: string, userId: string) => {
-        console.log("friendId", friendId);
-        console.log("userId", userId);
+        //console.log("friendId", friendId);
+        //console.log("userId", userId);
         socketChat?.emit('inviteOneVsOne', { friendId, userId});
     }
     return (
@@ -153,11 +153,11 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                                             } else {
                                                 audioRefs[index].pause();
                                             }
-                                            console.log("isPlaying[index] before update", isPlaying[index]);
+                                            //console.log("isPlaying[index] before update", isPlaying[index]);
                                             setIsPlaying((prevIsPlaying: boolean[]) => {
                                                 const temp = [...prevIsPlaying];
                                                 temp[index] = !temp[index];
-                                                console.log("temp[index]", temp[index]); // Log the updated value
+                                                //console.log("temp[index]", temp[index]); // Log the updated value
                                                 return temp;
                                             });
 

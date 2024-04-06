@@ -26,7 +26,7 @@ export class AuthController {
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
-        console.log(req.user)
+        //console.log(req.user)
         const isTwoFactorEnabled = req.user.twoFactorAuthentication;
         res.cookie('access_token', accessToken, { httpOnly: true});
         res.cookie('provider_access_token', providerAccessToken, { httpOnly: true});
@@ -39,8 +39,8 @@ export class AuthController {
         //     providerAccessToken, 
         //     firstLogin
         // }
-        // console.log(accessToken) 
-        // console.log(providerAccessToken)
+        // //console.log(accessToken) 
+        // //console.log(providerAccessToken)
         res.redirect(process.env.FRONT_URL);
     }
 
@@ -65,7 +65,7 @@ export class AuthController {
     @Get('decodeToken')
     @UseGuards(UseGuards)
     async decodedToken(@Req() req) {
-        // console.log(req.cookies)
+        // //console.log(req.cookies)
         return await this.authService.decodeToken(req);
     }
 

@@ -79,7 +79,7 @@ function SettingFunction(): JSX.Element {
 	
 	const fetchQRcode = async () => {
 		try {
-			console.log(APIURL + `2fa/authenticate/${input}/${userData[0].id}`)
+			//console.log(APIURL + `2fa/authenticate/${input}/${userData[0].id}`)
 			const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
 				method: 'POST',
 				credentials: 'same-origin',
@@ -92,10 +92,10 @@ function SettingFunction(): JSX.Element {
 			}
 		}
 		catch (error) {
-			console.log('Invalid qrcode \n', error);
+			//console.log('Invalid qrcode \n', error);
 		}
 	};
-	console.log(input , "--> input" , userData[0], "usesr\n");
+	//console.log(input , "--> input" , userData[0], "usesr\n");
 	useEffect(() => { }, [ischecked]);
 	const [firstName, setFirstName] = useState<string>('');
 	const [SecondName, setSecondName] = useState<string>('');

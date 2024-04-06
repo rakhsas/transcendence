@@ -18,13 +18,13 @@ export class UserController {
 	@Put("disable2FA/:userId")
     // @UseGuards(UserGuard)
     async update2FAState(@Param('userId') id: string) {
-		console.log("id: ", id);
+		//console.log("id: ", id);
         return this.userService.update2FAState(id);
     }
 
 	@Put('settingProfile/:id')
   	async updateSettingProfile(@Param('id') id: string, @Body() settingProfileDto : SettingProfileDto) {
-		console.log("id and body, ", id, settingProfileDto);
+		//console.log("id and body, ", id, settingProfileDto);
       const updatedData = await this.userService.updateUserSetting(id, settingProfileDto);
       return updatedData;
   	}

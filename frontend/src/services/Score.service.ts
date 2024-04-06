@@ -11,7 +11,7 @@ export class ScoreMatch
             });
             if (response.ok) {
                 const userData = await response.json();
-			    // console.log("fetchedUserData: ", userData)
+			    // //console.log("fetchedUserData: ", userData)
                 return userData;
             }
             else if (response.status === 401 || response.status === 403)

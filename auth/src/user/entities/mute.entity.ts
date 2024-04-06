@@ -29,10 +29,10 @@ export class Mute {
   @BeforeInsert()
   setFinishedAt() {
     const now = new Date();
-    console.log(now);
+    //console.log(now);
     now.setMinutes(now.getMinutes() + 1);
     this.finishedAt = now;
-    // console.log(this.finishedAt);
+    // //console.log(this.finishedAt);
   }
 
   @ManyToOne(() => User, (user) => user.Muted, {lazy: true})

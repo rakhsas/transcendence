@@ -25,7 +25,7 @@ export class FriendsService {
                 throw new Error('Request failed');
             }
         } catch (error) {
-            // console.log('APIURL: ', APIURL + 'friends/' + userId)
+            // //console.log('APIURL: ', APIURL + 'friends/' + userId)
             console.error('Request error:', error);
             window.location.href = '/';
             document.cookie = 'provider_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';

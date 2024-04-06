@@ -37,7 +37,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly gameService: GameService) {}
 
   async handleConnection(client: any): Promise<void> {
-    console.log('client connected');
+    //console.log('client connected');
   }
 
   @SubscribeMessage('playRandomMatch')
@@ -78,10 +78,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const friendIndex = this.waitingFriend.findIndex(
       (player) => player.friendId === id,
     );
-    console.log('friend id is : ', me);
+    //console.log('friend id is : ', me);
     if (friendIndex === -1) {
       // Add the client to the waiting friends list
-      console.log('client added to waiting list');
+      //console.log('client added to waiting list');
       this.waitingFriend.push({ id: id, socket: client, friendId: me });
       return;
     }
@@ -110,7 +110,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: any): void {
-    console.log('client disconnected');
+    //console.log('client disconnected');
     // save the state to db
     // sent win to room
     // remove from room
@@ -234,10 +234,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // romove it from the room
 
     const id: string = this.getIdOfRoom(playerId);
-    console.log('room id is : ', id);
+    //console.log('room id is : ', id);
     if (id === undefined) return;
     this.saveMatch(this.rooms[id], playerId);
-    console.log('room id is removed : ', id);
+    //console.log('room id is removed : ', id);
     this.rooms[id].game.stop();
     // Remove object with id 2
     delete this.rooms[id];

@@ -233,7 +233,7 @@ export class ChatService {
       newEntityChannel.password = "password" in payload ? payload.password : null;
       newEntityChannel.type = payload.channelType;
       newEntityChannel.picture = payload.picture
-      console.log("=> ", payload.picture);
+      //console.log("=> ", payload.picture);
       newEntityChannel.owner = Promise.resolve(payload.ownerId);
       // Save the new Channel entity
       const savedChannel = await this.channelRepository.save(newEntityChannel);
@@ -246,9 +246,9 @@ export class ChatService {
 
   async addNewMemberToChannel(payload: any, role: string) {
     // Load user and channel entities
-    console.log("payload.__owner__", payload.__owner__)
-    console.log("payload.id", payload.id)
-    console.log("-----------------------------------------------> joined");
+    //console.log("payload.__owner__", payload.__owner__)
+    //console.log("payload.id", payload.id)
+    //console.log("-----------------------------------------------> joined");
     const id = payload.__owner__;
     const user = await this.userService.viewUser(id);
     const channel: Channel = await this.channelRepository.findOne({where: {id: payload.id}});
@@ -273,7 +273,7 @@ export class ChatService {
    */
   async kickUserFromChannel(payload: any)
   {
-    console.log("payload", payload);
+    //console.log("payload", payload);
     const targetedEntity = await this.channelUserRepository.findOne({
       where: {
         channel: {id: payload.channelId},
@@ -288,7 +288,7 @@ export class ChatService {
       await this.channelUserRepository.delete(targetedEntity.id);
     }
     else
-      console.log("the user in channel-user relation is not found!!!");
+      //console.log("the user in channel-user relation is not found!!!");
   }
 
   async changeChannelType(payload: any)

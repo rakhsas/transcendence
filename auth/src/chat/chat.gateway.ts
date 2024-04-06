@@ -49,7 +49,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			delete this.peerConnections[client.id];
 		}
 
-		// console.log('A user disconnected');
+		// //console.log('A user disconnected');
 		this.usersArray = this.usersArray.filter(id => id !== client.id);
 		client.broadcast.emit('update-user-list', { userIds: this.usersArray });
 		client.broadcast.emit('user-disconnected', { userId: client.id });
@@ -67,7 +67,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (payload.hasOwnProperty('recieverName')) {
 			const recieverName = String(payload.recieverName);
 			const toUserSocket = this.connectedUsers.get(recieverName);
-			console.log('toUserSocket: ', payload.message);
+			//console.log('toUserSocket: ', payload.message);
 			if (toUserSocket) {
 				toUserSocket.emit('message', {
 					"to": payload.to,
@@ -100,9 +100,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('inviteOneVsOne')
 	async handleInviteOneVsOne(client: Socket, payload: any): Promise<void> {
-		console.log('inviteOneVsOne: ', payload)
+		//console.log('inviteOneVsOne: ', payload)
 		const areFriends = await this.friendService.getFriendship(payload.userId, payload.friendId);
-		console.log('areFriends: ', areFriends)
+		//console.log('areFriends: ', areFriends)
 		if (areFriends === true)
 		{
 			const notif = await this.notificationService.createNotification({
@@ -154,11 +154,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('acceptJoinChannel')
 	async handleAcceptJoinChannel(client: Socket, payload: any): Promise<void> {
-		console.log('acceptJoinChannel: ', payload)
+		//console.log('acceptJoinChannel: ', payload)
 		const channel = await this.chatService.getChannel(payload.id);
-		console.log("channel: ", channel)
+		//console.log("channel: ", channel)
 		if (channel.password !== null && channel.password !== "") {
-			console.log(channel.password, payload.password)
+			//console.log(channel.password, payload.password)
 			if ("password" in payload && channel.password === payload.password) {
 				client.join(payload.id);
 				await this.chatService.addNewMemberToChannel(payload, "");
@@ -188,7 +188,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('joinChannel')
 	async handleJoinChannel(client: Socket, payload: any): Promise<void> {
 		try {
-			console.log('payload: ', payload.__owner__)
+			//console.log('payload: ', payload.__owner__)
 			if (await this.chatService.isJoined(payload.id, payload.__owner__) === true)
 			{
 				client.emit("joinedError", {
@@ -216,7 +216,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('channelMessages')
 	async handleEvent(socket: Socket, payload: any): Promise<void> {
-		console.log('channelMessages: ', payload)
+		//console.log('channelMessages: ', payload)
 		const channelMembers = await this.channelService.getMembersOfChannel(payload.cid);
 		const message = await this.chatService.addMessage(payload);
 		channelMembers.forEach(async (member: any) => {
@@ -316,7 +316,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('blockUser')
 	async handleBlockUser(client: Socket, payload: any): Promise<void>
 	{
-		console.log('blockUser: ', payload)
+		//console.log('blockUser: ', payload)
 		await this.chatService.blockUser(payload);
 		client.emit('userBlocked', payload);
 	}
@@ -366,7 +366,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 	@SubscribeMessage('updateUsername')
 	async handleUpdateUsername(client: Socket, payload: any) {
-		console.log('updateUsername: ', payload)
+		//console.log('updateUsername: ', payload)
 		const newUser = await this.userService.updateUsername(payload.username, payload.userId);
 		client.emit('usernameUpdated', newUser);
 	}
@@ -436,7 +436,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('acceptCall')
 	async handleAcceptCall(client: Socket, payload: any) {
-		console.log('acceptCall');
+		//console.log('acceptCall');
 		client.to(payload.to).emit('AcceptCall', {
 			answer: payload.answer,
 			from: payload.from

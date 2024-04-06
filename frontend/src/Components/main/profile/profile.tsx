@@ -100,8 +100,8 @@ const FunctionProfileForm: React.FC = () => {
     }
   `;
 	// const progress = 22;
-	// console.log("--------> ", totalGames);
-	// console.log(totalGames.gamePlayed, "| -> totalgame <- | ");
+	// //console.log("--------> ", totalGames);
+	// //console.log(totalGames.gamePlayed, "| -> totalgame <- | ");
 	const achievements = [
 		{
 			icon: Achei,
@@ -162,12 +162,12 @@ const FunctionProfileForm: React.FC = () => {
 	let getTo: any = 0;
 	useEffect(() => {
 		const fetchScores = async () => {
-			// console.log("inside use effect: ", use);
+			// //console.log("inside use effect: ", use);
 			if (user) {
 				const result = await gameService.GetScoreMatches(user.id);
 				setScore(result);
 				const totalGames = await gameService.getTotalMatches(user.id);
-				console.log("inside use effect: ", totalGames);
+				//console.log("inside use effect: ", totalGames);
 				setTotalGames(totalGames);
 				if (userData[0].id !== user.id) {
 					const blockedResult = await messageService.BlockedUsers(userData[0].id, user.id);
@@ -181,9 +181,9 @@ const FunctionProfileForm: React.FC = () => {
 			}
 		};
 		fetchScores();
-		// console.log("user other: ", user);
+		// //console.log("user other: ", user);
 	}, [user]);
-	console.log(totalGames, "sfsddfsdf --> sfd");
+	//console.log(totalGames, "sfsddfsdf --> sfd");
 	const ButtonClick = () => {
 		SetBlocked(!BlockedFriend);
 	}
@@ -209,12 +209,12 @@ const FunctionProfileForm: React.FC = () => {
 	socketChat?.on('userBlocked', (data: any) => {
 		setIsBlocked(true);
 	})
-	// console.log('sdfsdf --> ', getTo);
+	// //console.log('sdfsdf --> ', getTo);
 	useEffect(() => {
 		// setProgress(getProgress(user?.score));
 		setProgress(calculateLevel(user?.score));
 		// setProgress(getProgress(5));
-		console.log("==========-==-==-==-=-=-=-=-=-=-=-=-=-=-=->>> ", user?.score);
+		//console.log("==========-==-==-==-=-=-=-=-=-=-=-=-=-=-=->>> ", user?.score);
 	}, [user])
 	return (
 		<div className="body m-4 flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting">

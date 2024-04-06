@@ -96,7 +96,7 @@ const HomeComponent: React.FC = () => {
         return <LoadingComponent />;
     const socket: Socket = userData[1];
     socket?.on('protectedChannels', async (data: any) => {
-        console.log('protectedChannels: ', await data);
+        //console.log('protectedChannels: ', await data);
         setProtectedChannels(data);
     })
     socket?.on('publicChannels', (data: any) => {
@@ -292,7 +292,7 @@ const HomeComponent: React.FC = () => {
                                     'Loading...'
                                 :
                                     friendData.map((friend, index) => {
-                                        // console.log('friendData: ', friend)
+                                        // //console.log('friendData: ', friend)
                                         return (
                                             <div className="w-16 h-20 relative flex flex-col items-center" key={index} onClick={() => navigate(`/dashboard/profile/${friend.user.id}`)}>
                                                 <div className="img p-2" key={index}>

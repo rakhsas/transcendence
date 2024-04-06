@@ -8,7 +8,7 @@ export class ChannelService {
                 credentials: 'same-origin'
             }
             );
-            // console.log(response);
+            // //console.log(response);
             if (response.ok) {
                 const messages = await response.json();
                 return messages;
@@ -20,7 +20,7 @@ export class ChannelService {
                 return ;
             }
             else {
-                console.log(APIURL + `channels/lastMessage/${userId}`);
+                //console.log(APIURL + `channels/lastMessage/${userId}`);
                 throw new Error('Request failed');
             }
         } catch (error) {

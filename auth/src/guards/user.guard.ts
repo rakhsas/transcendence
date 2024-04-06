@@ -40,7 +40,7 @@ export class UserGuard implements CanActivate {
             }
 			return true;
 		} catch ( error ) {
-			console.log( 'user error - ', error.message );
+			//console.log( 'user error - ', error.message );
 			throw new ForbiddenException(error.message || 'session expired! Please Sign In');
 		}
 	}
@@ -64,7 +64,7 @@ export class UserGuard implements CanActivate {
 					}
 				)
 			);
-			// console.log(token)
+			// //console.log(token)
 			return response;
 		} catch (error) {
 		  console.error('Error occurred during token validation:', error);

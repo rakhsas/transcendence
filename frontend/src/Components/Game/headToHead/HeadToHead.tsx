@@ -11,7 +11,6 @@ const CanvasHeadToHead = (props: {
   width: string;
   height: string;
   map: string | undefined;
-  globalSocket: Socket;
   idFoFriend: string | null;
 }) => {
   const ref = useRef(null);
@@ -67,8 +66,8 @@ const CanvasHeadToHead = (props: {
     if (!socket) return;
     // Event listener for receiving roomJoined event
     socket.on("roomJoined", (roomId, i, id) => {
-      console.log("Joined room");
-      console.log(id);
+      //console.log("Joined room");
+      //console.log(id);
 
       index.current = i;
       setRoomId(roomId);
@@ -86,14 +85,14 @@ const CanvasHeadToHead = (props: {
       setRoomId("win");
     });
     socket.on("connect", () => {
-      console.log("Connected");
-      console.log('props.idFoFriend', props.idFoFriend)
+      //console.log("Connected");
+      //console.log('props.idFoFriend', props.idFoFriend)
       if (props.idFoFriend) {
         socket.emit("playWithFriend", {me:props.idFoFriend});
       } else socket.emit("playRandomMatch");
     });
     socket.on("disconnect", () => {
-      console.log("Disconnected");
+      //console.log("Disconnected");
     });
     socket.on("inGame", () => {
       setInGame(true);

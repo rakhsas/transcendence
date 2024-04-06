@@ -127,7 +127,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 		setUserInput('');
 	};
 	chatSocket?.on('userKicked', async (data: any) => {
-		console.log('userKicked: ', data);
+		//console.log('userKicked: ', data);
 		setRoomMembers(data);
 	})
 	chatSocket?.on('channelJoined', async (data: any) => {
@@ -174,7 +174,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 						{
 							channelInfo.private === true &&
 							(
-								console.log('channelInfo: ', channelInfo),
+								//console.log('channelInfo: ', channelInfo),
 								<>
 									<div className="flex flex-row justify-center items-center">
 										<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
@@ -244,7 +244,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 									{
 										roomMembers?.map((member: any, index: number) => {
 											const user = member.user;
-											console.log('channelRole: ', channelRole);
+											//console.log('channelRole: ', channelRole);
 											return (
 												<div key={index} className="">
 													<a className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
