@@ -42,50 +42,21 @@ export class TwoFactorAuthenticationController {
   @Post('authenticate/:code/:id')
   // @UseGuards(UserGuard)
   @HttpCode(200)
-  async authenticate(
-    @Param('code') code: string,
-    @Param('id') id: string,
-    @Res() res: any,
-  ) {
-    // try {
+  async authenticate( @Param('code') code: string, @Param('id') id: string, @Res() res: any, ) {
+    try {
       const user: User = await this.usersService.viewUser(id);
       const isCodeValid =  await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
         code,
         user,
       );
-      console.log(isCodeValid,'--> : user --> ' ,user );
       if (!isCodeValid) {
-        //  return res.redirect(`https://localhost/dashboard/settings?invalid`);
         throw new BadRequestException('invalide code --> :');
-        // return false;
       }
       await this.usersService.turnOnTwoFactorAuthentication(user.id);
       console.log('code --> list',code);
-      return  res.redirect(`https://10.12.13.6/dashboard/`);
-      
-    // } catch (error) {
-    //   throw new UnauthorizedException('hna fin kayn');
-    // }
-  }
-
-  /*
-  @Post('authenticate/')
-  @HttpCode(200)
-  @Res()
-  // @UseGuards(UseGuards)
-  
-  async authenticate( @Param('code') code: string, @Param('userId') userId: string, @Param('email') email: string, @Param ('user') user: User
-  ) {
-    const isCodeValid =
-      this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-        code,  user
-      );
-    if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
+      return  res.redirect(process.env.FRONT_URL);
+    } catch (error) {
+      throw new UnauthorizedException(`hna fin kayn ${error}`);
     }
-    await this.usersService.turnOnTwoFactorAuthentication()
-    return res.redirect(`http://http://localhost:4200/dashboard`);
   }
-  */
-
 }

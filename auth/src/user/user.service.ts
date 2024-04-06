@@ -6,6 +6,7 @@ import { AxiosResponse } from 'axios';
 import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { response } from "express";
+import { SettingProfileDto } from "./dto/setting.user";
 @Injectable()
 
 export class UserService {
@@ -61,6 +62,23 @@ export class UserService {
 		}
 	}
 
+	async updateUserSetting(userId: string, payload: SettingProfileDto) {
+		console.log("the user id is absolutly: ", userId);
+		const existingData = await this.viewUser(userId);
+		if (!existingData) {
+			throw new Error('Data not found');
+		}
+		
+		// console.log("existing data: --------> ", existingData);
+		existingData.firstName = payload.firstName;
+		existingData.lastName = payload.lastName;
+		existingData.email = payload.email;
+		// console.log("after existing data: --------> ", existingData);
+
+		// console.log("*-*-*-*-*-**> : ", existingData);
+		return await this.userRepository.save(existingData);
+	}
+
 	async getUserById(id: string): Promise<User> {
 		return this.userRepository.findOneBy({
 			id
@@ -112,7 +130,7 @@ export class UserService {
 			'Authorization': `Bearer ${providerAccessToken}`
 		}
 		try {
-			const coalition = this.http.get('https://api.intra.42.fr/v2/users/' + id + '/coalitions', { headers })
+			const coalition = this.http.get(process.env.INTRA_USERS + id + '/coalitions', { headers })
 				.pipe(map(
 					(response: AxiosResponse) => {
 						// console.log(response.data);
@@ -157,7 +175,7 @@ export class UserService {
 
 	  async turnOnTwoFactorAuthentication(userId: string) {
 		return this.userRepository.update(userId, {
-		  isTwoFactorAuthenticationEnabled: false
+		  isTwoFactorAuthenticationEnabled: true
 		});
 	}
 
@@ -175,5 +193,17 @@ export class UserService {
 			username: username
 		})
 		return await this.viewUser(userId);
+	}
+
+
+	async update2FAState(userId: string) {
+		console.log("userId: ", userId);
+		const user = await this.viewUser(userId);
+		if (!user) {
+			throw new Error('User not found');
+		}
+		console.log("user: ", user);
+		user.isTwoFactorAuthenticationEnabled = !user.isTwoFactorAuthenticationEnabled;
+		return await this.userRepository.save(user);
 	}
 }

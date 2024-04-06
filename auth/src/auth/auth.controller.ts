@@ -26,10 +26,13 @@ export class AuthController {
         const firstLogin = req.user.firstLogin;
         const accessToken = req.user.appAccessToken;
         const providerAccessToken = req.user.providerAccessToken;
+        console.log(req.user)
+        const isTwoFactorEnabled = req.user.twoFactorAuthentication;
         res.cookie('access_token', accessToken, { httpOnly: true});
         res.cookie('provider_access_token', providerAccessToken, { httpOnly: true});
         res.cookie('isAuthenticated', true);
         res.cookie('firstLogin', firstLogin);
+        res.cookie('twoFactorAuthentication', isTwoFactorEnabled);
         // return {
         //     user,
         //     accessToken,

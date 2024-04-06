@@ -115,12 +115,9 @@ function AnalyticsComponent(): JSX.Element {
                                     <img src={BASE_API_URL + user.picture} alt="" />
                                     <h3 className='dark:text-white text-black fullName font-poppins '>{user.firstName} {user.lastName}</h3>
                                     <p className='login font-poppins'>{user.username}</p>
-                                    {/* <Link to="https://10.11.42.174/dashboard/"> */}
                                     <div className='btn-profile font-poppins' onClick={() => navigate(`/dashboard/profile/${user.id}`)}>
                                         Profile
                                     </div>
-
-                                    {/* <button className='btn-profile font-poppins'>Profile</button> */}
                                     <span className='dark:text-white!important rank font-poppins'>{index + 1}</span>
                                     <div className='dark:text-white text-black score font-poppins'>Score: {user.score} Pts</div>
                                 </div>

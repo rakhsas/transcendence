@@ -150,6 +150,13 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 			username
 		});
 	}
+
+	const leaveChannel = (friendId: string, channelId: number) => {
+		chatSocket?.emit('leavChannel', {
+			userId: friendId,
+			channelId
+		});
+	}
 	return (
 		<>
 			{
@@ -281,6 +288,15 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 															Kick
 														</a>
 													</div>
+													<div className="py-2" onClick={leaveChannel(optionMember?.user?.id, channelInfo.id)}>
+														<a className="cursor-pointer gap-2 bg-inherit flex justify-center items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
+															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/>
+															</svg>
+
+															Leave Channel
+														</a>
+													</div>
 												</>
 											):
 											<div className="flex flex-row py-2 justify-center w-full text-sm text-gray-700 text-center dark:text-gray-200 divide-y divide-gray-100  dark:divide-gray-600">
@@ -290,15 +306,6 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 									</div>
 								)
 							}
-						</div>
-						<div className="py-2">
-							<a className="cursor-pointer gap-2 bg-inherit flex justify-center items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
-								<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-									<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/>
-								</svg>
-
-								Leave Channel
-							</a>
 						</div>
 					</div>
 			}

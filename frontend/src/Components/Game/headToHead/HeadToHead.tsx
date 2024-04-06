@@ -11,6 +11,8 @@ const CanvasHeadToHead = (props: {
   width: string;
   height: string;
   map: string | undefined;
+  globalSocket: Socket;
+  idFoFriend: string | null;
 }) => {
   const ref = useRef(null);
   const index = useRef(0);
@@ -19,17 +21,6 @@ const CanvasHeadToHead = (props: {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [inGame, setInGame] = useState<boolean>(false);
   const navigate = useNavigate();
-  // const [counter, setCounter] = useState<number>(0);
-
-  // // Third Attempts
-  // useEffect(() => {
-  //   const timer =
-  //     counter > 0 && setInterval(() => setCounter(counter - 1), 1000);
-  //   return () => {
-  //     clearInterval(timer);
-  //   };
-  // }, [counter]);
-
   useEffect(() => {
     const newSocket: Socket = io(url, {
       path: "/sogame",
@@ -95,10 +86,12 @@ const CanvasHeadToHead = (props: {
       setRoomId("win");
     });
     socket.on("connect", () => {
-      console.log("Connected")
-      socket.emit('playRandomMatch')
-    }
-      );
+      console.log("Connected");
+      console.log('props.idFoFriend', props.idFoFriend)
+      if (props.idFoFriend) {
+        socket.emit("playWithFriend", {me:props.idFoFriend});
+      } else socket.emit("playRandomMatch");
+    });
     socket.on("disconnect", () => {
       console.log("Disconnected");
     });
@@ -118,12 +111,12 @@ const CanvasHeadToHead = (props: {
     };
   }, [socket]);
   function handleClick() {
-    navigate("/dashboard")
+    navigate("/dashboard");
   }
   return (
     <div className="flex  flex-col h-full w-full  items-center justify-center text-black  dark:text-white  ">
       {roomId ? (
-        <div className="border-2 rounded-2xl flex flex-col w-full h-full ">
+        <div className="flex flex-col w-full h-full ">
           <GameStatus socket={socket} roomId={roomId} />
           {roomId === "win" ? (
             <div className=" flex-1 flex justify-center items-center ">
@@ -157,7 +150,9 @@ const CanvasHeadToHead = (props: {
           <div className="flex flex-col items-center ">
             {" "}
             <h2 className=" md:text-3xl text-center  lg:text-4xl sm:text-xl text-sm font-extrabold text-black dark:text-white">
-              {inGame ? "You already in a game" : "Waiting for another player to join..."}
+              {inGame
+                ? "You already in a game"
+                : "Waiting for another player to join..."}
             </h2>
             <div className="w-10 h-10 o text-center">
               <Spinner

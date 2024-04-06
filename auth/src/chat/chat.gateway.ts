@@ -98,7 +98,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		//   this.server.emit('message', payload);
 	}
 
-
+	@SubscribeMessage('inviteOneVsOne')
+	async handleInviteOneVsOne(client: Socket, payload: any): Promise<void> {
+		console.log('inviteOneVsOne: ', payload)
+		const areFriends = await this.friendService.getFriendship(payload.userId, payload.friendId);
+		console.log('areFriends: ', areFriends)
+		if (areFriends === true)
+		{
+			const notif = await this.notificationService.createNotification({
+				target: payload.friendId,
+				type: NotificationType.ONEVSONE,
+				issuer: payload.userId,
+				message: "",
+				image: null,
+				audio: null,
+				channel: null
+			});
+			const lastnotif = await this.notificationService.getNotificationById(notif.id);
+			const target = this.connectedUsers.get(lastnotif.target.username);
+			target?.emit('invitedGame', lastnotif);
+		}
+	}
 
 	// =============================== Handle Muted users from a channel ============================
 

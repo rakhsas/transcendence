@@ -16,6 +16,7 @@ import ModalComponent from '../../modal/modal';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import InfoModal from '../../modal/Info.modal';
+import TwoFAComponent from '../../modal/2fa.modal';
 
 const group = () => {
     return (
@@ -53,10 +54,12 @@ const HomeComponent: React.FC = () => {
     const [friends, setFriends] = useState<any[]>([]);
     const [friendData, setFriendData] = useState<friend[]>([]);
     const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
+    const [playingUsers, setPlayingUsers] = useState<string[]>([]);
     const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
     const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const firstLogin = Cookies.get('firstLogin');
+    const twoFactorAuthentication = Cookies.get('twoFactorAuthentication');
     useEffect(() => {
         if (!userData) {
             return;
@@ -120,7 +123,7 @@ const HomeComponent: React.FC = () => {
                         ...friend,
                         status: 'online',
                         color: statusColor.green,
-                        gameStatus: 'online'
+                        gameStatus: 'offline'
                     };
                 } else {
                     return {
@@ -133,10 +136,27 @@ const HomeComponent: React.FC = () => {
             })
         );
     });
+    globalSocket?.on('playingUsers', (data: any) => {
+        const playingUsers: any = data.userIds;
+        const friendDataCopy = [...friendData];
+        friendDataCopy.forEach(friend => {
+            if (playingUsers?.includes(friend.user.username)) {
+                friend.gameStatus = 'online';
+            } else {
+                friend.gameStatus = 'offline';
+            }
+        });
+        setFriendData(friendDataCopy);
+    });
     
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
+                {
+                    twoFactorAuthentication === 'true' && (
+                        <TwoFAComponent userData={userData} />
+                    )
+                }
                 {
                     firstLogin === 'true' && (
                         <InfoModal userData={userData} socketChat={socket}/>
@@ -274,7 +294,7 @@ const HomeComponent: React.FC = () => {
                                     friendData.map((friend, index) => {
                                         // console.log('friendData: ', friend)
                                         return (
-                                            <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
+                                            <div className="w-16 h-20 relative flex flex-col items-center" key={index} onClick={() => navigate(`/dashboard/profile/${friend.user.id}`)}>
                                                 <div className="img p-2" key={index}>
                                                     <img src={baseAPIUrl + friend.user.picture} className={`w-10 h-10 mx-auto rounded-full object-cover ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
                                                 </div>

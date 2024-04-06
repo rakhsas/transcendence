@@ -85,7 +85,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 								}}>
 									
 									<div className="msg-profile rounded-full mr-4 bg-rose-400 ">
-										<div className="msg-profile group" style={{ backgroundImage: `url(${userData[0].id === message.__reciever__.id ? message.__owner__.picture : message.__reciever__.picture})` }}>
+										<div className="msg-profile group object-cover" style={{ backgroundImage: `url(${ userData[0].id === message.__reciever__.id ? baseAPIUrl + message.__owner__.picture : baseAPIUrl + message.__reciever__.picture})` }}>
 										</div>
 									</div>
 									<div className="msg-detail overflow-hidden ml-2">

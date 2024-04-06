@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { messageUser, messageUser1 } from "../../../model/messageUser.model";
 import User from "../../../model/user.model";
 import ModalComponent from "../../../utils/modal.component";
+import { Dropdown } from "flowbite-react";
+import { Socket } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 
 type props = {
     MESSAGES: any;
@@ -16,7 +19,26 @@ type props = {
 const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, modalPicPath }) => {
     const audioRefs: any = useRef([] as HTMLAudioElement[]);
     const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
+    const initialMessageStates = MESSAGES.map(() => useState<boolean>(false));
+    const [messageStates, setMessageStates] = useState(initialMessageStates);
+    const [socketChat, setSocketChat] = useState<Socket>();
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
+    const navigate = useNavigate();
+    const handleSvgClick = (index: number) => {
+        setMessageStates((prevMessageStates: any) => {
+          const newState = [...prevMessageStates];
+          newState[index] = !newState[index];
+          return newState;
+        });
+    };
+    useEffect(() => {
+        setSocketChat(userData[1]);
+    }, [userData]);
+    const handleInviteOneVsOne = (friendId: string, userId: string) => {
+        console.log("friendId", friendId);
+        console.log("userId", userId);
+        socketChat?.emit('inviteOneVsOne', { friendId, userId});
+    }
     return (
         <>
             {MESSAGES.map((message: any, index: any) => {
@@ -25,26 +47,43 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                 if (message.message.length > 0) {
                     return (
                         <div className="p-4" key={index}>
-                            <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                <img className="w-8 h-8 object-cover rounded-full" src={sender.picture} alt="Jese image" />
+                            <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
+                                <img className="w-8 h-8 object-cover self-start rounded-full" src={baseAPIUrl + sender.picture} alt="Jese image" />
                                 <div className="flex message flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
                                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                                         <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
                                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
                                     <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{message.message}</p>
-                                    {/* <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span> */}
                                 </div>
+                                <Dropdown label={undefined}
+                                renderTrigger={() => {
+                                    return (
+                                        <svg className="w-6 h-6 text-gray-800 dark:text-white options" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
+                                        </svg>
+                                    )
+                                }}>
+                                {
+                                    messageStates[index] && (
+                                            <Dropdown.Item onClick={() => {
+                                                handleInviteOneVsOne(reciever.id, sender.id);
+                                                navigate('/dashboard/gameRoom/' + reciever.id);
+                                            }}>Invite One VS ONE</Dropdown.Item>
+                                            )
+                                        }
+                                </Dropdown>
                             </div>
+
                         </div>
                     )
                 }
                 else if (message.img) {
                     return (
                         <div className="p-4" key={index}>
-                            <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                <img className="w-8 h-8 object-cover rounded-full" src={sender.picture} alt="" />
-                                <div className="flex flex-col gap-1">
+                            <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
+                                <img className="w-8 h-8 object-cover self-start rounded-full" src={baseAPIUrl + sender.picture} alt="" />
+                                <div className="flex flex-row-reverse items-center gap-1">
                                     <div className="flex message flex-col w-full max-w-[326px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
                                         <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
                                             <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
@@ -71,6 +110,22 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
                                         {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
                                     </div>
+                                    <Dropdown label={undefined} renderTrigger={() => {
+                                        return (
+                                            <svg className="w-6 h-6 text-gray-800 dark:text-white options" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                                <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
+                                            </svg>
+                                        )
+                                    }}>
+                                    {
+                                        messageStates[index] && (
+                                            <Dropdown.Item onClick={() => {
+                                                handleInviteOneVsOne(reciever.id, sender.id);
+                                                navigate('/dashboard/gameRoom/' + reciever.id);
+                                            }}>Invite One VS ONE</Dropdown.Item>
+                                            )
+                                            }
+                                    </Dropdown>
                                 </div>
                             </div>
                         </div>
@@ -80,8 +135,8 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                     isPlaying[index] = false;
                     return (
                         <div className="p-4" key={index}>
-                            <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                <img className="w-8 h-8 object-cover rounded-full" src={sender.picture} alt="" />
+                            <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
+                                <img className="w-8 h-8 object-cover self-start rounded-full" src={baseAPIUrl + sender.picture} alt="" />
                                 <div className="flex message flex-col gap-2.5 w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
                                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                                         <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
@@ -148,7 +203,24 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
                                         <span className="inline-flex self-center items-center p-2 text-sm font-medium text-gray-900 dark:text-white">s</span>
                                     </div>
                                     <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
+                                    
                                 </div>
+                                <Dropdown label={undefined} renderTrigger={() => {
+                                    return (
+                                        <svg className="w-6 h-6 text-gray-800 dark:text-white options" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
+                                        </svg>
+                                    )
+                                }}>
+                                {
+                                    messageStates[index] && (
+                                            <Dropdown.Item onClick={() => {
+                                                handleInviteOneVsOne(reciever.id, sender.id);
+                                                navigate('/dashboard/gameRoom/' + reciever.id);
+                                            }}>Invite One VS ONE</Dropdown.Item>
+                                            )
+                                        }
+                                </Dropdown>
                             </div>
                         </div>
                     )

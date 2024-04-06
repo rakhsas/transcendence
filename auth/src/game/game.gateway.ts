@@ -9,12 +9,17 @@ import { Server } from 'socket.io';
 import { Interval } from '@nestjs/schedule';
 import { GameService } from './game.service';
 import { Game } from './game';
+import cli from '@angular/cli';
 
 interface Player {
   id: string;
   socket: any;
 }
-
+interface Friend {
+  id: string;
+  socket: any;
+  friendId: string;
+}
 interface Room {
   players: Player[];
   game: Game;
@@ -27,7 +32,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   rooms: { [id: string]: Room } = {};
   waitingPlayers: Player[] = [];
-  waitingFriend: Player[] = [];
+  waitingFriend: Friend[] = [];
 
   constructor(private readonly gameService: GameService) {}
 
@@ -38,44 +43,65 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('playRandomMatch')
   async handleRandomMatch(client: any) {
     const id = await this.gameService.GuardsConsumer(client);
-    console.log('idGame: ', id);
-    if (this.waitingPlayers.find((player) => player.id === id)) {
+    if(this.isPlayerAlreadyPlaying(id)){
       this.server.to(client.id).emit('inGame');
       return;
-    }
-    if (this.waitingFriend.find((player) => player.id === id)) {
-      this.server.to(client.id).emit('inGame');
-      return;
-    }
-    for (const id in this.rooms) {
-      const player = this.rooms[id].players.find((p) => p.id === id);
-      if (player) {
-        this.server.to(client.id).emit('inGame');
-        return;
-      }
     }
     this.waitingPlayers.push({ id: id, socket: client });
     this.matchPlayers();
   }
 
+  private isPlayerAlreadyPlaying(id: string): boolean {
+    if (this.waitingPlayers.find((player) => player.id === id) || this.waitingFriend.find((player) => player.id === id)) {
+      return true;
+    }
+    if (this.waitingFriend.find((player) => player.id === id)) {
+      return true;
+    }
+    for (const id in this.rooms) {
+      const player = this.rooms[id].players.find((p) => p.id === id);
+      if (player) {
+        return true;
+      }
+    }
+    return false;
+  }
   @SubscribeMessage('playWithFriend')
-  handlePlayWithFriend(client: any, payload: { id: string }) {
-    const { id } = payload;
-    const friend = this.waitingFriend.find((player) => player.id === id);
-    if (!friend) {
-      client.emit('friendNotFound');
-      this.waitingFriend.push({ id: client.id, socket: client });
+  async handlePlayWithFriend(client: any, payload: { me: string }) {
+    const { me } = payload;
+    const id = await this.gameService.GuardsConsumer(client);
+    if(this.isPlayerAlreadyPlaying(id)){
+      this.server.to(client.id).emit('inGame');
+      return;
+    } 
+    // Check if the client's friend is already waiting
+    const friendIndex = this.waitingFriend.findIndex(
+      (player) => player.friendId === id,
+    );
+    console.log('friend id is : ', me);
+    if (friendIndex === -1) {
+      // Add the client to the waiting friends list
+      console.log('client added to waiting list');
+      this.waitingFriend.push({ id: id, socket: client, friendId: me });
       return;
     }
+
+    // Remove the friend from the waiting list
+    const friend = this.waitingFriend.splice(friendIndex, 1)[0];
     const roomId = Math.random().toString(36).substring(7);
     client.join(roomId);
+
+    /// frend socket id
+
     friend.socket.join(roomId);
+    client.join(roomId);
+
     client.emit('roomJoined', roomId, 1, friend.id);
-    friend.socket.emit('roomJoined', roomId, 2, client.id);
+    friend.socket.emit('roomJoined', roomId, 2, id);
     const game = new Game(this.server, roomId);
     const room: Room = {
       players: [
-        { id: client.id, socket: client },
+        { id: id, socket: client },
         { id: friend.id, socket: friend.socket },
       ],
       game,
@@ -196,7 +222,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.waitingPlayers.splice(indexOfPlayerToRemove, 1);
       return;
     }
-
+  // remove player from waiting palyers if it existes
+  const indexOfPlayerT = this.waitingFriend.findIndex(
+    (obj) => obj.socket.id === playerId,
+  );
+  // Get index of object with id 2 and remove it
+  if (indexOfPlayerT !== -1) {
+    this.waitingFriend.splice(indexOfPlayerToRemove, 1);
+    return;
+  }
     // romove it from the room
 
     const id: string = this.getIdOfRoom(playerId);

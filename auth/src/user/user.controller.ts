@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters, Put } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters, Put, ParseArrayPipe, HttpException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update.user';
@@ -7,12 +7,28 @@ import { ApiBody, ApiExtraModels, ApiOkResponse, ApiResponse, ApiTags, getSchema
 import { ValidationPipe } from './validators/validation.pipe';
 import { ValidationFilter } from './validators/validation.pipe';
 import { UserGuard } from '../guards/user.guard';
+import { SettingProfileDto } from './dto/setting.user';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
 	constructor(private readonly userService: UserService) {}
 
+
+	@Put("disable2FA/:userId")
+    // @UseGuards(UserGuard)
+    async update2FAState(@Param('userId') id: string) {
+		console.log("id: ", id);
+        return this.userService.update2FAState(id);
+    }
+
+	@Put('settingProfile/:id')
+  	async updateSettingProfile(@Param('id') id: string, @Body() settingProfileDto : SettingProfileDto) {
+		console.log("id and body, ", id, settingProfileDto);
+      const updatedData = await this.userService.updateUserSetting(id, settingProfileDto);
+      return updatedData;
+  	}
+	
 	@Post()
 	@ApiOkResponse({ description: 'User Created', type: CreateUserDto})
 	@ApiBody({ type: CreateUserDto, description: 'Create User', required: true,})
@@ -23,6 +39,8 @@ export class UserController {
 		return this.userService.createUser(createUserDto);
 	}
 	
+	
+
 	@Get('all')
 	@UseGuards(UserGuard)
 	findAllUsers() {
@@ -48,6 +66,7 @@ export class UserController {
 		return await this.userService.updateUsername(username, userId);
 	}
 
+	
 	
 	// @Patch(':id')
 	// @UseGuards(UserGuard)

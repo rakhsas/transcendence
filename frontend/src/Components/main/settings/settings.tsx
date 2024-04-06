@@ -3,6 +3,7 @@ import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
 import { TwoFaService } from "../../../services/twoFa.service";
+import { SettingService } from "../../../services/setting.service";
 
 
 const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -30,17 +31,30 @@ const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 // "linear-gradient(to right, #d80909, #a02626, #610101)"
 
 function SettingFunction(): JSX.Element {
+	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
+	const twoFaService = new TwoFaService();
 	const [ShowSignUp, SetShowSignUp] = useState<boolean>(false);
 	const [ischecked, setIsChecked] = useState<boolean>(false);
+	const [input, setInput] = useState("");
+	const [url, setUrl] = useState<string>("");
+	const userData = useContext(DataContext);
+	const [formData, setFormData] = useState({
+		firstName: '',
+		lastName: '',
+		email: ''
+	  });
+	const settingService = new SettingService();
 	const FuncClick = () => {
 		SetShowSignUp(!ShowSignUp);
 		setIsChecked(!ischecked);
 	}
-	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
-	const [input, setInput] = useState("");
-	const [url, setUrl] = useState<string>("");
-	const userData = useContext(DataContext);
-	const twoFaService = new TwoFaService();
+	const enable2FA = async () => {
+		const response = await fetch(APIURL + `user/disable2FA/${userData[0].id}`, {
+			method: 'PUT',
+			credentials: 'same-origin',
+		})
+		setIsChecked(!ischecked);
+	}
 	useEffect(() => {
 		if (!userData) return;
 		const fetchData = async () => {
@@ -56,38 +70,46 @@ function SettingFunction(): JSX.Element {
 	}, [userData]);
 	if (!userData) 
 	return <LoadingComponent />;
-
-		const fetchQRcode = async () => {
-			try {
-				console.log(APIURL + `2fa/authenticate/${input}/${userData[0].id}`)
-				const ValidQRcode = await fetch(`https://10.11.42.174/api/2fa/authenticate/${input}/${userData[0].id}`, {
-					method: 'POST',
-					credentials: 'same-origin',
-				})
-				if (ValidQRcode.status == 200) {
-					userData[0].isTwoFactorAuthenticationEnabled = true;
-				}
-				else {
-					userData[0].isTwoFactorAuthenticationEnabled = false;
-				}
-			}
-			catch (error) {
-				console.log('Invalid qrcode \n', error);
-			}
-		};
 	const onchange1 = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (input.length != 6)
 			return;
-		fetchQRcode();
+		await fetchQRcode();
 	}
+	
+	const fetchQRcode = async () => {
+		try {
+			console.log(APIURL + `2fa/authenticate/${input}/${userData[0].id}`)
+			const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
+				method: 'POST',
+				credentials: 'same-origin',
+			})
+			if (ValidQRcode.status == 200) {
+				userData[0].isTwoFactorAuthenticationEnabled = true;
+			}
+			else {
+				userData[0].isTwoFactorAuthenticationEnabled = false;
+			}
+		}
+		catch (error) {
+			console.log('Invalid qrcode \n', error);
+		}
+	};
 	console.log(input , "--> input" , userData[0], "usesr\n");
 	useEffect(() => { }, [ischecked]);
 	const [firstName, setFirstName] = useState<string>('');
 	const [SecondName, setSecondName] = useState<string>('');
 
+	const handleSubmitForm = async () => {
+		const result = await settingService.updateUserInfo(userData[0].id, formData);
+	}
+
 	const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
+		setFormData(prevState => ({
+			...prevState,
+			firstName: value
+		  }));
 		// Regular expression for validating first name (only alphabets, no special characters)
 		const isValidFirstName = /^[A-Za-z\s]+$/.test(value);
 		if (isValidFirstName || value === '') {
@@ -96,6 +118,10 @@ function SettingFunction(): JSX.Element {
 	};
 	const handleSecondNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
+		setFormData(prevState => ({
+			...prevState,
+			lastName: value
+		  }));
 		// Regular expression for validating first name (only alphabets, no special characters)
 		const isValidSecond = /^[A-Za-z\s]+$/.test(value);
 		if (isValidSecond || value === '') {
@@ -111,6 +137,10 @@ function SettingFunction(): JSX.Element {
 
 	const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setUserEmail(event.target.value);
+		setFormData(prevState => ({
+			...prevState,
+			email: event.target.value
+		  }));
 		if (isEmailValid)
 		setIsEmailValid(isValidEmail(event.target.value));
 	}
@@ -142,7 +172,9 @@ function SettingFunction(): JSX.Element {
 						</p>
 						<div className={`flex space-x-2 flex-row justify-center items-center ${ischecked ? 'block' : 'hidden'}`}>
 							<div className="flex flex-row justify-center items-center">
-								<label htmlFor="code-1" className="sr-only" onClick={SettingFunction} >
+								<label htmlFor="code-1"
+									className="sr-only" onClick={SettingFunction}
+								>
 									First code
 								</label>
 								<input
@@ -170,6 +202,7 @@ function SettingFunction(): JSX.Element {
 									id="helper-checkbox-2"
 									aria-describedby="helper-checkbox-text-2 "
 									type="checkbox"
+									onChange={enable2FA}
 									// checked={ischecked}
 									className="w-4 h-4  bg-gray-100 border-gray-300 rounded border-y-2"
 								/>
@@ -194,7 +227,7 @@ function SettingFunction(): JSX.Element {
 				</div>
 			</div>
 			<div className="part2 flex rounded-3xl flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE ">
-				<form className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] flex flex-col ">
+				<form onSubmit={handleSubmitForm} className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] flex flex-col ">
 					<h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5 ">
 						Information
 					</h2>
@@ -297,4 +330,3 @@ function SettingFunction(): JSX.Element {
 }
 
 export default SettingFunction;
-

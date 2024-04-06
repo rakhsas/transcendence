@@ -3,10 +3,13 @@ import CanvasHeadToHead from "./headToHead/HeadToHead";
 import img1 from "./images/table-tennis-ping-pong.jpg";
 import img2 from "./images/ping-pong.jpg";
 import img3 from "./images/pong.jpg";
+import { PropaneSharp } from "@mui/icons-material";
+import { useParams } from "react-router-dom";
 
-const HeadToHead = () => {
+const WithFriend = () => {
   const [selectedMap, setSelectedMap] = useState("map1"); // State to track the selected map
   const [isStarted, setIsStarted] = useState(false); // State to track if the game has started
+	const { idFoFriend } = useParams();
 
   const handleChange = (map) => {
     setSelectedMap(map); // Update the selected map
@@ -22,12 +25,12 @@ const HeadToHead = () => {
   return (
     <div className="flex text-black dark:text-white justify-center w-full h-full items-center">
       <div className="flex justify-center w-[600px] h-[450px] border-2 border-red-600 rounded-xl">
-        {isStarted ? (
+        {isStarted && idFoFriend ? (
           <CanvasHeadToHead
             width="600"
             height="400"
             map={maps.find((map) => map.id === selectedMap)?.imgSrc} // Pass the selected image URL as bg prop
-            idFoFriend={null}
+            idFoFriend={idFoFriend}
           />
         ) : (
           <div className="flex text-sm sm:text-2xl md:text-3xl flex-col justify-center items-center gap-3">
@@ -68,4 +71,4 @@ const HeadToHead = () => {
   );
 };
 
-export default HeadToHead;
+export default WithFriend;

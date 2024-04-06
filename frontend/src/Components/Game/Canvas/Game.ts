@@ -87,7 +87,7 @@ class Game {
     this.net = new Net(canvas);
     this.ball = new Ball(canvas);
     this.rectX = 0;
-       this.rotation = 0; // Initialize rotation angle to 0
+    this.rotation = 0; // Initialize rotation angle to 0
     this.isDragging = false;
     // Mouse position when the drag starts
     this.dragStartY = 0;
@@ -205,6 +205,10 @@ class Game {
       this.resetBall();
     }
 
+    if (this.ball.y + this.ball.r + this.ball.vy > this.canvas.height)
+      this.ball.y = this.canvas.height - this.ball.r - this.ball.vy;
+    else if (this.ball.y - this.ball.r + this.ball.vy < 0) this.ball.y = this.ball.r - this.ball.vy;
+
     this.ball.x += this.ball.vx;
     this.ball.y += this.ball.vy;
 
@@ -214,8 +218,8 @@ class Game {
       computerLevel;
 
     if (
-      this.ball.y + this.ball.r > this.canvas.height ||
-      this.ball.y - this.ball.r < 0
+      this.ball.y + this.ball.r >= this.canvas.height ||
+      this.ball.y - this.ball.r <= 0
     )
       this.ball.vy = -this.ball.vy;
 

@@ -18,6 +18,7 @@ import { gameScores, totalGames } from '../../../utils/types';
 import { GameService } from '../../../services/game.service';
 import { Socket } from 'socket.io-client';
 import MessageService from '../../../services/message.service';
+import MessageModal from '../../modal/message.modal';
 
 interface ButtonAttributes {
 	className: string;
@@ -86,6 +87,7 @@ const FunctionProfileForm: React.FC = () => {
 	const [socketChat, setSocketChat] = useState<Socket>();
 	const [progress, setProgress] = useState<number>(0);
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
+	const [newMessageOpen, setNewMessageOpen] = useState<boolean>(false);
 	const messageService = new MessageService();
 	const fillAnimationKeyframes = `
     @keyframes fillAnimation {
@@ -167,18 +169,21 @@ const FunctionProfileForm: React.FC = () => {
 				const totalGames = await gameService.getTotalMatches(user.id);
 				console.log("inside use effect: ", totalGames);
 				setTotalGames(totalGames);
-				const blockedResult = await messageService.BlockedUsers(userData[0].id, user.id); // need blockedFriendId
-				console.log("blocked result: ", blockedResult);
+				if (userData[0].id !== user.id) {
+					const blockedResult = await messageService.BlockedUsers(userData[0].id, user.id);
+					if (blockedResult===undefined)
+						setIsBlocked(false)
+					else
+					{
+						setIsBlocked(true);
+					}
+				}
 			}
 		};
-		try {
-			fetchScores();
-		} catch (error) {
-			console.log("error: ", error);
-		}
-		console.log("user other: ", user);
+		fetchScores();
+		// console.log("user other: ", user);
 	}, [user]);
-	
+	console.log(totalGames, "sfsddfsdf --> sfd");
 	const ButtonClick = () => {
 		SetBlocked(!BlockedFriend);
 	}
@@ -221,7 +226,18 @@ const FunctionProfileForm: React.FC = () => {
 								borderColor: user?.coalitionColor,
 							}}>
 								<img alt={user?.username} src={BASE_API_URL + user?.picture} className="w-24 h-24 object-cover" />
+
 							</div>
+							<div className="dots" onClick={() => setNewMessageOpen(!newMessageOpen)}>
+								<svg className="w-8 h-8 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+									<path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
+								</svg>
+							</div>
+							{
+								newMessageOpen && (
+									<MessageModal recieverName={user.username} socketChat={socketChat} isOpen={newMessageOpen} setNewMessageOpen={setNewMessageOpen} senderId={userData[0].id} recieverId={user?.id} />	
+								)
+							}
 						</div>
 						<div className="py-4">
 							<h5 className="text-xl text-black dark:text-white font-bolder font-poppins">{user?.firstName + ' ' + user?.lastName}</h5>
@@ -277,7 +293,7 @@ const FunctionProfileForm: React.FC = () => {
 										<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
 											<img src={achievement.icon} className="ml-2 w-16 h-16" />
 											<p className="flex flex-row justify-center items-center dark:text-white text-black">{achievement.name}</p>
-											{  index? (
+											{  totalGames?.gamePlayed > index? (
 												<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
 												</svg>

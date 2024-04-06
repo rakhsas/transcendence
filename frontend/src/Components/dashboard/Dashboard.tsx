@@ -53,6 +53,7 @@ function DashboardComponent() {
 					withCredentials: true
 				});
 				setSocket(socketCHAT);
+				console.log(fetchedUserData.username)
 				const globalSocket: Socket = io(url, {
 					path: "/global",
 					query: {

@@ -43,7 +43,7 @@ enum NotificationType {
     FRIEND_REQUEST_ACCEPTED= 'FRIEND_REQUEST_ACCEPTED',
     FRIEND_REQUEST_DECLINED= 'FRIEND_REQUEST_DECLINED',
     KIKED = 'KIKED',
-
+    ONEVSONE = 'ONEVSONE'
 }
 
 interface NotifMessage {
@@ -221,6 +221,28 @@ function NavbarComponent(): JSX.Element {
         const newItem: notificationInterface = {
             id: data.id,
             type: data.type,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    })
+    socket?.on("invitedGame", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: NotificationType.ONEVSONE,
             message: data.message,
             audio: data.audio,
             image: data.image,
@@ -461,6 +483,48 @@ function NavbarComponent(): JSX.Element {
                                                 </a>
                                             )
                                         }
+                                        else if (item.type === NotificationType.ONEVSONE) {
+                                            return (
+                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <div className="flex-shrink-0">
+                                                        <div className="pic rounded-full w-11 h-11">
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={BASE_API_URL + item.issuer.picture} alt="Robert image" />
+                                                        </div>
+                                                        <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-800">
+                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                                                <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z"/>
+                                                            </svg>
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-full ps-3">
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> invited You To a Game.</div>
+                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                            {
+                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                            }
+                                                        </div>
+                                                        <div className="flex gap-2 w-fit">
+                                                        <Button color="success" pill onClick={() => {
+                                                            navigate(`/dashboard/gameRoom/${item.issuer.id}`);
+                                                            setNotifIsOpen(false);
+                                                            item.seen = true;
+                                                        }}>
+                                                            Accept
+                                                        </Button>
+                                                        <Button color="failure" pill onClick={() => {
+                                                            socket?.emit("declineFriendRequest",
+                                                            {
+                                                                userId: userData[0].id,
+                                                                friendId: item.issuer.id
+                                                            });
+                                                        }}>
+                                                            Decline
+                                                        </Button>
+                                                    </div>
+                                                    </div>
+                                                </a>
+                                            )
+                                        }
                                         else if (item.type === NotificationType.CHANNEL_INVITE) {
                                             return (
                                                 <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -502,6 +566,8 @@ function NavbarComponent(): JSX.Element {
                                                                 password: ''
                                                             }
                                                             );
+                                                            setNotifIsOpen(false);
+                                                            item.seen = true;
                                                         }}>
                                                             Accept
                                                         </Button>
@@ -646,7 +712,7 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                     <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-red-500 border border-white rounded-full dark:border-gray-800">
                                                         <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"/>
+                                                            <path stroke="currentColor" strokeLinecap="round" stroke-linejoin="round" strokeWidth="2" d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"/>
                                                         </svg>
                                                     </div>
                                                 </div>

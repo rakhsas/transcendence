@@ -13,7 +13,9 @@ export enum NotificationType {
     FRIEND_REQUEST_ACCEPTED= 'FRIEND_REQUEST_ACCEPTED',
     FRIEND_REQUEST_DECLINED= 'FRIEND_REQUEST_DECLINED',
     KIKED = 'KIKED',
+    ONEVSONE = 'ONEVSONE',
 }
+
 
 @Entity()
 export class Notif {

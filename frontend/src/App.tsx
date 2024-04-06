@@ -12,6 +12,7 @@ import CallComponent from './Components/call/call';
 import ProfileComponent from './Components/main/profile/profile.tsx';
 import SettingFunction from './Components/main/settings/settings.tsx';
 import FunctionProfileForm from './Components/main/profile/profile.tsx';
+import WithFriend from './Components/Game/withFriend.tsx';
 // const url: string = import.meta.env.VITE_API_AUTH_KEY;
 
 function App() {
@@ -31,6 +32,9 @@ function App() {
             <Route path=':userId' element={<ProfileComponent />} />
           </Route>
           <Route path="game" element={<Game />} />
+          <Route path="gameRoom">
+            <Route path=":idFoFriend" element={<WithFriend />} />
+          </Route>
           <Route path="HeadToHead" element={<HeadToHead />} />
           <Route path="profile" element={<FunctionProfileForm />} />
         </Route>

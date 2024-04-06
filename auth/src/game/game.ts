@@ -129,11 +129,17 @@ export class Game {
         this.resetBall();
       }
 
+      if (this.ball.y + this.ball.r + this.ball.vy > this.height)
+        this.ball.y = this.height - this.ball.r - this.ball.vy;
+      else if (this.ball.y - this.ball.r + this.ball.vy < 0)
+        this.ball.y = this.ball.r - this.ball.vy;
+
       this.ball.x += this.ball.vx;
       this.ball.y += this.ball.vy;
+
       if (
-        this.ball.y + this.ball.r + 1 > this.height ||
-        this.ball.y - this.ball.r + 1 < 0
+        this.ball.y + this.ball.r >= this.height ||
+        this.ball.y - this.ball.r <= 0
       )
         this.ball.vy = -this.ball.vy;
 
