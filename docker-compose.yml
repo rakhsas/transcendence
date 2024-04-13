@@ -12,7 +12,6 @@ services:
       - "3000:3000"
     volumes:
       - ./auth:/app
-      - node_modules_auth:/app/node_modules
     networks:
       - backend
   frontend:
@@ -29,7 +28,6 @@ services:
       - backend
     volumes:
       - ./frontend:/app
-      - node_modules_front:/app/node_modules
   nginx:
     image: nginx
     build:
@@ -67,20 +65,6 @@ networks:
     name: backend
 
 volumes:
-  node_modules_auth:
-    name: node_modules_auth
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./auth/node_modules
-  node_modules_front:
-    name: node_modules_front
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./frontend/node_modules
   potgres_data:
     name: postgres_data
     driver: local
