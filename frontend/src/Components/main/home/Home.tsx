@@ -236,7 +236,7 @@ const HomeComponent: React.FC = () => {
                     </div>
                     <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
-                        <div className="flex flex-col w-full gap-2">
+                        <div className="flex flex-wrap gap-2 bg-green-400 w-full">
                             {
                                 protectedChannels?.length == 0
                                 ?
@@ -247,7 +247,7 @@ const HomeComponent: React.FC = () => {
                                     )
                                 :
                                 protectedChannels.map((channel, index) => (
-                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2 w-full" key={index}>
+                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex-wrap flex flex-row p-2 w-full" key={index}>
                                         <div className="infos flex flex-row items-center space-x-4">
                                             <div className="pic w-12 h-12 rounded-2xl">
                                                 <img src={baseAPIUrl + channel.picture} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
@@ -272,7 +272,7 @@ const HomeComponent: React.FC = () => {
                                 )
                             }
                         </div>
-                    </div>
+                    </div> 
                 </section>
 
             </main>
@@ -282,7 +282,6 @@ const HomeComponent: React.FC = () => {
                         <img src={baseAPIUrl + userData[0].picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData[0].username} />
                     </div>
                     <div className="groupslogo mt-8">
-                        {/* <img src={group} alt='Groups' /> */}
                         {group()}
                     </div>
                     <div className="friends mt-4 flex flex-wrap gap-2 flex-col">
@@ -292,7 +291,6 @@ const HomeComponent: React.FC = () => {
                                     'Loading...'
                                 :
                                     friendData.map((friend, index) => {
-                                        // //console.log('friendData: ', friend)
                                         return (
                                             <div className="w-16 h-20 relative flex flex-col items-center" key={index} onClick={() => navigate(`/dashboard/profile/${friend.user.id}`)}>
                                                 <div className="img p-2" key={index}>

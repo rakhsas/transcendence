@@ -91,6 +91,7 @@ export class User {
 
   @OneToMany(() => Blocked, blockedUser => blockedUser.user)
   blockedUsers: Blocked[];
+  
   @Column({ nullable: true })
   public twoFactorAuthenticationSecret?: string;
      

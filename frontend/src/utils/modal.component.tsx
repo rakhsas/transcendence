@@ -9,9 +9,11 @@ const ModalComponent: React.FC<ModalComponentProps> = ({ picPath, status, onClos
   // const [openModal, setOpenModal] = useState(status);
   // setOpenModal(status);
   return (
-    <Modal dismissible show={status} onClose={onClose}>
+    <Modal dismissible show={status} onClose={onClose} className='bg-zinc-950'>
       <Modal.Body className='bg-black'>
-        <img src={picPath} alt="placeholder" />
+        <div className="flex justify-center items-center">
+          <img src={picPath} alt="placeholder" />
+        </div>
       </Modal.Body>
     </Modal>
   );

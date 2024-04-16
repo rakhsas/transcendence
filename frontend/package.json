@@ -23,8 +23,10 @@
     "react-dom": "^18.2.0",
     "react-owl-carousel": "^2.3.3",
     "react-router-dom": "^6.22.0",
+    "react-wavesurfer": "^0.8.6",
     "socket.io-client": "^4.7.4",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.8",
+    "wavesurfer.js": "^7.7.9"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

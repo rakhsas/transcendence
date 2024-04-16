@@ -129,25 +129,29 @@ function NavbarComponent(): JSX.Element {
         navigate(`/dashboard/profile/${id}`);
     }
     const socket: Socket = userData[1];
-    // const onRequestCall = async (data: any) => {
-    //     setChannelNotifPayload(data);
-    //     const sender: User = await userService.getUser(data.senderId);
-    //     const newItem: notifItems = {
-    //         from: data.from,
-    //         to: data.to,
-    //         message: {
-    //             message: ' Requested a call.',
-    //             image: '',
-    //             audio: ''
-    //         },
-    //         sender: sender,
-    //         type: NotificationType.CallRequest
-    //     }
-    //     const updatedItems: notifItems[] = [...notifications, newItem];
-    //     setNotifications(updatedItems);
-    //     setNotificationCount(true);
-    // }
-    // socket?.on("RequestCall", onRequestCall);
+    const onRequestCall = async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: NotificationType.CALL_REQUEST,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    }
+    socket?.on("RequestCall", onRequestCall);
     const onDirectMessage = async (data: any) => {
         const newItem: notificationInterface = {
             id: data.id,
@@ -582,21 +586,44 @@ function NavbarComponent(): JSX.Element {
                                                 <a href="#" key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-11 h-11">
-                                                            <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={BASE_API_URL + item.issuer.picture} alt="Robert image" />
+                                                            <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={BASE_API_URL + item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
-                                                        <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
-                                                            <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z"/>
-                                                        </svg>
+                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
+                                                                <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z" />
+                                                            </svg>
                                                         </div>
                                                     </div>
                                                     <div className="w-full ps-3">
-                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video: Glassmorphism - learn how to implement the new design trend.</div>
+                                                        <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">Incoming call from <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span>.</div>
                                                         <div className="text-xs text-blue-600 dark:text-blue-500">
                                                             {
                                                                 new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
                                                             }
                                                         </div>
+                                                    </div>
+                                                    <div className="flex gap-2 w-fit">
+                                                        <Button color="success" pill onClick={() => {
+                                                            /*socket?.emit("acceptFriendRequest",
+                                                            {
+                                                                userId: userData[0].id,
+                                                                friendId: item.issuer.id
+                                                            }
+                                                            );*/
+                                                            setNotifIsOpen(false);
+                                                            item.seen = true;
+                                                        }}>
+                                                            Accept
+                                                        </Button>
+                                                        <Button color="failure" pill onClick={() => {
+                                                            /*socket?.emit("declineFriendRequest",
+                                                            {
+                                                                userId: userData[0].id,
+                                                                friendId: item.issuer.id
+                                                            });*/
+                                                        }}>
+                                                            Decline
+                                                        </Button>
                                                     </div>
                                                 </a>
                                             )
