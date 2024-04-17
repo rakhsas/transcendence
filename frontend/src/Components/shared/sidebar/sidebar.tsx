@@ -1,8 +1,6 @@
 import './sidebar.css';
 import logo from './../../../assets/Frame 1.svg'
 import { useContext, useEffect, useState } from 'react';
-import ExpandLeft from './../../../assets/Icon/Expand_left.png'
-import ExpandRight from './../../../assets/Icon/Expand_right.png'
 import ProfileIcon from '../icons/Profile';
 import HomeIcon from '../icons/Home';
 import AnalyticsIcon from '../icons/Analytics';
@@ -10,7 +8,6 @@ import ChatIcon from '../icons/Chat';
 import SettingsIcon from '../icons/Settings';
 import LogoutIcon from '../icons/Logout';
 import { NavLink, useLocation } from "react-router-dom";
-import User from '../../../model/user.model';
 import DataContext from '../../../services/data.context';
 import { PathLiteral, Paths } from '../../../utils/types';
 import AuthService from '../../../services/auth.service';
@@ -48,7 +45,7 @@ function SidebarComponent(): JSX.Element {
 
   return (
 	<>
-		<div className="w-[100px] dark:bg-zinc-900 bg-main-light-WHITE shadow overflow-y-auto flex flex-col justify-between h-screen">
+		<div className="w-[100px] dark:bg-zinc-900 bg-main-light-WHITE shadow overflow-y-auto md:flex flex-col justify-between h-screen hidden">
 			<img src={logo} alt="Logo" className="mx-auto pt-10" />
 			<div className="flex flex-col justify-center flex-grow mx-auto">
 				{icons.map((icon, index) => (
@@ -67,6 +64,26 @@ function SidebarComponent(): JSX.Element {
 				<LogoutIcon activeIndex={false}/>
 			</div>
 		</div>
+      <div className='absolute md:hidden bottom-0 bg-main-dark-SPRUCE z-20 w-full '>
+          <div className='flex justify-center items-center ' >
+            <div className="flex justify-center flex-grow mx-auto  px-3">
+              {icons.map((icon, index) => (
+                <NavLink to={icon.path === 'profile' ?  icon.path + '/' + userData[0].id : icon.path} key={index} className="w-full">
+                  <div
+                    key={index}
+                    className="px-2 py-2 rounded-lg justify-start items-center gap-2 flex cursor-pointer"
+                    onClick={() => handleIconClick(index)} 
+                  >
+                    {icon.icon}
+                  </div>
+                </NavLink>
+              ))} 
+            </div>
+            <div className="w-7  mr-3 " onClick={() => { logout() }}>
+              <LogoutIcon  activeIndex={false}/>
+            </div>
+        </div>
+      </div>
 	</>
   );
 }
