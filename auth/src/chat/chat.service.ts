@@ -288,7 +288,7 @@ export class ChatService {
       await this.channelUserRepository.delete(targetedEntity.id);
     }
     else
-      //console.log("the user in channel-user relation is not found!!!");
+      console.log("the user in channel-user relation is not found!!!");
   }
 
   async changeChannelType(payload: any)

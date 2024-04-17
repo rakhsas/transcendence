@@ -196,14 +196,12 @@ export class UserService {
 	}
 
 
-	async update2FAState(userId: string) {
-		//console.log("userId: ", userId);
+	async update2FAState(userId: string, status: boolean) {
 		const user = await this.viewUser(userId);
 		if (!user) {
 			throw new Error('User not found');
 		}
-		//console.log("user: ", user);
-		user.isTwoFactorAuthenticationEnabled = !user.isTwoFactorAuthenticationEnabled;
+		user.isTwoFactorAuthenticationEnabled = status;
 		return await this.userRepository.save(user);
 	}
 }

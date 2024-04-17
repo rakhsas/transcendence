@@ -1,4 +1,3 @@
-// src/chat/chat.gateway.ts
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
@@ -11,12 +10,6 @@ import { NotificationService } from 'src/notification/notification.service';
 import { NotificationType } from 'src/user/entities/notification.entity';
 import { FriendService } from 'src/friends/friends.service';
 import { MuteService } from 'src/mute/mute.service';
-// import cli from '@angular/cli';
-// import { Paths } from '../../../frontend/src/utils/types';
-
-// @WebSocketGateway()
-
-// connectionStateRecovery();
 @WebSocketGateway({ cors: true, path: '/chat', methods: ['GET', 'POST'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
@@ -399,12 +392,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('callUser')
 	async handleCallUser(client: Socket, payload: any) {
-		client.to(payload.to).emit('RequestCall', {
-			from: payload.from,
-			offer: payload.offer,
-			senderId: payload.senderId,
-			recieverId: payload.recieverId
+		console.log('callUser: ', payload)
+		// client.to(payload.to).emit('RequestCall', {
+		// 	from: payload.from,
+		// 	offer: payload.offer,
+		// 	senderId: payload.senderId,
+		// 	recieverId: payload.recieverId
+		// });
+		const notif = await this.notificationService.createNotification({
+			target: payload.target,
+			type: NotificationType.CALL_REQUEST,
+			issuer: payload.senderId,
+			message: "",
+			image: null,
+			audio: null,
+			channel: null,
 		});
+		const lastnotif = await this.notificationService.getNotificationById(notif.id);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('callNotif', lastnotif);
 	}
 
 	@SubscribeMessage('mediaOffer')

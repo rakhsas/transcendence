@@ -1,25 +1,37 @@
-import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters, Put, ParseArrayPipe, HttpException } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters, Put, ParseArrayPipe, HttpException, UseInterceptors, UploadedFile, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update.user';
 import { CreateUserDto } from './dto/create.user';
-import { ApiBody, ApiExtraModels, ApiOkResponse, ApiResponse, ApiTags, getSchemaPath, refs } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiExtraModels, ApiOkResponse, ApiParam, ApiResponse, ApiTags, getSchemaPath, refs } from '@nestjs/swagger';
 import { ValidationPipe } from './validators/validation.pipe';
 import { ValidationFilter } from './validators/validation.pipe';
 import { UserGuard } from '../guards/user.guard';
 import { SettingProfileDto } from './dto/setting.user';
+import { User } from './entities/user.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadController } from 'src/upload/upload.controller';
+import * as https from 'https';
+import axios from 'axios';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
-	constructor(private readonly userService: UserService) {}
-
+	constructor(
+		private readonly userService: UserService,
+		) {}
+	UPLOAD_API_URL = process.env.HOST + 'upload';
 
 	@Put("disable2FA/:userId")
-    // @UseGuards(UserGuard)
-    async update2FAState(@Param('userId') id: string) {
+    async update2FA(@Param('userId') id: string) {
 		//console.log("id: ", id);
-        return this.userService.update2FAState(id);
+        return this.userService.update2FAState(id, false);
+    }
+	
+	@Put("enable2FA/:userId")
+    async enable2FA(@Param('userId') id: string) {
+		//console.log("id: ", id);
+        return this.userService.update2FAState(id, true);
     }
 
 	@Put('settingProfile/:id')
@@ -66,17 +78,58 @@ export class UserController {
 		return await this.userService.updateUsername(username, userId);
 	}
 
-	
-	
-	// @Patch(':id')
-	// @UseGuards(UserGuard)
-	// UpdateUser(@Param('id') id: string, @Body() updatedUser: UpdateUserDto) {
-	// 	return this.userService.update(id, updatedUser);
-	// }
-	
-	// @Delete(':id')
-	// @UseGuards(UserGuard)
-	// deleteUser(@Param('id') id: number) {
-	// 	return this.userService.deleteUser(+id);
-	// }
+	@Put(":userId")
+	@ApiBody({ type: UpdateUserDto, description: 'Update User', required: true,})
+	async updateUser(@Param('userId') id: string, @Body() updateUserDto: Partial<User>) {
+		return await this.userService.update(id, updateUserDto);
+	}
+
+	// @Put('picture1/:userId')
+	// @ApiConsumes('multipart/form-data')
+	// @ApiBody({
+	// 	schema: {
+	// 		type: 'object',
+	// 		properties: {
+	// 			file: {
+	// 				type: 'string',
+	// 				format: 'binary',
+	// 			},
+	// 		},
+	// 	}
+	// })
+
+	@Put('picture/:userId')
+	@ApiParam({ name: 'userId', required: true, description: 'User ID' })
+	@ApiConsumes('multipart/form-data')
+	@UseInterceptors(FileInterceptor('file')) // Use FileInterceptor to handle file uploads
+	async updatePicture(@Param('userId') id: string, @UploadedFile() file: Express.Multer.File) {
+		console.log('pictureUrl:');
+		// if (!file) {
+		// 	throw new BadRequestException('No file uploaded!');
+		// }
+		// try {
+		// 	const pictureUrl = await this.uploadFile(file);
+		// 	return await this.userService.update(id, { picture: pictureUrl });
+		// } catch (error) {
+		// 	console.error('Error updating picture:', error);
+		// 	throw new InternalServerErrorException('Failed to update picture.');
+		// }
+	}
+
+	async uploadFile(file: Express.Multer.File) {
+		try {
+			const formData = new FormData();
+			formData.append('file', file.buffer, file.originalname); // Use file.buffer and file.originalname to append the file to FormData
+			const response = await axios.post(this.UPLOAD_API_URL, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				},
+				httpsAgent: new https.Agent({ rejectUnauthorized: false })
+			});
+			return response.data.url;
+		} catch (error) {
+			console.error('Error uploading file:', error);
+			throw new InternalServerErrorException('Failed to upload file.');
+		}
+	}
 }

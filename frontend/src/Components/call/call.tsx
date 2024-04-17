@@ -1,6 +1,5 @@
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import io, { Socket } from 'socket.io-client';
+import { useState, useContext } from "react";
 import DataContext from "../../services/data.context";
 import LoadingComponent from "../shared/loading/loading";
 
@@ -34,8 +33,8 @@ function CallComponent() {
     };
     socket?.on("update-user-list", onUpdateUserList);
     const onUserCall = (data: any) => {
-        //console.log("data.from", data.from);
-        //console.log("data.to", data.to);
+        console.log("data.from", data.from);
+        console.log("data.to", data.to);
     }
     socket?.on("RequestCall", onUserCall)
     const createPeerConnection = () => {
@@ -73,74 +72,78 @@ function CallComponent() {
     socket?.on("connect", onSocketConnect);
     const call = async () => {
         //console.log("selectedUser: 1111", selectedUser)
+        // console.log('from: ', socket?.id);
+        // console.log('to: ', selectedUser);
+        // console.log('senderId: ', userData[0].id);
         socket?.emit("callUser", {
             from: socket?.id,
             to: selectedUser,
-            senderId: userData[0].id
-        });
-        const localOfferPeer = await peer.createOffer();
-        await peer.setLocalDescription(new RTCSessionDescription(localOfferPeer));
-        socket?.emit("mediaOffer", {
-            offer: localOfferPeer,
-            from: socket?.id,
-            to: selectedUser,
-        });
-        //console.log(`mediaOffer is emitted`);
-        const onMediaOffer = async (data: any) => {
-            try {
-                //console.log("Received media offer:", data.offer);
-                await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
-                const peerAnswer = await peer.createAnswer();
-                await peer.setLocalDescription(new RTCSessionDescription(peerAnswer));
-
-                socket?.emit("mediaAnswer", {
-                    answer: peerAnswer,
-                    from: socket?.id,
-                    to: data.from,
-                });
-            } catch (error) {
-                console.error(error);
-            }
-        };
-        socket?.on("mediaOffer", onMediaOffer);
-        const onMediaAnswer = async (data: any) => {
-            try {
-                //console.log("Received media answer:", data.answer);
-                await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
-            } catch (error) {
-                console.error("Error setting remote description:", error);
-            }
-        };
-        const onIceCandidateEvent = (event: any) => {
-            socket?.emit("iceCandidate", {
-                to: selectedUser,
-                candidate: event.candidate,
-            });
-        };
-        socket?.on("mediaAnswer", onMediaAnswer);
-        peer.onicecandidate = onIceCandidateEvent;
-        const onRemotePeerIceCandidate = async (data: any) => {
-            try {
-                const candidate = new RTCIceCandidate(data.candidate);
-                await peer.addIceCandidate(candidate);
-            } catch (error) {
-            }
-        };
-        socket?.on("remotePeerIceCandidate", onRemotePeerIceCandidate);
-        const gotRemoteStream = (event: any) => {
-            const [stream] = event.streams;
-            //console.log("Got remote stream:", stream);
-            const remoteVideo =
-                document.querySelector<HTMLVideoElement>("#remoteVideo");
-            if (remoteVideo) {
-                remoteVideo.srcObject = stream;
-            }
-        };
-        peer.addEventListener("track", gotRemoteStream);
-        socket?.on('user-disconnected', (data: any) => {
-            const disconnectedUserId = data.userId;
+            senderId: userData[0].id,
+            target: 'df52828c-75fa-475c-a454-971cc757f472'
         });
     };
+    // const localOfferPeer = await peer.createOffer();
+    // await peer.setLocalDescription(new RTCSessionDescription(localOfferPeer));
+    // socket?.emit("mediaOffer", {
+    //     offer: localOfferPeer,
+    //     from: socket?.id,
+    //     to: selectedUser,
+    // });
+    // //console.log(`mediaOffer is emitted`);
+    // const onMediaOffer = async (data: any) => {
+    //     try {
+    //         //console.log("Received media offer:", data.offer);
+    //         await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
+    //         const peerAnswer = await peer.createAnswer();
+    //         await peer.setLocalDescription(new RTCSessionDescription(peerAnswer));
+
+    //         socket?.emit("mediaAnswer", {
+    //             answer: peerAnswer,
+    //             from: socket?.id,
+    //             to: data.from,
+    //         });
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
+    // socket?.on("mediaOffer", onMediaOffer);
+    // const onMediaAnswer = async (data: any) => {
+    //     try {
+    //         //console.log("Received media answer:", data.answer);
+    //         await peer.setRemoteDescription(new RTCSessionDescription(data.answer));
+    //     } catch (error) {
+    //         console.error("Error setting remote description:", error);
+    //     }
+    // };
+    // const onIceCandidateEvent = (event: any) => {
+    //     socket?.emit("iceCandidate", {
+    //         to: selectedUser,
+    //         candidate: event.candidate,
+    //     });
+    // };
+    // socket?.on("mediaAnswer", onMediaAnswer);
+    // peer.onicecandidate = onIceCandidateEvent;
+    // const onRemotePeerIceCandidate = async (data: any) => {
+    //     try {
+    //         const candidate = new RTCIceCandidate(data.candidate);
+    //         await peer.addIceCandidate(candidate);
+    //     } catch (error) {
+    //     }
+    // };
+    // socket?.on("remotePeerIceCandidate", onRemotePeerIceCandidate);
+    // const gotRemoteStream = (event: any) => {
+    //     const [stream] = event.streams;
+    //     //console.log("Got remote stream:", stream);
+    //     const remoteVideo =
+    //         document.querySelector<HTMLVideoElement>("#remoteVideo");
+    //     if (remoteVideo) {
+    //         remoteVideo.srcObject = stream;
+    //     }
+    // };
+    // peer.addEventListener("track", gotRemoteStream);
+    // socket?.on('user-disconnected', (data: any) => {
+    //     const disconnectedUserId = data.userId;
+    // });
 
 
     return (
