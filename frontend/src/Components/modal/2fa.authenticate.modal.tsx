@@ -6,17 +6,17 @@ import Cookies from 'js-cookie';
 type ModalProps = {
     userData: any;
 }
-const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
+const TwoFAComponent: React.FC<ModalProps> = ({ userData }) => {
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     const inputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
     const [incorrectPassword, setIncorrectPassword] = useState<boolean>(false);
     const [success, setSuccess] = useState<boolean>(false);
     const [isOpen, setOpenModal] = useState<boolean>(true);
+    const [url, setUrl] = useState<string>("");
+    const twoFaService = new TwoFaService();
     function onCloseModal() {
-        setOpenModal(false);
+        setOpenModal(false)
     }
-	const [url, setUrl] = useState<string>("");
-	const twoFaService = new TwoFaService();
 
     useEffect(() => {
 		if (!userData) return;
@@ -39,16 +39,12 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
     };
     const validateQr = async () => {
         const otp = inputRefs.map(inputRef => inputRef.current?.value).join('');
-        console.table(otp);
         try {
-			//console.log(baseAPIUrl + `2fa/authenticate/${otp}/${userData[0].id}`)
 			const ValidQRcode = await fetch(baseAPIUrl + `2fa/authenticate/${otp}/${userData[0].id}`, {
 				method: 'POST',
 				credentials: 'same-origin',
 			})
 			if (ValidQRcode.status == 200) {
-				// userData[0].isTwoFactorAuthenticationEnabled = true;
-                // await fetch(baseAPIUrl + `2fa/disable/${userData[0].id}`, {
                 Cookies.set('twoFactorAuthentication', 'false');
                 setOpenModal(false);
 			}

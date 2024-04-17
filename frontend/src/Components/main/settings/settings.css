@@ -86,18 +86,14 @@
 }
 
 #uploadbtn {
-   /* display: ; */
     display: flex;
-    opacity: 0;
-    width: 200px;
-    height: auto;
+    opacity: -1;
     justify-content: center;
     align-items: center;
-    padding: 2px;
     border-radius: 5px;
     cursor: pointer;
     color: white;
-    background-color: #31304D;
+    background-color: rgba(0, 0, 0, .7);
     box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.644);
     position: absolute;
     transition: all 0.3s ease;

@@ -16,7 +16,7 @@ import ModalComponent from '../../modal/modal';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import InfoModal from '../../modal/Info.modal';
-import TwoFAComponent from '../../modal/2fa.modal';
+import TwoFAComponent from '../../modal/2fa.authenticate.modal';
 
 const group = () => {
     return (
@@ -59,7 +59,7 @@ const HomeComponent: React.FC = () => {
     const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const firstLogin = Cookies.get('firstLogin');
-    const twoFactorAuthentication = Cookies.get('twoFactorAuthentication');
+    // const twoFactorAuthentication = Cookies.get('twoFactorAuthentication');
     useEffect(() => {
         if (!userData) {
             return;
@@ -148,13 +148,12 @@ const HomeComponent: React.FC = () => {
         });
         setFriendData(friendDataCopy);
     });
-    
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
                 {
-                    twoFactorAuthentication === 'true' && (
-                        <TwoFAComponent userData={userData} />
+                    userData[0].isTwoFactorAuthenticationEnabled === 'true' && (
+                        <TwoFAComponent userData={userData}/>
                     )
                 }
                 {

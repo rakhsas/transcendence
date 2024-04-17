@@ -37,6 +37,12 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
         socketChat?.emit('inviteOneVsOne', { friendId, userId});
         navigate('/dashboard/gameRoom/' + friendId);
     }
+    useEffect(() => {
+        const messageStates = MESSAGES.map((message: any) => {
+            return message.message.length > 0 || message.img || message.audio ? true : false;
+        });
+        setMessageStates(messageStates);
+    }, [MESSAGES]);
     return (
         <>
             {MESSAGES.map((message: any, index: any) => {
