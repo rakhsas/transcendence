@@ -159,7 +159,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 					)}
 				</Tabs.Item>
 			</Tabs>
-			<button className="add bottom-6" onClick={() => { setIsOpen(!isOpen) }}></button>
+			<button className="add bottom-0" onClick={() => { setIsOpen(!isOpen) }}></button>
 			{isOpen ? <Modal show={isOpen} onClose={() => {setIsOpen(false)}}>
 				<Modal.Header className="text-center">Channel Details</Modal.Header>
 				<Modal.Body>

@@ -87,9 +87,9 @@ function DashboardComponent() {
 		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 				<SidebarComponent />
-				<div className="overflow-auto  flex flex-col w-full">
+				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">
 					<NavbarComponent />
-					<div className="flex flex-1">
+					<div className="flex  flex-1">
 						<Outlet />
 					</div>
 				</div>

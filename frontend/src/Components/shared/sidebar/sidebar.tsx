@@ -64,7 +64,7 @@ function SidebarComponent(): JSX.Element {
 				<LogoutIcon activeIndex={false}/>
 			</div>
 		</div>
-      <div className='absolute md:hidden bottom-0 dark:bg-zinc-900 bg-main-light-WHITE  z-20 w-full '>
+      <div className='absolute md:hidden bottom-0 dark:bg-zinc-900 bg-main-light-WHITE   z-20 w-full '>
           <div className='flex justify-center items-center ' >
             <div className="flex justify-center flex-grow mx-auto  px-3">
               {icons.map((icon, index) => (

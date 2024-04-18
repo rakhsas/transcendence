@@ -381,7 +381,7 @@ function chatComponent(): JSX.Element {
 					setSelectedItem={setSelectedItem}
 					socket={socket}
 				/>
-				<div className=" sm:flex  flex-col overflow-hidden flex-1 h-full ">
+				<div className="flex  flex-col overflow-hidden flex-1 h-full ">
 
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
