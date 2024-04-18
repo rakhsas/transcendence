@@ -1,4 +1,4 @@
-import { Avatar, Button, FileInput, Label, Modal, Select, Tabs, TextInput } from "flowbite-react";
+import { CustomFlowbiteTheme, FileInput, FlowbiteButtonTheme, Label, Modal, Select, Tabs, TextInput } from "flowbite-react";
 import { tabsTheme } from "../../../utils/themes";
 import { LiaUserFriendsSolid } from "react-icons/lia";
 import { RiWechatChannelsFill } from "react-icons/ri";
@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { ChannelTypes } from "../../../utils/types";
 import UploadService from "../../../services/upload.service";
 import { Socket } from "socket.io-client";
+import { customTheme } from "../../../utils/theme";
 
 type data = {
 	latestMessages: messageUser[];
@@ -27,12 +28,14 @@ interface LatestMesg {
 	latestMessage: messageUser;
 }
 
+
 const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex, lstGroupMessages, handleSelectMessage, setLstGroupMessages, userData, isOpen, setIsOpen, selectedItem, setSelectedItem, socket }) => {
 	const [imagePath, setImagePath] = useState<any>();
 	useEffect(() => {
 
 	}, [lstGroupMessages]);
-	const addChannel = async (event: React.FormEvent<HTMLFormElement>) => {
+	const addChannel = async (event: any) => {
+		console.log('addChannel');
         event.preventDefault();
         const name = event.currentTarget.channelName.value;
         const type = event.currentTarget.types.value;
@@ -104,9 +107,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 																	message.message.length > 0 ? (
 																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
 																	) : (
-																		message.message.img && message.message.img.length > 0 ? ' Picture' :
-																		message.message.audio && message.message.audio.length > 0 ? ' Audio' :
-																		null
+																		message.img ? ' Picture' : ' Audio'
 																	)
 																}
 															</span>
@@ -119,9 +120,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 																	message.message.length > 0 ? (
 																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
 																	) : (
-																		message.message.img && message.message.img.length > 0 ? ' Picture' :
-																		message.message.audio && message.message.audio.length > 0 ? ' Audio' :
-																		null
+																		message.img ? ' Picture' : ' Audio'
 																	)
 																}
 															</span>
@@ -159,21 +158,30 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 					)}
 				</Tabs.Item>
 			</Tabs>
-			<button className="add bottom-0" onClick={() => { setIsOpen(!isOpen) }}></button>
-			{isOpen ? <Modal show={isOpen} onClose={() => {setIsOpen(false)}}>
-				<Modal.Header className="text-center">Channel Details</Modal.Header>
-				<Modal.Body>
+			<button className="add bottom-6" onClick={() => { setIsOpen(!isOpen) }}></button>
+			{isOpen ? <Modal show={isOpen} onClose={() => {setIsOpen(false)}} className="bg-zinc-900">
+				<Modal.Header theme={customTheme.modal?.header} className="text-center dark:bg-main-light-EGGSHELL bg-main-light-FERN text-white">Channel Details</Modal.Header>
+				<Modal.Body className="bg-zinc-800">
 					<form className="flex flex-col gap-4 m-0" onSubmit={addChannel}>
-						<div className="conta flex flex-col">
+						<div className="conta flex flex-col gap-8">
 							<div className="flex justify-center">
-								<input type="file" onChange={(e) => setImagePath(e.target.files?.[0])} />
+								<div className="pic w-32 h-32 rounded-full bg-green-500">
+								<div className="flex flex-col items-center justify-center">
+									<svg className="mb-4 h-8 w-8 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16" >
+										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+									</svg>
+								</div>
+								</div>
+							{/* <Label htmlFor="dropzone-file" className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"> */}
+							{/* </Label> */}
+								{/* <input type="file" accept="image/jpeg, image/jpg" required className="" onChange={(e) => setImagePath(e.target.files?.[0])} /> */}
 							</div>
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
 								<div>
 									<div className="mb-2 block">
 										<Label htmlFor="channelName" value="Room Name" />
 									</div>
-									<TextInput id="channelName" type="text" autoComplete="OFF" placeholder="Give It a name" />
+									<TextInput id="channelName" className="" theme={customTheme.textInput} color="primary" required type="text" autoComplete="OFF" placeholder="Give It a name" />
 								</div>
 								<div className="mb-2 block">
 									<div className="mb-2 block">
@@ -200,7 +208,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 								}
 							</div>
 						</div>
-						<Button type="submit">Submit</Button>
+						<button  className="bg-main-light-EGGSHELL p-4 rounded-xl w-fit px-8 self-center cursor-pointer" onClick={(e) => addChannel}>Submit</button>
 					</form>
 				</Modal.Body>
 			</Modal> : null}

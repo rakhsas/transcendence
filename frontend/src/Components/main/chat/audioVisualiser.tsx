@@ -20,11 +20,11 @@ const AudioPlayerWithWaveform = ({ audioSrc }: any) => {
         container: ref,
         waveColor: '#6B7280',
         progressColor: '#40c057',
-        cursorColor: '#fcc8a7',
+        cursorColor: 'transparent',
         barWidth: 3,
         barRadius: 10,
         responsive: true,
-        height: 30,
+        height: 25,
         normalize: true,
         barGap: 3,
     })

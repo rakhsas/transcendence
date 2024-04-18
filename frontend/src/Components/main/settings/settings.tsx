@@ -1,53 +1,55 @@
 import "./settings.css";
-import React, { ChangeEvent, useContext, useEffect, useState } from "react";
+import React, { ChangeEvent, useCallback, useContext, useEffect, useState } from "react";
 import DataContext from "../../../services/data.context";
 import LoadingComponent from "../../shared/loading/loading";
 import { TwoFaService } from "../../../services/twoFa.service";
 import { SettingService } from "../../../services/setting.service";
+import UserService from "../../../services/user.service";
+import TwoFAComponent from "../../modal/2fa.authenticate.modal";
+import TwoFAActivateComponent from "../../modal/2fa.activate.modal";
 
 
-const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-	const fileInput = event.target;
-	const chosenFile = fileInput.files && fileInput.files[0];
-
-	if (chosenFile) {
-		const reader = new FileReader();
-		reader.onload = () => {
-			const imgElement = document.querySelector("#list") as HTMLImageElement;
-			
-			if (imgElement) {
-				imgElement.src = reader.result as string;
-			}
-		};
-		reader.readAsDataURL(chosenFile);
-	}
-
-};
 function SettingFunction(): JSX.Element {
 	const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 	const twoFaService = new TwoFaService();
-	const [ischecked, setIsChecked] = useState<boolean>(false);
+	const userData = useContext(DataContext);
+	const [ischecked, setIsChecked] = useState<boolean>(userData[0].isTwoFactorAuthenticationEnabled);
 	const [input, setInput] = useState("");
 	const [url, setUrl] = useState<string>("");
 	const [firstName, setFirstName] = useState<string>('');
 	const [SecondName, setSecondName] = useState<string>('');
-	const userData = useContext(DataContext);
 	const [formData, setFormData] = useState({
 		firstName: '',
 		lastName: '',
 		email: ''
 	});
 	const settingService = new SettingService();
-	const FuncClick = () => {
-		// SetShowSignUp(!ShowSignUp);
-		setIsChecked(!ischecked);
-	}
+	const userService = new UserService();
+	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const fileInput = event.target;
+		const chosenFile = fileInput.files && fileInput.files[0];
+		if (chosenFile) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				const imgElement = document.querySelector("#list") as HTMLImageElement;
+				changePicture(chosenFile);
+				if (imgElement) {
+					imgElement.src = reader.result as string;
+				}
+			};
+			reader.readAsDataURL(chosenFile);
+		}
+	};
 	const enable2FA = async () => {
-		await fetch(APIURL + `user/enable2FA/${userData[0].id}`, {
+		await fetch(APIURL + `user/2fa/enable2FA/${userData[0].id}`, {
 			method: 'PUT',
 			credentials: 'same-origin',
 		})
-		setIsChecked(!ischecked);
+		setIsChecked(false);
+	}
+	const changePicture = async (file: File) => {
+		const result = await userService.updateUserPicture(userData[0].id, file);
+		userData[0].picture = result.picture;
 	}
 	useEffect(() => {
 		if (!userData) return;
@@ -78,7 +80,6 @@ function SettingFunction(): JSX.Element {
 				credentials: 'same-origin',
 			})
 			if (ValidQRcode.status == 200) {
-				console.log('valid')
 				enable2FA();
 			}
 			else {
@@ -88,19 +89,15 @@ function SettingFunction(): JSX.Element {
 		catch (error) {
 		}
 	};
-
-
 	const handleSubmitForm = async () => {
 		const result = await settingService.updateUserInfo(userData[0].id, formData);
 	}
-
 	const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
 		setFormData(prevState => ({
 			...prevState,
 			firstName: value
 		}));
-		// Regular expression for validating first name (only alphabets, no special characters)
 		const isValidFirstName = /^[A-Za-z\s]+$/.test(value);
 		if (isValidFirstName || value === '') {
 			setFirstName(value);
@@ -112,7 +109,6 @@ function SettingFunction(): JSX.Element {
 			...prevState,
 			lastName: value
 		}));
-		// Regular expression for validating first name (only alphabets, no special characters)
 		const isValidSecond = /^[A-Za-z\s]+$/.test(value);
 		if (isValidSecond || value === '') {
 			setSecondName(value);
@@ -134,42 +130,34 @@ function SettingFunction(): JSX.Element {
 		if (isEmailValid)
 			setIsEmailValid(isValidEmail(event.target.value));
 	}
+	const disableTwoFA = useCallback(async () => {
+        await fetch(APIURL + `user/2fa/disable2FA/${userData[0].id}`, {
+            method: 'PUT',
+            credentials: 'same-origin',
+        });
+		userData[0].isTwoFactorAuthenticationEnabled = false;
+        setIsChecked(false);
+    }, [userData]);
+
+    useEffect(() => {
+        if (!ischecked && userData[0].isTwoFactorAuthenticationEnabled) {
+            disableTwoFA();
+            console.log('disable');
+        }
+    }, [ischecked, userData, disableTwoFA]);
 	return (
 		<div className="flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting p-8" >
 			<div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900  bg-main-light-WHITE">
 				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
 					<img src={APIURL + userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl" id="list" />
 					<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture">
-						<svg className="w-12 h-12 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-							<path fillRule="evenodd" d="M12 3a1 1 0 0 1 .78.375l4 5a1 1 0 1 1-1.56 1.25L13 6.85V14a1 1 0 1 1-2 0V6.85L8.78 9.626a1 1 0 1 1-1.56-1.25l4-5A1 1 0 0 1 12 3ZM9 14v-1H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-4v1a3 3 0 1 1-6 0Zm8 2a1 1 0 1 0 0 2h.01a1 1 0 1 0 0-2H17Z" clipRule="evenodd" />
-						</svg>
+						<svg className="hoverIcon__2025e" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="white" d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"></path></svg>
 					</label>
 				</div>
-				<input type="file" id="file" onChange={handleFileChange} />
+				<input type="file" id="file" accept="image/jpeg, image/jpg" onChange={handleFileChange}  />
 				<div className="flex flex-col justify-center items-center gap-6 py-2">
-					<h2 className="font-poppins font-bold rounded-lg text-sm px-5 py-2.5 text-center dark:text-white text-black bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80">
-						2FA-AUTHENTICATION
-					</h2>
-					<img className={`${ischecked ? 'visible' : 'invisible'} Qrcode bg-gradient-to-r from-green-400 via-green-500 to-green-600`} src={url} alt="" />
-					<form className="max-w-sm mx-auto flex flex-col gap-2 p-4 space-y-2" onSubmit={onchange1}>
-						
-						<div className={`flex flex-col gap-4 justify-center items-center ${ischecked ? 'block' : 'hidden'}`}>
-							<input
-								type="text"
-								value={input}
-								onChange={(e) => setInput(e.target.value)}
-								maxLength={6}
-								autoComplete="OFF"
-								placeholder="Enter Scanned Code"
-								id="code-1"
-								className="w-full rounded-md bg-gradient-to-r from-green-400 via-green-500 to-green-600 placeholder:text-black dark:placeholder:text-white placeholder:text-sm"
-								required
-							/>
-							<button type="submit" className="w-full bg-gradient-to-r from-green-400 via-green-500 to-green-600 py-2 rounded-xl" >Submit</button>
-						</div>
-					</form>
 					<li className="list-none">
-						<div className={`flex p-2 rounded border-green-600 py-2.5 ${ischecked ? 'bg-gradient-to-r from-green-500 via-green-400 to-green-600 border ' : 'bg-red-500'}`} onChange={FuncClick}>
+						<div className={`flex p-2 rounded border-green-600 py-2.5 ${ischecked ? 'bg-gradient-to-r from-green-500 via-green-400 to-green-600 border ' : 'bg-red-500'}`}>
 							<div className="flex items-center h-full w-8 justify-center relative py-2" >
 								<input
 									id="helper-checkbox-2"
@@ -180,13 +168,16 @@ function SettingFunction(): JSX.Element {
 									className="w-4 h-4  bg-gray-100 border-gray-300 rounded border-y-2"
 								/>
 							</div>
-							<div className="w-[250px] ms-2 text-sm flex flex-row justify-center items-center " >
+							<div className=" ms-2 text-sm flex flex-row justify-center items-center " >
 								<div className="--Enable-2fa font-medium flex flex-row justify-center items-center " >
-									{ischecked ? '2F-AUTHENTICATION-ATCIVE' : '2F-AUTHENTICATION-INACTIVE'}
+									{ischecked ? 'DISABLE 2FA AUTHENTICATION' : 'ENABLE 2FA AUTHENTICATION'}
 								</div>
 							</div>
 						</div>
 					</li>
+					{
+						ischecked && !userData[0].isTwoFactorAuthenticationEnabled && <TwoFAActivateComponent userData={userData} />
+					}
 				</div>
 			</div>
 			<div className="part2 flex rounded-3xl flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE ">

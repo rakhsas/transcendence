@@ -46,10 +46,11 @@ const GameModesCarousel: React.FC = () => {
     ));
     const options = {
         className: "owl-theme",
-        center: true,
+        center: false,
         dots: true,
         loop: true,
-        margin: 100
+        margin: 100,
+        autoPlay: true,
     }
     return (
         <div

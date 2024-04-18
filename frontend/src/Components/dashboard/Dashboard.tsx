@@ -13,6 +13,8 @@ import { ChannelService } from '../../services/channel.service';
 import { Channel, notificationInterface } from '../../utils/types';
 import { NotificationService } from '../../services/notification.service';
 import { FriendsService } from '../../services/friend.service';
+import TwoFAComponent from '../modal/2fa.authenticate.modal';
+import cookies from 'js-cookie';
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 function DashboardComponent() {
@@ -83,13 +85,19 @@ function DashboardComponent() {
 	if (!userData || !socket || !globalSocket || !users) {
 		return <LoadingComponent />;
 	}
+	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (
 		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">
 					<NavbarComponent />
-					<div className="flex  flex-1">
+					<div className="flex flex-1">
+						{
+							twoFactorAuthentication == "true" && (
+								<TwoFAComponent userData={userData}/>
+							)
+						}
 						<Outlet />
 					</div>
 				</div>

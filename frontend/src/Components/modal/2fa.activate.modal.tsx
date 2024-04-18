@@ -1,4 +1,4 @@
-import {  Modal } from "flowbite-react";
+import {  Modal, Toast } from "flowbite-react";
 import React, { useState, useEffect, useRef } from "react";
 import { TwoFaService } from "../../services/twoFa.service";
 import Cookies from 'js-cookie';
@@ -6,18 +6,18 @@ import Cookies from 'js-cookie';
 type ModalProps = {
     userData: any;
 }
-const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
+const TwoFAActivateComponent: React.FC<ModalProps> = ({ userData }) => {
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     const inputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
     const [incorrectPassword, setIncorrectPassword] = useState<boolean>(false);
     const [success, setSuccess] = useState<boolean>(false);
     const [isOpen, setOpenModal] = useState<boolean>(true);
+    const [url, setUrl] = useState<string>("");
+    const twoFaService = new TwoFaService();
     function onCloseModal() {
-        setOpenModal(false);
+        setOpenModal(false)
     }
-	const [url, setUrl] = useState<string>("");
-	const twoFaService = new TwoFaService();
-
+    
     useEffect(() => {
 		if (!userData) return;
 		const fetchData = async () => {
@@ -39,42 +39,43 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
     };
     const validateQr = async () => {
         const otp = inputRefs.map(inputRef => inputRef.current?.value).join('');
-        console.table(otp);
         try {
-			//console.log(baseAPIUrl + `2fa/authenticate/${otp}/${userData[0].id}`)
 			const ValidQRcode = await fetch(baseAPIUrl + `2fa/authenticate/${otp}/${userData[0].id}`, {
 				method: 'POST',
 				credentials: 'same-origin',
 			})
 			if (ValidQRcode.status == 200) {
-				// userData[0].isTwoFactorAuthenticationEnabled = true;
-                // await fetch(baseAPIUrl + `2fa/disable/${userData[0].id}`, {
-                Cookies.set('twoFactorAuthentication', 'false');
-                setOpenModal(false);
+                setSuccess(true);
+                setTimeout(() => {
+                    setSuccess(false);
+                    setOpenModal(false);
+                }, 2000);
 			}
 			else {
-				userData[0].isTwoFactorAuthenticationEnabled = false;
+                setIncorrectPassword(true);
+                setTimeout(() => {
+                    setIncorrectPassword(false);
+                }, 2000);
 			}
 		}
 		catch (error) {
-			//console.log('Invalid qrcode \n', error);
 		}
     }
     useEffect(() => {}, [incorrectPassword])
     return (
-        <Modal size="md" show={isOpen} popup className="bg-black items-center">
+        <Modal size="md" show={isOpen} popup className="bg-black items-center" onClose={() => onCloseModal()}>
             <Modal.Header className="overflow-hidden bg-neutral-100 dark:bg-main-dark-SPRUCE" />
             <Modal.Body className="overflow-hidden bg-neutral-100 dark:bg-main-dark-SPRUCE">
                 <div className="relative flex min-h-fit flex-col justify-center overflow-hidden bg-gray-50 dark:bg-inherit py-12">
                     <div className={`toast my-4 px-6 `}>
-                        {/* <Toast className={`w-full max-w-full dark:bg-zinc-900 justify-between ${incorrectPassword? 'block' : 'hidden'}`}>
+                        <Toast className={`w-full max-w-full dark:bg-zinc-900 justify-between ${incorrectPassword? 'block' : 'hidden'}`}>
                             <div className="errorRowHolder flex items-center justify-between">
                                 <div className="holder flex items-center">
                                     <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
                                         <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 20 20" aria-hidden="true" className="h-5 w-5" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
                                         </svg>
                                     </div>
-                                    <div className="ml-3 text-sm font-normal">Incorrect Password.</div>
+                                    <div className="ml-3 text-sm font-normal">Invalid Code.</div>
                                 </div>
                                 <div className="close cursor-pointer" onClick={() => {
                                         setIncorrectPassword(false)
@@ -90,7 +91,7 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
                                     <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
                                     <svg stroke="currentColor" fill="currentColor" strokeWidth="0" viewBox="0 0 20 20" aria-hidden="true" className="h-5 w-5" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>
                                     </div>
-                                    <div className="ml-3 text-sm font-normal">Successfully Joined the Room.</div>
+                                    <div className="ml-3 text-sm font-normal">Successfully Activated 2FA</div>
                                 </div>
                                 <div className="close cursor-pointer" onClick={() => {
                                         setSuccess(false)
@@ -100,7 +101,7 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
                                     </svg>
                                 </div>
                             </div>
-                        </Toast> */}
+                        </Toast>
                     </div>
                     <div className="mx-auto flex w-full max-w-md flex-col gap-12">
                         <div className="flex flex-col items-center justify-center text-center space-y-2">
@@ -144,4 +145,4 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData}) => {
     )
 }
 
-export default TwoFAComponent;
+export default TwoFAActivateComponent;

@@ -36,28 +36,28 @@ const levels = [
 	{ level: 4.5, minScore: 301, maxScore: 350 },
 	{ level: 5, minScore: 351, maxScore: 400 },
 	// Add more levels and score ranges as needed
-  ];
-  
-  function getProgress(score: number) {
+];
+
+function getProgress(score: number) {
 	for (let i = 0; i < levels.length; i++) {
-	  if (score >= levels[i].minScore && score <= levels[i].maxScore) {
-		const levelRange = levels[i].maxScore - levels[i].minScore;
-		const scoreWithinLevel = score - levels[i].minScore;
-		return (i + scoreWithinLevel / levelRange) / levels.length * 100;
-	  }
+		if (score >= levels[i].minScore && score <= levels[i].maxScore) {
+			const levelRange = levels[i].maxScore - levels[i].minScore;
+			const scoreWithinLevel = score - levels[i].minScore;
+			return (i + scoreWithinLevel / levelRange) / levels.length * 100;
+		}
 	}
 	return 0;
-  }
+}
 
-  function calculateLevel(score: number) {
+function calculateLevel(score: number) {
 	// Define the score threshold for each level
 	const levelThreshold = 100; // Increase this value if you want higher levels to require more score
-  
+
 	// Calculate the level based on the score
 	const level = (score / levelThreshold); // Adding 1 because levels start from 1
-  
+
 	return level;
-  }
+}
 
 const validAchie: string[] = [Achei, Achei1, Achei2, Achei3, Achei4];
 const validName: string[] = [
@@ -82,15 +82,15 @@ const FunctionProfileForm: React.FC = () => {
 	const [newMessageOpen, setNewMessageOpen] = useState<boolean>(false);
 	const messageService = new MessageService();
 	const fillAnimationKeyframes = `
-    @keyframes fillAnimation {
-      from {
-        width: 0%;
-      }
-      to {
-        width: ${progress}%;
-      }
-    }
-  `;
+		@keyframes fillAnimation {
+		from {
+			width: 0%;
+		}
+		to {
+			width: ${progress}%;
+		}
+		}
+	`;
 	const achievements = [
 		{
 			icon: Achei,
@@ -136,7 +136,6 @@ const FunctionProfileForm: React.FC = () => {
 	const { userId } = useParams();
 
 	useEffect(() => {
-		// if (id !== 'profile' && user && friends && users) {
 		const requestedUser = users?.find((u) => u.id === userId);
 		if (requestedUser) {
 			const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
@@ -146,33 +145,26 @@ const FunctionProfileForm: React.FC = () => {
 				isFriend: isFriend
 			}));
 		}
-		// }
 	}, [friends, users, userId]);
-	let getTo: any = 0;
 	useEffect(() => {
 		const fetchScores = async () => {
-			// //console.log("inside use effect: ", use);
 			if (user) {
 				const result = await gameService.GetScoreMatches(user.id);
 				setScore(result);
 				const totalGames = await gameService.getTotalMatches(user.id);
-				//console.log("inside use effect: ", totalGames);
 				setTotalGames(totalGames);
 				if (userData[0].id !== user.id) {
 					const blockedResult = await messageService.BlockedUsers(userData[0].id, user.id);
-					if (blockedResult===undefined)
+					if (blockedResult === undefined)
 						setIsBlocked(false)
-					else
-					{
+					else {
 						setIsBlocked(true);
 					}
 				}
 			}
 		};
 		fetchScores();
-		// //console.log("user other: ", user);
 	}, [user]);
-	//console.log(totalGames, "sfsddfsdf --> sfd");
 	const ButtonClick = () => {
 		SetBlocked(!BlockedFriend);
 	}
@@ -198,12 +190,8 @@ const FunctionProfileForm: React.FC = () => {
 	socketChat?.on('userBlocked', (data: any) => {
 		setIsBlocked(true);
 	})
-	// //console.log('sdfsdf --> ', getTo);
 	useEffect(() => {
-		// setProgress(getProgress(user?.score));
 		setProgress(calculateLevel(user?.score));
-		// setProgress(getProgress(5));
-		//console.log("==========-==-==-==-=-=-=-=-=-=-=-=-=-=-=->>> ", user?.score);
 	}, [user])
 	return (
 		<div className="body m-4 flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting">
@@ -219,12 +207,12 @@ const FunctionProfileForm: React.FC = () => {
 							</div>
 							<div className={`dots ${user != userData[0] ? 'block' : 'hidden'}`} onClick={() => setNewMessageOpen(!newMessageOpen)}>
 								<svg className="w-8 h-8 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-									<path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 6h.01M12 12h.01M12 18h.01"/>
+									<path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 6h.01M12 12h.01M12 18h.01" />
 								</svg>
 							</div>
 							{
 								newMessageOpen && (
-									<MessageModal recieverName={user.username} socketChat={socketChat} isOpen={newMessageOpen} setNewMessageOpen={setNewMessageOpen} senderId={userData[0].id} recieverId={user?.id} />	
+									<MessageModal recieverName={user.username} socketChat={socketChat} isOpen={newMessageOpen} setNewMessageOpen={setNewMessageOpen} senderId={userData[0].id} recieverId={user?.id} />
 								)
 							}
 						</div>
@@ -257,17 +245,11 @@ const FunctionProfileForm: React.FC = () => {
 							)
 						}
 					</div>
-					
-						<div className="progress-bar-container text-black dark:text-white">
-							<style>{fillAnimationKeyframes}</style>
-							<div
-								className="progress-bar text-black dark:text-white" 
-								// style={fillAnimationKeyframes}
-								// style={{ width: `${progress}%`}}
-							/>
-							<span className="progress-label text-black dark:text-white">{progress.toFixed(2)}%</span>
-						</div>
-					
+					<div className="progress-bar-container text-black dark:text-white">
+						<style>{fillAnimationKeyframes}</style>
+						<div className="progress-bar text-black dark:text-white" />
+						<span className="progress-label text-black dark:text-white">{progress.toFixed(2)}%</span>
+					</div>
 				</div>
 				<div className='w-full md:w-[85%] flex flex-col justify-between p-4 rounded-3xl items-center h-[75vh] dark:bg-zinc-900  bg-main-light-WHITE'>
 					<div className="header w-full overflow-hidden text-center py-2.5">
@@ -275,60 +257,27 @@ const FunctionProfileForm: React.FC = () => {
 					</div>
 					<div className="achievements flex flex-col justify-center gap-8 w-full h-full">
 						{
-							
+
 							achievements.map((achievement, index: any) => {
-								
-									return (
-										<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
-											<img src={achievement.icon} className="ml-2 w-16 h-16" />
-											<p className="flex flex-row justify-center items-center dark:text-white text-black">{achievement.name}</p>
-											{  totalGames?.gamePlayed > index? (
-												<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+
+								return (
+									<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
+										<img src={achievement.icon} className="ml-2 w-16 h-16" />
+										<p className="flex flex-row justify-center items-center dark:text-white text-black">{achievement.name}</p>
+										{totalGames?.gamePlayed > index ? (
+											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-												</svg>
-											) : (
-												<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+											</svg>
+										) : (
+											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-												</svg>
-											)}
-											</div>
-	
-									);
-								
-							})
-							
-					
-							/*
-							totalGames?.map((object: totalGames, index: number) => {
-								if (object.gamePlayed >= index + 1) {
-									return (
-										<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
-											<img src={validAchie[index]} className="ml-2 w-16 h-16" />
-											<p className="flex flex-row justify-center items-center dark:text-white text-black">{validName[index]}</p>
-											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true"
-												xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-													d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
 											</svg>
-										</div>
-									)
-								}
-								else {
-									return (
-										<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
-											<img src={validAchie[index]} className="ml-2 w-16 h-16" />
-											<p className="flex flex-row justify-center items-center dark:text-white text-black">{validName[index]}</p>
-											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true"
-												xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-													d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-											</svg>
-										</div>
-									);
-								}
+										)}
+									</div>
+
+								);
+
 							})
-							*/
-							
 						}
 					</div>
 				</div>

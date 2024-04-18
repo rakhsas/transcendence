@@ -16,7 +16,7 @@ import ModalComponent from '../../modal/modal';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import InfoModal from '../../modal/Info.modal';
-import TwoFAComponent from '../../modal/2fa.modal';
+import TwoFAComponent from '../../modal/2fa.authenticate.modal';
 
 const group = () => {
     return (
@@ -59,7 +59,7 @@ const HomeComponent: React.FC = () => {
     const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
     const firstLogin = Cookies.get('firstLogin');
-    const twoFactorAuthentication = Cookies.get('twoFactorAuthentication');
+    // const twoFactorAuthentication = Cookies.get('twoFactorAuthentication');
     useEffect(() => {
         if (!userData) {
             return;
@@ -148,15 +148,10 @@ const HomeComponent: React.FC = () => {
         });
         setFriendData(friendDataCopy);
     });
-    
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
-                {
-                    twoFactorAuthentication === 'true' && (
-                        <TwoFAComponent userData={userData} />
-                    )
-                }
+                
                 {
                     firstLogin === 'true' && (
                         <InfoModal userData={userData} socketChat={socket}/>
@@ -236,7 +231,7 @@ const HomeComponent: React.FC = () => {
                     </div>
                     <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
-                        <div className="flex flex-wrap gap-2 bg-green-400 w-full">
+                        <div className="flex flex-wrap gap-2 w-full">
                             {
                                 protectedChannels?.length == 0
                                 ?

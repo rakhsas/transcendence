@@ -18,7 +18,7 @@ export class FriendsService {
             else if (response.status === 401 || response.status === 403)
             {
                 window.location.href = '/';
-                document.cookie = 'provider_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                document.cookie = 'provider_access_token=; access_token=; twoFactorAuthentication=; firstLogin=; isAuthenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
                 return ;
             }
             else {
@@ -28,7 +28,7 @@ export class FriendsService {
             // //console.log('APIURL: ', APIURL + 'friends/' + userId)
             console.error('Request error:', error);
             window.location.href = '/';
-            document.cookie = 'provider_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'provider_access_token=; access_token=; twoFactorAuthentication=; firstLogin=; isAuthenticated=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             throw error;
         }
     }
