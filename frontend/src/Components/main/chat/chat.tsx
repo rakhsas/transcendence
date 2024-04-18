@@ -35,7 +35,7 @@ function chatComponent(): JSX.Element {
 	const [MESSAGES, setMESSAGES] = useState<any>(null);
 	const [friendId, setFriendId] = useState('');
 	const [selectedColor, setSelectedColor] = useState("black");
-	const [selectedMessageIndex, setSelectedMessageIndex] = useState('0');
+	const [selectedMessageIndex, setSelectedMessageIndex] = useState('-1');
 	const [socketChat, setSocketChat] = useState<Socket>();
 	const [message, setMessage] = useState('');
 	const [modalPicPath, setModalPicPath] = useState('');
@@ -367,7 +367,7 @@ function chatComponent(): JSX.Element {
 
 	return (
 		<>
-			<div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
+			<div className="flex bg-red-600l w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
 				<ConversationArea
 					latestMessages={latestMessages}
 					selectedMessageIndex={selectedMessageIndex}
@@ -381,13 +381,23 @@ function chatComponent(): JSX.Element {
 					setSelectedItem={setSelectedItem}
 					socket={socket}
 				/>
-				<div className="flex flex-col overflow-hidden flex-1 h-full">
+				<div className=" sm:flex  flex-col overflow-hidden flex-1 h-full bg-green-400">
+
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
 							{MESSAGES && (
 								<>
-									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800">
+									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800 ">
 										<div className="flex flex-row items-center space-x-2">
+											<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" onClick={()=>{
+													setSelectedMessageIndex('-1');
+													setRoomMembers([]);
+													setRoomMessages([]);
+													setChannelId(-1);
+													setFriendId('');
+												}}>
+												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 19-7-7 7-7"/>
+											</svg>
 											<div className="msg-profile group bg-white"
 												style={{
 													backgroundImage: `url(${baseAPIUrl + getMessageFriend(MESSAGES[selectedMessageIndex])
@@ -452,6 +462,16 @@ function chatComponent(): JSX.Element {
 								<>
 									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-2 bg-inherit dark:bg-zinc-800">
 										<div className="flex gap-2 items-center">
+											<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" onClick={()=>{
+													setSelectedMessageIndex('-1');
+													setRoomMembers([]);
+													setRoomMessages([]);
+													setChannelId(-1);
+													setFriendId('');
+												}}>
+												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 19-7-7 7-7"/>
+											</svg>
+
 											<div className="flex flex-row items-center">
 												<Avatar
 													img={

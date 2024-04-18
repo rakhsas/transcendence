@@ -69,7 +69,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
     }
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 	return (
-		<div className="flex flex-col relative justify-between pb-5 overflow-y-auto w-64 overflow-x-hidden border-r-[1px] dark:border-gray-700 border-black">
+		<div className={`sm:flex flex-col bg-red-600 w-full sm:w-auto ${selectedMessageIndex !== '-1' ? 'hidden' : 'flex' } relative justify-between pb-5 overflow-y-auto w-64 overflow-x-hidden border-r-[1px] dark:border-gray-700 border-black`}>
 			<Tabs aria-label="Tabs with icons" style="underline" theme={tabsTheme}>
 				<Tabs.Item active title="Friends" icon={LiaUserFriendsSolid}>
 					{latestMessages.length == 0 ?

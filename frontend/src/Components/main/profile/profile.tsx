@@ -67,14 +67,6 @@ const validName: string[] = [
 	'Play The Fourth Game',
 	'Play The Fifth Game'];
 
-// const ValidDescrition : string[] = [
-// 	'Play the first game on the platform',
-// 	'Play the second game on the platform',
-// 	'Play the third game on the platform',
-// 	'Play the fourth game on the platform',
-// 	'Play the fifth game on the platform'
-// ]
-
 const FunctionProfileForm: React.FC = () => {
 	const userData = useContext(DataContext);
 	const BASE_API_URL = import.meta.env.VITE_API_AUTH_KEY;
@@ -99,9 +91,6 @@ const FunctionProfileForm: React.FC = () => {
       }
     }
   `;
-	// const progress = 22;
-	// //console.log("--------> ", totalGames);
-	// //console.log(totalGames.gamePlayed, "| -> totalgame <- | ");
 	const achievements = [
 		{
 			icon: Achei,

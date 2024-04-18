@@ -68,7 +68,8 @@ function NavbarComponent(): JSX.Element {
     // const [notifications, setNotifications] = useState<notifItems[]>([]);
     const [notificationCount, setNotificationCount] = useState<boolean>(false);
     const [users, setUsers] = useState<User[]>([]);
-    const [searchInput, setSearchInput] = useState<string>('');
+    const [
+        searchInput, setSearchInput] = useState<string>('');
     const [channelNotifPayload, setChannelNotifPayload] = useState<any>({});
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [notifications, setNotifications] = useState<notificationInterface[]>([]);
@@ -368,12 +369,12 @@ function NavbarComponent(): JSX.Element {
         setNotificationCount(false);
     }
     return (
-        <div className="p-4 flex flex-col sm:flex-row sm:justify-between" id="nav">
+        <div className="p-4 flex flex-col sm:flex-row items-center sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
                 <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased font-poppins">{greeting}<span className="dark:text-white text-black uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
             </div>
-            <div className="max-w-md pl-4 flex flex-col md:sm:flex-row sm:space-x-4 xs:space-x-2 xs:flex-row">
-                <div className="relative h-10 flex items-center">
+            <div className="max-w-md  flex flex-row-reverse gap-3 sm:flex-row px-3 ">
+                <div className="relative h-10 flex items-center ">
                     <div className="svg" onClick={() =>  {setNotifIsOpen(!isNotifOpen); updateNotif()}}>
                         <svg  className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
                             <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
