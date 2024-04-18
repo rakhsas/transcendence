@@ -568,13 +568,13 @@ function chatComponent(): JSX.Element {
 										/>
 									</div>
 								</div>
-								<div className={`ml-4 `}>
+								<div className='ml-2 '>
 									<button
 										onClick={handleTextSubmit}
-										className="flex items-center justify-center bg-main-light-FERN rounded-xl text-white px-4 py-1 flex-shrink-0"
+										className="flex items-center  gap-2 justify-center bg-main-light-FERN rounded-xl text-white px-4 py-2 "
 									>
-										<span>Send</span>
-										<span className="ml-2 overflow-hidden">
+										<span className='hidden md:inline'>Send</span>
+										<span className="overflow-hidden">
 											<svg
 												className="w-4 h-auto transform rotate-45 -mt-px"
 												fill="none"
