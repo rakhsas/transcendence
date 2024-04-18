@@ -35,7 +35,7 @@ function chatComponent(): JSX.Element {
 	const [MESSAGES, setMESSAGES] = useState<any>(null);
 	const [friendId, setFriendId] = useState('');
 	const [selectedColor, setSelectedColor] = useState("black");
-	const [selectedMessageIndex, setSelectedMessageIndex] = useState('0');
+	const [selectedMessageIndex, setSelectedMessageIndex] = useState('-1');
 	const [socketChat, setSocketChat] = useState<Socket>();
 	const [message, setMessage] = useState('');
 	const [modalPicPath, setModalPicPath] = useState('');
@@ -385,11 +385,19 @@ function chatComponent(): JSX.Element {
 
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
-
 							{MESSAGES && (
 								<>
 									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800 ">
 										<div className="flex flex-row items-center space-x-2">
+											<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" onClick={()=>{
+													setSelectedMessageIndex('-1');
+													setRoomMembers([]);
+													setRoomMessages([]);
+													setChannelId(-1);
+													setFriendId('');
+												}}>
+												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 19-7-7 7-7"/>
+											</svg>
 											<div className="msg-profile group bg-white"
 												style={{
 													backgroundImage: `url(${baseAPIUrl + getMessageFriend(MESSAGES[selectedMessageIndex])
@@ -454,23 +462,16 @@ function chatComponent(): JSX.Element {
 								<>
 									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-2 bg-inherit dark:bg-zinc-800">
 										<div className="flex gap-2 items-center">
-											<svg
-												stroke="currentColor"
-												className="stroke-black dark:stroke-white"
-												fill="none"
-												strokeWidth="2"
-												viewBox="0 0 24 24"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												height="23"
-												width="23"
-												xmlns="http://www.w3.org/2000/svg"
-												onClick={()=>setSelectedMessageIndex('0')}
-											>
-												<circle cx="12" cy="12" r="10"></circle>
-												<line x1="12" y1="16" x2="12" y2="12"></line>
-												<line x1="12" y1="8" x2="12.01" y2="8"></line>
+											<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" onClick={()=>{
+													setSelectedMessageIndex('-1');
+													setRoomMembers([]);
+													setRoomMessages([]);
+													setChannelId(-1);
+													setFriendId('');
+												}}>
+												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 19-7-7 7-7"/>
 											</svg>
+
 											<div className="flex flex-row items-center">
 												<Avatar
 													img={
