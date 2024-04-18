@@ -367,7 +367,7 @@ function chatComponent(): JSX.Element {
 
 	return (
 		<>
-			<div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
+			<div className="flex bg-red-600l w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
 				<ConversationArea
 					latestMessages={latestMessages}
 					selectedMessageIndex={selectedMessageIndex}
@@ -381,12 +381,14 @@ function chatComponent(): JSX.Element {
 					setSelectedItem={setSelectedItem}
 					socket={socket}
 				/>
-				<div className="flex flex-col overflow-hidden flex-1 h-full">
+				<div className=" sm:flex  flex-col overflow-hidden flex-1 h-full bg-green-400">
+
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
+
 							{MESSAGES && (
 								<>
-									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800">
+									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800 ">
 										<div className="flex flex-row items-center space-x-2">
 											<div className="msg-profile group bg-white"
 												style={{
@@ -452,6 +454,23 @@ function chatComponent(): JSX.Element {
 								<>
 									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-2 bg-inherit dark:bg-zinc-800">
 										<div className="flex gap-2 items-center">
+											<svg
+												stroke="currentColor"
+												className="stroke-black dark:stroke-white"
+												fill="none"
+												strokeWidth="2"
+												viewBox="0 0 24 24"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												height="23"
+												width="23"
+												xmlns="http://www.w3.org/2000/svg"
+												onClick={()=>setSelectedMessageIndex('0')}
+											>
+												<circle cx="12" cy="12" r="10"></circle>
+												<line x1="12" y1="16" x2="12" y2="12"></line>
+												<line x1="12" y1="8" x2="12.01" y2="8"></line>
+											</svg>
 											<div className="flex flex-row items-center">
 												<Avatar
 													img={
