@@ -393,12 +393,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('callUser')
 	async handleCallUser(client: Socket, payload: any) {
 		console.log('callUser: ', payload)
-		// client.to(payload.to).emit('RequestCall', {
-		// 	from: payload.from,
-		// 	offer: payload.offer,
-		// 	senderId: payload.senderId,
-		// 	recieverId: payload.recieverId
-		// });
+		client.to(payload.to).emit('RequestCall', {
+			from: payload.from,
+			// offer: payload.offer,
+			senderId: payload.senderId,
+			recieverId: payload.recieverId
+		});
+		console.log({
+			from: payload.from,
+			// offer: payload.offer,
+			senderId: payload.senderId,
+			recieverId: payload.recieverId
+		})
 		const notif = await this.notificationService.createNotification({
 			target: payload.target,
 			type: NotificationType.CALL_REQUEST,

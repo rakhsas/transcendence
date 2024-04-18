@@ -15,6 +15,7 @@ import { NotificationService } from '../../services/notification.service';
 import { FriendsService } from '../../services/friend.service';
 import TwoFAComponent from '../modal/2fa.authenticate.modal';
 import cookies from 'js-cookie';
+import DraggableDiv from './draggable';
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 function DashboardComponent() {
@@ -98,6 +99,7 @@ function DashboardComponent() {
 								<TwoFAComponent userData={userData}/>
 							)
 						}
+						{/* <DraggableDiv socketCHAT={socket}/> */}
 						<Outlet />
 					</div>
 				</div>

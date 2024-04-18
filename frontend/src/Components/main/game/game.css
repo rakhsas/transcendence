@@ -10,9 +10,9 @@
         /* } */
 /* } */
     
-/* .owl-item {
+.owl-item {
     filter: blur(calc(10px / 5));
-} */
+}
 /* width: fit-content !important; */
 
 .center :hover {

@@ -226,38 +226,39 @@ function chatComponent(): JSX.Element {
 		input.click();
 	};
 	const handleSelectMessage = async (index: string, friendId?: string, cid?: number) => {
-		setSelectedMessageIndex('');
 		setSelectedMessageIndex(index);
-		if (friendId) {
-			setFriendId(friendId);
-			setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
-			// //console.log(MESSAGES);
-			setRoomMessages(null);
-			setRoomMembers([]);
-			setMutedUsers([]);
-			setChannelId(-1)
-		}
-		else if (cid) {
-			setFriendId('')
-			setMESSAGES(null);
-			setChannelId(cid);
-			await channelService.getChannelMembers(cid).then(
-				(data: any) => {
-					setRoomMembers(data);
-				}
-			)
-			await channelService.getChannelMessages(cid).then(
-				(data: any) => {
-					setRoomMessages(data);
-				}
-			)
-			await muteService.MutedUsers(cid).then(
-				(data: any) => {
-					setMutedUsers(data);
-					//console.log(data);
-				}
-			)
-		}
+		console.log(MESSAGES)
+		// if (friendId) {
+		// 	setFriendId(friendId);
+		// 	console.log(index)
+		// 	setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
+		// 	// //console.log(MESSAGES);
+		// 	setRoomMessages(null);
+		// 	setRoomMembers([]);
+		// 	setMutedUsers([]);
+		// 	setChannelId(-1)
+		// }
+		// else if (cid) {
+		// 	setFriendId('')
+		// 	setMESSAGES(null);
+		// 	setChannelId(cid);
+		// 	await channelService.getChannelMembers(cid).then(
+		// 		(data: any) => {
+		// 			setRoomMembers(data);
+		// 		}
+		// 	)
+		// 	await channelService.getChannelMessages(cid).then(
+		// 		(data: any) => {
+		// 			setRoomMessages(data);
+		// 		}
+		// 	)
+		// 	await muteService.MutedUsers(cid).then(
+		// 		(data: any) => {
+		// 			setMutedUsers(data);
+		// 			//console.log(data);
+		// 		}
+		// 	)
+		// }
 	};
 	const onDirectMessage = async (data: any) => {
 		setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
@@ -289,13 +290,10 @@ function chatComponent(): JSX.Element {
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 			const mediaRecorder = new MediaRecorder(stream);
 			mediaRecorderRef.current = mediaRecorder;
-
 			const chunks: any = []; // Create a new array for chunks
-
 			mediaRecorder.ondataavailable = (e) => {
 				chunks.push(e.data);
 			};
-
 			mediaRecorder.onstop = async () => {
 				const audioBlob = new Blob(chunks, { type: 'audio/wav' }); // Use the chunks array directly
 				const formData = new FormData();
@@ -364,7 +362,7 @@ function chatComponent(): JSX.Element {
 	const setOpenModal = (status: boolean) => {
 		setIsOpen(status);
 	}
-
+	useEffect(() => {},[MESSAGES])
 	return (
 		<>
 			<div className="flex bg-red-600l w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
@@ -385,7 +383,7 @@ function chatComponent(): JSX.Element {
 
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
-							{MESSAGES && (
+							{MESSAGES  && (
 								<>
 									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800 ">
 										<div className="flex flex-row items-center space-x-2">
@@ -411,7 +409,14 @@ function chatComponent(): JSX.Element {
 											</div>
 										</div>
 										<div className="flex flex-row justify-around w-20 h-8 gap-2">
-											<svg onClick={() => setOpenVideoCall(!openVideoCall)} xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" className="fill-black dark:fill-white" >
+											<svg onClick={() => {
+												setOpenVideoCall(!openVideoCall)
+												socketChat?.emit('callUser', {
+													from: userData[0].id,
+													userId: userData[0].id,
+													recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id
+												})
+												}} xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" className="fill-black dark:fill-white" >
 												<path d="M 4 4.75 C 3.271 4.75 2.5706875 5.0396875 2.0546875 5.5546875 C 1.5396875 6.0706875 1.25 6.771 1.25 7.5 L 1.25 16.5 C 1.25 17.229 1.5396875 17.929313 2.0546875 18.445312 C 2.5706875 18.960313 3.271 19.25 4 19.25 L 14.5 19.25 C 15.229 19.25 15.929312 18.960313 16.445312 18.445312 C 16.960313 17.929313 17.25 17.229 17.25 16.5 L 17.25 16.166016 L 20.982422 17.861328 C 21.369422 18.037328 21.819734 18.004438 22.177734 17.773438 C 22.534734 17.543438 22.75 17.147656 22.75 16.722656 L 22.75 7.2773438 C 22.75 6.8523438 22.534734 6.4565625 22.177734 6.2265625 C 21.819734 5.9955625 21.369422 5.9626719 20.982422 6.1386719 L 17.25 7.8339844 L 17.25 7.5 C 17.25 6.771 16.960313 6.0706875 16.445312 5.5546875 C 15.929312 5.0396875 15.229 4.75 14.5 4.75 L 4 4.75 z M 4 6.25 L 14.5 6.25 C 14.832 6.25 15.149766 6.3812344 15.384766 6.6152344 C 15.618766 6.8502344 15.75 7.168 15.75 7.5 L 15.75 9 L 15.75 15 L 15.75 16.5 C 15.75 16.832 15.618766 17.149766 15.384766 17.384766 C 15.149766 17.618766 14.832 17.75 14.5 17.75 L 4 17.75 C 3.668 17.75 3.3502344 17.618766 3.1152344 17.384766 C 2.8812344 17.149766 2.75 16.832 2.75 16.5 L 2.75 7.5 C 2.75 7.168 2.8812344 6.8502344 3.1152344 6.6152344 C 3.3502344 6.3812344 3.668 6.25 4 6.25 z M 21.25 7.6640625 L 21.25 16.335938 L 17.25 14.517578 L 17.25 9.4824219 C 17.25 9.4824219 20.213 8.1350625 21.25 7.6640625 z"></path>
 											</svg>
 											<svg
