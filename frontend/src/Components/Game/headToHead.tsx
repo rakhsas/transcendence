@@ -21,7 +21,7 @@ const HeadToHead = () => {
 
   return (
     <div className="flex text-black dark:text-white justify-center w-full h-full items-center">
-      <div className="flex justify-center w-[600px] h-[450px] border-2 border-red-600 rounded-xl">
+      <div className="flex justify-center w-[600px] h-[450px] border-2 dark:border-main-light-FERN border-main-light-EGGSHELL rounded-xl">
         {isStarted ? (
           <CanvasHeadToHead
             width="600"
@@ -31,16 +31,14 @@ const HeadToHead = () => {
           />
         ) : (
           <div className="flex text-sm sm:text-2xl md:text-3xl flex-col justify-center items-center gap-3">
-            <h1 className=" font-bold text-center">
-              Chose your game background
-            </h1>
+            <h1 className=" font-bold text-center font-poppins overflow-hidden px-2 text-2xl"> Choose The Desired Game Background </h1>
             <div className="flex gap-3 flex-wrap justify-center items-center">
               {maps.map((map) => (
                 <div
                   key={map.id}
                   className={`flex max-w-[200px] flex-col items-center transition-all duration-300 rounded-lg  ${
                     selectedMap === map.id
-                      ? "border blur-none border-blue-500"
+                      ? "border-2 blur-none dark:border-main-light-FERN border-main-light-EGGSHELL"
                       : "blur-sm"
                   }`}
                   onClick={() => handleChange(map.id)}
@@ -55,10 +53,7 @@ const HeadToHead = () => {
                 </div>
               ))}
             </div>
-            <button
-              onClick={() => setIsStarted(true)}
-              className="bg-blue-500 sm:text-xl text-black dark:text-white px-6 mt-2 py-2 rounded"
-            >
+            <button onClick={() => setIsStarted(true)} className="bg-main-light-FERN dark:bg-main-light-EGGSHELL sm:text-lg font-poppins text-black dark:text-white px-6 mt-2 py-2 rounded" >
               Start
             </button>
           </div>
