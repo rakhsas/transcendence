@@ -10,3 +10,4 @@ postgres/
 auth/uploads
 docker-compose.yml
 .idea/*
+frontend/.vite/*
