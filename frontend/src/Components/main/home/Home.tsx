@@ -148,14 +148,11 @@ const HomeComponent: React.FC = () => {
         });
         setFriendData(friendDataCopy);
     });
+    console.log(userData[0].isTwoFactorAuthenticationEnabled)
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
-                {
-                    userData[0].isTwoFactorAuthenticationEnabled === 'true' && (
-                        <TwoFAComponent userData={userData}/>
-                    )
-                }
+                
                 {
                     firstLogin === 'true' && (
                         <InfoModal userData={userData} socketChat={socket}/>

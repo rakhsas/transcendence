@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { ChannelTypes } from "../../../utils/types";
 import UploadService from "../../../services/upload.service";
 import { Socket } from "socket.io-client";
+import { customTheme } from "../../../utils/theme";
 
 type data = {
 	latestMessages: messageUser[];
@@ -27,19 +28,6 @@ interface LatestMesg {
 	latestMessage: messageUser;
 }
 
-const customTheme: CustomFlowbiteTheme = {
-	textInput: {
-		field: {
-			base: "border-0 ring-0",
-			input: {
-				base: "bg-white  dark:bg-zinc-800 text-black dark:text-white focus:border-4 border-2 border-main-light-FERN focus:border-main-light-FERN dark:border-main-light-EGGSHELL focus:ring-0",
-			}
-		}
-	},
-	label: {
-		
-	}
-};
 
 const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex, lstGroupMessages, handleSelectMessage, setLstGroupMessages, userData, isOpen, setIsOpen, selectedItem, setSelectedItem, socket }) => {
 	const [imagePath, setImagePath] = useState<any>();

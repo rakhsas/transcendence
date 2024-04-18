@@ -1,7 +1,8 @@
-import {  Modal } from "flowbite-react";
+import {  Modal, Toast } from "flowbite-react";
 import React, { useState, useEffect, useRef } from "react";
 import { TwoFaService } from "../../services/twoFa.service";
 import Cookies from 'js-cookie';
+import { customTheme } from "../../utils/theme";
 
 type ModalProps = {
     userData: any;
@@ -17,12 +18,11 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData }) => {
     function onCloseModal() {
         setOpenModal(false)
     }
-
     useEffect(() => {
 		if (!userData) return;
 		const fetchData = async () => {
 			try {
-				const Qrcode = await twoFaService.generateQrCode(userData[0].id, userData[0].email);
+				const Qrcode = await twoFaService.generateQrCode(userData.id, userData.email);
 				setUrl(Qrcode);
 			} catch (error) {
 				console.error("Error fetching user ", error);
@@ -40,30 +40,35 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData }) => {
     const validateQr = async () => {
         const otp = inputRefs.map(inputRef => inputRef.current?.value).join('');
         try {
-			const ValidQRcode = await fetch(baseAPIUrl + `2fa/authenticate/${otp}/${userData[0].id}`, {
+			const ValidQRcode = await fetch(baseAPIUrl + `2fa/authenticate/${otp}/${userData.id}`, {
 				method: 'POST',
 				credentials: 'same-origin',
 			})
 			if (ValidQRcode.status == 200) {
                 Cookies.set('twoFactorAuthentication', 'false');
-                setOpenModal(false);
-			}
-			else {
-				userData[0].isTwoFactorAuthenticationEnabled = false;
+                setSuccess(true);
+                setTimeout(() => {
+                    setSuccess(false);
+                    setOpenModal(false);
+                }, 2000);
+            } else {
+                setIncorrectPassword(true);
+                setTimeout(() => {
+                    setIncorrectPassword(false);
+                }, 2000);
 			}
 		}
 		catch (error) {
-			//console.log('Invalid qrcode \n', error);
 		}
     }
     useEffect(() => {}, [incorrectPassword])
     return (
         <Modal size="md" show={isOpen} popup className="bg-black items-center">
-            <Modal.Header className="overflow-hidden bg-neutral-100 dark:bg-main-dark-SPRUCE" />
+            <Modal.Header theme={customTheme?.modal?.header}> Confirm Your Identity </Modal.Header>
             <Modal.Body className="overflow-hidden bg-neutral-100 dark:bg-main-dark-SPRUCE">
                 <div className="relative flex min-h-fit flex-col justify-center overflow-hidden bg-gray-50 dark:bg-inherit py-12">
                     <div className={`toast my-4 px-6 `}>
-                        {/* <Toast className={`w-full max-w-full dark:bg-zinc-900 justify-between ${incorrectPassword? 'block' : 'hidden'}`}>
+                        <Toast className={`w-full max-w-full dark:bg-zinc-900 justify-between ${incorrectPassword? 'block' : 'hidden'}`}>
                             <div className="errorRowHolder flex items-center justify-between">
                                 <div className="holder flex items-center">
                                     <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200">
@@ -96,7 +101,7 @@ const TwoFAComponent: React.FC<ModalProps> = ({ userData }) => {
                                     </svg>
                                 </div>
                             </div>
-                        </Toast> */}
+                        </Toast>
                     </div>
                     <div className="mx-auto flex w-full max-w-md flex-col gap-12">
                         <div className="flex flex-col items-center justify-center text-center space-y-2">
