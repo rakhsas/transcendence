@@ -148,7 +148,6 @@ const HomeComponent: React.FC = () => {
         });
         setFriendData(friendDataCopy);
     });
-    console.log(userData[0].isTwoFactorAuthenticationEnabled)
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
@@ -232,7 +231,7 @@ const HomeComponent: React.FC = () => {
                     </div>
                     <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
-                        <div className="flex flex-wrap gap-2 bg-green-400 w-full">
+                        <div className="flex flex-wrap gap-2 w-full">
                             {
                                 protectedChannels?.length == 0
                                 ?
