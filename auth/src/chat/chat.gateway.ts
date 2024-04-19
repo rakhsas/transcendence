@@ -393,20 +393,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('callUser')
 	async handleCallUser(client: Socket, payload: any) {
 		console.log('callUser: ', payload)
-		client.to(payload.to).emit('RequestCall', {
-			from: payload.from,
-			// offer: payload.offer,
-			senderId: payload.senderId,
-			recieverId: payload.recieverId
-		});
-		console.log({
-			from: payload.from,
-			// offer: payload.offer,
-			senderId: payload.senderId,
-			recieverId: payload.recieverId
-		})
+		// client.to(payload.to).emit('RequestCall', {
+		// 	from: payload.from,
+		// 	// offer: payload.offer,
+		// 	senderId: payload.senderId,
+		// 	recieverId: payload.recieverId
+		// });
 		const notif = await this.notificationService.createNotification({
-			target: payload.target,
+			target: payload.recieverId,
 			type: NotificationType.CALL_REQUEST,
 			issuer: payload.senderId,
 			message: "",
@@ -415,7 +409,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			channel: null,
 		});
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
-		this.connectedUsers.get(lastnotif.target.username)?.emit('callNotif', lastnotif);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('RequestCall', lastnotif);
 	}
 
 	@SubscribeMessage('mediaOffer')
@@ -454,6 +448,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
+	@SubscribeMessage("acceptVideoCall")
+	async handleAcceptVideoCall(client: Socket, payload: any) {
+		console.log(payload)
+		client.to(this.connectedUsers.get(payload.caller.username).id).emit("callPermission", payload)
+		client.emit("callPermission", payload)
+	}
+
+	@SubscribeMessage("callVideoEnded")
+	async handleCallVideoEnd(client: Socket, payload: any) {
+		client.to(this.connectedUsers.get(payload.opponnet).id).emit("callVideoEnded", true)
+	}
 
 	async GuardsConsumer(client: Socket): Promise<string> {
 		const cookies = client.handshake.headers.cookie?.split(';');

@@ -19,8 +19,10 @@ type props = {
     openVideoCall: any;
     setOpenVideoCall: any;
     socketChat: any;
+    getFriend: any;
+    friendId: string
 }
-const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, modalPicPath, openVideoCall, setOpenVideoCall, socketChat }) => {
+const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, modalPicPath, openVideoCall, setOpenVideoCall, socketChat, getFriend, friendId }) => {
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     const navigate = useNavigate();
 	const messagesRef = useRef<HTMLDivElement>(null);
@@ -46,8 +48,8 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
     return (
         <>
             {MESSAGES.map((message: any, index: any) => {
-                const sender: User = message.senderId === userData[0].id ? userData[0] : getMessageFriend(MESSAGES[selectedMessageIndex]);
-                const reciever: User = message.senderId === userData[0].id ? getMessageFriend(MESSAGES[selectedMessageIndex]) : userData[0];
+                const sender: User = message.senderId === userData[0].id ? userData[0] : getFriend(friendId);
+                const reciever: User = message.senderId === userData[0].id ? getFriend(friendId) : userData[0];
                 if (message.message.length > 0) {
                     return (
                         <div className="p-4" key={index}>

@@ -26,6 +26,8 @@ function DashboardComponent() {
 	const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
 	const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
 	const [notifications, setNotifications] = useState<notificationInterface[]>([]);
+	const [userCallingWith, setUserCallingWith] = useState<User>();
+	const [callPermission, setCallPermission] = useState<boolean>(false);
 	const [friends, setFriends] = useState<any>();
 	useEffect(() => {
 		const fetchData = async () => {
@@ -86,10 +88,15 @@ function DashboardComponent() {
 	if (!userData || !socket || !globalSocket || !users) {
 		return <LoadingComponent />;
 	}
+	socket?.on("callPermission", async (data: any) => {
+		
+		setUserCallingWith(userData.id !== data.user.id ? data.user : data.caller);
+		setCallPermission(data.permission);
+	})
 	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (
 		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends]}>
-			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh ">
+			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh relative">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">
 					<NavbarComponent />
@@ -99,7 +106,11 @@ function DashboardComponent() {
 								<TwoFAComponent userData={userData}/>
 							)
 						}
-						{/* <DraggableDiv socketCHAT={socket}/> */}
+						{
+							callPermission && userCallingWith && (
+								<DraggableDiv socketCHAT={socket} user={userCallingWith} setUserCallingWith={setUserCallingWith} setCallPermission={setCallPermission}/>
+							)
+						}
 						<Outlet />
 					</div>
 				</div>

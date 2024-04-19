@@ -55,6 +55,7 @@ function chatComponent(): JSX.Element {
 	const [selectedItem, setSelectedItem] = useState<any>('');
 	const [mutedUsers, setMutedUsers] = useState<MutedUsers[]>([]);
 	const [openVideoCall, setOpenVideoCall] = useState<boolean>();
+	const [friends, setFriends] = useState<any[]>([])
 	const userData = useContext(DataContext);
 	if (!userData) {
 		return <LoadingComponent />;
@@ -114,6 +115,7 @@ function chatComponent(): JSX.Element {
 		};
 		fetchData();
 		setSocketChat(userData[1]);
+		setFriends(userData[7]);
 	}, [userData]);
 	if (!userData[0] || !userData[1]) {
 		return <LoadingComponent />;
@@ -211,9 +213,6 @@ function chatComponent(): JSX.Element {
 			console.error('Error uploading file:', error);
 		}
 	};
-
-
-
 	const handleChange = (event: any) => {
 		const selectedFile = event.target.files[0];
 		handleImageSubmit(selectedFile);
@@ -227,38 +226,37 @@ function chatComponent(): JSX.Element {
 	};
 	const handleSelectMessage = async (index: string, friendId?: string, cid?: number) => {
 		setSelectedMessageIndex(index);
-		console.log(MESSAGES)
-		// if (friendId) {
-		// 	setFriendId(friendId);
-		// 	console.log(index)
-		// 	setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
-		// 	// //console.log(MESSAGES);
-		// 	setRoomMessages(null);
-		// 	setRoomMembers([]);
-		// 	setMutedUsers([]);
-		// 	setChannelId(-1)
-		// }
-		// else if (cid) {
-		// 	setFriendId('')
-		// 	setMESSAGES(null);
-		// 	setChannelId(cid);
-		// 	await channelService.getChannelMembers(cid).then(
-		// 		(data: any) => {
-		// 			setRoomMembers(data);
-		// 		}
-		// 	)
-		// 	await channelService.getChannelMessages(cid).then(
-		// 		(data: any) => {
-		// 			setRoomMessages(data);
-		// 		}
-		// 	)
-		// 	await muteService.MutedUsers(cid).then(
-		// 		(data: any) => {
-		// 			setMutedUsers(data);
-		// 			//console.log(data);
-		// 		}
-		// 	)
-		// }
+		if (friendId) {
+			setChannelId(-1);
+			setRoomMessages(null);
+			setRoomMembers([]);
+			setFriendId(friendId);
+			setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
+			setMutedUsers([]);
+			setChannelId(-1);
+			// setLstGroupMessages()
+		}
+		else if (cid) {
+			setFriendId('')
+			setMESSAGES(null);
+			setChannelId(cid);
+			await channelService.getChannelMembers(cid).then(
+				(data: any) => {
+					setRoomMembers(data);
+				}
+			)
+			await channelService.getChannelMessages(cid).then(
+				(data: any) => {
+					setRoomMessages(data);
+				}
+			)
+			await muteService.MutedUsers(cid).then(
+				(data: any) => {
+					setMutedUsers(data);
+					//console.log(data);
+				}
+			)
+		}
 	};
 	const onDirectMessage = async (data: any) => {
 		setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
@@ -284,6 +282,9 @@ function chatComponent(): JSX.Element {
 	const getMessageFriend = (message: messageUser) => {
 		const { __owner__, __reciever__ } = message;
 		return __owner__.id === userData[0].id ? __reciever__ : __owner__;
+	};
+	const getFriend = (friendId: string): User | undefined => {
+		return friends.find((friend) => friend.id === friendId);
 	};
 	const startRecording = async () => {
 		try {
@@ -363,6 +364,9 @@ function chatComponent(): JSX.Element {
 		setIsOpen(status);
 	}
 	useEffect(() => {},[MESSAGES])
+	socket?.on("callPermission", async (data: any) => {
+		data.permission ? setOpenVideoCall(false) : null;
+	})
 	return (
 		<>
 			<div className="flex bg-red-600l w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
@@ -395,17 +399,14 @@ function chatComponent(): JSX.Element {
 											</svg>
 											<div className="msg-profile group bg-white"
 												style={{
-													backgroundImage: `url(${baseAPIUrl + getMessageFriend(MESSAGES[selectedMessageIndex])
-															.picture
+													backgroundImage: `url(${baseAPIUrl + getFriend(friendId)?.picture
 														})`,
 												}}
 											></div>
 											<div className="font-onest text-lg capitalize text-zinc-700 dark:text-white">
-												{getMessageFriend(MESSAGES[selectedMessageIndex])
-													.firstName +
+												{getFriend(friendId)?.firstName +
 													" " +
-													getMessageFriend(MESSAGES[selectedMessageIndex])
-														.lastName}
+													getFriend(friendId)?.lastName}
 											</div>
 										</div>
 										<div className="flex flex-row justify-around w-20 h-8 gap-2">
@@ -413,8 +414,8 @@ function chatComponent(): JSX.Element {
 												setOpenVideoCall(!openVideoCall)
 												socketChat?.emit('callUser', {
 													from: userData[0].id,
-													userId: userData[0].id,
-													recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id
+													senderId: userData[0].id,
+													recieverId: getFriend(friendId)?.id
 												})
 												}} xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" className="fill-black dark:fill-white" >
 												<path d="M 4 4.75 C 3.271 4.75 2.5706875 5.0396875 2.0546875 5.5546875 C 1.5396875 6.0706875 1.25 6.771 1.25 7.5 L 1.25 16.5 C 1.25 17.229 1.5396875 17.929313 2.0546875 18.445312 C 2.5706875 18.960313 3.271 19.25 4 19.25 L 14.5 19.25 C 15.229 19.25 15.929312 18.960313 16.445312 18.445312 C 16.960313 17.929313 17.25 17.229 17.25 16.5 L 17.25 16.166016 L 20.982422 17.861328 C 21.369422 18.037328 21.819734 18.004438 22.177734 17.773438 C 22.534734 17.543438 22.75 17.147656 22.75 16.722656 L 22.75 7.2773438 C 22.75 6.8523438 22.534734 6.4565625 22.177734 6.2265625 C 21.819734 5.9955625 21.369422 5.9626719 20.982422 6.1386719 L 17.25 7.8339844 L 17.25 7.5 C 17.25 6.771 16.960313 6.0706875 16.445312 5.5546875 C 15.929312 5.0396875 15.229 4.75 14.5 4.75 L 4 4.75 z M 4 6.25 L 14.5 6.25 C 14.832 6.25 15.149766 6.3812344 15.384766 6.6152344 C 15.618766 6.8502344 15.75 7.168 15.75 7.5 L 15.75 9 L 15.75 15 L 15.75 16.5 C 15.75 16.832 15.618766 17.149766 15.384766 17.384766 C 15.149766 17.618766 14.832 17.75 14.5 17.75 L 4 17.75 C 3.668 17.75 3.3502344 17.618766 3.1152344 17.384766 C 2.8812344 17.149766 2.75 16.832 2.75 16.5 L 2.75 7.5 C 2.75 7.168 2.8812344 6.8502344 3.1152344 6.6152344 C 3.3502344 6.3812344 3.668 6.25 4 6.25 z M 21.25 7.6640625 L 21.25 16.335938 L 17.25 14.517578 L 17.25 9.4824219 C 17.25 9.4824219 20.213 8.1350625 21.25 7.6640625 z"></path>
@@ -456,11 +457,13 @@ function chatComponent(): JSX.Element {
 											openVideoCall={openVideoCall}
 											setOpenVideoCall={setOpenVideoCall}
 											socketChat={socketChat}
+											getFriend={getFriend}
+											friendId={friendId}
 										/>
 									</div>
 								</>
 							)}
-							{roomMembers && roomMessages && (
+							{roomMembers && roomMessages && channelId !== -1 && (
 								<>
 									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-2 bg-inherit dark:bg-zinc-800">
 										<div className="flex gap-2 items-center">

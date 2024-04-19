@@ -605,18 +605,24 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                     <div className="flex gap-2 w-fit">
                                                         <Button color="success" pill onClick={() => {
-                                                            /*socket?.emit("acceptFriendRequest",
-                                                            {
-                                                                userId: userData[0].id,
-                                                                friendId: item.issuer.id
-                                                            }
-                                                            );*/
+                                                            socket.emit("acceptVideoCall", {
+                                                                user: userData[0],
+                                                                caller: item.issuer,
+                                                                permission: true
+                                                            });
                                                             setNotifIsOpen(false);
                                                             item.seen = true;
                                                         }}>
                                                             Accept
                                                         </Button>
                                                         <Button color="failure" pill onClick={() => {
+                                                            socket.emit("acceptVideoCall", {
+                                                                user: userData[0],
+                                                                caller: item.issuer,
+                                                                permission: false
+                                                            });
+                                                            setNotifIsOpen(false);
+                                                            item.seen = true;
                                                             /*socket?.emit("declineFriendRequest",
                                                             {
                                                                 userId: userData[0].id,
