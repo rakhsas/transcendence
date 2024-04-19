@@ -29,6 +29,7 @@ function DashboardComponent() {
 	const [userCallingWith, setUserCallingWith] = useState<User>();
 	const [callPermission, setCallPermission] = useState<boolean>(false);
 	const [friends, setFriends] = useState<any>();
+	const [stream , setStream] = useState<any>();
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -71,13 +72,15 @@ function DashboardComponent() {
 				console.error('Error fetching user ', error);
 			}
 		};
-	
 		fetchData();
 		return () => {
 			socket?.disconnect();
 			globalSocket?.disconnect();
 		};
 	}, []);
+	useEffect(() => {
+		console.log(stream);
+	}, [stream]);
 	socket?.on("usernameUpdated", async (data: any) => {
         // userData[0] = data;
         setUserData(data);
@@ -89,13 +92,12 @@ function DashboardComponent() {
 		return <LoadingComponent />;
 	}
 	socket?.on("callPermission", async (data: any) => {
-		
 		setUserCallingWith(userData.id !== data.user.id ? data.user : data.caller);
 		setCallPermission(data.permission);
 	})
 	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (
-		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends]}>
+		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh relative">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">

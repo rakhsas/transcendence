@@ -368,6 +368,21 @@ function NavbarComponent(): JSX.Element {
         })
         setNotificationCount(false);
     }
+    const acceptVideoCall = async (item: any) => {
+        const constraints = {
+            audio: true,
+            video: true,
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        userData[8](stream)
+        stream && socket.emit("acceptVideoCall", {
+            user: userData[0],
+            caller: item.issuer,
+            permission: true
+        });
+        setNotifIsOpen(false);
+        item.seen = true;
+    }
     return (
         <div className="p-4 flex flex-col sm:flex-row items-center sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
@@ -604,15 +619,9 @@ function NavbarComponent(): JSX.Element {
                                                         </div>
                                                     </div>
                                                     <div className="flex gap-2 w-fit">
-                                                        <Button color="success" pill onClick={() => {
-                                                            socket.emit("acceptVideoCall", {
-                                                                user: userData[0],
-                                                                caller: item.issuer,
-                                                                permission: true
-                                                            });
-                                                            setNotifIsOpen(false);
-                                                            item.seen = true;
-                                                        }}>
+                                                        <Button color="success" pill onClick={() => 
+                                                            acceptVideoCall(item)
+                                                        }>
                                                             Accept
                                                         </Button>
                                                         <Button color="failure" pill onClick={() => {

@@ -49,8 +49,7 @@ const GameModesCarousel: React.FC = () => {
         center: true,
         dots: false,
         loop: true,
-        margin: 100,
-        autoPlay: true,
+        margin: 10,
     }
     return (
         <div
