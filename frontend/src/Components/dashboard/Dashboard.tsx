@@ -29,7 +29,10 @@ function DashboardComponent() {
 	const [userCallingWith, setUserCallingWith] = useState<User>();
 	const [callPermission, setCallPermission] = useState<boolean>(false);
 	const [friends, setFriends] = useState<any>();
-	const [stream , setStream] = useState<any>();
+	const [stream , setStream] = useState<MediaStream>();
+	const [userList, setUserList] = useState<any[]>([]);
+	const [selectedUserSocketId, setSelectedUserSocketId] = useState<string>('')
+	const [caller, setCaller] = useState<User>();
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -79,8 +82,11 @@ function DashboardComponent() {
 		};
 	}, []);
 	useEffect(() => {
-		console.log(stream);
+		// console.log(stream);
 	}, [stream]);
+	useEffect(() => {
+		// console.log(userList)
+	}, [userList])
 	socket?.on("usernameUpdated", async (data: any) => {
         // userData[0] = data;
         setUserData(data);
@@ -91,26 +97,32 @@ function DashboardComponent() {
 	if (!userData || !socket || !globalSocket || !users) {
 		return <LoadingComponent />;
 	}
+	socket.on("update-user-list", (data: any) => {
+		setUserList(data)
+	})
 	socket?.on("callPermission", async (data: any) => {
 		setUserCallingWith(userData.id !== data.user.id ? data.user : data.caller);
 		setCallPermission(data.permission);
+		setSelectedUserSocketId(data.selectedUser)
+		setCaller(data.caller);
 	})
+	
 	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (
-		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream]}>
+		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream, userList]}>
 			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh relative">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">
 					<NavbarComponent />
-					<div className="flex flex-1">
+					<div className="flex flex-1 relative">
 						{
 							twoFactorAuthentication == "true" && (
 								<TwoFAComponent userData={userData}/>
 							)
 						}
 						{
-							callPermission && userCallingWith && (
-								<DraggableDiv socketCHAT={socket} user={userCallingWith} setUserCallingWith={setUserCallingWith} setCallPermission={setCallPermission}/>
+							callPermission && caller && userCallingWith && (
+								<DraggableDiv socketCHAT={socket} caller={caller} user={userCallingWith} setUserCallingWith={setUserCallingWith} setCallPermission={setCallPermission} selectedUserSocketId={selectedUserSocketId} />
 							)
 						}
 						<Outlet />

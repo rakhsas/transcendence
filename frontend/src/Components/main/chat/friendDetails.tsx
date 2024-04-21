@@ -16,7 +16,9 @@ type DetailsAreaProps = {
     onCloseModal: () => void;
     onOpenModal: (picPath: string) => void;
     getMessageFriend: (message: messageUser) => User;
-    handleOpenDetails: () => void
+    handleOpenDetails: () => void,
+    getFriend: any,
+    friendId: string
 }
 function DetailsArea({
     MESSAGES,
@@ -28,7 +30,9 @@ function DetailsArea({
     onCloseModal,
     onOpenModal,
     getMessageFriend,
-    handleOpenDetails
+    handleOpenDetails,
+    getFriend,
+    friendId
 }: DetailsAreaProps) {
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 
@@ -36,7 +40,7 @@ function DetailsArea({
         return null;
     }
     const navigate = useNavigate();
-    const messageData = getMessageFriend(MESSAGES[selectedMessageIndex]);
+    const messageData = getFriend(friendId);
     // //console.log("messageData222: ", MESSAGES[selectedMessageIndex]);
     // //console.log(isModalOpen, modalPicPath, selectedMessageIndex, latestMessages[selectedMessageIndex])
     return (

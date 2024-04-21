@@ -96,7 +96,6 @@ function CallComponent() {
     //         await peer.setRemoteDescription(new RTCSessionDescription(data.offer));
     //         const peerAnswer = await peer.createAnswer();
     //         await peer.setLocalDescription(new RTCSessionDescription(peerAnswer));
-
     //         socket?.emit("mediaAnswer", {
     //             answer: peerAnswer,
     //             from: socket?.id,

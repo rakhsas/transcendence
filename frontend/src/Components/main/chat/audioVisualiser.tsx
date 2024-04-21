@@ -30,11 +30,10 @@ const AudioPlayerWithWaveform = ({ audioSrc }: any) => {
     })
     
     useEffect(() => {
-        if (!waveFormRef.current) return; // Ensure waveFormRef is available
-    
+        if (!waveFormRef.current) return;
         const options = waveSurferOptions(waveFormRef.current);
         waveSurfer.current = WaveSurfer.create(options);
-    
+        
         waveSurfer.current.load(audioSrc);
         waveSurfer.current.on('ready', () => {
             setCurrentTime(convertSecToMin(waveSurfer.current!.getDuration()));
@@ -43,10 +42,13 @@ const AudioPlayerWithWaveform = ({ audioSrc }: any) => {
             setIsPlaying(false);
             waveSurfer.current!.stop();
         });
-    
+        
         return () => {
+            if (waveSurfer.current && waveSurfer.current.isPlaying()) {
+                waveSurfer.current.stop() // Arrêter la lecture avant de détruire l'objet
+            }
             if (waveSurfer.current) {
-                waveSurfer.current.destroy();
+                waveSurfer.current.destroy(); // Détruire l'objet uniquement s'il est correctement initialisé
             }
         };
     }, [audioSrc]);

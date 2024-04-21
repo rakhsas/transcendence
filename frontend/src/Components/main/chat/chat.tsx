@@ -115,7 +115,6 @@ function chatComponent(): JSX.Element {
 		fetchData();
 		setSocketChat(userData[1]);
 		setFriends(userData[7]);
-		console.log(userData[9])
 	}, [userData]);
 	if (!userData[0] || !userData[1]) {
 		return <LoadingComponent />;
@@ -129,13 +128,13 @@ function chatComponent(): JSX.Element {
 		}
 		if (friendId != '') {
 			const newMessage: messageUser1 = {
-				to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+				to: getFriend(friendId)!.id,
 				from: userData[0].id,
 				message: messageValue,
 				image: '', // No image selected
 				senderId: userData[0].id,
-				recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
-				recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+				recieverId: getFriend(friendId)!.id,
+				recieverName: getFriend(friendId)!.username,
 				date: new Date().toISOString(),
 				audio: ''
 			};
@@ -311,14 +310,14 @@ function chatComponent(): JSX.Element {
 						const audioPath = data.url;
 						if (friendId !== '') {
 							const newMessage: messageUser1 = {
-								to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+								to: getFriend(friendId)!.id,
 								from: userData[0].id,
 								message: '',
 								audio: audioPath || '',
 								image: '',
 								senderId: userData[0].id,
-								recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
-								recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+								recieverId: getFriend(friendId)!.id,
+								recieverName: getFriend(friendId)!.username,
 								date: new Date().toISOString()
 							};
 							socketChat?.emit('message', newMessage);
@@ -372,6 +371,7 @@ function chatComponent(): JSX.Element {
 				video: true,
 			};
 			const stream = await navigator.mediaDevices.getUserMedia(constraints);
+			stream.getTracks().forEach((track) => {track.enabled = false});
 			userData[8](stream)
 			stream && socketChat?.emit('callUser', {
 				from: userData[0].id,
@@ -616,7 +616,7 @@ function chatComponent(): JSX.Element {
 					?
 					<DetailsArea MESSAGES={MESSAGES} selectedMessageIndex={selectedMessageIndex} 
 					selectedColor={selectedColor} handleSelectedColor={handleSelectedColor} modalPicPath={modalPicPath} isModalOpen={isModalOpen} onCloseModal={onCloseModal}
-					onOpenModal={onOpenModal} getMessageFriend={getMessageFriend} handleOpenDetails={handleOpenDetails} />
+					onOpenModal={onOpenModal} getMessageFriend={getMessageFriend} getFriend={getFriend} friendId={friendId} handleOpenDetails={handleOpenDetails} />
 					: null}
 				{onOpenDetails && channelId != -1 ? (
 					<RoomDetails

@@ -26,17 +26,19 @@ const customTheme: CustomFlowbiteTheme = {
 		}
 	},
 	label: {
-		
 	},
     modal: {
         header: {
-            base: "flex justify-center items-center text-center dark:bg-main-light-EGGSHELL bg-main-light-FERN text-white font-poppins",
+            base: "flex justify-between place-self-center w-full items-center text-center dark:bg-main-light-EGGSHELL bg-main-light-FERN text-white font-poppins p-4",
             title: "text-white justify-items-end text-center text-white",
             close: {
-                base: "hidden",
-                icon: ""
+                base: "-mr-1 flex rounded-lg p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white",
+                icon: "w-5 h-5"
             }
         }
+    },
+    tabs: {
+        
     }
 };
 export {

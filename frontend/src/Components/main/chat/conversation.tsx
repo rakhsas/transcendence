@@ -67,73 +67,97 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
         });
         setLstGroupMessages(updatedChannels);
     }
+	const chooseFile = (event: any) => {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = 'image/*';
+		input.addEventListener('change', handleChange); // Add event listener
+		input.click();
+		const fileInput = event.target;
+		const chosenFile = fileInput.files && fileInput.files[0];
+		if (chosenFile) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				const imgElement = document.querySelector("#list") as HTMLImageElement;
+				setImagePath(chosenFile);
+				if (imgElement) {
+					imgElement.src = reader.result as string;
+				}
+			};
+			reader.readAsDataURL(chosenFile);
+		}
+	};
+	const handleChange = (event: any) => {
+		const selectedFile = event.target.files[0];
+	};
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 	return (
 		<div className={`md:flex flex-col  ${selectedMessageIndex !== '-1' ? 'hidden' : 'flex' } relative justify-between pb-5 overflow-y-auto w-full md:w-64 overflow-x-hidden border-r-[1px] dark:border-gray-700 border-black`}>
 			<Tabs aria-label="Tabs with icons" style="underline" theme={tabsTheme}>
 				<Tabs.Item active title="Friends" icon={LiaUserFriendsSolid}>
-					{latestMessages.length == 0 ?
-						(
-							<div className="flex items-center justify-center h-64 w-64 text-red-900 dark:text-red-500">
-								You have no messages
-							</div>
-						) : (
-							latestMessages.map((message: any, index) => (
-								<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
-									handleSelectMessage(
-										index.toString(),
-										message.__reciever__.id === userData[0].id ? message.__owner__.id : message.__reciever__.id,
-										undefined
-									)
-								}}>
-									
-									<div className="msg-profile rounded-full mr-4 bg-rose-400 ">
-										<div className="msg-profile group object-cover" style={{ backgroundImage: `url(${ userData[0].id === message.__reciever__.id ? baseAPIUrl + message.__owner__.picture : baseAPIUrl + message.__reciever__.picture})` }}>
-										</div>
-									</div>
-									<div className="msg-detail overflow-hidden ml-2">
-										<div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base">
-											{message.__reciever__.id === userData[0].id ? message.__owner__.firstName + ' ' + message.__owner__.lastName : message.__reciever__.firstName + ' ' + message.__reciever__.lastName}
-										</div>
-										<div className="msg-content font-medium text-xs">
-											<span className="msg-message whitespace-nowrap overflow-hidden overflow-ellipsis text-main-dark-SIDEMESSAGE">
-												{
-													message.senderId === userData[0].id
-														?
-														<span className="font-poppins font-bold text-gray-700">
-															YOU:
-															<span className="text-black dark:text-white rrrrr">
-																{
-																	message.message.length > 0 ? (
-																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
-																	) : (
-																		message.img ? ' Picture' : ' Audio'
-																	)
-																}
-															</span>
-														</span>
-														:
-														<span className="font-poppins font-bold text-gray-700">
-															HIM:
-															<span className="text-black dark:text-white rrrrr">
-																{
-																	message.message.length > 0 ? (
-																		message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
-																	) : (
-																		message.img ? ' Picture' : ' Audio'
-																	)
-																}
-															</span>
-														</span>
-												}
-											</span>
-											<span className="msg-date text-main-light-FERN text-sm ml-4">
-												{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}
-											</span>
-										</div>
-									</div>
+					<div className="flex flex-col">
+						{latestMessages.length == 0 ?
+							(
+								<div className="flex items-center justify-center h-64 w-64 text-red-900">
+									You have no messages
 								</div>
-							)))}
+							) : (
+								latestMessages.map((message: any, index) => (
+									<div key={index} className={`msg py-5 h-28 w-96 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
+										handleSelectMessage(
+											index.toString(),
+											message.__reciever__.id === userData[0].id ? message.__owner__.id : message.__reciever__.id,
+											undefined
+										)
+									}}>
+										<div className="msg-profile rounded-full mr-4 bg-rose-400 ">
+											<div className="msg-profile group object-cover" style={{ backgroundImage: `url(${ userData[0].id === message.__reciever__.id ? baseAPIUrl + message.__owner__.picture : baseAPIUrl + message.__reciever__.picture})` }}>
+											</div>
+										</div>
+										<div className="msg-detail overflow-hidden ml-2">
+											<div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base">
+												{message.__reciever__.id === userData[0].id ? message.__owner__.firstName + ' ' + message.__owner__.lastName : message.__reciever__.firstName + ' ' + message.__reciever__.lastName}
+											</div>
+											<div className="msg-content font-medium text-xs">
+												<span className="msg-message whitespace-nowrap overflow-hidden overflow-ellipsis text-main-dark-SIDEMESSAGE">
+													{
+														message.senderId === userData[0].id
+															?
+															<span className="font-poppins font-bold text-gray-700">
+																YOU:
+																<span className="text-black dark:text-white rrrrr">
+																	{
+																		message.message.length > 0 ? (
+																			message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																		) : (
+																			message.img ? ' Picture' : ' Audio'
+																		)
+																	}
+																</span>
+															</span>
+															:
+															<span className="font-poppins font-bold text-gray-700">
+																HIM:
+																<span className="text-black dark:text-white rrrrr">
+																	{
+																		message.message.length > 0 ? (
+																			message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																		) : (
+																			message.img ? ' Picture' : ' Audio'
+																		)
+																	}
+																</span>
+															</span>
+													}
+												</span>
+												<span className="msg-date text-main-light-FERN text-sm ml-4">
+													{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}
+												</span>
+											</div>
+										</div>
+									</div>
+						)))}
+					</div>
 				</Tabs.Item>
 				<Tabs.Item title="Rooms" icon={RiWechatChannelsFill}>
 					{lstGroupMessages.map((item, index) => {
@@ -165,12 +189,13 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 					<form className="flex flex-col gap-4 m-0" onSubmit={addChannel}>
 						<div className="conta flex flex-col gap-8">
 							<div className="flex justify-center">
-								<div className="pic w-32 h-32 rounded-full bg-green-500">
-								<div className="flex flex-col items-center justify-center">
-									<svg className="mb-4 h-8 w-8 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16" >
-										<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-									</svg>
-								</div>
+								<div className="pic w-32 h-32 rounded-full bg-green-500 flex flex-col items-center justify-center cursor-pointer" onClick={chooseFile} style={{ backgroundImage: `url(${imagePath}`}}>
+									{/* <img src={imagePath} className="object-cover w-48 h-48 rounded-3xl" id="list" /> */}
+									<div className="">
+										<svg className="h-8 w-8 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16" >
+											<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+										</svg>
+									</div>
 								</div>
 							{/* <Label htmlFor="dropzone-file" className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"> */}
 							{/* </Label> */}

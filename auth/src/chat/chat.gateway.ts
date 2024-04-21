@@ -33,19 +33,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.connectedUsers.set(userName, client);
 		this.usersArray.push(client.id);
 		client.emit('update-user-list', { userIds: this.usersArray });
-		this.server.emit('update-user-list', { userIds: this.usersArray });
+		const mapObject = [];
+		this.connectedUsers.forEach((value, key) => {
+			// mapObject[key] = value.id;
+			const field = {
+				name: key,
+				id: value.id
+			}
+			mapObject.push(field)
+		});
+		console.log(mapObject)
+		this.server.emit('update-user-list', mapObject);
 	}
 
 	handleDisconnect(client: Socket) {
-		if (this.peerConnections[client.id]) {
-			this.peerConnections[client.id].close();
-			delete this.peerConnections[client.id];
-		}
-
 		// //console.log('A user disconnected');
 		this.usersArray = this.usersArray.filter(id => id !== client.id);
 		client.broadcast.emit('update-user-list', { userIds: this.usersArray });
-		client.broadcast.emit('user-disconnected', { userId: client.id });
+		// client.broadcast.emit('user-disconnected', { userId: client.id });
 		const userName = String(client.handshake.query.userName);
 		this.connectedUsers.delete(userName);
 	}
@@ -392,7 +397,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('callUser')
 	async handleCallUser(client: Socket, payload: any) {
-		console.log('callUser: ', payload)
+		// console.log('callUser: ', payload)
 		// client.to(payload.to).emit('RequestCall', {
 		// 	from: payload.from,
 		// 	// offer: payload.offer,
@@ -414,6 +419,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('mediaOffer')
 	async handleOnMediaOffer(client: Socket, payload: any) {
+		// const {to, from, fromUsername, toUsername} = payload;
+		// console.log("to", to)
+		// console.log("from", from)
+		// console.log("toUsername", toUsername)
+		// console.log("fromUsername", fromUsername)
+		console.log({
+			fromUsername: payload.fromUsername,
+			// offer: payload.offer,
+			toUsername: payload.toUsername
+		})
 		client.to(payload.to).emit('mediaOffer', {
 			from: payload.from,
 			offer: payload.offer
@@ -422,6 +437,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('mediaAnswer')
 	async handleOnMediaAnswer(client: Socket, payload: any) {
+		const {from, to} = payload;
+		console.log("mediaAnswer:", from, to)
 		client.to(payload.to).emit('mediaAnswer', {
 			answer: payload.answer,
 			from: payload.from
@@ -437,8 +454,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
-
-
 	@SubscribeMessage('acceptCall')
 	async handleAcceptCall(client: Socket, payload: any) {
 		//console.log('acceptCall');
@@ -450,9 +465,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("acceptVideoCall")
 	async handleAcceptVideoCall(client: Socket, payload: any) {
-		console.log(payload)
-		client.to(this.connectedUsers.get(payload.caller.username).id).emit("callPermission", payload)
-		client.emit("callPermission", payload)
+		client.to(this.connectedUsers.get(payload.caller.username).id).emit("callPermission", {
+			user: payload.user,
+			caller: payload.caller,
+			permission: payload.permission,
+			selectedUser: this.connectedUsers.get(payload.caller.username).id
+		})
+		client.emit("callPermission", 
+			{
+				user: payload.user,
+				caller: payload.caller,
+				permission: payload.permission,
+				selectedUser: this.connectedUsers.get(payload.caller.username).id
+			}
+		)
 	}
 
 	@SubscribeMessage("callVideoEnded")

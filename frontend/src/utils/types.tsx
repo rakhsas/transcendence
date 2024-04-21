@@ -50,8 +50,8 @@ export interface notificationInterface {
     message: string;
     audio: string;
     image: string;
-    seen: false;
-    read: false;
+    seen: boolean;
+    read: boolean;
     channel: Channel;
     issuer: User;
     target: User;

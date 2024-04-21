@@ -7,7 +7,6 @@ import Robot from './../../../assets/robot.png';
 import fire from './../../../assets/Icon/fire.svg';
 import play from './../../../assets/img/Play.svg'
 import videoSource from './../../../assets/avatars/490488ec-2f13-402b-b203-951e4a4775cd.mp4';
-import Chart from 'chart.js/auto';
 import { FriendsService } from '../../../services/friend.service';
 import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
@@ -16,7 +15,6 @@ import ModalComponent from '../../modal/modal';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import InfoModal from '../../modal/Info.modal';
-import TwoFAComponent from '../../modal/2fa.authenticate.modal';
 
 const group = () => {
     return (
@@ -54,7 +52,7 @@ const HomeComponent: React.FC = () => {
     const [friends, setFriends] = useState<any[]>([]);
     const [friendData, setFriendData] = useState<friend[]>([]);
     const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
-    const [playingUsers, setPlayingUsers] = useState<string[]>([]);
+    // const [playingUsers, setPlayingUsers] = useState<string[]>([]);
     const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
     const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -285,7 +283,7 @@ const HomeComponent: React.FC = () => {
                                 ?
                                     'Loading...'
                                 :
-                                    friendData.map((friend, index) => {
+                                    friendData.slice(0, 7).map((friend, index) => {
                                         return (
                                             <div className="w-16 h-20 relative flex flex-col items-center" key={index} onClick={() => navigate(`/dashboard/profile/${friend.user.id}`)}>
                                                 <div className="img p-2" key={index}>

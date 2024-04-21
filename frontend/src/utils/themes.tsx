@@ -12,9 +12,11 @@ const inputTheme: CustomFlowbiteTheme["textInput"] = {
     },
 };
 const tabsTheme: CustomFlowbiteTheme["tabs"] = {
+    base: "flex flex-col gap-2",
     tablist: {
         tabitem: {
-            base: "flex items-center justify-center p-4 rounded-t-lg text-red-500 text-sm font-poppins first:ml-0 h-[83px]",
+            // "base": "flex items-center justify-center rounded-t-lg p-4 text-sm font-medium first:ml-0 h-[80px]",
+            base: "flex items-center justify-center p-4 rounded-t-lg text-red-500 text-sm font-poppins first:ml-0 h-[80px]",
             styles: {
                 underline: {
                     active: {
@@ -22,9 +24,11 @@ const tabsTheme: CustomFlowbiteTheme["tabs"] = {
                         off: "text-gray-400 hover:border-gray-300 hover:text-gray-600"        
                     }
                 }
-            }
-        }
-    }
+            },
+        },
+        base: "flex flex-row gap-2 overflow-hidden",
+    },
+    tabpanel: "py-3",
     
 };
 
