@@ -219,6 +219,7 @@ function NavbarComponent(): JSX.Element {
         });
         setNotifications(updatedItems);
         setNotificationCount(true);
+        navigate('/dashboard');
     })
     socket?.on("channelJoinNotif", async (data: any) => {
         setChannelNotifPayload(data.payload);

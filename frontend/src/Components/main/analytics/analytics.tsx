@@ -8,6 +8,8 @@ import DataContext from '../../../services/data.context';
 import LoadingComponent from '../../shared/loading/loading';
 import { GameService } from '../../../services/game.service';
 import { AnalyticsService } from '../../../services/analytics.service';
+import { setRef } from '@mui/material';
+import { SettingsBackupRestoreOutlined } from '@mui/icons-material';
 
 function AnalyticsComponent(): JSX.Element {
     Chart.register(...registerables);
@@ -32,7 +34,8 @@ function AnalyticsComponent(): JSX.Element {
             if (result.length > 3 || result.length === 3)
                 result.splice(0, 3);
             else if (result.length < 3){
-                result.splice(0, result.lenght);
+                // result.splice(0, result.lenght);
+                setOtherPlayers([]);
             }
             //console.log("other player are: ", result);
             setOtherPlayers(result);

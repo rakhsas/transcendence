@@ -45,8 +45,6 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
     return (
         <>
             {MESSAGES.map((message: any, index: any) => {
-                // console.log('message', message);
-                console.log("getFriend(friendId)", getFriend(friendId))
                 const sender: User = message.senderId === userData[0].id ? userData[0] : getFriend(friendId);
                 const reciever: User = message.senderId === userData[0].id ? getFriend(friendId) : userData[0];
                 if (message.message.length > 0) {

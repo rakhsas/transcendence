@@ -123,38 +123,26 @@ const FunctionProfileForm: React.FC = () => {
 	}, [userData]);
 	let { userId } = useParams();
 	useEffect(() => {
-		if (!userId)
-			userId = userData[0].id;
-		const requestedUser = users?.find((u) => u.id === userId) || userData[0];
-		// console.log(requestedUser)
-		if (requestedUser) {
-			const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
-			setUser((prevUser: User) => ({
-				...prevUser,
-				...requestedUser,
-				isFriend: isFriend
-			}));
+		if (!userId || userId === undefined || userId === '') {
+			setUser(userData[0]);
+			return;
 		}
-	}, [friends, users, userId]);
-	useEffect(() => {
+		const requestedUser = users?.find((u) => u.id === userId) || userData[0];
+		const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
+		setUser({ ...requestedUser, isFriend });
 		const fetchScores = async () => {
-			if (user) {
-				const result = await gameService.GetScoreMatches(user.id);
-				setScore(result);
-				const totalGames = await gameService.getTotalMatches(user.id);
-				setTotalGames(totalGames);
-				if (userData[0].id !== user.id) {
-					const blockedResult = await messageService.BlockedUsers(userData[0].id, user.id);
-					if (blockedResult === undefined)
-						setIsBlocked(false)
-					else {
-						setIsBlocked(true);
-					}
-				}
+			const result = await gameService.GetScoreMatches(requestedUser.id);
+			setScore(result);
+			const totalGames = await gameService.getTotalMatches(requestedUser.id);
+			setTotalGames(totalGames);
+			if (userData[0].id !== requestedUser.id) {
+				const blockedResult = await messageService.BlockedUsers(userData[0].id, requestedUser.id);
+				setIsBlocked(blockedResult);
 			}
 		};
 		fetchScores();
-	}, [user]);
+	}, [userId, userData, users, friends]);
+	
 	const ButtonClick = () => {
 		SetBlocked(!BlockedFriend);
 	}
@@ -183,6 +171,8 @@ const FunctionProfileForm: React.FC = () => {
 	useEffect(() => {
 		setProgress(calculateLevel(user?.score));
 	}, [user])
+	if (!user)
+		return <LoadingComponent />
 	return (
 		<div className="body m-4 flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting">
 			<div className="side1 flex flex-col gap-4 items-center w-full md:min-w-[35%] min-h-full overflow-hidden">
@@ -192,8 +182,7 @@ const FunctionProfileForm: React.FC = () => {
 							<div className={`relative border-2 rounded-full `} style={{
 								borderColor: user?.coalitionColor,
 							}}>
-								<img alt={user?.username} src={BASE_API_URL + user?.picture} className="w-24 h-24 object-cover" />
-
+								<img alt={user?.username} src={BASE_API_URL + user?.picture } className="w-24 h-24 object-cover" />
 							</div>
 							<div className={`dots ${user != userData[0] ? 'block' : 'hidden'}`} onClick={() => setNewMessageOpen(!newMessageOpen)}>
 								<svg className="w-8 h-8 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -327,9 +316,9 @@ const FunctionProfileForm: React.FC = () => {
 					<div className="header w-full overflow-hidden text-center py-2.5">
 						<h5 className='font-bolder dark:text-main-light-FERN text-main-light-EGGSHELL font-poppins uppercase'>user progress</h5>
 					</div>
-					<div className="chart-container">
+					{/* <div className="chart-container">
 						<CreatChartDesign user={user} totalGames={totalGames} />
-					</div>
+					</div> */}
 				</div>
 			</div>
 		</div>
