@@ -121,7 +121,7 @@ const FunctionProfileForm: React.FC = () => {
 		setFriends(userData[7]);
 		setSocketChat(userData[1]);
 	}, [userData]);
-	const { userId } = useParams();
+	let { userId } = useParams();
 	useEffect(() => {
 		if (!userId)
 			userId = userData[0].id;
