@@ -499,6 +499,8 @@ function NavbarComponent(): JSX.Element {
                                                                 userId: userData[0].id,
                                                                 friendId: item.issuer.id
                                                             });
+                                                            setNotifIsOpen(false);
+                                                            item.seen = true;
                                                         }}>
                                                             Decline
                                                         </Button>
@@ -629,11 +631,11 @@ function NavbarComponent(): JSX.Element {
                                                             Accept
                                                         </Button>
                                                         <Button color="failure" pill onClick={() => {
-                                                            socket.emit("acceptVideoCall", {
-                                                                user: userData[0],
-                                                                caller: item.issuer,
-                                                                permission: false
-                                                            });
+                                                            // socket.emit("acceptVideoCall", {
+                                                            //     user: userData[0],
+                                                            //     caller: item.issuer,
+                                                            //     permission: false
+                                                            // });
                                                             setNotifIsOpen(false);
                                                             item.seen = true;
                                                             /*socket?.emit("declineFriendRequest",
@@ -650,7 +652,10 @@ function NavbarComponent(): JSX.Element {
                                         }
                                         else if (item.type === NotificationType.CHANNEL_MESSAGE) {
                                             return (
-                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <a  key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => {
+                                                    setNotifIsOpen(false);
+                                                    item.seen = true;
+                                                }}>
                                                     <div className="flex-shrink-0">
                                                         <div className="pic rounded-full w-12 h-12">
                                                             <img className="h-full w-full object-cover bg-contain bg-no-repeat bg-center" src={BASE_API_URL + item.issuer.picture} alt="Jese image" />
@@ -711,7 +716,10 @@ function NavbarComponent(): JSX.Element {
                                             )
                                         }
                                         else if (item.type === NotificationType.FRIEND_REQUEST_DECLINED ) {return (
-                                            <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                            <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => {
+                                                setNotifIsOpen(false);
+                                                item.seen = true;
+                                            }}>
                                                 <div className="flex-shrink-0">
                                                     <div className="pic rounded-full w-11 h-11">
                                                         <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={BASE_API_URL + item.issuer.picture} alt={item.issuer.username} />

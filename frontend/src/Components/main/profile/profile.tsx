@@ -35,7 +35,6 @@ const levels = [
 	{ level: 4, minScore: 251, maxScore: 300 },
 	{ level: 4.5, minScore: 301, maxScore: 350 },
 	{ level: 5, minScore: 351, maxScore: 400 },
-	// Add more levels and score ranges as needed
 ];
 
 function getProgress(score: number) {
@@ -134,9 +133,10 @@ const FunctionProfileForm: React.FC = () => {
 		setSocketChat(userData[1]);
 	}, [userData]);
 	const { userId } = useParams();
-
+	// console.log(userId)
 	useEffect(() => {
-		const requestedUser = users?.find((u) => u.id === userId);
+		const requestedUser = users?.find((u) => u.id === userId) || userData[0];
+		// console.log(requestedUser)
 		if (requestedUser) {
 			const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
 			setUser((prevUser: User) => ({
@@ -220,15 +220,15 @@ const FunctionProfileForm: React.FC = () => {
 							<h5 className="text-xl text-black dark:text-white font-bolder font-poppins">{user?.firstName + ' ' + user?.lastName}</h5>
 						</div>
 						{
-							userId && userId !== userData[0].id && (
+							user && user.username !== userData[0].username && (
 								<div className="flex flex-1 flex-wrap justify-center items-center w-full overflow-hidden py-2">
 									{
 										user && user?.isFriend === false ? (
-											<button type="button" className="dark:text-white text-black bg-yellow-300 hover:bg-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:focus:ring-yellow-900" onClick={
+											<div className="dark:text-white text-black bg-main-light-FERN hover:bg-main-light-EGGSHELL hover:text-white focus:outline-none focus:ring-4 focus:ring-yellow-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:focus:ring-yellow-900" onClick={
 												() => sendFriendRequest()
 											}>
 												Send Friend Request
-											</button>
+											</div>
 										) : (
 											!isBlocked ? (
 												<button type="button" className="dark:text-white text-black bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" onClick={

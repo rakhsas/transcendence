@@ -2,6 +2,7 @@ import { Button, Modal, TextInput } from "flowbite-react";
 import React, { useState } from "react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Socket } from "socket.io-client";
+import { customTheme } from "../../utils/theme";
 
 interface MessageProps {
     senderId: string;
@@ -31,15 +32,18 @@ const MessageModal: React.FC<MessageProps> = ({ senderId,recieverName, recieverI
     return (
         <>
         <Modal show={isOpen} size="md" onClose={() => setNewMessageOpen(false)} popup>
-            <Modal.Header />
-            <Modal.Body>
-            <div className="w-full mt-4 h-32">
+            <Modal.Header  theme={customTheme.modal?.header}> Send Message </Modal.Header>
+            <Modal.Body className="overflow-hidden bg-neutral-100 dark:bg-main-dark-SPRUCE">
+            {/* <div className="w-full mt-4 h-32">
                 <TextInput placeholder="Type your message here" onChange={(e) => setMessage(e.target.value)} />
             </div>
             <div className="flex justify-center gap-4">
-                <Button color="success" onClick={() => sendMessage()}>
-                    {"Yes, I'm sure"}
-                </Button>
+        </div> */}
+                <div className="flex flex-col h-auto w-full p-4 items-center space-y-4">
+                    <TextInput  className="w-full" theme={customTheme.textInput} color="primary" placeholder="Type your message here" onChange={(e) => setMessage(e.target.value)} />
+                    <Button color="success" onClick={() => sendMessage()}>
+                        Send
+                    </Button>
                 </div>
             </Modal.Body>
         </Modal>

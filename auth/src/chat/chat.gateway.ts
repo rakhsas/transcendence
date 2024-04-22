@@ -297,8 +297,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 		await this.friendService.createFriendship(payload.userId, payload.friendId);
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
-		const friends = await this.friendService.getFriendsOfUser(payload.friendId);
-		this.connectedUsers.get(lastnotif.target.username)?.emit('updatedFriends', friends);
+		const targetFriends = await this.friendService.getFriendsOfUser(payload.friendId);
+		const issuerFriends = await this.friendService.getFriendsOfUser(payload.userId);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('updatedFriends', targetFriends);
+		this.connectedUsers.get(lastnotif.issuer.username)?.emit('updatedFriends', issuerFriends);
 		this.connectedUsers.get(lastnotif.target.username)?.emit('friendRequestAcceptedNotif', lastnotif);
 		// await this.notificationService.updateNotificationState(notif.id, {seen: true});
 		

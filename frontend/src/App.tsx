@@ -29,6 +29,7 @@ function App() {
           <Route path="call" element={<CallComponent />} />
           <Route path="settings" element={<SettingFunction />} />
           <Route path="profile">
+            <Route index element={<ProfileComponent />} />
             <Route path=':userId' element={<ProfileComponent />} />
           </Route>
           <Route path="game" element={<Game />} />

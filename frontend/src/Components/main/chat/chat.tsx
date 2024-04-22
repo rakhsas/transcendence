@@ -290,13 +290,14 @@ function chatComponent(): JSX.Element {
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 			const mediaRecorder = new MediaRecorder(stream);
 			mediaRecorderRef.current = mediaRecorder;
-			const chunks: any = []; // Create a new array for chunks
+			const chunks: any = [];
 			mediaRecorder.ondataavailable = (e) => {
 				chunks.push(e.data);
 			};
 			mediaRecorder.onstop = async () => {
 				const audioBlob = new Blob(chunks, { type: 'audio/wav' }); // Use the chunks array directly
 				const formData = new FormData();
+				stream.getTracks().forEach((track) => track.stop());
 				formData.append('file', audioBlob);
 				const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 				try {

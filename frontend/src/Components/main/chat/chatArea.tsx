@@ -1,11 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { messageUser, messageUser1 } from "../../../model/messageUser.model";
 import User from "../../../model/user.model";
 import ModalComponent from "../../../utils/modal.component";
 import { Dropdown } from "flowbite-react";
-import { Socket } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
 import AudioVisualizer from "./audioVisualiser";
 type props = {
     MESSAGES: any;
@@ -22,7 +19,7 @@ type props = {
     getFriend: any;
     friendId: string
 }
-const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessageIndex, getMessageFriend, isModalOpen, onOpenModal, onCloseModal, modalPicPath, openVideoCall, setOpenVideoCall, socketChat, getFriend, friendId }) => {
+const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, onOpenModal, onCloseModal, modalPicPath, socketChat, getFriend, friendId }) => {
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
     const navigate = useNavigate();
 	const messagesRef = useRef<HTMLDivElement>(null);
@@ -48,6 +45,8 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, selectedMessag
     return (
         <>
             {MESSAGES.map((message: any, index: any) => {
+                // console.log('message', message);
+                console.log("getFriend(friendId)", getFriend(friendId))
                 const sender: User = message.senderId === userData[0].id ? userData[0] : getFriend(friendId);
                 const reciever: User = message.senderId === userData[0].id ? getFriend(friendId) : userData[0];
                 if (message.message.length > 0) {
