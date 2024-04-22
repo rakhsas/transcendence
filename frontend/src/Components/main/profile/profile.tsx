@@ -1,7 +1,5 @@
 
 import { useContext, useEffect, useState } from 'react';
-// import DataContext from '../../../services/data.context';
-
 import DataContext from '../../../services/data.context';
 import Achei from '../../../assets/acheivements/poker.png'
 import Achei2 from '../../../assets/acheivements/fire.png'
@@ -10,21 +8,15 @@ import Achei4 from '../../../assets/acheivements/fire2.png'
 import Achei1 from '../../../assets/acheivements/poker1.png'
 import './updateprofile.css'
 import CreatChartDesign from './Chart';
-import picture from './mdarify.png'
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import LoadingComponent from '../../shared/loading/loading';
 import User from '../../../model/user.model';
-import { gameScores, totalGames } from '../../../utils/types';
+import { gameScores } from '../../../utils/types';
 import { GameService } from '../../../services/game.service';
 import { Socket } from 'socket.io-client';
 import MessageService from '../../../services/message.service';
 import MessageModal from '../../modal/message.modal';
 
-interface ButtonAttributes {
-	className: string;
-	value: string;
-	onClick?: () => void;
-}
 
 const levels = [
 	{ level: 1, minScore: 0, maxScore: 50 },
@@ -49,22 +41,19 @@ function getProgress(score: number) {
 }
 
 function calculateLevel(score: number) {
-	// Define the score threshold for each level
-	const levelThreshold = 100; // Increase this value if you want higher levels to require more score
-
-	// Calculate the level based on the score
-	const level = (score / levelThreshold); // Adding 1 because levels start from 1
+	const levelThreshold = 100;
+	const level = (score / levelThreshold);
 
 	return level;
 }
 
-const validAchie: string[] = [Achei, Achei1, Achei2, Achei3, Achei4];
-const validName: string[] = [
-	'Play The First Game',
-	'Play The Second Game',
-	'Play The Third Game',
-	'Play The Fourth Game',
-	'Play The Fifth Game'];
+// const validAchie: string[] = [Achei, Achei1, Achei2, Achei3, Achei4];
+// const validName: string[] = [
+// 	'Play The First Game',
+// 	'Play The Second Game',
+// 	'Play The Third Game',
+// 	'Play The Fourth Game',
+// 	'Play The Fifth Game'];
 
 const FunctionProfileForm: React.FC = () => {
 	const userData = useContext(DataContext);
@@ -133,8 +122,9 @@ const FunctionProfileForm: React.FC = () => {
 		setSocketChat(userData[1]);
 	}, [userData]);
 	const { userId } = useParams();
-	// console.log(userId)
 	useEffect(() => {
+		if (!userId)
+			userId = userData[0].id;
 		const requestedUser = users?.find((u) => u.id === userId) || userData[0];
 		// console.log(requestedUser)
 		if (requestedUser) {

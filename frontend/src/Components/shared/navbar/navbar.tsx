@@ -543,6 +543,8 @@ function NavbarComponent(): JSX.Element {
                                                                 userId: userData[0].id,
                                                                 friendId: item.issuer.id
                                                             });
+                                                            setNotifIsOpen(false);
+                                                            item.seen = true;
                                                         }}>
                                                             Decline
                                                         </Button>
