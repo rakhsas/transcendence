@@ -33,7 +33,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
 	}, [MESSAGES, messagesRef]);
     
     const handleInviteOneVsOne = (friendId: string, userId: string) => {
-        socketChat?.emit('inviteOneVsOne', { friendId, userId});
+        socketChat?.emit('inviteOneVsOne', { userId, friendId});
         navigate('/dashboard/gameRoom/' + friendId);
     }
     useEffect(() => {
@@ -72,7 +72,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                                 {
                                     messageStates[index] && (
                                             <Dropdown.Item onClick={() => {
-                                                handleInviteOneVsOne(reciever.id, sender.id);
+                                                handleInviteOneVsOne(sender.id, reciever.id);
                                                 // navigate('/dashboard/gameRoom/' + reciever.id);
                                             }}>Invite One VS ONE</Dropdown.Item>
                                             )
