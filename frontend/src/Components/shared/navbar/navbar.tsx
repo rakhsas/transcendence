@@ -43,7 +43,8 @@ enum NotificationType {
     FRIEND_REQUEST_ACCEPTED= 'FRIEND_REQUEST_ACCEPTED',
     FRIEND_REQUEST_DECLINED= 'FRIEND_REQUEST_DECLINED',
     KIKED = 'KIKED',
-    ONEVSONE = 'ONEVSONE'
+    ONEVSONE = 'ONEVSONE',
+    ONEVSONE_DECLINED = 'ONEVSONE_DECLINED',
 }
 
 interface NotifMessage {
@@ -176,6 +177,28 @@ function NavbarComponent(): JSX.Element {
     }
     socket?.on("directMessageNotif", onDirectMessage);
     socket?.on("roomMessageNotif", async (data: any) => {
+        const newItem: notificationInterface = {
+            id: data.id,
+            type: data.type,
+            message: data.message,
+            audio: data.audio,
+            image: data.image,
+            seen: false,
+            read: false,
+            issuer: data.issuer,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            channel: data.channel,
+            target: data.target
+        }
+        const updatedItems: notificationInterface[] = [...notifications, newItem];
+        updatedItems.sort((a, b) => {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        setNotifications(updatedItems);
+        setNotificationCount(true);
+    })
+    socket?.on("gameRequestDeclined", async (data: any) => {
         const newItem: notificationInterface = {
             id: data.id,
             type: data.type,
@@ -538,10 +561,10 @@ function NavbarComponent(): JSX.Element {
                                                             Accept
                                                         </Button>
                                                         <Button color="failure" pill onClick={() => {
-                                                            socket?.emit("declineFriendRequest",
+                                                            socket?.emit("declineGameRequest",
                                                             {
-                                                                userId: userData[0].id,
-                                                                friendId: item.issuer.id
+                                                                issuer: userData[0].id,
+                                                                target: item.issuer.id
                                                             });
                                                             setNotifIsOpen(false);
                                                             item.seen = true;
@@ -718,6 +741,31 @@ function NavbarComponent(): JSX.Element {
                                             )
                                         }
                                         else if (item.type === NotificationType.FRIEND_REQUEST_DECLINED ) {return (
+                                            <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => {
+                                                setNotifIsOpen(false);
+                                                item.seen = true;
+                                            }}>
+                                                <div className="flex-shrink-0">
+                                                    <div className="pic rounded-full w-11 h-11">
+                                                        <img className="h-full bject-cover bg-contain bg-no-repeat bg-center" src={BASE_API_URL + item.issuer.picture} alt={item.issuer.username} />
+                                                    </div>
+                                                    <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-red-500 border border-white rounded-full dark:border-gray-800">
+                                                        <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path fillRule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z" clipRule="evenodd"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div className="w-full ps-3">
+                                                    <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400"><span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> declined your friend request.</div>
+                                                    <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                        {
+                                                            new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                        else if (item.type === NotificationType.ONEVSONE_DECLINED ) {return (
                                             <div key={index} className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700" onClick={() => {
                                                 setNotifIsOpen(false);
                                                 item.seen = true;

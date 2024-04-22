@@ -42,7 +42,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			mapObject.push(field)
 		});
-		console.log(mapObject)
+		// console.log(mapObject)
 		this.server.emit('update-user-list', mapObject);
 	}
 
@@ -98,7 +98,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('inviteOneVsOne')
 	async handleInviteOneVsOne(client: Socket, payload: any): Promise<void> {
-		//console.log('inviteOneVsOne: ', payload)
+		console.log('inviteOneVsOne: ', payload)
 		const areFriends = await this.friendService.getFriendship(payload.userId, payload.friendId);
 		//console.log('areFriends: ', areFriends)
 		if (areFriends === true)
@@ -120,6 +120,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// =============================== Handle Muted users from a channel ============================
 
+	@SubscribeMessage("declineGameRequest")
+	async handleDeclineGameRequest(client: Socket, payload: any): Promise<void> {
+		console.log('declineGameRequest: ', payload)
+		const notif = await this.notificationService.createNotification({
+			target: payload.target,
+			type: NotificationType.ONEVSONE_DECLINED,
+			issuer: payload.issuer,
+			message: "",
+			image: null,
+			audio: null,
+			channel: null
+		});
+		const lastnotif = await this.notificationService.getNotificationById(notif.id);
+		const target = this.connectedUsers.get(lastnotif.target.username);
+		target?.emit('gameRequestDeclined', lastnotif);
+	}
 	
 
 	// ================================ Channel hevents ====================================================================
