@@ -137,7 +137,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		target?.emit('gameRequestDeclined', lastnotif);
 	}
 	
-
+	@SubscribeMessage("iCallUser")
+	async handleBeginCall(client: Socket, payload: any) {
+		client.emit('iAmCallingAUser', payload)
+	}
 	// ================================ Channel hevents ====================================================================
 
 	@SubscribeMessage('leavChannel')
@@ -401,6 +404,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		userId: the user should be banned.
 	}
 	*/
+
+	@SubscribeMessage("isUserOnline")
+	async isUserOnline(client: Socket, payload: any): Promise<void> {
+		console.log(payload.userName)
+		const user = this.connectedUsers.get(payload.userName);
+		if (user) {
+			client.emit("userIsOnline", true);
+		}
+		else {
+			client.emit("userIsOnline", false);
+		}
+	}
+
 	@SubscribeMessage('banUser')
 	async handleBanUser(client: Socket ,payload: any): Promise<void> {
 		client.leave(payload.channelId);
@@ -430,6 +446,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			image: null,
 			audio: null,
 			channel: null,
+			seen: true,
+			read: true
 		});
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
 		this.connectedUsers.get(lastnotif.target.username)?.emit('RequestCall', lastnotif);
@@ -498,7 +516,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 		)
 	}
-
+	@SubscribeMessage("callRejected")
+	async handleCallRejected(client: Socket, payload: any) {
+		client.to(this.connectedUsers.get(payload.caller.username).id).emit("callRejected", payload)
+		client.emit("callRejected", payload)
+	}
 	@SubscribeMessage("callVideoEnded")
 	async handleCallVideoEnd(client: Socket, payload: any) {
 		client.to(this.connectedUsers.get(payload.opponnet).id).emit("callVideoEnded", true)

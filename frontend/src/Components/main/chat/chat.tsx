@@ -48,13 +48,11 @@ function chatComponent(): JSX.Element {
 	const messageService = new MessageService();
 	const channelService = new ChannelService();
 	const muteService = new MuteService();
-	const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
 	const messagesRef = useRef<HTMLDivElement>(null);
 	const [channelId, setChannelId] = useState<number>(-1);
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedItem, setSelectedItem] = useState<any>('');
 	const [mutedUsers, setMutedUsers] = useState<MutedUsers[]>([]);
-	const [openVideoCall, setOpenVideoCall] = useState<boolean>();
 	const [friends, setFriends] = useState<any[]>([]);
 	const userData = useContext(DataContext);
 	if (!userData) {
@@ -366,7 +364,6 @@ function chatComponent(): JSX.Element {
 	useEffect(() => {},[MESSAGES])
 	const callUser = async () => {
 		if (userData[8]) {
-			setOpenVideoCall(!openVideoCall)
 			const constraints = {
 				audio: true,
 				video: true,
@@ -374,6 +371,9 @@ function chatComponent(): JSX.Element {
 			const stream = await navigator.mediaDevices.getUserMedia(constraints);
 			stream.getTracks().forEach((track) => {track.enabled = false});
 			userData[8](stream)
+			stream && socketChat?.emit('iCallUser', {
+				calle: getFriend(friendId)
+			});
 			stream && socketChat?.emit('callUser', {
 				from: userData[0].id,
 				senderId: userData[0].id,
@@ -381,9 +381,6 @@ function chatComponent(): JSX.Element {
 			})
 		}
 	}
-	socket?.on("callPermission", async (data: any) => {
-		data.permission ? setOpenVideoCall(false) : null;
-	})
 	return (
 		<>
 			<div className="flex bg-red-600l w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
@@ -451,11 +448,6 @@ function chatComponent(): JSX.Element {
 											</svg>
 										</div>
 									</div>
-									{
-										openVideoCall && (
-											<VideoCallComponent user={userData[0]} />
-										)
-									}
 									<div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `}>
 										<ChatAreaComponent
 											MESSAGES={MESSAGES}
@@ -466,8 +458,6 @@ function chatComponent(): JSX.Element {
 											onOpenModal={onOpenModal}
 											onCloseModal={onCloseModal}
 											modalPicPath={modalPicPath}
-											openVideoCall={openVideoCall}
-											setOpenVideoCall={setOpenVideoCall}
 											socketChat={socketChat}
 											getFriend={getFriend}
 											friendId={friendId}

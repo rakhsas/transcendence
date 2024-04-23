@@ -127,6 +127,7 @@ function NavbarComponent(): JSX.Element {
         setFilteredUsers(filtered);
     }, [searchInput]);
     const handleNavigate = (id: string) => {
+        setSearchInput('');
         navigate(`/dashboard/profile/${id}`);
     }
     const socket: Socket = userData[1];
@@ -152,7 +153,7 @@ function NavbarComponent(): JSX.Element {
         setNotifications(updatedItems);
         setNotificationCount(true);
     }
-    socket?.on("RequestCall", onRequestCall);
+    // socket?.on("RequestCall", onRequestCall);
     const onDirectMessage = async (data: any) => {
         const newItem: notificationInterface = {
             id: data.id,
@@ -829,7 +830,7 @@ function NavbarComponent(): JSX.Element {
                     </svg>
                 </div>
                 <div className="group" onClick={() => { toogleSearchDropDown() }}>
-                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" onChange={(e) => {e.preventDefault(); setSearchInput(e.target.value)}} />
+                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" value={searchInput} onChange={(e) => {e.preventDefault(); setSearchInput(e.target.value)}} />
                     {
                         filteredUsers.length > 0 ? (
                             <div className={`absolute mt-2 z-40 rounded-md shadow-lg dark:bg-neutral-700 md:w-64 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>
@@ -837,7 +838,7 @@ function NavbarComponent(): JSX.Element {
                                         <div onClick={() => handleNavigate(user.id)} key={index} className="flex flex-col">
                                             <div className="flex px-4 py-2 hover:bg-gray-100 w-full dark:hover:bg-gray-600 dark:hover:text-white">
                                                 <div className="pic">
-                                                    <img className="w-6 h-6 me-2 rounded-full" src={BASE_API_URL + user.picture} alt="Jese image" />
+                                                    <img className="w-8 h-8 me-2 rounded-full object-cover" src={BASE_API_URL + user.picture} alt="Jese image" />
                                                 </div>
                                                 <div className="info">
                                                     <span>{user.firstName + ' ' + user.lastName}</span>

@@ -13,8 +13,6 @@ type props = {
     onOpenModal: any;
     onCloseModal: any;
     modalPicPath: any;
-    openVideoCall: any;
-    setOpenVideoCall: any;
     socketChat: any;
     getFriend: any;
     friendId: string
