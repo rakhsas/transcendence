@@ -22,8 +22,8 @@ interface messageUser1 {
     to: string;
     from: string;
     message: string;
-    image: string;
-    audio: string;
+    image: string | null;
+    audio: string | null;
     senderId: string;
     recieverId: string;
     recieverName: string;

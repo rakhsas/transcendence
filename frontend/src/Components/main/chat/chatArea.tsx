@@ -133,6 +133,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                     )
                 }
                 else if (message.audio && message.audio.length > 0) {
+                    console.log('audio', message);
                     return (
                         <div className="p-4" key={index}>
                             <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>

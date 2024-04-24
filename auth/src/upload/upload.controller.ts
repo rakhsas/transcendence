@@ -39,6 +39,7 @@ export class UploadController {
     @UseInterceptors(FileInterceptor('file', {storage}))
     async uploadAudio(@UploadedFile() file: Express.Multer.File) {
         if (file) {
+            console.log(file)
             return { url: `upload/${file.filename}` };
         } else {
             return { message: 'No file uploaded!' };

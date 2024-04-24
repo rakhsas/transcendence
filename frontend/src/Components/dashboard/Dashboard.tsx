@@ -16,7 +16,6 @@ import { FriendsService } from '../../services/friend.service';
 import TwoFAComponent from '../modal/2fa.authenticate.modal';
 import cookies from 'js-cookie';
 import DraggableDiv from './draggable';
-import SlideToAnswer from './slider';
 import { SwipeableButton } from 'react-swipeable-button';
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
@@ -116,7 +115,6 @@ function DashboardComponent() {
 			audio: true,
 			video: true,
 		};
-		console.log('here');
 		const stream = await navigator.mediaDevices.getUserMedia(constraints);
 		stream.getTracks().forEach((track: MediaStreamTrack) => {track.enabled = false});
 		setStream(stream)
@@ -128,7 +126,6 @@ function DashboardComponent() {
 		setCallRequest(null);
 	}
 	socket?.on("iAmCallingAUser", async (data: any) => {
-		console.log(data)
 		setCallingUser(data.calle);
 		setCallRejected(false);
 		const executeEveryFiveSeconds = () => {
@@ -156,7 +153,6 @@ function DashboardComponent() {
 			callingUser && setCallingUser(null)
 		}, 3000);
 		setCallingUserStatus(false);
-		console.log(data)
 	})
 	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (
@@ -232,9 +228,9 @@ function DashboardComponent() {
 														setCallRequest(null);
 													}}
 													text="slide to answer"
-													text_unlocked="yeee"
+													text_unlocked="accepted"
 													color="#00453F"
-													/>
+												/>
 											</div>
 										</div>
 									</div>
@@ -242,9 +238,6 @@ function DashboardComponent() {
 	
 							)
 						}
-						{
-						}
-					
 						{
 							twoFactorAuthentication == "true" && (
 								<TwoFAComponent userData={userData}/>
