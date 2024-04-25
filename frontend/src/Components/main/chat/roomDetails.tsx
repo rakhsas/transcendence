@@ -164,7 +164,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 					?
 					null
 					:
-					<div className="detail-area shrink-0 border-l-[1px] gap-4 border-gray-700 ml-auto flex flex-col overflow-auto">
+                	<div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto w-full md:ml-0">
 						<div className="detail-area-header">
 							<div className="msg-profile group w-16 h-16" onClick={handleOpenDetails}>
 								<img src={baseAPIUrl + channelInfo.picture} alt="" className="w-full h-full" />
@@ -249,7 +249,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 												<div key={index} className="">
 													<a className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
 														<div className="flex-shrink-0">
-															<img className="rounded-full w-11 h-11" src={baseAPIUrl + user.picture} alt={user.firstName + ' ' + user.lastName} />
+															<img className="rounded-full w-11 h-11 object-cover" src={baseAPIUrl + user.picture} alt={user.firstName + ' ' + user.lastName} />
 														</div>
 														<div className="w-full ps-3">
 															<div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">

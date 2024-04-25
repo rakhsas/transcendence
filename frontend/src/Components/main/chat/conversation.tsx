@@ -4,12 +4,12 @@ import { LiaUserFriendsSolid } from "react-icons/lia";
 import { RiWechatChannelsFill } from "react-icons/ri";
 import { messageUser } from "../../../model/messageUser.model";
 import User from "../../../model/user.model";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { ChannelTypes } from "../../../utils/types";
 import UploadService from "../../../services/upload.service";
 import { Socket } from "socket.io-client";
 import { customTheme } from "../../../utils/theme";
-
+import defaultAvatar from "./../../../assets/avatars/anime_style.png";
 type data = {
 	latestMessages: messageUser[];
 	lstGroupMessages: any[];
@@ -30,12 +30,11 @@ interface LatestMesg {
 
 
 const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex, lstGroupMessages, handleSelectMessage, setLstGroupMessages, userData, isOpen, setIsOpen, selectedItem, setSelectedItem, socket }) => {
-	const [imagePath, setImagePath] = useState<any>();
+	const [imagePath, setImagePath] = useState<any>(null);
 	useEffect(() => {
 
 	}, [lstGroupMessages]);
 	const addChannel = async (event: any) => {
-		console.log('addChannel');
         event.preventDefault();
         const name = event.currentTarget.channelName.value;
         const type = event.currentTarget.types.value;
@@ -90,31 +89,46 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 	const handleChange = (event: any) => {
 		const selectedFile = event.target.files[0];
 	};
+	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const fileInput = event.target;
+		const chosenFile = fileInput.files && fileInput.files[0];
+		if (chosenFile) {
+			const reader = new FileReader();
+			reader.onload = () => {
+				const imgElement = document.querySelector("#channelPicture") as HTMLImageElement;
+				setImagePath(chosenFile);
+				if (imgElement) {
+					imgElement.src = reader.result as string;
+				}
+			};
+			reader.readAsDataURL(chosenFile);
+		}
+	};
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 	return (
 		<div className={`md:flex flex-col  ${selectedMessageIndex !== '-1' ? 'hidden' : 'flex' } relative justify-between pb-5 overflow-y-auto w-full md:w-64 overflow-x-hidden border-r-[1px] dark:border-gray-700 border-black`}>
 			<Tabs aria-label="Tabs with icons" style="underline" theme={tabsTheme}>
 				<Tabs.Item active title="Friends" icon={LiaUserFriendsSolid}>
-					<div className="flex flex-col">
+					<div className="flex flex-col items-start w-full lg:w-80 gap-1 relative">
 						{latestMessages.length == 0 ?
 							(
-								<div className="flex items-center justify-center h-64 w-64 text-red-900">
+								<div className="flex items-center font-poppins justify-center h-64 w-64 text-red-900">
 									You have no messages
 								</div>
 							) : (
 								latestMessages.map((message: any, index) => (
-									<div key={index} className={`msg py-5 h-28 w-96 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
+									<div key={index} className={`flex justify-between msg md:gap-2 lg:gap-0 h-20 items-center w-full overflow-hidden px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 										handleSelectMessage(
 											index.toString(),
 											message.__reciever__.id === userData[0].id ? message.__owner__.id : message.__reciever__.id,
 											undefined
 										)
 									}}>
-										<div className="msg-profile rounded-full mr-4 bg-rose-400 ">
+										<div className="flex justify-center w-1/4 h-auto">
 											<div className="msg-profile group object-cover" style={{ backgroundImage: `url(${ userData[0].id === message.__reciever__.id ? baseAPIUrl + message.__owner__.picture : baseAPIUrl + message.__reciever__.picture})` }}>
 											</div>
 										</div>
-										<div className="msg-detail overflow-hidden ml-2">
+										<div className="msg-detail overflow-hidden w-3/4 flex h-20 flex-col justify-center">
 											<div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base">
 												{message.__reciever__.id === userData[0].id ? message.__owner__.firstName + ' ' + message.__owner__.lastName : message.__reciever__.firstName + ' ' + message.__reciever__.lastName}
 											</div>
@@ -123,9 +137,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 													{
 														message.senderId === userData[0].id
 															?
-															<span className="font-poppins font-bold text-gray-700">
+															<span className="font-poppins font-bold text-gray-400">
 																YOU:
-																<span className="text-black dark:text-white rrrrr">
+																<span className="text-black dark:text-white">
 																	{
 																		message.message.length > 0 ? (
 																			message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
@@ -136,9 +150,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 																</span>
 															</span>
 															:
-															<span className="font-poppins font-bold text-gray-700">
+															<span className="font-poppins font-bold text-gray-400">
 																HIM:
-																<span className="text-black dark:text-white rrrrr">
+																<span className="text-black dark:text-white">
 																	{
 																		message.message.length > 0 ? (
 																			message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
@@ -185,21 +199,24 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 			<button className="add bottom-6" onClick={() => { setIsOpen(!isOpen) }}></button>
 			{isOpen ? <Modal show={isOpen} onClose={() => {setIsOpen(false)}} className="bg-zinc-900">
 				<Modal.Header theme={customTheme.modal?.header} className="text-center dark:bg-main-light-EGGSHELL bg-main-light-FERN text-white">Channel Details</Modal.Header>
-				<Modal.Body className="bg-zinc-800">
+				<Modal.Body className="bg-white dark:bg-zinc-800">
 					<form className="flex flex-col gap-4 m-0" onSubmit={addChannel}>
 						<div className="conta flex flex-col gap-8">
-							<div className="flex justify-center">
-								<div className="pic w-32 h-32 rounded-full bg-green-500 flex flex-col items-center justify-center cursor-pointer" onClick={chooseFile} style={{ backgroundImage: `url(${imagePath}`}}>
-									{/* <img src={imagePath} className="object-cover w-48 h-48 rounded-3xl" id="list" /> */}
-									<div className="">
-										<svg className="h-8 w-8 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16" >
-											<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-										</svg>
-									</div>
+							<div className="flex justify-center ">
+								<div className="p-2 overflow-hidden flex flex-col w-52 h-52 justify-center items-center gap-12">
+									{
+										imagePath ?
+										<img alt='' className="object-cover w-52 h-52 rounded-full" id="channelPicture" />
+										:
+										<div className="svg w-">
+											<span className="text-gray-500 text-lg font-poppins">Put Picture</span>
+										</div>
+									}
+									<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture bg-zinc-800 dark:bg-stone-800 rounded-full m-2">
+										<svg className="hoverIcon__2025e" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="white" d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"></path></svg>
+									</label>
 								</div>
-							{/* <Label htmlFor="dropzone-file" className="flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"> */}
-							{/* </Label> */}
-								{/* <input type="file" accept="image/jpeg, image/jpg" required className="" onChange={(e) => setImagePath(e.target.files?.[0])} /> */}
+								<input type="file" id="file" accept="image/jpg, image/jpeg" onChange={handleFileChange}  />
 							</div>
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
 								<div>
@@ -212,7 +229,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 									<div className="mb-2 block">
 										<Label htmlFor="types" value="Select your country" />
 									</div>
-									<Select id="types" required onChange={(e) => setSelectedItem(e.currentTarget.value)}>
+									<Select id="types" theme={customTheme.select} color="primary" required onChange={(e) => setSelectedItem(e.currentTarget.value)}>
 										<option value={ChannelTypes.PUBLIC}>Public</option>
 										<option value={ChannelTypes.PROTECTED}>Protected</option>
 										<option value={ChannelTypes.PRIVATE}>Private</option>
@@ -225,7 +242,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 												<div className="mb-2 block">
 													<Label htmlFor="password" value="Your password" />
 												</div>
-												<TextInput id="password" type="password" maxLength={6} minLength={6} />
+												<TextInput id="password" type="password" theme={customTheme.textInput} color="primary" maxLength={6} minLength={6} />
 											</div>
 										</div>
 									) :

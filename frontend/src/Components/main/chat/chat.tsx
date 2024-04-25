@@ -17,6 +17,7 @@ import RoomDetails from "./roomDetails";
 import MuteService from "../../../services/mute.service";
 import { MutedUsers } from "../../../utils/types";
 import VideoCallComponent from "./videocall";
+import { keyframes } from "@emotion/react";
 
 enum roomRoles {
 	OWNER = "OWNER",
@@ -33,7 +34,7 @@ function chatComponent(): JSX.Element {
 	const [roomMessages, setRoomMessages] = useState<any>(null);
 	const [roomMembers, setRoomMembers] = useState<membersRole[]>([])
 	const [MESSAGES, setMESSAGES] = useState<any>(null);
-	const [friendId, setFriendId] = useState('');
+	const [friendId, setFriendId] = useState<string>('');
 	const [selectedColor, setSelectedColor] = useState("black");
 	const [selectedMessageIndex, setSelectedMessageIndex] = useState('-1');
 	const [socketChat, setSocketChat] = useState<Socket>();
@@ -217,12 +218,13 @@ function chatComponent(): JSX.Element {
 	const chooseFile = () => {
 		const input = document.createElement('input');
 		input.type = 'file';
-		input.accept = 'image/*';
+		input.accept = 'image/png, image/jpeg, image/jpg';
 		input.addEventListener('change', handleChange); // Add event listener
 		input.click();
 	};
 	const handleSelectMessage = async (index: string, friendId?: string, cid?: number) => {
 		setSelectedMessageIndex(index);
+		setOnOpenDetails(false);
 		if (friendId) {
 			setChannelId(-1);
 			setRoomMessages(null);
@@ -255,14 +257,16 @@ function chatComponent(): JSX.Element {
 			)
 		}
 	};
-	useEffect(() => {
+	// useEffect(() => {
 		const onDirectMessage = async (data: any) => {
-			// console.log((await messageService.getMessages(userData[0].id, friendId)))
-			setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
+			if (friendId == data.issuer.id)
+			{
+				setMESSAGES((await messageService.getMessages(userData[0].id, data.issuer.id)));
+			}
 			setLatestMessages(await messageService.latestMessages(userData[0].id))
 		}
 		socketChat?.on("directMessageNotif", onDirectMessage)
-	}, [socketChat]);
+	// }, [socketChat]);
 	const handleOpenDetails = () => {
 		setOnOpenDetails(!onOpenDetails)
 	}
@@ -385,7 +389,7 @@ function chatComponent(): JSX.Element {
 	}
 	return (
 		<>
-			<div className="flex bg-red-600l w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
+			<div className="flex w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
 				<ConversationArea
 					latestMessages={latestMessages}
 					selectedMessageIndex={selectedMessageIndex}
@@ -399,12 +403,11 @@ function chatComponent(): JSX.Element {
 					setSelectedItem={setSelectedItem}
 					socket={socket}
 				/>
-				<div className="flex  flex-col overflow-hidden flex-1 h-full ">
-
+				<div className={`flex flex-col overflow-hidden flex-1 h-full ${onOpenDetails ? 'lg:hidden block' : ''}`}>
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
 							{MESSAGES  && (
-								<>
+								<div className={`${onOpenDetails && friendId !== "" ? 'md:visible invisible' : ''} flex flex-col h-full`}>
 									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800 ">
 										<div className="flex flex-row items-center space-x-2">
 											<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" onClick={()=>{
@@ -465,10 +468,10 @@ function chatComponent(): JSX.Element {
 											friendId={friendId}
 										/>
 									</div>
-								</>
+								</div>
 							)}
 							{roomMembers && roomMessages && channelId !== -1 && (
-								<>
+								<div className={`${onOpenDetails && channelId != -1 && 'md:visible invisible'}  flex flex-col h-full`}>
 									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-2 bg-inherit dark:bg-zinc-800">
 										<div className="flex gap-2 items-center">
 											<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" onClick={()=>{
@@ -526,7 +529,7 @@ function chatComponent(): JSX.Element {
 											</svg>
 										</div>
 									</div>
-									<div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `} >
+									<div className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `} >
 										<ChatRoom
 											roomMembers={roomMembers}
 											roomMessages={roomMessages}
@@ -540,11 +543,11 @@ function chatComponent(): JSX.Element {
 											socketChat={socketChat}
 										/>
 									</div>
-								</>
+								</div>
 							)}
 						</div>
 					)}
-					{(friendId !== "" || channelId !== -1) && (
+					{(friendId !== "" || channelId !== -1) && (!onOpenDetails) && (
 						<div className="flex flex-row items-center h-16 rounded-xl bg-white dark:bg-main-dark-SPRUCE w-full px-4">
 							<form onSubmit={handleTextSubmit} className="m-0 flex flex-row items-center h-16 rounded-xl w-full px-4" >
 								<div className="flex">
@@ -580,7 +583,7 @@ function chatComponent(): JSX.Element {
 								<div className='ml-2 '>
 									<button
 										onClick={handleTextSubmit}
-										className="flex items-center  gap-2 justify-center bg-main-light-FERN rounded-xl text-white px-4 py-2 "
+										className="flex items-center  gap-2 justify-center bg-main-light-FERN dark:bg-main-light-EGGSHELL rounded-xl text-white px-4 py-2 "
 									>
 										<span className='hidden md:inline'>Send</span>
 										<span className="overflow-hidden">
@@ -607,11 +610,14 @@ function chatComponent(): JSX.Element {
 				</div>
 				{onOpenDetails && friendId !== ""
 					?
-					<DetailsArea MESSAGES={MESSAGES} selectedMessageIndex={selectedMessageIndex} 
-					selectedColor={selectedColor} handleSelectedColor={handleSelectedColor} modalPicPath={modalPicPath} isModalOpen={isModalOpen} onCloseModal={onCloseModal}
-					onOpenModal={onOpenModal} getMessageFriend={getMessageFriend} getFriend={getFriend} friendId={friendId} handleOpenDetails={handleOpenDetails} />
+					<div className={`md:w-[340px] w-full h-full`}>
+						<DetailsArea MESSAGES={MESSAGES} selectedMessageIndex={selectedMessageIndex} 
+						selectedColor={selectedColor} handleSelectedColor={handleSelectedColor} modalPicPath={modalPicPath} isModalOpen={isModalOpen} onCloseModal={onCloseModal}
+						onOpenModal={onOpenModal} getMessageFriend={getMessageFriend} getFriend={getFriend} friendId={friendId} handleOpenDetails={handleOpenDetails} />
+					</div>
 					: null}
 				{onOpenDetails && channelId != -1 ? (
+					<div className={`md:w-[340px] w-full h-full`}>
 					<RoomDetails
 						channelInfo={lstGroupMessages[selectedMessageIndex].channel}
 						channelRole={lstGroupMessages[selectedMessageIndex].role}
@@ -620,7 +626,8 @@ function chatComponent(): JSX.Element {
 						setRoomMembers={setRoomMembers}
 						roomMembers={roomMembers}
 						userData={userData}
-					/>
+						/>
+					</div>
 				) : null}
 			</div>
 		</>

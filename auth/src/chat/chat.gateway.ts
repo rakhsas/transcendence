@@ -86,9 +86,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					channel: null
 				});
 				const lastnotif = await this.notificationService.getNotificationById(notif.id);
-				const message = await this.chatService.addMessage(payload);
-				const newMessage = (await this.chatService.getMessage(message.id))
-				toUserSocket.emit('directMessageNotif', newMessage)
+				toUserSocket.emit('directMessageNotif', lastnotif)
+				await this.chatService.addMessage(payload);
 			}
 			else
 				await this.chatService.addMessage(payload)

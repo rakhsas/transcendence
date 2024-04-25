@@ -37,9 +37,14 @@ const header: FlowbiteModalHeaderTheme = {
         setOpenModal(false);
         Cookies.set('firstLogin', 'false');
     })
+    const closeModal = () => {
+        Cookies.set('firstLogin', 'false');
+        setOpenModal(false);
+
+    }
     return (
         <>
-            <Modal show={openModal} size="md" popup onClose={() => setOpenModal(false)} className="bg-zinc-900 text-center">
+            <Modal show={openModal} size="md" popup onClose={() => closeModal()} className="bg-zinc-900 text-center">
                 <Modal.Header theme={header} >Edit Profile (OPTIONAL)</Modal.Header>
                 <Modal.Body className="bg-zinc-900 p-4">
                     <div className="h-auto">

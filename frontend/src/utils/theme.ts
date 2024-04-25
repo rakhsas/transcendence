@@ -28,6 +28,18 @@ const customTheme: CustomFlowbiteTheme = {
             },
 		}
 	},
+    select: {
+        base: "block bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-0 border-0 border-main-light-FERN focus:border-main-light-FERN dark:border-main-light-EGGSHELL focus:ring-0",
+        field: {
+            base: "border-0 ring-0 relative flex",
+            select: {
+                base: "block bg-white dark:bg-zinc-800 text-black dark:text-white focus:border-4 border-2 border-main-light-FERN focus:border-main-light-FERN dark:border-main-light-EGGSHELL focus:ring-0",
+                colors: {
+                    primary: "w-full border-main-light-FERN focus:border-main-light-PUMPKIN dark:border-main-light-EGGSHELL focus:border-main-light-EGGSHELL",
+                }
+            },
+        }
+    },
 	label: {
 	},
     modal: {

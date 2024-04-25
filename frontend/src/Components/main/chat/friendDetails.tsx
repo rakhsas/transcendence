@@ -47,7 +47,7 @@ function DetailsArea({
         <>
             {
                 !MESSAGES ? null :
-                <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto">
+                <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto w-full md:ml-0 h-full">
                         <div className="detail-area-header">
                             <div className="msg-profile group" onClick={handleOpenDetails}>
                                 <img src={baseAPIUrl + messageData.picture} alt="" />

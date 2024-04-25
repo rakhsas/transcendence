@@ -84,11 +84,11 @@ body {
   color: #fff
 }
 
-.conversation-area,
+/* .conversation-area,
 .detail-area {
   width: 340px;
   flex-shrink: 0;
-}
+} */
 
 .detail-area {
   padding: 30px 30px 0 30px;

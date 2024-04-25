@@ -39,12 +39,12 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
         scrollToBottom(messagesRef.current!);
     })
     return (
-        <div className="" key={Math.random()} ref={messagesRef}>
+        <div className=""  ref={messagesRef}>
             {
-                roomMessages.length > 0 && roomMessages?.map((message: any, index) => {
+                roomMessages.length > 0 && roomMessages?.map((message: any, index: any) => {
                     const sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId))?.user;
                     if (!sender)
-                        return <LoadingComponent />
+                        return <LoadingComponent key={index}/>
                     if (message.message.length > 0) {
                         return (
                             <div className="p-4" key={index}>

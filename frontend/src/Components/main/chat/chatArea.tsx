@@ -51,7 +51,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                             <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
                                 <img className="w-8 h-8 object-cover self-start rounded-full" src={baseAPIUrl + sender.picture} alt="Jese image" />
                                 <div className="flex message flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
-                                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                    <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse">
                                         <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
                                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
@@ -86,7 +86,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                                 <img className="w-8 h-8 object-cover self-start rounded-full" src={baseAPIUrl + sender.picture} alt="" />
                                 <div className="flex flex-row-reverse items-center gap-1">
                                     <div className="flex message flex-col w-full max-w-[326px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
-                                        <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
+                                        <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse mb-2">
                                             <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
                                             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
@@ -108,7 +108,6 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                                             </div>
                                             <img src={baseAPIUrl + message.img} className="rounded-lg" />
                                         </div>
-                                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
                                         {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
                                     </div>
                                     <Dropdown label={undefined} renderTrigger={() => {
@@ -133,19 +132,16 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                     )
                 }
                 else if (message.audio && message.audio.length > 0) {
-                    console.log('audio', message);
                     return (
                         <div className="p-4" key={index}>
                             <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
                                 <img className="w-8 h-8 object-cover self-start rounded-full" src={baseAPIUrl + sender.picture} alt="" />
                                 <div className="flex message flex-col gap-2.5 w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-                                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                    <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse">
                                         <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
                                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
                                     <AudioVisualizer audioSrc={baseAPIUrl + message.audio} />
-                                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400">Delivered</span>
-                                    
                                 </div>
                                 <Dropdown label={undefined} renderTrigger={() => {
                                     return (
