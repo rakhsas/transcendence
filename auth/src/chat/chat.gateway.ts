@@ -98,7 +98,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('inviteOneVsOne')
 	async handleInviteOneVsOne(client: Socket, payload: any): Promise<void> {
-		console.log('inviteOneVsOne: ', payload)
+		// console.log('inviteOneVsOne: ', payload)
 		const areFriends = await this.friendService.getFriendship(payload.userId, payload.friendId);
 		//console.log('areFriends: ', areFriends)
 		if (areFriends === true)
@@ -122,7 +122,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("declineGameRequest")
 	async handleDeclineGameRequest(client: Socket, payload: any): Promise<void> {
-		console.log('declineGameRequest: ', payload)
+		// console.log('declineGameRequest: ', payload)
 		const notif = await this.notificationService.createNotification({
 			target: payload.target,
 			type: NotificationType.ONEVSONE_DECLINED,
@@ -192,6 +192,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// client.emit('channelJoined', payload.__owner__);
 		const members = await this.channelService.getMembersOfChannel(payload.channelId);
 		client.emit('channelJoined', members);
+		this.connectedUsers.get(payload.issuer.username).emit('channelJoined', members);
 		if (channel.type === 'protected') {
 			const ProtectedChannelsMembers = await this.channelService.getProtectedChannelsExpectUser(payload.__owner__);
 			client.emit('protectedChannels', ProtectedChannelsMembers);
@@ -407,7 +408,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage("isUserOnline")
 	async isUserOnline(client: Socket, payload: any): Promise<void> {
-		console.log(payload.userName)
+		// console.log(payload.userName)
 		const user = this.connectedUsers.get(payload.userName);
 		if (user) {
 			client.emit("userIsOnline", true);
@@ -427,6 +428,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handlePromteUser(payload: any): Promise<void> {
 		await this.chatService.promoteUser(payload);
 	}
+
+	// ============================== USER  events ===================================================================
+
+	@SubscribeMessage("updateUser")
+	async handleUpdateUser(client: Socket, payload: any): Promise<void> {
+		const user = await this.userService.updateUserSetting(payload.userID, {
+			firstName: payload.firstName,
+			lastName: payload.lastName,
+			email: payload.email
+		});
+		client.emit("userUpdated", user);
+	}
+
 	// ============================== Vedio call events ===================================================================
 
 	@SubscribeMessage('callUser')
@@ -460,11 +474,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// console.log("from", from)
 		// console.log("toUsername", toUsername)
 		// console.log("fromUsername", fromUsername)
-		console.log({
-			fromUsername: payload.fromUsername,
-			// offer: payload.offer,
-			toUsername: payload.toUsername
-		})
+		// console.log({
+		// 	fromUsername: payload.fromUsername,
+		// 	// offer: payload.offer,
+		// 	toUsername: payload.toUsername
+		// })
 		client.to(payload.to).emit('mediaOffer', {
 			from: payload.from,
 			offer: payload.offer
@@ -474,7 +488,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('mediaAnswer')
 	async handleOnMediaAnswer(client: Socket, payload: any) {
 		const {from, to} = payload;
-		console.log("mediaAnswer:", from, to)
+		//console.log("mediaAnswer:", from, to)
 		client.to(payload.to).emit('mediaAnswer', {
 			answer: payload.answer,
 			from: payload.from

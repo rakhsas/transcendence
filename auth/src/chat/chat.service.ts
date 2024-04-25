@@ -73,6 +73,7 @@ export class ChatService {
   }
 
   async banUser(payload: any){
+    
     const newRecord = this.BanRepository.create({
       user: {id: payload.userId},
       channel: {id: payload.channelId}

@@ -36,16 +36,21 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
         const newMessage = [...roomMessages];
         newMessage.push(data);
         setRoomMessages(newMessage);
-        scrollToBottom(messagesRef.current!);
+        if (messagesRef.current)
+            scrollToBottom(messagesRef.current!);
     })
     return (
         <div className=""  ref={messagesRef}>
             {
                 roomMessages.length > 0 && roomMessages?.map((message: any, index: any) => {
-                    const sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId))?.user;
-                    if (!sender)
-                        return <LoadingComponent key={index}/>
-                    if (message.message.length > 0) {
+                    let sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId))?.user
+                    if(!sender)
+                    {
+                        sender = userData[3].find((member: any) => (member.id === message.senderId));
+                    }
+                    // if (!sender)
+                    //     return <LoadingComponent key={index}/>
+                    if (message.message && message.message.length > 0) {
                         return (
                             <div className="p-4" key={index}>
                                 <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
@@ -61,7 +66,7 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
                             </div>
                         )
                     }
-                    else if (message.img.length > 0) {
+                    else if (message.img && message.img.length > 0) {
                         return (
                             <div className="p-4" key={index}>
                                 <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>

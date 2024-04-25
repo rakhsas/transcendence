@@ -26,7 +26,6 @@ export class UserController {
 
 	@Put('settingProfile/:id')
   	async updateSettingProfile(@Param('id') id: string, @Body() settingProfileDto : SettingProfileDto) {
-		//console.log("id and body, ", id, settingProfileDto);
       const updatedData = await this.userService.updateUserSetting(id, settingProfileDto);
       return updatedData;
   	}

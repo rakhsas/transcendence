@@ -211,6 +211,9 @@ function chatComponent(): JSX.Element {
 			console.error('Error uploading file:', error);
 		}
 	};
+	socketChat?.on('channelJoined', async (data: any) => {
+		setLstGroupMessages(await channelService.latestChannels(userData[0].id));
+	})
 	const handleChange = (event: any) => {
 		const selectedFile = event.target.files[0];
 		handleImageSubmit(selectedFile);
@@ -222,6 +225,13 @@ function chatComponent(): JSX.Element {
 		input.addEventListener('change', handleChange); // Add event listener
 		input.click();
 	};
+	socket?.on("kickedNotif", async (data: any) => {
+		console.log(data);
+		setChannelId(-1);
+		setRoomMessages(null);
+		setRoomMembers([]);
+		setLstGroupMessages(await channelService.latestChannels(userData[0].id));
+    })
 	const handleSelectMessage = async (index: string, friendId?: string, cid?: number) => {
 		setSelectedMessageIndex(index);
 		setOnOpenDetails(false);
@@ -257,16 +267,14 @@ function chatComponent(): JSX.Element {
 			)
 		}
 	};
-	// useEffect(() => {
-		const onDirectMessage = async (data: any) => {
-			if (friendId == data.issuer.id)
-			{
-				setMESSAGES((await messageService.getMessages(userData[0].id, data.issuer.id)));
-			}
-			setLatestMessages(await messageService.latestMessages(userData[0].id))
+	const onDirectMessage = async (data: any) => {
+		if (friendId == data.issuer.id)
+		{
+			setMESSAGES((await messageService.getMessages(userData[0].id, data.issuer.id)));
 		}
-		socketChat?.on("directMessageNotif", onDirectMessage)
-	// }, [socketChat]);
+		setLatestMessages(await messageService.latestMessages(userData[0].id))
+	}
+	socketChat?.on("directMessageNotif", onDirectMessage);
 	const handleOpenDetails = () => {
 		setOnOpenDetails(!onOpenDetails)
 	}
@@ -387,6 +395,9 @@ function chatComponent(): JSX.Element {
 			})
 		}
 	}
+	useEffect(() => {
+		console.log("isDisabled: ", isDisabled);
+	}, [isDisabled])
 	return (
 		<>
 			<div className="flex w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
@@ -403,7 +414,7 @@ function chatComponent(): JSX.Element {
 					setSelectedItem={setSelectedItem}
 					socket={socket}
 				/>
-				<div className={`flex flex-col overflow-hidden flex-1 h-full ${onOpenDetails ? 'lg:hidden block' : ''}`}>
+				<div className={`flex flex-col overflow-hidden flex-1 h-full ${onOpenDetails ? '2xl:hidden block' : ''}`}>
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
 							{MESSAGES  && (
@@ -547,16 +558,22 @@ function chatComponent(): JSX.Element {
 							)}
 						</div>
 					)}
-					{(friendId !== "" || channelId !== -1) && (!onOpenDetails) && (
-						<div className="flex flex-row items-center h-16 rounded-xl bg-white dark:bg-main-dark-SPRUCE w-full px-4">
+					{(friendId !== "" || channelId !== -1) && (
+						<div className={`flex flex-row items-center h-16 rounded-xl bg-white dark:bg-main-dark-SPRUCE w-full px-4 ${!onOpenDetails ? 'md:block' : 'md:block'}`}>
 							<form onSubmit={handleTextSubmit} className="m-0 flex flex-row items-center h-16 rounded-xl w-full px-4" >
 								<div className="flex">
-									<div className="flex items-center justify-center text-gray-400 hover:text-gray-600" onClick={chooseFile} >
+									<div className="flex items-center justify-center text-gray-400 hover:text-gray-600" onClick={() => {
+										if (!isDisabled)
+											chooseFile()
+									}} >
 										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
 										</svg>
 									</div>
-									<div className={`realtive flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600`} onClick={recording ? stopRecording : startRecording}>
+									<div className={`realtive flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600`} onClick={() => {
+										if(!isDisabled)
+											recording ? stopRecording() : startRecording()
+									}}>
 										{<svg className={`${recording ? 'text-yellow-300' : ''}`} stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
 											<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
 											<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>

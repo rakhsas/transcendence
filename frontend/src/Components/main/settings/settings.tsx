@@ -7,6 +7,7 @@ import { SettingService } from "../../../services/setting.service";
 import UserService from "../../../services/user.service";
 import TwoFAComponent from "../../modal/2fa.authenticate.modal";
 import TwoFAActivateComponent from "../../modal/2fa.activate.modal";
+import { Socket } from "socket.io-client";
 
 
 function SettingFunction(): JSX.Element {
@@ -18,6 +19,7 @@ function SettingFunction(): JSX.Element {
 	const [url, setUrl] = useState<string>("");
 	const [firstName, setFirstName] = useState<string>('');
 	const [SecondName, setSecondName] = useState<string>('');
+	const [socketChat, setSocketChat] = useState<Socket>();
 	const [formData, setFormData] = useState({
 		firstName: '',
 		lastName: '',
@@ -63,34 +65,21 @@ function SettingFunction(): JSX.Element {
 		};
 		fetchData();
 		setIsChecked(userData[0].isTwoFactorAuthenticationEnabled);
+		setSocketChat(userData[1]);
 	}, [userData]);
 	if (!userData)
 		return <LoadingComponent />;
-	const onchange1 = async (event: React.FormEvent<HTMLFormElement>) => {
-		console.log('onchange1')
+	const handleSubmitForm = async (event: any) => {
 		event.preventDefault();
-		if (input.length != 6)
-			return;
-		await fetchQRcode();
-	}
-	const fetchQRcode = async () => {
-		try {
-			const ValidQRcode = await fetch(APIURL + `2fa/authenticate/${input}/${userData[0].id}`, {
-				method: 'POST',
-				credentials: 'same-origin',
-			})
-			if (ValidQRcode.status == 200) {
-				enable2FA();
-			}
-			else {
-				console.log('invalid')
-			}
-		}
-		catch (error) {
-		}
-	};
-	const handleSubmitForm = async () => {
-		const result = await settingService.updateUserInfo(userData[0].id, formData);
+		socketChat?.emit('updateUser', {
+			userID: userData[0].id,
+			firstName: formData.firstName,
+			lastName: formData.lastName,
+			email: formData.email
+		});
+		setSecondName('');
+		setFirstName('');
+		setUserEmail('');
 	}
 	const handleFirstNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = event.target;
@@ -142,13 +131,12 @@ function SettingFunction(): JSX.Element {
     useEffect(() => {
         if (!ischecked && userData[0].isTwoFactorAuthenticationEnabled) {
             disableTwoFA();
-            console.log('disable');
         }
     }, [ischecked, userData, disableTwoFA]);
 	return (
-		<div className="flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting p-8" >
-			<div className="part1 rounded-3xl gap-4 w-full md:min-w-[35%]  min-h-full  Usredit dark:bg-zinc-900  bg-main-light-WHITE">
-				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 ">
+		<div className="flex flex-col new:flex-row w-full h-[90vh] overflow-hidden justify-between gap-4 bg-inherit Setting p-8" >
+			<div className="part1 rounded-3xl space-y-2 w-full md:min-w-[35%] min-h-full Usredit dark:bg-zinc-900 bg-main-light-WHITE px-8">
+				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 relative">
 					<img src={APIURL + userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl" id="list" />
 					<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture rounded-3xl bg-zinc-800">
 						<svg className="hoverIcon__2025e" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="white" d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"></path></svg>
@@ -179,32 +167,18 @@ function SettingFunction(): JSX.Element {
 						ischecked && !userData[0].isTwoFactorAuthenticationEnabled && <TwoFAActivateComponent userData={userData} />
 					}
 				</div>
-			</div>
-			<div className="part2 flex rounded-3xl flex-col  md:flex-row gap-4 w-full md:min-w-[50%] min-h-full Information  justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE ">
-				<form onSubmit={handleSubmitForm} className=" gap-4 mt-2 p-5 form--setting ms:h-[50vh] flex flex-col ">
+				<form onSubmit={handleSubmitForm} className="gap-4 mt-2 m-auto p-5 form--setting flex flex-col custom-shadow overflow-visible">
 					<h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5 ">
 						Information
 					</h2>
-					<div className="grid gap-6 mb-6 mx:grid-cols-2">
+					<div className="grid gap-6 mb-6">
 						<div>
-							<label
-								htmlFor="first_name"
-								className="block mb-2 text-sm  text-main-light-EGGSHELL font-bolder dark:text-main-light-FERN"
-							>
-								First name
-							</label>
-							<input
-								type="text"
-								id="first_name"
-								value={firstName}
-								onChange={handleFirstNameChange}
+							<label htmlFor="first_name" className="block mb-2 text-sm  text-main-light-EGGSHELL font-bolder dark:text-main-light-FERN">First name </label>
+							<input type="text" id="first_name" value={firstName} onChange={handleFirstNameChange}
 								maxLength={15}
 								className=" bg-main-light-WHITE border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			  dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-								placeholder="Mohamed"
-								autoComplete="OFF"
-								required
-							/>
+								placeholder="Ayyoub" autoComplete="OFF" required />
 							{!/^$|^[A-Za-z\s]+$/.test(firstName) && (
 								<p style={{ color: 'red' }}>Please enter a valid first name (only alphabets).</p>
 							)}
@@ -217,7 +191,7 @@ function SettingFunction(): JSX.Element {
 								id="last_name" value={SecondName} onChange={handleSecondNameChange} maxLength={10}
 								className=" bg-main-light-WHITE border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			  dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-								placeholder="Darify"
+								placeholder="GaouGaou"
 								required
 							/>
 							{!/^$|^[A-Za-z\s]+$/.test(SecondName) && (
@@ -243,34 +217,7 @@ function SettingFunction(): JSX.Element {
 							placeholder="UserName@student.1337.ma"
 							required
 						/>
-						{/* {isEmailValid ? `${handleEmailChange == handleEmailChange}`: <p>Invalid email format!</p>} */}
 					</div>
-					{/* <div className="flex items-start mb-6">
-			<div className="flex items-center h-5">
-			  <input
-				id="remember"
-				type="checkbox"
-				value=""
-				className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600
-				 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
-				required
-
-			  />
-			</div>
-			<label
-			  htmlFor="remember"
-			  className="ms-2 text-sm text-blue-600 font-bolder dark:text-gray-300"
-			>
-			  I agree with the{" "}
-			  <a
-				href="#"
-				className="text-blue-600 hover:underline dark:text-blue-500"
-			  >
-				Terms and conditions
-			  </a>
-			  
-			</label>
-		  </div> */}
 					<button
 						type="submit"
 						className="flex  flex-row justify-center items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bolder rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"

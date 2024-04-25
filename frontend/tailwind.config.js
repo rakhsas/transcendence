@@ -30,6 +30,8 @@ export default {
       }
     },
     screens: {
+      '2xl': '2560px',
+      'xl': '1920px',
       'lg': '1700px',
       'new': '1200px',
       'md': '768px',

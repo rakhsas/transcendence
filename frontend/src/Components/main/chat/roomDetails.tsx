@@ -164,17 +164,16 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 					?
 					null
 					:
-                	<div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto w-full md:ml-0">
+                	<div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto w-full md:ml-0 h-full items-center">
 						<div className="detail-area-header">
 							<div className="msg-profile group w-16 h-16" onClick={handleOpenDetails}>
-								<img src={baseAPIUrl + channelInfo.picture} alt="" className="w-full h-full" />
+								<img src={baseAPIUrl + channelInfo.picture} alt="" className="w-full h-full object-cover" />
 							</div>
 							<div className="font-onest text-xl capitalize text-black dark:text-white overflow-hidden">{channelInfo.name}</div>
 						</div>
 						{
 							channelInfo.private === true &&
 							(
-								//console.log('channelInfo: ', channelInfo),
 								<>
 									<div className="flex flex-row justify-center items-center">
 										<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
@@ -183,15 +182,6 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 													<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
 												</svg>
 												<span className="text-black dark:text-white font-onest text-xs capitalize"> Add Member </span>
-											</div>
-										</div>
-										<div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
-											<div className="item flex justify-between flex-col items-center space-y-1 cursor-pointer" onClick={() => setDropdownUsersStatus(!isdropdownUsersOpen)}>
-												<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-													<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-												</svg>
-
-												<span className="text-black dark:text-white font-onest text-xs capitalize"> About </span>
 											</div>
 										</div>
 									</div>
@@ -210,7 +200,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 														<li key={index} className="mx-2 bg-zinc-800 rounded">
 															<div className="flex flex-row gap-2 w-full h-12 rounded justify-between items-center px-2">
 																<div className="pic">
-																	<img src={baseAPIUrl + user.picture} className="w-8 h-8 rounded-full" />
+																	<img src={baseAPIUrl + user.picture} className="w-8 h-8 rounded-full object-cover" />
 																</div>
 																<div className="info">
 																	<span className="text-sm text-gray-700 dark:text-white"> {user.firstName + ' ' + user.lastName} </span>
@@ -224,7 +214,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 													))
 												}
 											</ul>
-											<a onClick={addUser} className="cursor-pointer flex justify-center items-center p-3 text-sm font-medium text-green-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-green-500 hover:underline">
+											<a onClick={addUser} className="cursor-pointer flex justify-center items-center p-3 text-sm font-medium border-t border-gray-200 rounded-b-lg bg-gray-700 dark:border-gray-600 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 text-green-500 hover:underline">
 												<svg className="w-6 h-6 text-green-500 dark:text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 													<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
 												</svg>
@@ -240,14 +230,14 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 								Room Members
 							</div>
 							<div className="divide-y divide-gray-100 dark:divide-gray-700 relative">
-								<ul className="overflow-y-auto">
+								<ul className="overflow-y-auto px-4">
 									{
 										roomMembers?.map((member: any, index: number) => {
 											const user = member.user;
 											//console.log('channelRole: ', channelRole);
 											return (
 												<div key={index} className="">
-													<a className="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
+													<a className="flex px-4 py-3 justify-between hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
 														<div className="flex-shrink-0">
 															<img className="rounded-full w-11 h-11 object-cover" src={baseAPIUrl + user.picture} alt={user.firstName + ' ' + user.lastName} />
 														</div>
@@ -288,7 +278,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 															Kick
 														</a>
 													</div>
-													<div className="py-2" onClick={leaveChannel(optionMember?.user?.id, channelInfo.id)}>
+													<div className="py-2" onClick={() => leaveChannel(optionMember?.user?.id, channelInfo.id)}>
 														<a className="cursor-pointer gap-2 bg-inherit flex justify-center items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
 															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/>

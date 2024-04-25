@@ -1,5 +1,5 @@
 import { Routes, Route, Outlet } from 'react-router-dom';
-import NavbarComponent from "../shared/navbar/navbar";
+import NavbarComponent, { NotificationType } from "../shared/navbar/navbar";
 import SidebarComponent from "../shared/sidebar/sidebar";
 import "./Dashboard.css"
 import User from './../../model/user.model';
@@ -92,7 +92,8 @@ function DashboardComponent() {
     })
 	socket?.on('updatedFriends', async (data: any) => {
 		setFriends(data);
-	})
+	});
+	
 	if (!userData || !socket || !globalSocket || !users) {
 		return <LoadingComponent />;
 	}
@@ -153,6 +154,9 @@ function DashboardComponent() {
 			callingUser && setCallingUser(null)
 		}, 3000);
 		setCallingUserStatus(false);
+	})
+	socket?.on("userUpdated", async (data: any) => {
+		setUserData(data);
 	})
 	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (

@@ -33,7 +33,7 @@ const colorSettings: CustomFlowbiteTheme['textInput'] = {
 //     RoomMessage = "RoomMessage"
 // }
 
-enum NotificationType {
+export enum NotificationType {
     MESSAGE = 'MESSAGE',
     FRIEND_REQUEST = 'FRIEND_REQUEST',
     CALL_REQUEST = 'CALL_REQUEST',
@@ -800,7 +800,7 @@ function NavbarComponent(): JSX.Element {
                                                     </div>
                                                     <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-red-500 border border-white rounded-full dark:border-gray-800">
                                                         <svg className="w-3 h-3 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                                            <path stroke="currentColor" strokeLinecap="round" stroke-linejoin="round" strokeWidth="2" d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"/>
+                                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H8m12 0-4 4m4-4-4-4M9 4H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h2"/>
                                                         </svg>
                                                     </div>
                                                 </div>
