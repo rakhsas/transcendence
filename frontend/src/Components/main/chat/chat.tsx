@@ -48,13 +48,11 @@ function chatComponent(): JSX.Element {
 	const messageService = new MessageService();
 	const channelService = new ChannelService();
 	const muteService = new MuteService();
-	const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
 	const messagesRef = useRef<HTMLDivElement>(null);
 	const [channelId, setChannelId] = useState<number>(-1);
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedItem, setSelectedItem] = useState<any>('');
 	const [mutedUsers, setMutedUsers] = useState<MutedUsers[]>([]);
-	const [openVideoCall, setOpenVideoCall] = useState<boolean>();
 	const [friends, setFriends] = useState<any[]>([]);
 	const userData = useContext(DataContext);
 	if (!userData) {
@@ -131,12 +129,12 @@ function chatComponent(): JSX.Element {
 				to: getFriend(friendId)!.id,
 				from: userData[0].id,
 				message: messageValue,
-				image: '', // No image selected
+				image: null,
 				senderId: userData[0].id,
 				recieverId: getFriend(friendId)!.id,
 				recieverName: getFriend(friendId)!.username,
 				date: new Date().toISOString(),
-				audio: ''
+				audio: null
 			};
 			socketChat?.emit('message', newMessage);
 			const newMessages = [...MESSAGES, newMessage];
@@ -149,8 +147,8 @@ function chatComponent(): JSX.Element {
 				senderId: userData[0].id,
 				cid: channelId,
 				message: messageValue,
-				image: '',
-				audio: ''
+				image: null,
+				audio: null
 			};
 			socketChat?.emit('channelMessages', newMessage);
 			setLstGroupMessages(await channelService.latestChannels(userData[0].id))
@@ -176,15 +174,15 @@ function chatComponent(): JSX.Element {
 				imagePath = imagePath.url;
 				if (friendId != '') {
 					const newMessage: messageUser1 = {
-						to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+						to: getFriend(friendId)!.id,
 						from: userData[0].id,
 						message: '',
-						image: imagePath ? imagePath : '',
+						image: imagePath ? imagePath : null,
 						senderId: userData[0].id,
-						recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
-						recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+						recieverId: getFriend(friendId)!.id,
+						recieverName: getFriend(friendId)!.username,
 						date: new Date().toISOString(),
-						audio: ''
+						audio: null
 					};
 					socketChat?.emit('message', newMessage);
 					handleSelectMessage(selectedMessageIndex, friendId);
@@ -196,15 +194,15 @@ function chatComponent(): JSX.Element {
 						senderId: userData[0].id,
 						cid: channelId,
 						message: '',
-						image: imagePath,
-						audio: ''
+						image: imagePath ? imagePath : null,
+						audio: null
 					};
 					socketChat?.emit('channelMessages', newMessage);
 					setLstGroupMessages(await channelService.latestChannels(userData[0].id))
 					setRoomMessages(await channelService.getChannelMessages(channelId));
 				}
-				if (messagesRef.current)
-					scrollToBottom(messagesRef.current)
+				// if (messagesRef.current)
+				// 	scrollToBottom(messagesRef.current)
 			} else {
 				console.error('Failed to upload image');
 			}
@@ -257,11 +255,14 @@ function chatComponent(): JSX.Element {
 			)
 		}
 	};
-	const onDirectMessage = async (data: any) => {
-		setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
-		setLatestMessages(await messageService.latestMessages(userData[0].id))
-	}
-	socketChat?.on("directMessageNotif", onDirectMessage)
+	useEffect(() => {
+		const onDirectMessage = async (data: any) => {
+			// console.log((await messageService.getMessages(userData[0].id, friendId)))
+			setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
+			setLatestMessages(await messageService.latestMessages(userData[0].id))
+		}
+		socketChat?.on("directMessageNotif", onDirectMessage)
+	}, [socketChat]);
 	const handleOpenDetails = () => {
 		setOnOpenDetails(!onOpenDetails)
 	}
@@ -274,7 +275,6 @@ function chatComponent(): JSX.Element {
 		setModalPicPath(picPath);
 		setIsModalOpen(true);
 	};
-
 	const onCloseModal = () => {
 		setIsModalOpen(false);
 	};
@@ -314,8 +314,8 @@ function chatComponent(): JSX.Element {
 								to: getFriend(friendId)!.id,
 								from: userData[0].id,
 								message: '',
-								audio: audioPath || '',
-								image: '',
+								audio: audioPath || null,
+								image: null,
 								senderId: userData[0].id,
 								recieverId: getFriend(friendId)!.id,
 								recieverName: getFriend(friendId)!.username,
@@ -331,7 +331,7 @@ function chatComponent(): JSX.Element {
 								senderId: userData[0].id,
 								cid: channelId,
 								message: '',
-								image: '',
+								image: null,
 								audio: audioPath
 							};
 							socketChat?.emit('channelMessages', newMessage);
@@ -366,7 +366,6 @@ function chatComponent(): JSX.Element {
 	useEffect(() => {},[MESSAGES])
 	const callUser = async () => {
 		if (userData[8]) {
-			setOpenVideoCall(!openVideoCall)
 			const constraints = {
 				audio: true,
 				video: true,
@@ -374,6 +373,9 @@ function chatComponent(): JSX.Element {
 			const stream = await navigator.mediaDevices.getUserMedia(constraints);
 			stream.getTracks().forEach((track) => {track.enabled = false});
 			userData[8](stream)
+			stream && socketChat?.emit('iCallUser', {
+				calle: getFriend(friendId)
+			});
 			stream && socketChat?.emit('callUser', {
 				from: userData[0].id,
 				senderId: userData[0].id,
@@ -381,9 +383,6 @@ function chatComponent(): JSX.Element {
 			})
 		}
 	}
-	socket?.on("callPermission", async (data: any) => {
-		data.permission ? setOpenVideoCall(false) : null;
-	})
 	return (
 		<>
 			<div className="flex bg-red-600l w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
@@ -451,11 +450,6 @@ function chatComponent(): JSX.Element {
 											</svg>
 										</div>
 									</div>
-									{
-										openVideoCall && (
-											<VideoCallComponent user={userData[0]} />
-										)
-									}
 									<div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `}>
 										<ChatAreaComponent
 											MESSAGES={MESSAGES}
@@ -466,8 +460,6 @@ function chatComponent(): JSX.Element {
 											onOpenModal={onOpenModal}
 											onCloseModal={onCloseModal}
 											modalPicPath={modalPicPath}
-											openVideoCall={openVideoCall}
-											setOpenVideoCall={setOpenVideoCall}
 											socketChat={socketChat}
 											getFriend={getFriend}
 											friendId={friendId}

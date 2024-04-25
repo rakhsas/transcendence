@@ -13,8 +13,6 @@ type props = {
     onOpenModal: any;
     onCloseModal: any;
     modalPicPath: any;
-    openVideoCall: any;
-    setOpenVideoCall: any;
     socketChat: any;
     getFriend: any;
     friendId: string
@@ -45,8 +43,6 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
     return (
         <>
             {MESSAGES.map((message: any, index: any) => {
-                // console.log('message', message);
-                console.log("getFriend(friendId)", getFriend(friendId))
                 const sender: User = message.senderId === userData[0].id ? userData[0] : getFriend(friendId);
                 const reciever: User = message.senderId === userData[0].id ? getFriend(friendId) : userData[0];
                 if (message.message.length > 0) {
@@ -137,6 +133,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                     )
                 }
                 else if (message.audio && message.audio.length > 0) {
+                    console.log('audio', message);
                     return (
                         <div className="p-4" key={index}>
                             <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>

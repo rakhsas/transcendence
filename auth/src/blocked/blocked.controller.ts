@@ -14,7 +14,7 @@ export class BlockedController {
     }
 
     @Get(':userId/:friendId')
-    async checkBlock(@Param('userId')userId: string, @Param('friendId') blockedUserId: string): Promise<Blocked> {
-        return await this.blockedService.checkBlocked(userId, blockedUserId);
+    async checkBlock(@Param('userId')userId: string, @Param('friendId') blockedUserId: string): Promise<boolean> {
+        return (await this.blockedService.checkBlocked(userId, blockedUserId)) ? true : false;
     }
 }

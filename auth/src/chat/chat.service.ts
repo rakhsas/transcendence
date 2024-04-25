@@ -329,6 +329,13 @@ export class ChatService {
 
     await this.muteRepository.save(newEntity);
   }
+
+  async getMessage(id: number): Promise<Msg> {
+    return await this.msgRepository.findOne(
+      {
+        where: { id },
+        relations: ['owner', 'reciever']
+      },
+    );
+  }
 }
-
-

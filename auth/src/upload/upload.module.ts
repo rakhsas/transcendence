@@ -16,7 +16,15 @@ const storage = diskStorage({
 @Module({
     imports: [
         MulterModule.register({
-            storage: storage
+            storage: storage,
+            fileFilter: (req, file, cb) => {
+                console.log(file.mimetype.match(/^(image|audio|video)\/(mp3|wav|jpeg|png)$/) ? 'true' : 'false');
+                if (file.mimetype.match(/^(image|audio|video)\/(mp3|wav|jpeg|png)$/)) {
+                    cb(null, true);
+                } else {
+                    cb(new Error('Not a valid file'), false);
+                }
+            }
         })
     ],
     controllers: [UploadController]
