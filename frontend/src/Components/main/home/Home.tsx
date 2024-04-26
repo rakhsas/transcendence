@@ -229,18 +229,14 @@ const HomeComponent: React.FC = () => {
                     </div>
                     <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
-                        <div className="flex flex-wrap gap-2 w-full">
-                            {
-                                protectedChannels?.length == 0
-                                ?
-                                    (
-                                        <div className="flex justify-center">
-                                            <span className='font-poppins text-lg dark:text-main-light-FERN text-main-light-EGGSHELL'> Noo Roooms</span>
-                                        </div>
-                                    )
-                                :
+                        <div className="flex flex-wrap justify-between w-full">
+                            {protectedChannels?.length === 0 ? (
+                                <div className="flex justify-center">
+                                    <span className='font-poppins text-lg dark:text-main-light-FERN text-main-light-EGGSHELL'> No Rooms</span>
+                                </div>
+                            ) : (
                                 protectedChannels.map((channel, index) => (
-                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex-wrap flex flex-row p-2 w-full" key={index}>
+                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL m-1 flex flex-row items-center justify-between p-2 w-full sm:w-full md:w-[48%] xl:w-[48%]" key={index}>
                                         <div className="infos flex flex-row items-center space-x-4">
                                             <div className="pic w-12 h-12 rounded-2xl">
                                                 <img src={baseAPIUrl + channel.picture} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
@@ -254,16 +250,14 @@ const HomeComponent: React.FC = () => {
                                             setOpenModal(!openModal);
                                             setChannel(channel);
                                         }}>
-                                            <img src={play} alt="Play" />
+                                        <img src={play} alt="Play" />
                                         </div>
                                     </div>
                                 ))
-                            }
-                            {
-                                openModal && (
-                                    <ModalComponent isOpen channelData={channel} setOpenModal={setOpenModal} userData={userData}/>
-                                )
-                            }
+                            )}
+                            {openModal && (
+                                <ModalComponent isOpen channelData={channel} setOpenModal={setOpenModal} userData={userData}/>
+                            )}
                         </div>
                     </div> 
                 </section>

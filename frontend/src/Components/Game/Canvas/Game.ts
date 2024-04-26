@@ -11,7 +11,7 @@ class User {
     this.y = canvas.height / 2 - 50;
     this.width = 15;
     this.height = 100 - 15;
-    this.color = "#FD0363";
+    this.color = "#3DBDA7";
     this.score = 0;
   }
 }
@@ -29,7 +29,7 @@ class Computer {
     this.y = canvas.height / 2 - 50;
     this.width = 15;
     this.height = 100 - 15;
-    this.color = "#FD0363";
+    this.color = "#3DBDA7";
     this.score = 0;
   }
 }
@@ -63,7 +63,7 @@ class Ball {
     this.x = canvas.width / 2;
     this.y = canvas.height / 2;
     this.r = 10;
-    this.color = "#FDA403";
+    this.color = "#fff";
     this.speed = 5;
     this.vx = 5;
     this.vy = 5;
@@ -250,13 +250,13 @@ class Game {
         this.user.score,
         this.canvas.width / 4,
         this.canvas.height / 5,
-        "#BFFF3C"
+        "#E86931"
       );
       this.drawText(
         this.computer.score,
         (3 * this.canvas.width) / 4,
         this.canvas.height / 5,
-        "#BFFF3C"
+        "#E86931"
       );
       this.drawNet();
       this.drawRect(

@@ -394,10 +394,7 @@ function chatComponent(): JSX.Element {
 				recieverId: getFriend(friendId)?.id
 			})
 		}
-	}
-	useEffect(() => {
-		console.log("isDisabled: ", isDisabled);
-	}, [isDisabled])
+	}	
 	return (
 		<>
 			<div className="flex w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">

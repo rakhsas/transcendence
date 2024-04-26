@@ -1,8 +1,5 @@
-import { useState } from "react";
 import { messageUser } from "../../../model/messageUser.model";
-import { Dropdown } from "flowbite-react";
 import ModalComponent from "../../../utils/modal.component";
-import { messages } from "../../../utils/data";
 import User from "../../../model/user.model";
 import { useNavigate } from "react-router-dom";
 
@@ -22,14 +19,11 @@ type DetailsAreaProps = {
 }
 function DetailsArea({
     MESSAGES,
-    selectedMessageIndex,
     handleSelectedColor,
     selectedColor,
     modalPicPath,
     isModalOpen,
     onCloseModal,
-    onOpenModal,
-    getMessageFriend,
     handleOpenDetails,
     getFriend,
     friendId
@@ -41,8 +35,6 @@ function DetailsArea({
     }
     const navigate = useNavigate();
     const messageData = getFriend(friendId);
-    // //console.log("messageData222: ", MESSAGES[selectedMessageIndex]);
-    // //console.log(isModalOpen, modalPicPath, selectedMessageIndex, latestMessages[selectedMessageIndex])
     return (
         <>
             {
@@ -50,7 +42,7 @@ function DetailsArea({
                 <div className="detail-area shrink-0 border-l-[1px] border-gray-700 ml-auto flex flex-col overflow-auto w-full md:ml-0 h-full">
                         <div className="detail-area-header">
                             <div className="msg-profile group" onClick={handleOpenDetails}>
-                                <img src={baseAPIUrl + messageData.picture} alt="" />
+                                <img src={baseAPIUrl + messageData.picture} className="object-cover w-full h-full" alt="" />
                             </div>
                             <div className="font-onest text-xl capitalize text-black dark:text-white">{messageData.username}</div>
                         </div>

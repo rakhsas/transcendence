@@ -262,24 +262,46 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 										{
 											(optionMember?.role !== 'OWNER') ? (
 												<>
-													<ul className="py-2 text-sm text-gray-700 text-center dark:text-gray-200 divide-y divide-gray-100  dark:divide-gray-600">
+													{/* <ul className="py-2 text-sm text-gray-700 text-center dark:text-gray-200 divide-y divide-gray-100  dark:divide-gray-600">
 														<li>
 															<a className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Make Admin</a>
 														</li>
-														<li>
-															<a className="block px-4 py-2 hover:bg-gray-100 focus:bg-green-500 dark:hover:bg-gray-600 dark:hover:text-white" onClick={() => MuteUser(optionMember?.user?.id, channelInfo.id, optionMember?.user.username)}>Mute</a>
-														</li>
-													</ul>
-													<div className="py-2" onClick={() => kickUser(optionMember?.user?.id, userData[0].id, channelInfo.id)}>
-														<a className="cursor-pointer bg-inherit flex justify-center items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
+													</ul> */}
+													<div className="py-2 px-4">
+														<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-green-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-green-500 hover:underline">
+															<svg className="w-6 h-6 text-green-500 dark:text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																<path stroke="currentColor" strokeLinecap="square" strokeLinejoin="round" strokeWidth="2" d="M10 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h2m10 1a3 3 0 0 1-3 3m3-3a3 3 0 0 0-3-3m3 3h1m-4 3a3 3 0 0 1-3-3m3 3v1m-3-4a3 3 0 0 1 3-3m-3 3h-1m4-3v-1m-2.121 1.879-.707-.707m5.656 5.656-.707-.707m-4.242 0-.707.707m5.656-5.656-.707.707M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+															</svg>
+															Make Admin
+														</a>
+													</div>
+													<div className="py-2 px-4" onClick={() => MuteUser(optionMember?.user?.id, channelInfo.id, optionMember?.user.username)}>
+														<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
+															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.5 8.43A4.985 4.985 0 0 1 17 12c0 1.126-.5 2.5-1.5 3.5m2.864-9.864A8.972 8.972 0 0 1 21 12c0 2.023-.5 4.5-2.5 6M7.8 7.5l2.56-2.133a1 1 0 0 1 1.64.768V12m0 4.5v1.365a1 1 0 0 1-1.64.768L6 15H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1m1-4 14 14"/>
+															</svg>
+															Mute
+														</a>
+													</div>
+													<div className="py-2 px-4" onClick={() => MuteUser(optionMember?.user?.id, channelInfo.id, optionMember?.user.username)}>
+														<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-white  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-white hover:underline">
+															<svg className="w-6 h-6 text-black dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																<path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m6 6 12 12m3-6a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+															</svg>
+
+															Ban
+														</a>
+													</div>
+													<div className="py-2 px-4" onClick={() => kickUser(optionMember?.user?.id, userData[0].id, channelInfo.id)}>
+														<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
 															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
 															</svg>
 															Kick
 														</a>
 													</div>
-													<div className="py-2" onClick={() => leaveChannel(optionMember?.user?.id, channelInfo.id)}>
-														<a className="cursor-pointer gap-2 bg-inherit flex justify-center items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
+													<div className="py-2 px-4" onClick={() => leaveChannel(optionMember?.user?.id, channelInfo.id)}>
+														<a className="cursor-pointer gap-2 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
 															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/>
 															</svg>

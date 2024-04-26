@@ -36,6 +36,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 	}, [lstGroupMessages]);
 	const addChannel = async (event: any) => {
         event.preventDefault();
+		setImagePath(null);
         const name = event.currentTarget.channelName.value;
         const type = event.currentTarget.types.value;
         const password = event.currentTarget.password?.value;
@@ -66,36 +67,34 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
         });
         setLstGroupMessages(updatedChannels);
     }
-	const chooseFile = (event: any) => {
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.accept = 'image/*';
-		input.addEventListener('change', handleChange); // Add event listener
-		input.click();
-		const fileInput = event.target;
-		const chosenFile = fileInput.files && fileInput.files[0];
-		if (chosenFile) {
-			const reader = new FileReader();
-			reader.onload = () => {
-				const imgElement = document.querySelector("#list") as HTMLImageElement;
-				setImagePath(chosenFile);
-				if (imgElement) {
-					imgElement.src = reader.result as string;
-				}
-			};
-			reader.readAsDataURL(chosenFile);
-		}
-	};
-	const handleChange = (event: any) => {
-		const selectedFile = event.target.files[0];
-	};
+	// const chooseFile = (event: any) => {
+	// 	const input = document.createElement('input');
+	// 	input.type = 'file';
+	// 	input.accept = 'image/*';
+	// 	input.addEventListener('change', handleChange); // Add event listener
+	// 	input.click();
+	// 	const fileInput = event.target;
+	// 	const chosenFile = fileInput.files && fileInput.files[0];
+	// 	if (chosenFile) {
+	// 		const reader = new FileReader();
+	// 		reader.onload = () => {
+	// 			const imgElement = document.querySelector("#list") as HTMLImageElement;
+	// 			setImagePath(chosenFile);
+	// 			if (imgElement) {
+	// 				imgElement.src = reader.result as string;
+	// 			}
+	// 		};
+	// 		reader.readAsDataURL(chosenFile);
+	// 	}
+	// };
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const fileInput = event.target;
 		const chosenFile = fileInput.files && fileInput.files[0];
 		if (chosenFile) {
 			const reader = new FileReader();
 			reader.onload = () => {
-				const imgElement = document.querySelector("#channelPicture") as HTMLImageElement;
+				const imgElement = document.querySelector("#channelPicture") as any;
+				console.log(imgElement)
 				setImagePath(chosenFile);
 				if (imgElement) {
 					imgElement.src = reader.result as string;
@@ -204,19 +203,15 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 						<div className="conta flex flex-col gap-8">
 							<div className="flex justify-center ">
 								<div className="p-2 overflow-hidden flex flex-col w-52 h-52 justify-center items-center gap-12">
-									{
-										imagePath ?
-										<img alt='' className="object-cover w-52 h-52 rounded-full" id="channelPicture" />
-										:
-										<div className="svg w-">
-											<span className="text-gray-500 text-lg font-poppins">Put Picture</span>
-										</div>
-									}
+									<img alt="Uploaded" className={`object-cover w-full h-full rounded-full ${imagePath ? 'block' : 'hidden'}`} id="channelPicture" />
+									<div className={`svg border rounded-full border-gray-500 w-full h-full flex  justify-center items-center ${!imagePath ? 'block' : 'hidden'}`}>
+										<span className="text-gray-500 text-lg font-poppins">Put Picture</span>
+									</div>
 									<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture bg-zinc-800 dark:bg-stone-800 rounded-full m-2">
 										<svg className="hoverIcon__2025e" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="white" d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"></path></svg>
 									</label>
+									<input type="file" id="file" accept="image/jpg, image/jpeg" onChange={handleFileChange} />
 								</div>
-								<input type="file" id="file" accept="image/jpg, image/jpeg" onChange={handleFileChange}  />
 							</div>
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">
 								<div>
@@ -250,7 +245,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 								}
 							</div>
 						</div>
-						<button  className="bg-main-light-EGGSHELL p-4 rounded-xl w-fit px-8 self-center cursor-pointer" onClick={(e) => addChannel}>Submit</button>
+						<button  className="dark:bg-main-light-EGGSHELL bg-main-light-FERN font-poppins p-4 rounded-xl w-fit px-8 self-center cursor-pointer" onClick={(e) => addChannel}>Submit</button>
 					</form>
 				</Modal.Body>
 			</Modal> : null}
