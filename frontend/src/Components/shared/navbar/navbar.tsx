@@ -586,47 +586,44 @@ function NavbarComponent(): JSX.Element {
                                                             <img className="h-full object-cover bg-contain bg-no-repeat bg-center" src={BASE_API_URL + item.issuer.picture} alt="Robert image" />
                                                         </div>
                                                         <div className="absolute flex items-center justify-center w-5 h-5 ms-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-800">
-                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 14">
-                                                                <path d="M11 0H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2Zm8.585 1.189a.994.994 0 0 0-.9-.138l-2.965.983a1 1 0 0 0-.685.949v8a1 1 0 0 0 .675.946l2.965 1.02a1.013 1.013 0 0 0 1.032-.242A1 1 0 0 0 20 12V2a1 1 0 0 0-.415-.811Z" />
+                                                            <svg className="w-2 h-2 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                                                                <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z"/>
                                                             </svg>
                                                         </div>
                                                     </div>
-                                                    <div className="w-fit px-2">
+                                                    <div className="w-fit ps-3">
                                                         <div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400 w-fit§">
                                                             <span className="font-semibold text-gray-900 dark:text-white">{item.issuer.username}</span> : invited you to join the channel <span className="font-semibold text-gray-900 dark:text-white">{item.channel?.name + '.'}</span>
                                                         </div>
-                                                        <div className="text-xs text-blue-600 dark:text-blue-500">
-                                                            {
-                                                                new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
-                                                            }
+                                                        <div className="flex items-center justify-around w-full">
+                                                            <div className="text-xs text-blue-600 dark:text-blue-500">
+                                                                {
+                                                                    new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[1].split(':').slice(0, 2).join(':') + ' ' + new Date(item.createdAt).toLocaleString().split(',')[1].split(' ')[2]
+                                                                }
+                                                            </div>
+                                                            <Button color="success" pill onClick={() => {
+                                                                socket?.emit("acceptJoinChannel",
+                                                                {
+                                                                    id: item.channel.id,
+                                                                    channelId: item.channel.id,
+                                                                    __owner__: userData[0].id,
+                                                                    role: 'MEMBER',
+                                                                    issuer: item.issuer,
+                                                                    message: item.message,
+                                                                    createdAt: new Date().toISOString(),
+                                                                    updatedAt: new Date().toISOString(),
+                                                                    seen: false,
+                                                                    read: false,
+                                                                    type: NotificationType.CHANNEL_INVITE,
+                                                                    password: ''
+                                                                }
+                                                                );
+                                                                setNotifIsOpen(false);
+                                                                item.seen = true;
+                                                            }}>
+                                                                Accept
+                                                            </Button>
                                                         </div>
-                                                    </div>
-                                                    <div className="flex gap-2 w-fit">
-                                                        <Button color="success" pill onClick={() => {
-                                                            socket?.emit("acceptJoinChannel",
-                                                            {
-                                                                id: item.channel.id,
-                                                                channelId: item.channel.id,
-                                                                __owner__: userData[0].id,
-                                                                role: 'MEMBER',
-                                                                issuer: item.issuer,
-                                                                message: item.message,
-                                                                createdAt: new Date().toISOString(),
-                                                                updatedAt: new Date().toISOString(),
-                                                                seen: false,
-                                                                read: false,
-                                                                type: NotificationType.CHANNEL_INVITE,
-                                                                password: ''
-                                                            }
-                                                            );
-                                                            setNotifIsOpen(false);
-                                                            item.seen = true;
-                                                        }}>
-                                                            Accept
-                                                        </Button>
-                                                        <Button color="failure" pill>
-                                                            Decline
-                                                        </Button>
                                                     </div>
                                                 </a>
                                             )

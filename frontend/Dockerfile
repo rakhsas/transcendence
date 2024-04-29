@@ -4,4 +4,6 @@ WORKDIR /app
 
 EXPOSE 4200
 
-CMD "npm install -force && npm run dev"
+# CMD ["tail", "-f", "/dev/null"]
+
+CMD npm install && npm run dev

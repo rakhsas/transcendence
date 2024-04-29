@@ -1,7 +1,7 @@
 import { Button, Modal, TextInput } from "flowbite-react";
 import React, { useState } from "react";
-import { HiOutlineExclamationCircle } from "react-icons/hi";
-import { Socket } from "socket.io-client";
+// import { HiOutlineExclamationCircle } from "react-icons/hi";
+// import { Socket } from "socket.io-client";
 import { customTheme } from "../../utils/theme";
 
 interface MessageProps {

@@ -31,11 +31,13 @@ function AnalyticsComponent(): JSX.Element {
 
         const otherPlayer = async () => {
             const result = await analyticsService.otherPlayers();
+            console.log(result);
+            console.log("the length of other players is : --> ", result.length); // Use result.length instead of result.lenght
             if (result.length > 3 || result.length === 3)
                 result.splice(0, 3);
             else if (result.length < 3){
-                // result.splice(0, result.lenght);
-                setOtherPlayers([]);
+                result.splice(0, result.length); // Use result.length instead of result.lenght
+                // setOtherPlayers([]);
             }
             //console.log("other player are: ", result);
             setOtherPlayers(result);

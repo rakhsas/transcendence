@@ -86,6 +86,13 @@ function DashboardComponent() {
 			globalSocket?.disconnect();
 		};
 	}, []);
+	socket?.on('protectedChannels', async (data: any) => {
+        //console.log('protectedChannels: ', await data);
+        setProtectedChannels(data);
+    })
+    socket?.on('publicChannels', (data: any) => {
+        setPublicChannels(data);
+    })
 	socket?.on("usernameUpdated", async (data: any) => {
         // userData[0] = data;
         setUserData(data);
@@ -158,6 +165,9 @@ function DashboardComponent() {
 	socket?.on("userUpdated", async (data: any) => {
 		setUserData(data);
 	})
+	// socket?.on('channelJoined', async (data: any) => {
+	// 	console.log('channelJoined: ', data);
+	// })
 	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (
 		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream, userList]}>

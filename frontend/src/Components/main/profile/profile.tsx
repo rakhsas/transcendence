@@ -67,6 +67,7 @@ const FunctionProfileForm: React.FC = () => {
 	const [socketChat, setSocketChat] = useState<Socket>();
 	const [progress, setProgress] = useState<number>(0);
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
+	const [blockBetween, setBlockBetween] = useState<boolean>(false);
 	const [newMessageOpen, setNewMessageOpen] = useState<boolean>(false);
 	const messageService = new MessageService();
 	const fillAnimationKeyframes = `
@@ -138,6 +139,8 @@ const FunctionProfileForm: React.FC = () => {
 			if (userData[0].id !== requestedUser.id) {
 				const blockedResult = await messageService.BlockedUsers(userData[0].id, requestedUser.id);
 				setIsBlocked(blockedResult);
+				const blockBetween = await messageService.BlockBetween(userData[0].id, requestedUser.id);
+				setBlockBetween(blockBetween);
 			}
 		};
 		fetchScores();
@@ -184,7 +187,7 @@ const FunctionProfileForm: React.FC = () => {
 							}}>
 								<img alt={user?.username} src={BASE_API_URL + user?.picture } className="w-24 h-24 object-cover" />
 							</div>
-							<div className={`dots ${user.username != userData[0].username ? 'block' : 'hidden'}`} onClick={() => setNewMessageOpen(!newMessageOpen)}>
+							<div className={`dots ${user.username != userData[0].username && !blockBetween ? 'block' : 'hidden'}`} onClick={() => setNewMessageOpen(!newMessageOpen)}>
 								<svg className="w-8 h-8 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 									<path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 6h.01M12 12h.01M12 18h.01" />
 								</svg>

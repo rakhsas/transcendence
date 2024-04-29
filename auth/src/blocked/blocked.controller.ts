@@ -6,7 +6,7 @@ import { BlockedService } from "./blocked.service";
 import { Blocked } from "src/user/entities/blocked.entity";
 
 @Controller("Blocked")
-@ApiTags("Blocked")
+@ApiTags("Block")
 export class BlockedController {
     constructor(
         private readonly blockedService: BlockedService
@@ -16,5 +16,10 @@ export class BlockedController {
     @Get(':userId/:friendId')
     async checkBlock(@Param('userId')userId: string, @Param('friendId') blockedUserId: string): Promise<boolean> {
         return (await this.blockedService.checkBlocked(userId, blockedUserId)) ? true : false;
+    }
+
+    @Get('between/:userId/:friendId')
+    async checkBlockBetween(@Param('userId')userId: string, @Param('friendId') blockedUserId: string): Promise<boolean> {
+        return (await this.blockedService.checkBlockBetween(userId, blockedUserId)) ? true : false;
     }
 }

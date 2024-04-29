@@ -147,6 +147,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleLeaveChannel(socket: Socket, payload: any): Promise<void> {
 		socket.leave(payload.channelId);
 		await this.chatService.leaveFromChannel(payload);
+		const channelMembers = await this.channelService.getMembersOfChannel(payload.channelId);
+		channelMembers.forEach(async (member: any) => {
+			if (this.connectedUsers.has(member.user.username)) {
+				this.connectedUsers.get(member.user.username).emit('userLeft', {
+					members:channelMembers,
+					payload
+				});
+			}
+		});
+		socket.emit('userLeft', {
+			members:channelMembers,
+			payload
+		});
 	}
 
 
@@ -189,10 +202,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.join(payload.channelId);
 			await this.chatService.addNewMemberToChannel(payload, "");
 		}
-		// client.emit('channelJoined', payload.__owner__);
 		const members = await this.channelService.getMembersOfChannel(payload.channelId);
-		client.emit('channelJoined', members);
-		this.connectedUsers.get(payload.issuer.username).emit('channelJoined', members);
+		members.forEach((member: any) => {
+			if (this.connectedUsers.has(member.user.username)) {
+				this.connectedUsers.get(member.user.username).emit('newMemberJoined', {
+					members,
+					payload
+				});
+			}
+		});
+		this.connectedUsers.get(payload.issuer?.username)?.emit('channelJoined', members);
+		this.connectedUsers.get(payload.__owner__?.username)?.emit('channelJoined', members);
 		if (channel.type === 'protected') {
 			const ProtectedChannelsMembers = await this.channelService.getProtectedChannelsExpectUser(payload.__owner__);
 			client.emit('protectedChannels', ProtectedChannelsMembers);
@@ -359,7 +379,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.leave(payload.channelId);
 		await this.chatService.kickUserFromChannel(payload);
 		const members = await this.channelService.getMembersOfChannel(payload.channelId);
-		socket?.emit('userKicked', members);
+		members.forEach((member: any) => {
+			if (this.connectedUsers.has(member.user.username)) {
+				this.connectedUsers.get(member.user.username).emit('userKicked', members);
+			}
+		});
+		// socket?.emit('userKicked', members);
 		const notif = await this.notificationService.createNotification({
 			target: payload.target,
 			type: NotificationType.KIKED,
@@ -425,7 +450,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('promoteUser')
-	async handlePromteUser(payload: any): Promise<void> {
+	async handlePromteUser(client: Socket ,payload: any): Promise<void> {
 		await this.chatService.promoteUser(payload);
 	}
 

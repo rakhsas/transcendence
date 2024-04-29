@@ -55,6 +55,7 @@ function chatComponent(): JSX.Element {
 	const [selectedItem, setSelectedItem] = useState<any>('');
 	const [mutedUsers, setMutedUsers] = useState<MutedUsers[]>([]);
 	const [friends, setFriends] = useState<any[]>([]);
+	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 	const userData = useContext(DataContext);
 	if (!userData) {
 		return <LoadingComponent />;
@@ -68,12 +69,10 @@ function chatComponent(): JSX.Element {
 		element.scrollTop = element.scrollHeight;
 	};
 	const [isDisabled, setIsDisabled] = useState(false);
-
 	useEffect(() => {
 		const mutedUser = mutedUsers.find((object) => {
 		  return object.userId === userData[0].id && new Date(object.finishedAt) > new Date();
 		});
-		//console.log(mutedUser);
 		if (mutedUser) {
 		  const timeRemaining = new Date(mutedUser.finishedAt).getTime() - new Date().getTime();
 		  if (timeRemaining > 0) {
@@ -211,8 +210,14 @@ function chatComponent(): JSX.Element {
 			console.error('Error uploading file:', error);
 		}
 	};
-	socketChat?.on('channelJoined', async (data: any) => {
+	// useEffect(() => {
+	// 	console.log(roomMembers)
+	// }, [roomMembers]);
+
+	socketChat?.on('newMemberJoined', async (data: any) => {
 		setLstGroupMessages(await channelService.latestChannels(userData[0].id));
+		if (channelId != -1 &&  channelId == data.payload.channelId)
+			setRoomMembers(data.members);
 	})
 	const handleChange = (event: any) => {
 		const selectedFile = event.target.files[0];
@@ -225,8 +230,11 @@ function chatComponent(): JSX.Element {
 		input.addEventListener('change', handleChange); // Add event listener
 		input.click();
 	};
+	// socket?.on("userKicked", async (data: any) => {
+	// 	console.log(data)
+	// })
 	socket?.on("kickedNotif", async (data: any) => {
-		console.log(data);
+		// console.log(data);
 		setChannelId(-1);
 		setRoomMessages(null);
 		setRoomMembers([]);
@@ -243,7 +251,12 @@ function chatComponent(): JSX.Element {
 			setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
 			setMutedUsers([]);
 			setChannelId(-1);
-			// setLstGroupMessages()
+			const blockedResult = await messageService.BlockBetween(userData[0].id, friendId);
+			if (blockedResult)
+			{
+				setIsDisabled(true);
+				setMessage('You Cannot Send Messages to this User');
+			}
 		}
 		else if (cid) {
 			setFriendId('')
@@ -290,6 +303,18 @@ function chatComponent(): JSX.Element {
 	const onCloseModal = () => {
 		setIsModalOpen(false);
 	};
+	socketChat?.on('userLeft', async (data: any) => {
+		// setRoomMembers(data.members);
+		// console.log(data.payload)
+		if (data.payload.userId === userData[0].id) {
+			setChannelId(-1);
+			setRoomMessages(null);
+			setRoomMembers([]);
+			setLstGroupMessages(await channelService.latestChannels(userData[0].id));
+		}else {
+			setRoomMembers(data.members);
+		}
+	})
 	const getMessageFriend = (message: messageUser) => {
 		const { __owner__, __reciever__ } = message;
 		return __owner__.id === userData[0].id ? __reciever__ : __owner__;
@@ -334,8 +359,7 @@ function chatComponent(): JSX.Element {
 								date: new Date().toISOString()
 							};
 							socketChat?.emit('message', newMessage);
-							const newMessages = [...MESSAGES, newMessage];
-							setMESSAGES(newMessages);
+							setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
 							setLatestMessages(await messageService.latestMessages(userData[0].id));
 						} else if (channelId != -1) {
 							const newMessage: any = {
@@ -411,7 +435,7 @@ function chatComponent(): JSX.Element {
 					setSelectedItem={setSelectedItem}
 					socket={socket}
 				/>
-				<div className={`flex flex-col overflow-hidden flex-1 h-full ${onOpenDetails ? '2xl:hidden block' : ''}`}>
+				<div className={`flex flex-col overflow-hidden flex-1 h-full ${onOpenDetails ? '' : ''}`}>
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
 							{MESSAGES  && (
@@ -634,12 +658,12 @@ function chatComponent(): JSX.Element {
 					<div className={`md:w-[340px] w-full h-full`}>
 					<RoomDetails
 						channelInfo={lstGroupMessages[selectedMessageIndex].channel}
-						channelRole={lstGroupMessages[selectedMessageIndex].role}
 						handleOpenDetails={handleOpenDetails}
+						channelRole={lstGroupMessages[selectedMessageIndex].role}
+						userData={userData}
 						chatSocket={socketChat}
 						setRoomMembers={setRoomMembers}
 						roomMembers={roomMembers}
-						userData={userData}
 						/>
 					</div>
 				) : null}

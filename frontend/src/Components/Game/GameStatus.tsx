@@ -15,10 +15,10 @@ const GameStatus = (props: { socket: Socket | null; roomId: string }) => {
   const userData = useContext(DataContext);
   if (!userData) <LoadingComponent />;
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!userData) return;
     globalSocket.current=userData[2];
-  }, [userData]);
+  }, [userData]); */
   const [data, setData] = useState<Data | null>(null);
   useEffect(() => {
     if (!socket || !globalSocket) return;

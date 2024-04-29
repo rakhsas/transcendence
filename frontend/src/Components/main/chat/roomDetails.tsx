@@ -2,17 +2,17 @@ import { useEffect, useState } from "react";
 import { Checkbox, TextInput } from "flowbite-react";
 import UserService from "../../../services/user.service";
 import { inputTheme } from "../../../utils/themes";
-import { Translate } from "@mui/icons-material";
 import { Socket } from "socket.io-client";
 import User from "../../../model/user.model";
-import { log10 } from "chart.js/helpers";
+import { BannedService } from "../../../services/banned.service";
+import { useNavigate } from "react-router-dom";
 
 type DetailsAreaProps = {
 	channelInfo: any;
 	channelRole: string;
 	handleOpenDetails: () => void,
 	userData: any,
-	chatSocket: any,
+	chatSocket: Socket,
 	setRoomMembers: any,
 	roomMembers: any
 }
@@ -48,15 +48,20 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 	const [usersCopy, setUsersCopy] = useState<any[]>();
 	const [filtredUsers, setFiltredUsers] = useState<any[]>();
 	const userService = new UserService();
-	const [dropdownTimeout, setDropdownTimeout] = useState(null);
+	const [dropdownTimeout, setDropdownTimeout] = useState<any>(null);
 	const [optionsDropdown, setOptionsDropdown] = useState<boolean>(false);
 	const [alerts, setAlerts] = useState<alertProps[]>(roomMembers.map((member: any) => ({ user: member.user, isVisible: false })));
+	const [bannedUsers, setBannedUsers] = useState<any[]>([]);
+	const bannedService = new BannedService();
+	const navigate = useNavigate();
 	useEffect(() => {
 		const fetchUsers = async () => {
 			const users = await userService.getAllUsersExcept(userData[0].id);
 			setUsers(users);
 			const usersCopy = users.map((user: any) => ({ ...user, selected: false }));
 			setUsersCopy(usersCopy);
+			const banned = await bannedService.getBannedUsers(channelInfo.id);
+			setBannedUsers(banned);
 		}
 		fetchUsers();
 	}, [])
@@ -69,7 +74,7 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 			const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
 			return (
 				(fullName.includes(userInput.toLowerCase()) || user.username.toLowerCase().includes(userInput.toLowerCase())) &&
-				!roomMembers.some((member: any) => member.user.id === user.id)
+				!roomMembers.some((member: any) => member.user.id === user.id) && !bannedUsers.some((bannedUser: any) => bannedUser.user === user.id)
 			);
 		});
 		setFiltredUsers(filteredUsers);
@@ -150,12 +155,28 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 			username
 		});
 	}
+	
+	const BanUser = async (userId: string, channelId: number, target: string) => {
+		kickUser(target, userData[0].id, channelId)
+		chatSocket?.emit('banUser', {
+			userId,
+			channelId
+		});
+		const banned = await bannedService.getBannedUsers(channelInfo.id);
+		setBannedUsers(banned);
+	}
 
 	const leaveChannel = (friendId: string, channelId: number) => {
 		chatSocket?.emit('leavChannel', {
 			userId: friendId,
 			channelId
 		});
+	}
+	const MakeAdmin = (channelId: number, userToBePromoted: string) => {
+		chatSocket?.emit("promoteUser", {
+			channelId,
+			userId: userToBePromoted
+		})
 	}
 	return (
 		<>
@@ -208,7 +229,8 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 																<Checkbox
 																	id={`user-${user.id}`}
 																	checked={usersCopy?.some(user1 => user1.id === user.id && user1.selected)}
-																	onChange={() => handleCheckboxChange(index, user)} />
+																	onChange={() => handleCheckboxChange(index, user)}
+																/>
 															</div>
 														</li>
 													))
@@ -225,28 +247,32 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 								</>
 							)
 						}
-						<div className="z-20 mt-2 w-full max-w-sm bg-white divide-y max-h-60 divide-gray-100 rounded-lg shadow dark:bg-zinc-800 dark:divide-gray-700 overflow-hidden" aria-labelledby="dropdownNotificationButton">
+						<div className="z-20 mt-2 w-full max-w-sm bg-white divide-y max-h-60 divide-gray-100 shadow dark:bg-zinc-800 dark:divide-gray-700 overflow-hidden" aria-labelledby="dropdownNotificationButton">
 							<div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-gray-50 dark:bg-zinc-700 dark:text-white">
 								Room Members
 							</div>
 							<div className="divide-y divide-gray-100 dark:divide-gray-700 relative">
-								<ul className="overflow-y-auto px-4">
+								<ul className="overflow-y-auto">
 									{
 										roomMembers?.map((member: any, index: number) => {
 											const user = member.user;
-											//console.log('channelRole: ', channelRole);
+											// console.log('member', member)
+											// // console.log('user', user)
+											// console.log('channelRole', ['ADMIN', 'OWNER'].includes(channelRole) )
 											return (
 												<div key={index} className="">
-													<a className="flex px-4 py-3 justify-between hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
+													<a className="flex py-3 px-2 justify-between hover:bg-gray-100 dark:hover:bg-gray-700 items-center w-full">
 														<div className="flex-shrink-0">
-															<img className="rounded-full w-11 h-11 object-cover" src={baseAPIUrl + user.picture} alt={user.firstName + ' ' + user.lastName} />
+															<img className="rounded-full w-11 h-11 object-cover" onClick={() => {
+																navigate(`/dashboard/profile/${user.id}`)
+															}} src={baseAPIUrl + user.picture} alt={user.firstName + ' ' + user.lastName} />
 														</div>
 														<div className="w-full ps-3">
 															<div className="text-gray-500 text-sm mb-1.5 dark:text-gray-400">
 																<span className="font-semibold text-gray-900 dark:text-white">{user.firstName + ' ' + user.lastName}</span>
 															</div>
 														</div>
-														<svg onClick={() => toggleOptionsDropdown(member)} className={`w-5 h-5 cursor-pointer fill-black dark:fill-gray-200 ${channelRole === 'MEMBER' || member.user.id === userData[0].id ? 'invisible' : 'visible'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 3">
+														<svg onClick={() => toggleOptionsDropdown(member)} className={`w-5 h-5 cursor-pointer fill-black dark:fill-gray-200 ${['ADMIN', 'OWNER'].includes(channelRole) ? 'block': 'hidden'}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 3">
 															<path d="M2 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm6.041 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM14 0a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
 														</svg>
 													</a>
@@ -258,57 +284,53 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 							</div>
 							{
 								optionsDropdown && (
-									<div className={`z-30 right-0 absolute bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-zinc-700 dark:divide-gray-600 ${optionsDropdown ? 'visible' : 'invisible'}`} style={{ transform: 'translateX(-50%)' }}>
+									<div className={`z-30 right-0 absolute bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-zinc-700 dark:divide-gray-600 ${optionsDropdown ? 'visible' : 'visible'}`} style={{ transform: 'translateX(-50%)' }}>
 										{
-											(optionMember?.role !== 'OWNER') ? (
+											(optionMember?.role !== 'OWNER' && optionMember.user.id !== userData[0].id) ? (
 												<>
-													{/* <ul className="py-2 text-sm text-gray-700 text-center dark:text-gray-200 divide-y divide-gray-100  dark:divide-gray-600">
+													<ul className="py-2 text-sm text-gray-700 text-center h-64 dark:text-gray-200 divide-y divide-gray-100  dark:divide-gray-600">
 														<li>
-															<a className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Make Admin</a>
+															<div className="py-2 px-4">
+																<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-green-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-green-500 hover:underline"
+																onClick={() => MakeAdmin(channelInfo.id, optionMember?.user?.id)}>
+																	<svg className="w-6 h-6 text-green-500 dark:text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																		<path stroke="currentColor" strokeLinecap="square" strokeLinejoin="round" strokeWidth="2" d="M10 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h2m10 1a3 3 0 0 1-3 3m3-3a3 3 0 0 0-3-3m3 3h1m-4 3a3 3 0 0 1-3-3m3 3v1m-3-4a3 3 0 0 1 3-3m-3 3h-1m4-3v-1m-2.121 1.879-.707-.707m5.656 5.656-.707-.707m-4.242 0-.707.707m5.656-5.656-.707.707M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+																	</svg>
+																	Make Admin
+																</a>
+															</div>
 														</li>
-													</ul> */}
-													<div className="py-2 px-4">
-														<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-green-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-green-500 hover:underline">
-															<svg className="w-6 h-6 text-green-500 dark:text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-																<path stroke="currentColor" strokeLinecap="square" strokeLinejoin="round" strokeWidth="2" d="M10 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h2m10 1a3 3 0 0 1-3 3m3-3a3 3 0 0 0-3-3m3 3h1m-4 3a3 3 0 0 1-3-3m3 3v1m-3-4a3 3 0 0 1 3-3m-3 3h-1m4-3v-1m-2.121 1.879-.707-.707m5.656 5.656-.707-.707m-4.242 0-.707.707m5.656-5.656-.707.707M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-															</svg>
-															Make Admin
-														</a>
-													</div>
-													<div className="py-2 px-4" onClick={() => MuteUser(optionMember?.user?.id, channelInfo.id, optionMember?.user.username)}>
-														<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
-															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.5 8.43A4.985 4.985 0 0 1 17 12c0 1.126-.5 2.5-1.5 3.5m2.864-9.864A8.972 8.972 0 0 1 21 12c0 2.023-.5 4.5-2.5 6M7.8 7.5l2.56-2.133a1 1 0 0 1 1.64.768V12m0 4.5v1.365a1 1 0 0 1-1.64.768L6 15H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1m1-4 14 14"/>
-															</svg>
-															Mute
-														</a>
-													</div>
-													<div className="py-2 px-4" onClick={() => MuteUser(optionMember?.user?.id, channelInfo.id, optionMember?.user.username)}>
-														<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-white  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-white hover:underline">
-															<svg className="w-6 h-6 text-black dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-																<path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m6 6 12 12m3-6a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-															</svg>
-
-															Ban
-														</a>
-													</div>
-													<div className="py-2 px-4" onClick={() => kickUser(optionMember?.user?.id, userData[0].id, channelInfo.id)}>
-														<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
-															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-															</svg>
-															Kick
-														</a>
-													</div>
-													<div className="py-2 px-4" onClick={() => leaveChannel(optionMember?.user?.id, channelInfo.id)}>
-														<a className="cursor-pointer gap-2 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
-															<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-																<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/>
-															</svg>
-
-															Leave Channel
-														</a>
-													</div>
+														<li>
+															<div className="py-2 px-4" onClick={() => MuteUser(optionMember?.user?.id, channelInfo.id, optionMember?.user.username)}>
+																<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
+																	<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																		<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.5 8.43A4.985 4.985 0 0 1 17 12c0 1.126-.5 2.5-1.5 3.5m2.864-9.864A8.972 8.972 0 0 1 21 12c0 2.023-.5 4.5-2.5 6M7.8 7.5l2.56-2.133a1 1 0 0 1 1.64.768V12m0 4.5v1.365a1 1 0 0 1-1.64.768L6 15H4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1m1-4 14 14"/>
+																	</svg>
+																	Mute
+																</a>
+															</div>
+														</li>
+														<li>
+															<div className="py-2 px-4" onClick={() => BanUser(optionMember?.user?.id, channelInfo.id, optionMember?.user?.id)}>
+																<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-white  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-white hover:underline">
+																	<svg className="w-6 h-6 text-black dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																		<path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m6 6 12 12m3-6a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+																	</svg>
+																	Ban
+																</a>
+															</div>
+														</li>
+														<li>
+															<div className="py-2 px-4" onClick={() => kickUser(optionMember?.user?.id, userData[0].id, channelInfo.id)}>
+																<a className="cursor-pointer px-4 bg-inherit flex justify-start items-center p-3 text-sm font-medium text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
+																	<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+																		<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12h4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+																	</svg>
+																	Kick
+																</a>
+															</div>
+														</li>
+													</ul>
 												</>
 											):
 											<div className="flex flex-row py-2 justify-center w-full text-sm text-gray-700 text-center dark:text-gray-200 divide-y divide-gray-100  dark:divide-gray-600">
@@ -318,6 +340,14 @@ const RoomDetails: React.FC<DetailsAreaProps> = ({
 									</div>
 								)
 							}
+						</div>
+						<div className="rounded-b-xl bg-gray-500 w-full" onClick={() => leaveChannel(userData[0]?.id, channelInfo.id)}>
+							<a className="cursor-pointer gap-2 bg-inherit flex justify-center items-center p-3 text-md font-medium w-full text-red-500  border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100  dark:hover:bg-gray-600 dark:text-red-500 hover:underline">
+								<svg className="w-6 h-6 text-red-500 dark:text-red-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+									<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/>
+								</svg>
+								Leave Channel
+							</a>
 						</div>
 					</div>
 			}

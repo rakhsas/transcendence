@@ -27,10 +27,10 @@ import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: 'config/.env',
-      isGlobal: true,
-    }),
+    // ConfigModule.forRoot({
+    //   envFilePath: '.env',
+    //   isGlobal: true,
+    // }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'postgres',

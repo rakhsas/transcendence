@@ -1,4 +1,4 @@
-import { CustomFlowbiteTheme, FileInput, FlowbiteButtonTheme, Label, Modal, Select, Tabs, TextInput } from "flowbite-react";
+import { Label, Modal, Select, Tabs, TextInput } from "flowbite-react";
 import { tabsTheme } from "../../../utils/themes";
 import { LiaUserFriendsSolid } from "react-icons/lia";
 import { RiWechatChannelsFill } from "react-icons/ri";
@@ -9,7 +9,6 @@ import { ChannelTypes } from "../../../utils/types";
 import UploadService from "../../../services/upload.service";
 import { Socket } from "socket.io-client";
 import { customTheme } from "../../../utils/theme";
-import defaultAvatar from "./../../../assets/avatars/anime_style.png";
 type data = {
 	latestMessages: messageUser[];
 	lstGroupMessages: any[];

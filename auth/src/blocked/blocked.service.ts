@@ -28,4 +28,19 @@ export class BlockedService {
         });
     }
 
+    async checkBlockBetween(userId: string, blockedUserId: string): Promise<Blocked> {
+        return await this.blockedRepository.findOne({
+            where: [
+                {
+                    user: {id: userId},
+                    blockedUser: {id: blockedUserId}
+                },
+                {
+                    user: {id: blockedUserId},
+                    blockedUser: {id: userId}
+                }
+            ],
+            relations: ['user', 'blockedUser']
+        });
+    }
 }

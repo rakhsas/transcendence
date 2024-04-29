@@ -68,7 +68,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                                 {
                                     messageStates[index] && (
                                             <Dropdown.Item onClick={() => {
-                                                handleInviteOneVsOne(sender.id, reciever.id);
+                                                handleInviteOneVsOne(friendId, userData[0].id);
                                                 // navigate('/dashboard/gameRoom/' + reciever.id);
                                             }}>Invite One VS ONE</Dropdown.Item>
                                             )
@@ -120,8 +120,8 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                                     {
                                         messageStates[index] && (
                                             <Dropdown.Item onClick={() => {
-                                                handleInviteOneVsOne(reciever.id, sender.id);
-                                                navigate('/dashboard/gameRoom/' + reciever.id);
+                                                handleInviteOneVsOne(friendId, userData[0].id);
+                                                // navigate('/dashboard/gameRoom/' + reciever.id);
                                             }}>Invite One VS ONE</Dropdown.Item>
                                             )
                                             }
@@ -153,8 +153,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                                 {
                                     messageStates[index] && (
                                             <Dropdown.Item onClick={() => {
-                                                handleInviteOneVsOne(reciever.id, sender.id);
-                                                navigate('/dashboard/gameRoom/' + reciever.id);
+                                                handleInviteOneVsOne(friendId, userData[0].id);
                                             }}>Invite One VS ONE</Dropdown.Item>
                                             )
                                 }

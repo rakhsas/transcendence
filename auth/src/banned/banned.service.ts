@@ -26,4 +26,13 @@ export class BannedService {
         });
     }
 
+    async getBannedUsers(channelId: number) {
+        return this.bannedRepository.find({
+            where: {
+                channel: {id: channelId},
+            },
+            loadRelationIds: true
+        })
+    }
+
 }
