@@ -36,7 +36,7 @@ const ModalComponent: React.FC<ModalProps> = ({isOpen, channelData, setOpenModal
             password: otp
         });
         socketChat?.on("channelPasswordInvalid", (data: any) => {
-            console.log('channelPasswordInvalid: ', data)
+            //console.log('channelPasswordInvalid: ', data)
             setIncorrectPassword(true);
             setTimeout(() => {
                 setIncorrectPassword(false);

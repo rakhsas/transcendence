@@ -6,10 +6,13 @@ import { Strategy } from 'passport-42';
 import { Injectable } from "@nestjs/common";
 import { UserService } from "src/user/user.service";
 import { AuthService } from "../auth.service";
-
+import axios, { AxiosRequestConfig } from 'axios';
+import * as https from 'https';
 @Injectable()
 
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
+    UPLOAD_API_URL = process.env.HOST + 'upload';
+
     constructor(
         private readonly userService: UserService,
         private readonly authService: AuthService
@@ -31,13 +34,15 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
             const email = profile?.emails?.[0]?.value;
             const firstName = profile?.name?.givenName;
             const lastName = profile?.name?.familyName;
-            const picture = profile?._json.image?.link;
+            const providerPicture = profile?._json.image?.link;
             const username = profile?.username;
             const providerId = profile.id;
             const provider = profile.provider;
-            var Object = await this.userService.findOne({ email, firstName, lastName, picture, username, providerId, provider});
+            var Object = await this.userService.findOne({providerId, provider});
             if (!Object) {
                 const coalitionObject = await this.userService.getCoalition(providerId, accessToken);
+                const pictureResponse = await this.userService.getPicture(providerPicture, accessToken);
+                const picture = await this.uploadFile(pictureResponse);
                 const coalition = coalitionObject[0].name;
                 const coalitionPic = coalitionObject[0].image_url;
                 const coalitionCover = coalitionObject[0].cover_url;
@@ -50,10 +55,30 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
                 user: Object.user,
                 firstLogin: Object.firstLogin,
                 appAccessToken: shortLivedAccessToken,
-                providerAccessToken: accessToken
+                providerAccessToken: accessToken,
+                twoFactorAuthentication: Object.user.isTwoFactorAuthenticationEnabled
             }
         } catch (error) {
             done(error, false);
         }
     }
+    
+    async uploadFile(file: File) {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            //console.log('Uploading file...');
+            //console.log('File:', file);
+            //console.log('this.UPLOAD_API_URL:', this.UPLOAD_API_URL);
+            const response = await axios.post(this.UPLOAD_API_URL, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                httpsAgent: new https.Agent({ rejectUnauthorized: false })
+            });
+            return response.data.url;
+        } catch (error) {
+            console.error('Error uploading file:', error);
+        }
+    };
 }

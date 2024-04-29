@@ -1,4 +1,3 @@
-// src/chat/chat.gateway.ts
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
@@ -11,12 +10,6 @@ import { NotificationService } from 'src/notification/notification.service';
 import { NotificationType } from 'src/user/entities/notification.entity';
 import { FriendService } from 'src/friends/friends.service';
 import { MuteService } from 'src/mute/mute.service';
-// import cli from '@angular/cli';
-// import { Paths } from '../../../frontend/src/utils/types';
-
-// @WebSocketGateway()
-
-// connectionStateRecovery();
 @WebSocketGateway({ cors: true, path: '/chat', methods: ['GET', 'POST'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
@@ -40,19 +33,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.connectedUsers.set(userName, client);
 		this.usersArray.push(client.id);
 		client.emit('update-user-list', { userIds: this.usersArray });
-		this.server.emit('update-user-list', { userIds: this.usersArray });
+		const mapObject = [];
+		this.connectedUsers.forEach((value, key) => {
+			// mapObject[key] = value.id;
+			const field = {
+				name: key,
+				id: value.id
+			}
+			mapObject.push(field)
+		});
+		// console.log(mapObject)
+		this.server.emit('update-user-list', mapObject);
 	}
 
 	handleDisconnect(client: Socket) {
-		if (this.peerConnections[client.id]) {
-			this.peerConnections[client.id].close();
-			delete this.peerConnections[client.id];
-		}
-
-		// console.log('A user disconnected');
+		// //console.log('A user disconnected');
 		this.usersArray = this.usersArray.filter(id => id !== client.id);
 		client.broadcast.emit('update-user-list', { userIds: this.usersArray });
-		client.broadcast.emit('user-disconnected', { userId: client.id });
+		// client.broadcast.emit('user-disconnected', { userId: client.id });
 		const userName = String(client.handshake.query.userName);
 		this.connectedUsers.delete(userName);
 	}
@@ -67,7 +65,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (payload.hasOwnProperty('recieverName')) {
 			const recieverName = String(payload.recieverName);
 			const toUserSocket = this.connectedUsers.get(recieverName);
-			console.log('toUserSocket: ', payload.message);
+			//console.log('toUserSocket: ', payload.message);
 			if (toUserSocket) {
 				toUserSocket.emit('message', {
 					"to": payload.to,
@@ -89,7 +87,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				});
 				const lastnotif = await this.notificationService.getNotificationById(notif.id);
 				toUserSocket.emit('directMessageNotif', lastnotif)
-				await this.chatService.addMessage(payload)
+				await this.chatService.addMessage(payload);
 			}
 			else
 				await this.chatService.addMessage(payload)
@@ -98,13 +96,73 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		//   this.server.emit('message', payload);
 	}
 
-
+	@SubscribeMessage('inviteOneVsOne')
+	async handleInviteOneVsOne(client: Socket, payload: any): Promise<void> {
+		// console.log('inviteOneVsOne: ', payload)
+		const areFriends = await this.friendService.getFriendship(payload.userId, payload.friendId);
+		//console.log('areFriends: ', areFriends)
+		if (areFriends === true)
+		{
+			const notif = await this.notificationService.createNotification({
+				target: payload.friendId,
+				type: NotificationType.ONEVSONE,
+				issuer: payload.userId,
+				message: "",
+				image: null,
+				audio: null,
+				channel: null
+			});
+			const lastnotif = await this.notificationService.getNotificationById(notif.id);
+			const target = this.connectedUsers.get(lastnotif.target.username);
+			target?.emit('invitedGame', lastnotif);
+		}
+	}
 
 	// =============================== Handle Muted users from a channel ============================
 
+	@SubscribeMessage("declineGameRequest")
+	async handleDeclineGameRequest(client: Socket, payload: any): Promise<void> {
+		// console.log('declineGameRequest: ', payload)
+		const notif = await this.notificationService.createNotification({
+			target: payload.target,
+			type: NotificationType.ONEVSONE_DECLINED,
+			issuer: payload.issuer,
+			message: "",
+			image: null,
+			audio: null,
+			channel: null
+		});
+		const lastnotif = await this.notificationService.getNotificationById(notif.id);
+		const target = this.connectedUsers.get(lastnotif.target.username);
+		target?.emit('gameRequestDeclined', lastnotif);
+	}
 	
-
+	@SubscribeMessage("iCallUser")
+	async handleBeginCall(client: Socket, payload: any) {
+		client.emit('iAmCallingAUser', payload)
+	}
 	// ================================ Channel hevents ====================================================================
+
+	@SubscribeMessage('leavChannel')
+	async handleLeaveChannel(socket: Socket, payload: any): Promise<void> {
+		socket.leave(payload.channelId);
+		await this.chatService.leaveFromChannel(payload);
+		const channelMembers = await this.channelService.getMembersOfChannel(payload.channelId);
+		channelMembers.forEach(async (member: any) => {
+			if (this.connectedUsers.has(member.user.username)) {
+				this.connectedUsers.get(member.user.username).emit('userLeft', {
+					members:channelMembers,
+					payload
+				});
+			}
+		});
+		socket.emit('userLeft', {
+			members:channelMembers,
+			payload
+		});
+	}
+
+
 
 	@SubscribeMessage('createChannel')
 	async handleCreateChannel(socket: Socket, payload: any): Promise<void> {
@@ -126,11 +184,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('acceptJoinChannel')
 	async handleAcceptJoinChannel(client: Socket, payload: any): Promise<void> {
-		console.log('acceptJoinChannel: ', payload)
+		//console.log('acceptJoinChannel: ', payload)
 		const channel = await this.chatService.getChannel(payload.id);
-		console.log("channel: ", channel)
+		//console.log("channel: ", channel)
 		if (channel.password !== null && channel.password !== "") {
-			console.log(channel.password, payload.password)
+			//console.log(channel.password, payload.password)
 			if ("password" in payload && channel.password === payload.password) {
 				client.join(payload.id);
 				await this.chatService.addNewMemberToChannel(payload, "");
@@ -144,9 +202,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.join(payload.channelId);
 			await this.chatService.addNewMemberToChannel(payload, "");
 		}
-		// client.emit('channelJoined', payload.__owner__);
 		const members = await this.channelService.getMembersOfChannel(payload.channelId);
-		client.emit('channelJoined', members);
+		members.forEach((member: any) => {
+			if (this.connectedUsers.has(member.user.username)) {
+				this.connectedUsers.get(member.user.username).emit('newMemberJoined', {
+					members,
+					payload
+				});
+			}
+		});
+		this.connectedUsers.get(payload.issuer?.username)?.emit('channelJoined', members);
+		this.connectedUsers.get(payload.__owner__?.username)?.emit('channelJoined', members);
 		if (channel.type === 'protected') {
 			const ProtectedChannelsMembers = await this.channelService.getProtectedChannelsExpectUser(payload.__owner__);
 			client.emit('protectedChannels', ProtectedChannelsMembers);
@@ -160,7 +226,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('joinChannel')
 	async handleJoinChannel(client: Socket, payload: any): Promise<void> {
 		try {
-			console.log('payload: ', payload.__owner__)
+			//console.log('payload: ', payload.__owner__)
 			if (await this.chatService.isJoined(payload.id, payload.__owner__) === true)
 			{
 				client.emit("joinedError", {
@@ -188,7 +254,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('channelMessages')
 	async handleEvent(socket: Socket, payload: any): Promise<void> {
-		console.log('channelMessages: ', payload)
+		//console.log('channelMessages: ', payload)
 		const channelMembers = await this.channelService.getMembersOfChannel(payload.cid);
 		const message = await this.chatService.addMessage(payload);
 		channelMembers.forEach(async (member: any) => {
@@ -239,7 +305,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			const lastnotif = await this.notificationService.getNotificationById(notif.id);
 			const target = this.connectedUsers.get(lastnotif.target.username);
-			target.emit('friendRequestNotif', lastnotif);
+			target?.emit('friendRequestNotif', lastnotif);
 		}
 	}
 	
@@ -260,7 +326,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('acceptFriendRequest')
 	async handleAcceptFriendRequest(client: Socket, payload: any): Promise<void> {
-		console.log('acceptFriendRequest: ')
 		const notif = await this.notificationService.createNotification({
 			target: payload.friendId,
 			type: NotificationType.FRIEND_REQUEST_ACCEPTED,
@@ -269,13 +334,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			image: null,
 			audio: null,
 			channel: null,
-			
 		});
 		await this.friendService.createFriendship(payload.userId, payload.friendId);
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
-		const friends = await this.friendService.getFriendsOfUser(payload.friendId);
-		this.connectedUsers.get(lastnotif.target.username)?.emit('updatedFriends', friends);
+		const targetFriends = await this.friendService.getFriendsOfUser(payload.friendId);
+		const issuerFriends = await this.friendService.getFriendsOfUser(payload.userId);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('updatedFriends', targetFriends);
+		this.connectedUsers.get(lastnotif.issuer.username)?.emit('updatedFriends', issuerFriends);
 		this.connectedUsers.get(lastnotif.target.username)?.emit('friendRequestAcceptedNotif', lastnotif);
+		// await this.notificationService.updateNotificationState(notif.id, {seen: true});
+		
 	}
 
 	@SubscribeMessage('changeChannelType')
@@ -285,9 +353,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	// ====================== User function ===================================================
 
+	@SubscribeMessage('blockUser')
+	async handleBlockUser(client: Socket, payload: any): Promise<void>
+	{
+		//console.log('blockUser: ', payload)
+		await this.chatService.blockUser(payload);
+		client.emit('userBlocked', payload);
+	}
 	/*
-		@SubscribeMessage('blockUser')
-		async handleBlockUse(payload: any): Promise<void>
+	  	async blockUser(userId: string , blockedUserId: string): Promise<Blocked>
 		{
 			// the userId and the id the user you want to block
 			const newRecord = this.blockRespository.create({
@@ -305,7 +379,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.leave(payload.channelId);
 		await this.chatService.kickUserFromChannel(payload);
 		const members = await this.channelService.getMembersOfChannel(payload.channelId);
-		socket?.emit('userKicked', members);
+		members.forEach((member: any) => {
+			if (this.connectedUsers.has(member.user.username)) {
+				this.connectedUsers.get(member.user.username).emit('userKicked', members);
+			}
+		});
+		// socket?.emit('userKicked', members);
 		const notif = await this.notificationService.createNotification({
 			target: payload.target,
 			type: NotificationType.KIKED,
@@ -316,9 +395,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			channel: payload.channelId,
 		});
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
-		console.log('lastnotif: ', lastnotif)
 		this.connectedUsers.get(lastnotif.target.username)?.emit('kickedNotif', lastnotif);
 	}
+
+	@SubscribeMessage('checkUsername')
+	async handleCheckUsername(client: Socket, payload: any): Promise<void> {
+		const user = await this.userService.findByUserName(payload.username);
+		console.timeLog('user: ', user)
+		if (user) {
+			client.emit('usernameExist', "Exist");
+		}
+		else {
+			client.emit('usernameNotExist', null);
+		}
+	}
+	@SubscribeMessage('updateUsername')
+	async handleUpdateUsername(client: Socket, payload: any) {
+		//console.log('updateUsername: ', payload)
+		const newUser = await this.userService.updateUsername(payload.username, payload.userId);
+		client.emit('usernameUpdated', newUser);
+	}
+
 
 	@SubscribeMessage('muteUser')
 	async handleMuteEvent(socket: Socket, payload: any): Promise<void> {
@@ -333,6 +430,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		userId: the user should be banned.
 	}
 	*/
+
+	@SubscribeMessage("isUserOnline")
+	async isUserOnline(client: Socket, payload: any): Promise<void> {
+		// console.log(payload.userName)
+		const user = this.connectedUsers.get(payload.userName);
+		if (user) {
+			client.emit("userIsOnline", true);
+		}
+		else {
+			client.emit("userIsOnline", false);
+		}
+	}
+
 	@SubscribeMessage('banUser')
 	async handleBanUser(client: Socket ,payload: any): Promise<void> {
 		client.leave(payload.channelId);
@@ -340,23 +450,60 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('promoteUser')
-	async handlePromteUser(payload: any): Promise<void> {
+	async handlePromteUser(client: Socket ,payload: any): Promise<void> {
 		await this.chatService.promoteUser(payload);
 	}
+
+	// ============================== USER  events ===================================================================
+
+	@SubscribeMessage("updateUser")
+	async handleUpdateUser(client: Socket, payload: any): Promise<void> {
+		const user = await this.userService.updateUserSetting(payload.userID, {
+			firstName: payload.firstName,
+			lastName: payload.lastName,
+			email: payload.email
+		});
+		client.emit("userUpdated", user);
+	}
+
 	// ============================== Vedio call events ===================================================================
 
 	@SubscribeMessage('callUser')
 	async handleCallUser(client: Socket, payload: any) {
-		client.to(payload.to).emit('RequestCall', {
-			from: payload.from,
-			offer: payload.offer,
-			senderId: payload.senderId,
-			recieverId: payload.recieverId
+		// console.log('callUser: ', payload)
+		// client.to(payload.to).emit('RequestCall', {
+		// 	from: payload.from,
+		// 	// offer: payload.offer,
+		// 	senderId: payload.senderId,
+		// 	recieverId: payload.recieverId
+		// });
+		const notif = await this.notificationService.createNotification({
+			target: payload.recieverId,
+			type: NotificationType.CALL_REQUEST,
+			issuer: payload.senderId,
+			message: "",
+			image: null,
+			audio: null,
+			channel: null,
+			seen: true,
+			read: true
 		});
+		const lastnotif = await this.notificationService.getNotificationById(notif.id);
+		this.connectedUsers.get(lastnotif.target.username)?.emit('RequestCall', lastnotif);
 	}
 
 	@SubscribeMessage('mediaOffer')
 	async handleOnMediaOffer(client: Socket, payload: any) {
+		// const {to, from, fromUsername, toUsername} = payload;
+		// console.log("to", to)
+		// console.log("from", from)
+		// console.log("toUsername", toUsername)
+		// console.log("fromUsername", fromUsername)
+		// console.log({
+		// 	fromUsername: payload.fromUsername,
+		// 	// offer: payload.offer,
+		// 	toUsername: payload.toUsername
+		// })
 		client.to(payload.to).emit('mediaOffer', {
 			from: payload.from,
 			offer: payload.offer
@@ -365,6 +512,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('mediaAnswer')
 	async handleOnMediaAnswer(client: Socket, payload: any) {
+		const {from, to} = payload;
+		//console.log("mediaAnswer:", from, to)
 		client.to(payload.to).emit('mediaAnswer', {
 			answer: payload.answer,
 			from: payload.from
@@ -380,17 +529,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
-
-
 	@SubscribeMessage('acceptCall')
 	async handleAcceptCall(client: Socket, payload: any) {
-		console.log('acceptCall');
+		//console.log('acceptCall');
 		client.to(payload.to).emit('AcceptCall', {
 			answer: payload.answer,
 			from: payload.from
 		});
 	}
 
+	@SubscribeMessage("acceptVideoCall")
+	async handleAcceptVideoCall(client: Socket, payload: any) {
+		client.to(this.connectedUsers.get(payload.caller.username).id).emit("callPermission", {
+			user: payload.user,
+			caller: payload.caller,
+			permission: payload.permission,
+			selectedUser: this.connectedUsers.get(payload.caller.username).id
+		})
+		client.emit("callPermission", 
+			{
+				user: payload.user,
+				caller: payload.caller,
+				permission: payload.permission,
+				selectedUser: this.connectedUsers.get(payload.caller.username).id
+			}
+		)
+	}
+	@SubscribeMessage("callRejected")
+	async handleCallRejected(client: Socket, payload: any) {
+		client.to(this.connectedUsers.get(payload.caller.username).id).emit("callRejected", payload)
+		client.emit("callRejected", payload)
+	}
+	@SubscribeMessage("callVideoEnded")
+	async handleCallVideoEnd(client: Socket, payload: any) {
+		client.to(this.connectedUsers.get(payload.opponnet).id).emit("callVideoEnded", true)
+	}
 
 	async GuardsConsumer(client: Socket): Promise<string> {
 		const cookies = client.handshake.headers.cookie?.split(';');

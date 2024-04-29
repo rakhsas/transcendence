@@ -1,7 +1,5 @@
 
 import { useContext, useEffect, useState } from 'react';
-// import DataContext from '../../../services/data.context';
-
 import DataContext from '../../../services/data.context';
 import Achei from '../../../assets/acheivements/poker.png'
 import Achei2 from '../../../assets/acheivements/fire.png'
@@ -10,39 +8,56 @@ import Achei4 from '../../../assets/acheivements/fire2.png'
 import Achei1 from '../../../assets/acheivements/poker1.png'
 import './updateprofile.css'
 import CreatChartDesign from './Chart';
-import picture from './mdarify.png'
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import LoadingComponent from '../../shared/loading/loading';
 import User from '../../../model/user.model';
-import { gameScores, totalGames } from '../../../utils/types';
+import { gameScores } from '../../../utils/types';
 import { GameService } from '../../../services/game.service';
 import { Socket } from 'socket.io-client';
+import MessageService from '../../../services/message.service';
+import MessageModal from '../../modal/message.modal';
 
-interface ButtonAttributes {
-	className: string;
-	value: string;
-	onClick?: () => void;
+
+const levels = [
+	{ level: 1, minScore: 0, maxScore: 50 },
+	{ level: 1.5, minScore: 51, maxScore: 100 },
+	{ level: 2.5, minScore: 101, maxScore: 150 },
+	{ level: 3, minScore: 151, maxScore: 200 },
+	{ level: 3.5, minScore: 201, maxScore: 250 },
+	{ level: 4, minScore: 251, maxScore: 300 },
+	{ level: 4.5, minScore: 301, maxScore: 350 },
+	{ level: 5, minScore: 351, maxScore: 400 },
+];
+
+function getProgress(score: number) {
+	for (let i = 0; i < levels.length; i++) {
+		if (score >= levels[i].minScore && score <= levels[i].maxScore) {
+			const levelRange = levels[i].maxScore - levels[i].minScore;
+			const scoreWithinLevel = score - levels[i].minScore;
+			return (i + scoreWithinLevel / levelRange) / levels.length * 100;
+		}
+	}
+	return 0;
 }
 
-const validAchie: string[] = [Achei, Achei1, Achei2, Achei3, Achei4];
-const validName: string[] = [
-	'Play The First Game',
-	'Play The Second Game',
-	'Play The Third Game',
-	'Play The Fourth Game',
-	'Play The Fifth Game'];
+function calculateLevel(score: number) {
+	const levelThreshold = 100;
+	const level = (score / levelThreshold);
 
-// const ValidDescrition : string[] = [
-// 	'Play the first game on the platform',
-// 	'Play the second game on the platform',
-// 	'Play the third game on the platform',
-// 	'Play the fourth game on the platform',
-// 	'Play the fifth game on the platform'
-// ]
+	return level;
+}
+
+// const validAchie: string[] = [Achei, Achei1, Achei2, Achei3, Achei4];
+// const validName: string[] = [
+// 	'Play The First Game',
+// 	'Play The Second Game',
+// 	'Play The Third Game',
+// 	'Play The Fourth Game',
+// 	'Play The Fifth Game'];
 
 const FunctionProfileForm: React.FC = () => {
 	const userData = useContext(DataContext);
-	// const [id, setId] = useState<string>();
+	const BASE_API_URL = import.meta.env.VITE_API_AUTH_KEY;
 	const [user, setUser] = useState<any>();
 	const [friends, setFriends] = useState<User[]>();
 	const [users, setUsers] = useState<User[]>();
@@ -50,8 +65,21 @@ const FunctionProfileForm: React.FC = () => {
 	const [score, setScore] = useState<gameScores[]>([]);
 	const [totalGames, setTotalGames] = useState<any>();
 	const [socketChat, setSocketChat] = useState<Socket>();
-	// console.log("--------> ", totalGames);
-	// console.log(totalGames.gamePlayed, "| -> totalgame <- | ");
+	const [progress, setProgress] = useState<number>(0);
+	const [isBlocked, setIsBlocked] = useState<boolean>(false);
+	const [blockBetween, setBlockBetween] = useState<boolean>(false);
+	const [newMessageOpen, setNewMessageOpen] = useState<boolean>(false);
+	const messageService = new MessageService();
+	const fillAnimationKeyframes = `
+		@keyframes fillAnimation {
+		from {
+			width: 0%;
+		}
+		to {
+			width: ${progress}%;
+		}
+		}
+	`;
 	const achievements = [
 		{
 			icon: Achei,
@@ -94,35 +122,29 @@ const FunctionProfileForm: React.FC = () => {
 		setFriends(userData[7]);
 		setSocketChat(userData[1]);
 	}, [userData]);
-	const { userId } = useParams();
-
+	let { userId } = useParams();
 	useEffect(() => {
-		// if (id !== 'profile' && user && friends && users) {
-		const requestedUser = users?.find((u) => u.id === userId);
-		if (requestedUser) {
-			const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
-			setUser((prevUser: User) => ({
-				...prevUser,
-				...requestedUser,
-				isFriend: isFriend
-			}));
+		if (!userId || userId === undefined || userId === '') {
+			setUser(userData[0]);
+			return;
 		}
-		// }
-	}, [friends, users, userId]);
-	let getTo: any = 0;
-	useEffect(() => {
+		const requestedUser = users?.find((u) => u.id === userId) || userData[0];
+		const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
+		setUser({ ...requestedUser, isFriend });
 		const fetchScores = async () => {
-			// console.log("inside use effect: ", use);
-			if (user) {
-				const result = await gameService.GetScoreMatches(user.id);
-				setScore(result);
-				const totalGames = await gameService.getTotalMatches(user.id);
-				console.log("inside use effect: ", totalGames);
-				 setTotalGames(totalGames);
+			const result = await gameService.GetScoreMatches(requestedUser.id);
+			setScore(result);
+			const totalGames = await gameService.getTotalMatches(requestedUser.id);
+			setTotalGames(totalGames);
+			if (userData[0].id !== requestedUser.id) {
+				const blockedResult = await messageService.BlockedUsers(userData[0].id, requestedUser.id);
+				setIsBlocked(blockedResult);
+				const blockBetween = await messageService.BlockBetween(userData[0].id, requestedUser.id);
+				setBlockBetween(blockBetween);
 			}
 		};
 		fetchScores();
-	}, [user]);
+	}, [userId, userData, users, friends]);
 	
 	const ButtonClick = () => {
 		SetBlocked(!BlockedFriend);
@@ -138,40 +160,77 @@ const FunctionProfileForm: React.FC = () => {
 			});
 		}
 	}
-	// console.log('sdfsdf --> ', getTo);
-	
+	const blockFriend = () => {
+		if (socketChat && user) {
+			socketChat.emit('blockUser', {
+				userId: userData[0].id,
+				blockedUserId: user.id
+			});
+		}
+	}
+	socketChat?.on('userBlocked', (data: any) => {
+		setIsBlocked(true);
+	})
+	useEffect(() => {
+		setProgress(calculateLevel(user?.score));
+	}, [user])
+	if (!user)
+		return <LoadingComponent />
 	return (
 		<div className="body m-4 flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting">
 			<div className="side1 flex flex-col gap-4 items-center w-full md:min-w-[35%] min-h-full overflow-hidden">
-				<div className="w-full md:w-[85%] h-1/2 p-4 flex justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE border-gray-200 rounded-3xl shadow overflow-hidden">
+				<div className="w-full md:w-[85%] h-1/2 p-4 flex flex-col justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE border-gray-200 rounded-3xl shadow overflow-hidden">
 					<div className="flex flex-col p-2 items-center w-full">
 						<div className="flex justify-center items-center p-1 w-full">
 							<div className={`relative border-2 rounded-full `} style={{
 								borderColor: user?.coalitionColor,
 							}}>
-								<img alt={user?.username} src={user?.picture} className="w-24 h-24 object-cover" />
+								<img alt={user?.username} src={BASE_API_URL + user?.picture } className="w-24 h-24 object-cover" />
 							</div>
+							<div className={`dots ${user.username != userData[0].username && !blockBetween ? 'block' : 'hidden'}`} onClick={() => setNewMessageOpen(!newMessageOpen)}>
+								<svg className="w-8 h-8 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+									<path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M12 6h.01M12 12h.01M12 18h.01" />
+								</svg>
+							</div>
+							{
+								newMessageOpen && (
+									<MessageModal recieverName={user.username} socketChat={socketChat} isOpen={newMessageOpen} setNewMessageOpen={setNewMessageOpen} senderId={userData[0].id} recieverId={user?.id} />
+								)
+							}
 						</div>
 						<div className="py-4">
 							<h5 className="text-xl text-black dark:text-white font-bolder font-poppins">{user?.firstName + ' ' + user?.lastName}</h5>
 						</div>
 						{
-							userId && userId !== userData[0].id && (
-								<div className="flex flex-1 flex-wrap justify-center items-center w-full py-2">
+							user && user.username !== userData[0].username && (
+								<div className="flex flex-1 flex-wrap justify-center items-center w-full overflow-hidden py-2">
 									{
 										user && user?.isFriend === false ? (
-											<button type="button" className="dark:text-white text-black bg-yellow-300 hover:bg-yellow-400 focus:outline-none focus:ring-4 focus:ring-yellow-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:focus:ring-yellow-900" onClick={
+											<div className="dark:text-white text-black bg-main-light-FERN hover:bg-main-light-EGGSHELL hover:text-white focus:outline-none focus:ring-4 focus:ring-yellow-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:focus:ring-yellow-900" onClick={
 												() => sendFriendRequest()
 											}>
 												Send Friend Request
-											</button>
+											</div>
 										) : (
-											<button type="button" className="dark:text-white text-black bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Block</button>
+											!isBlocked ? (
+												<button type="button" className="dark:text-white text-black bg-red-600 hover:bg-red-500 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" onClick={
+													() => blockFriend()
+												}>
+													Block
+												</button>
+											) : (
+												<button type="button" className="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Blocked</button>
+											)
 										)
 									}
 								</div>
 							)
 						}
+					</div>
+					<div className="progress-bar-container text-black dark:text-white">
+						<style>{fillAnimationKeyframes}</style>
+						<div className="progress-bar text-black dark:text-white" />
+						<span className="progress-label text-black dark:text-white">{progress.toFixed(2)}%</span>
 					</div>
 				</div>
 				<div className='w-full md:w-[85%] flex flex-col justify-between p-4 rounded-3xl items-center h-[75vh] dark:bg-zinc-900  bg-main-light-WHITE'>
@@ -180,60 +239,27 @@ const FunctionProfileForm: React.FC = () => {
 					</div>
 					<div className="achievements flex flex-col justify-center gap-8 w-full h-full">
 						{
-							
+
 							achievements.map((achievement, index: any) => {
-								
-									return (
-										<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
-											<img src={achievement.icon} className="ml-2 w-16 h-16" />
-											<p className="flex flex-row justify-center items-center dark:text-white text-black">{achievement.name}</p>
-											{  index? (
-												<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+
+								return (
+									<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
+										<img src={achievement.icon} className="ml-2 w-16 h-16" />
+										<p className="flex flex-row justify-center items-center dark:text-white text-black">{achievement.name}</p>
+										{totalGames?.gamePlayed > index ? (
+											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-												</svg>
-											) : (
-												<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+											</svg>
+										) : (
+											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-												</svg>
-											)}
-											</div>
-	
-									);
-								
-							})
-							
-					
-							/*
-							totalGames?.map((object: totalGames, index: number) => {
-								if (object.gamePlayed >= index + 1) {
-									return (
-										<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
-											<img src={validAchie[index]} className="ml-2 w-16 h-16" />
-											<p className="flex flex-row justify-center items-center dark:text-white text-black">{validName[index]}</p>
-											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true"
-												xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-													d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
 											</svg>
-										</div>
-									)
-								}
-								else {
-									return (
-										<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
-											<img src={validAchie[index]} className="ml-2 w-16 h-16" />
-											<p className="flex flex-row justify-center items-center dark:text-white text-black">{validName[index]}</p>
-											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true"
-												xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-													d="m15 9-6 6m0-6 6 6m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-											</svg>
-										</div>
-									);
-								}
+										)}
+									</div>
+
+								);
+
 							})
-							*/
-							
 						}
 					</div>
 				</div>
@@ -261,7 +287,7 @@ const FunctionProfileForm: React.FC = () => {
 														<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 													</svg>
 												</div>
-												<img src={object.player1.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player1?.coalitionColor} ` }} />
+												<img src={BASE_API_URL + object.player1.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player1?.coalitionColor} ` }} />
 											</div>
 											<div className="flex flex-row gap-2">
 												<p className="w-8 h-8 flex justify-center items-center dark:text-white text-black font-bold text-2xl">{object?.user_score}</p>
@@ -280,7 +306,7 @@ const FunctionProfileForm: React.FC = () => {
 														<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 													</svg>
 												</div>
-												<img src={object.player2.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player2?.coalitionColor} ` }} />
+												<img src={BASE_API_URL + object.player2.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player2?.coalitionColor} ` }} />
 											</div>
 										</div>
 									</li>

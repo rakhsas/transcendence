@@ -16,6 +16,8 @@ import { Avatar } from "flowbite-react";
 import RoomDetails from "./roomDetails";
 import MuteService from "../../../services/mute.service";
 import { MutedUsers } from "../../../utils/types";
+import VideoCallComponent from "./videocall";
+import { keyframes } from "@emotion/react";
 
 enum roomRoles {
 	OWNER = "OWNER",
@@ -32,9 +34,9 @@ function chatComponent(): JSX.Element {
 	const [roomMessages, setRoomMessages] = useState<any>(null);
 	const [roomMembers, setRoomMembers] = useState<membersRole[]>([])
 	const [MESSAGES, setMESSAGES] = useState<any>(null);
-	const [friendId, setFriendId] = useState('');
+	const [friendId, setFriendId] = useState<string>('');
 	const [selectedColor, setSelectedColor] = useState("black");
-	const [selectedMessageIndex, setSelectedMessageIndex] = useState('0');
+	const [selectedMessageIndex, setSelectedMessageIndex] = useState('-1');
 	const [socketChat, setSocketChat] = useState<Socket>();
 	const [message, setMessage] = useState('');
 	const [modalPicPath, setModalPicPath] = useState('');
@@ -47,13 +49,13 @@ function chatComponent(): JSX.Element {
 	const messageService = new MessageService();
 	const channelService = new ChannelService();
 	const muteService = new MuteService();
-	const audioRefs = useRef([] as HTMLAudioElement[]);
-	const [isPlaying, setIsPlaying] = useState<boolean[]>([]);
 	const messagesRef = useRef<HTMLDivElement>(null);
 	const [channelId, setChannelId] = useState<number>(-1);
 	const [isOpen, setIsOpen] = useState(false);
 	const [selectedItem, setSelectedItem] = useState<any>('');
 	const [mutedUsers, setMutedUsers] = useState<MutedUsers[]>([]);
+	const [friends, setFriends] = useState<any[]>([]);
+	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 	const userData = useContext(DataContext);
 	if (!userData) {
 		return <LoadingComponent />;
@@ -67,12 +69,10 @@ function chatComponent(): JSX.Element {
 		element.scrollTop = element.scrollHeight;
 	};
 	const [isDisabled, setIsDisabled] = useState(false);
-
 	useEffect(() => {
 		const mutedUser = mutedUsers.find((object) => {
 		  return object.userId === userData[0].id && new Date(object.finishedAt) > new Date();
 		});
-		console.log(mutedUser);
 		if (mutedUser) {
 		  const timeRemaining = new Date(mutedUser.finishedAt).getTime() - new Date().getTime();
 		  if (timeRemaining > 0) {
@@ -89,14 +89,13 @@ function chatComponent(): JSX.Element {
 				setMessage(`You are muted for ${Math.ceil(remaining / 1000)} seconds`);
 			  }
 			}, 1000);
-	  
 			return () => clearInterval(interval);
 		  } else {
 			setIsDisabled(false);
 		  }
 		}
-	  }, [mutedUsers, userData]);
-	  
+	}, [mutedUsers, userData]);
+	
 	useEffect(() => {
 		if (!userData[0] || !userData[1]) return;
 		const fetchData = async () => {
@@ -113,6 +112,7 @@ function chatComponent(): JSX.Element {
 		};
 		fetchData();
 		setSocketChat(userData[1]);
+		setFriends(userData[7]);
 	}, [userData]);
 	if (!userData[0] || !userData[1]) {
 		return <LoadingComponent />;
@@ -121,20 +121,20 @@ function chatComponent(): JSX.Element {
 		e.preventDefault();
 		const messageValue = message;
 		if (!messageValue || isDisabled) {
-			console.log('Message is empty');
+			//console.log('Message is empty');
 			return;
 		}
 		if (friendId != '') {
 			const newMessage: messageUser1 = {
-				to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+				to: getFriend(friendId)!.id,
 				from: userData[0].id,
 				message: messageValue,
-				image: '', // No image selected
+				image: null,
 				senderId: userData[0].id,
-				recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
-				recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+				recieverId: getFriend(friendId)!.id,
+				recieverName: getFriend(friendId)!.username,
 				date: new Date().toISOString(),
-				audio: ''
+				audio: null
 			};
 			socketChat?.emit('message', newMessage);
 			const newMessages = [...MESSAGES, newMessage];
@@ -147,8 +147,8 @@ function chatComponent(): JSX.Element {
 				senderId: userData[0].id,
 				cid: channelId,
 				message: messageValue,
-				image: '',
-				audio: ''
+				image: null,
+				audio: null
 			};
 			socketChat?.emit('channelMessages', newMessage);
 			setLstGroupMessages(await channelService.latestChannels(userData[0].id))
@@ -174,15 +174,15 @@ function chatComponent(): JSX.Element {
 				imagePath = imagePath.url;
 				if (friendId != '') {
 					const newMessage: messageUser1 = {
-						to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+						to: getFriend(friendId)!.id,
 						from: userData[0].id,
 						message: '',
-						image: imagePath ? imagePath : '',
+						image: imagePath ? imagePath : null,
 						senderId: userData[0].id,
-						recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
-						recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+						recieverId: getFriend(friendId)!.id,
+						recieverName: getFriend(friendId)!.username,
 						date: new Date().toISOString(),
-						audio: ''
+						audio: null
 					};
 					socketChat?.emit('message', newMessage);
 					handleSelectMessage(selectedMessageIndex, friendId);
@@ -194,15 +194,15 @@ function chatComponent(): JSX.Element {
 						senderId: userData[0].id,
 						cid: channelId,
 						message: '',
-						image: imagePath,
-						audio: ''
+						image: imagePath ? imagePath : null,
+						audio: null
 					};
 					socketChat?.emit('channelMessages', newMessage);
 					setLstGroupMessages(await channelService.latestChannels(userData[0].id))
 					setRoomMessages(await channelService.getChannelMessages(channelId));
 				}
-				if (messagesRef.current)
-					scrollToBottom(messagesRef.current)
+				// if (messagesRef.current)
+				// 	scrollToBottom(messagesRef.current)
 			} else {
 				console.error('Failed to upload image');
 			}
@@ -210,9 +210,15 @@ function chatComponent(): JSX.Element {
 			console.error('Error uploading file:', error);
 		}
 	};
+	// useEffect(() => {
+	// 	console.log(roomMembers)
+	// }, [roomMembers]);
 
-
-
+	socketChat?.on('newMemberJoined', async (data: any) => {
+		setLstGroupMessages(await channelService.latestChannels(userData[0].id));
+		if (channelId != -1 &&  channelId == data.payload.channelId)
+			setRoomMembers(data.members);
+	})
 	const handleChange = (event: any) => {
 		const selectedFile = event.target.files[0];
 		handleImageSubmit(selectedFile);
@@ -220,21 +226,37 @@ function chatComponent(): JSX.Element {
 	const chooseFile = () => {
 		const input = document.createElement('input');
 		input.type = 'file';
-		input.accept = 'image/*';
+		input.accept = 'image/png, image/jpeg, image/jpg';
 		input.addEventListener('change', handleChange); // Add event listener
 		input.click();
 	};
+	// socket?.on("userKicked", async (data: any) => {
+	// 	console.log(data)
+	// })
+	socket?.on("kickedNotif", async (data: any) => {
+		// console.log(data);
+		setChannelId(-1);
+		setRoomMessages(null);
+		setRoomMembers([]);
+		setLstGroupMessages(await channelService.latestChannels(userData[0].id));
+    })
 	const handleSelectMessage = async (index: string, friendId?: string, cid?: number) => {
-		setSelectedMessageIndex('');
 		setSelectedMessageIndex(index);
+		setOnOpenDetails(false);
 		if (friendId) {
-			setFriendId(friendId);
-			setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
-			// console.log(MESSAGES);
+			setChannelId(-1);
 			setRoomMessages(null);
 			setRoomMembers([]);
+			setFriendId(friendId);
+			setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
 			setMutedUsers([]);
-			setChannelId(-1)
+			setChannelId(-1);
+			const blockedResult = await messageService.BlockBetween(userData[0].id, friendId);
+			if (blockedResult)
+			{
+				setIsDisabled(true);
+				setMessage('You Cannot Send Messages to this User');
+			}
 		}
 		else if (cid) {
 			setFriendId('')
@@ -253,16 +275,19 @@ function chatComponent(): JSX.Element {
 			await muteService.MutedUsers(cid).then(
 				(data: any) => {
 					setMutedUsers(data);
-					console.log(data);
+					//console.log(data);
 				}
 			)
 		}
 	};
 	const onDirectMessage = async (data: any) => {
-		setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
+		if (friendId == data.issuer.id)
+		{
+			setMESSAGES((await messageService.getMessages(userData[0].id, data.issuer.id)));
+		}
 		setLatestMessages(await messageService.latestMessages(userData[0].id))
 	}
-	socketChat?.on("directMessageNotif", onDirectMessage)
+	socketChat?.on("directMessageNotif", onDirectMessage);
 	const handleOpenDetails = () => {
 		setOnOpenDetails(!onOpenDetails)
 	}
@@ -275,29 +300,41 @@ function chatComponent(): JSX.Element {
 		setModalPicPath(picPath);
 		setIsModalOpen(true);
 	};
-
 	const onCloseModal = () => {
 		setIsModalOpen(false);
 	};
+	socketChat?.on('userLeft', async (data: any) => {
+		// setRoomMembers(data.members);
+		// console.log(data.payload)
+		if (data.payload.userId === userData[0].id) {
+			setChannelId(-1);
+			setRoomMessages(null);
+			setRoomMembers([]);
+			setLstGroupMessages(await channelService.latestChannels(userData[0].id));
+		}else {
+			setRoomMembers(data.members);
+		}
+	})
 	const getMessageFriend = (message: messageUser) => {
 		const { __owner__, __reciever__ } = message;
 		return __owner__.id === userData[0].id ? __reciever__ : __owner__;
+	};
+	const getFriend = (friendId: string): User | undefined => {
+		return friends.find((friend) => friend.id === friendId);
 	};
 	const startRecording = async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 			const mediaRecorder = new MediaRecorder(stream);
 			mediaRecorderRef.current = mediaRecorder;
-
-			const chunks: any = []; // Create a new array for chunks
-
+			const chunks: any = [];
 			mediaRecorder.ondataavailable = (e) => {
 				chunks.push(e.data);
 			};
-
 			mediaRecorder.onstop = async () => {
 				const audioBlob = new Blob(chunks, { type: 'audio/wav' }); // Use the chunks array directly
 				const formData = new FormData();
+				stream.getTracks().forEach((track) => track.stop());
 				formData.append('file', audioBlob);
 				const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 				try {
@@ -311,19 +348,18 @@ function chatComponent(): JSX.Element {
 						const audioPath = data.url;
 						if (friendId !== '') {
 							const newMessage: messageUser1 = {
-								to: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
+								to: getFriend(friendId)!.id,
 								from: userData[0].id,
 								message: '',
-								audio: audioPath || '',
-								image: '',
+								audio: audioPath || null,
+								image: null,
 								senderId: userData[0].id,
-								recieverId: getMessageFriend(MESSAGES[selectedMessageIndex]).id,
-								recieverName: getMessageFriend(MESSAGES[selectedMessageIndex]).username,
+								recieverId: getFriend(friendId)!.id,
+								recieverName: getFriend(friendId)!.username,
 								date: new Date().toISOString()
 							};
 							socketChat?.emit('message', newMessage);
-							const newMessages = [...MESSAGES, newMessage];
-							setMESSAGES(newMessages);
+							setMESSAGES((await messageService.getMessages(userData[0].id, friendId)));
 							setLatestMessages(await messageService.latestMessages(userData[0].id));
 						} else if (channelId != -1) {
 							const newMessage: any = {
@@ -331,7 +367,7 @@ function chatComponent(): JSX.Element {
 								senderId: userData[0].id,
 								cid: channelId,
 								message: '',
-								image: '',
+								image: null,
 								audio: audioPath
 							};
 							socketChat?.emit('channelMessages', newMessage);
@@ -363,10 +399,29 @@ function chatComponent(): JSX.Element {
 	const setOpenModal = (status: boolean) => {
 		setIsOpen(status);
 	}
-
+	useEffect(() => {},[MESSAGES])
+	const callUser = async () => {
+		if (userData[8]) {
+			const constraints = {
+				audio: true,
+				video: true,
+			};
+			const stream = await navigator.mediaDevices.getUserMedia(constraints);
+			stream.getTracks().forEach((track) => {track.enabled = false});
+			userData[8](stream)
+			stream && socketChat?.emit('iCallUser', {
+				calle: getFriend(friendId)
+			});
+			stream && socketChat?.emit('callUser', {
+				from: userData[0].id,
+				senderId: userData[0].id,
+				recieverId: getFriend(friendId)?.id
+			})
+		}
+	}	
 	return (
 		<>
-			<div className="flex w-full border-t-[1px] dark:border-gray-700 border-black">
+			<div className="flex w-full flex-warp border-t-[1px] dark:border-gray-700 border-black ">
 				<ConversationArea
 					latestMessages={latestMessages}
 					selectedMessageIndex={selectedMessageIndex}
@@ -380,50 +435,35 @@ function chatComponent(): JSX.Element {
 					setSelectedItem={setSelectedItem}
 					socket={socket}
 				/>
-				<div className="flex flex-col overflow-hidden flex-1 h-full">
+				<div className={`flex flex-col overflow-hidden flex-1 h-full ${onOpenDetails ? '' : ''}`}>
 					{selectedMessageIndex !== "-1" && (
 						<div className="flex-1 overflow-hidden h-[85%]">
-							{MESSAGES && (
-								<>
-									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800">
+							{MESSAGES  && (
+								<div className={`${onOpenDetails && friendId !== "" ? 'md:visible invisible' : ''} flex flex-col h-full`}>
+									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-5 bg-inherit dark:bg-zinc-800 ">
 										<div className="flex flex-row items-center space-x-2">
-											<div
-												className="msg-profile group bg-white"
+											<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" onClick={()=>{
+													setSelectedMessageIndex('-1');
+													setFriendId('');
+												}}>
+												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 19-7-7 7-7"/>
+											</svg>
+											<div className="msg-profile group bg-white"
 												style={{
-													backgroundImage: `url(${getMessageFriend(MESSAGES[selectedMessageIndex])
-															.picture
+													backgroundImage: `url(${baseAPIUrl + getFriend(friendId)?.picture
 														})`,
 												}}
 											></div>
 											<div className="font-onest text-lg capitalize text-zinc-700 dark:text-white">
-												{getMessageFriend(MESSAGES[selectedMessageIndex])
-													.firstName +
+												{getFriend(friendId)?.firstName +
 													" " +
-													getMessageFriend(MESSAGES[selectedMessageIndex])
-														.lastName}
+													getFriend(friendId)?.lastName}
 											</div>
 										</div>
 										<div className="flex flex-row justify-around w-20 h-8 gap-2">
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												x="0px"
-												y="0px"
-												width="24"
-												height="24"
-												viewBox="0 0 50 50"
-												className="fill-black dark:fill-white stroke-2"
-											>
-												<path d="M 11.839844 2.988281 C 11.070313 2.925781 10.214844 3.148438 9.425781 3.703125 C 8.730469 4.1875 7.230469 5.378906 5.828125 6.726563 C 5.128906 7.398438 4.460938 8.097656 3.945313 8.785156 C 3.425781 9.472656 2.972656 10.101563 3 11.015625 C 3.027344 11.835938 3.109375 14.261719 4.855469 17.980469 C 6.601563 21.695313 9.988281 26.792969 16.59375 33.402344 C 23.203125 40.011719 28.300781 43.398438 32.015625 45.144531 C 35.730469 46.890625 38.160156 46.972656 38.980469 47 C 39.890625 47.027344 40.519531 46.574219 41.207031 46.054688 C 41.894531 45.535156 42.59375 44.871094 43.265625 44.171875 C 44.609375 42.769531 45.800781 41.269531 46.285156 40.574219 C 47.390625 39 47.207031 37.140625 45.976563 36.277344 C 45.203125 35.734375 38.089844 31 37.019531 30.34375 C 35.933594 29.679688 34.683594 29.980469 33.566406 30.570313 C 32.6875 31.035156 30.308594 32.398438 29.628906 32.789063 C 29.117188 32.464844 27.175781 31.171875 23 26.996094 C 18.820313 22.820313 17.53125 20.878906 17.207031 20.367188 C 17.597656 19.6875 18.957031 17.320313 19.425781 16.425781 C 20.011719 15.3125 20.339844 14.050781 19.640625 12.957031 C 19.347656 12.492188 18.015625 10.464844 16.671875 8.429688 C 15.324219 6.394531 14.046875 4.464844 13.714844 4.003906 L 13.714844 4 C 13.28125 3.402344 12.605469 3.050781 11.839844 2.988281 Z M 11.65625 5.03125 C 11.929688 5.066406 12.09375 5.175781 12.09375 5.175781 C 12.253906 5.398438 13.65625 7.5 15 9.53125 C 16.34375 11.566406 17.714844 13.652344 17.953125 14.03125 C 17.992188 14.089844 18.046875 14.753906 17.65625 15.492188 L 17.65625 15.496094 C 17.214844 16.335938 15.15625 19.933594 15.15625 19.933594 L 14.871094 20.4375 L 15.164063 20.9375 C 15.164063 20.9375 16.699219 23.527344 21.582031 28.410156 C 26.46875 33.292969 29.058594 34.832031 29.058594 34.832031 L 29.558594 35.125 L 30.0625 34.839844 C 30.0625 34.839844 33.652344 32.785156 34.5 32.339844 C 35.238281 31.953125 35.902344 32.003906 35.980469 32.050781 C 36.671875 32.476563 44.355469 37.582031 44.828125 37.914063 C 44.84375 37.925781 45.261719 38.558594 44.652344 39.425781 L 44.648438 39.425781 C 44.28125 39.953125 43.078125 41.480469 41.824219 42.785156 C 41.195313 43.4375 40.550781 44.046875 40.003906 44.457031 C 39.457031 44.867188 38.96875 44.996094 39.046875 45 C 38.195313 44.972656 36.316406 44.953125 32.867188 43.332031 C 29.417969 41.714844 24.496094 38.476563 18.007813 31.984375 C 11.523438 25.5 8.285156 20.578125 6.664063 17.125 C 5.046875 13.675781 5.027344 11.796875 5 10.949219 C 5.003906 11.027344 5.132813 10.535156 5.542969 9.988281 C 5.953125 9.441406 6.558594 8.792969 7.210938 8.164063 C 8.519531 6.910156 10.042969 5.707031 10.570313 5.339844 L 10.570313 5.34375 C 11.003906 5.039063 11.382813 5 11.65625 5.03125 Z"></path>
-											</svg>
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												x="0px"
-												y="0px"
-												width="24"
-												height="24"
-												viewBox="0 0 24 24"
-												className="fill-black dark:fill-white"
-											>
+											<svg onClick={() => {
+												callUser();
+												}} xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24" className="fill-black dark:fill-white" >
 												<path d="M 4 4.75 C 3.271 4.75 2.5706875 5.0396875 2.0546875 5.5546875 C 1.5396875 6.0706875 1.25 6.771 1.25 7.5 L 1.25 16.5 C 1.25 17.229 1.5396875 17.929313 2.0546875 18.445312 C 2.5706875 18.960313 3.271 19.25 4 19.25 L 14.5 19.25 C 15.229 19.25 15.929312 18.960313 16.445312 18.445312 C 16.960313 17.929313 17.25 17.229 17.25 16.5 L 17.25 16.166016 L 20.982422 17.861328 C 21.369422 18.037328 21.819734 18.004438 22.177734 17.773438 C 22.534734 17.543438 22.75 17.147656 22.75 16.722656 L 22.75 7.2773438 C 22.75 6.8523438 22.534734 6.4565625 22.177734 6.2265625 C 21.819734 5.9955625 21.369422 5.9626719 20.982422 6.1386719 L 17.25 7.8339844 L 17.25 7.5 C 17.25 6.771 16.960313 6.0706875 16.445312 5.5546875 C 15.929312 5.0396875 15.229 4.75 14.5 4.75 L 4 4.75 z M 4 6.25 L 14.5 6.25 C 14.832 6.25 15.149766 6.3812344 15.384766 6.6152344 C 15.618766 6.8502344 15.75 7.168 15.75 7.5 L 15.75 9 L 15.75 15 L 15.75 16.5 C 15.75 16.832 15.618766 17.149766 15.384766 17.384766 C 15.149766 17.618766 14.832 17.75 14.5 17.75 L 4 17.75 C 3.668 17.75 3.3502344 17.618766 3.1152344 17.384766 C 2.8812344 17.149766 2.75 16.832 2.75 16.5 L 2.75 7.5 C 2.75 7.168 2.8812344 6.8502344 3.1152344 6.6152344 C 3.3502344 6.3812344 3.668 6.25 4 6.25 z M 21.25 7.6640625 L 21.25 16.335938 L 17.25 14.517578 L 17.25 9.4824219 C 17.25 9.4824219 20.213 8.1350625 21.25 7.6640625 z"></path>
 											</svg>
 											<svg
@@ -445,10 +485,7 @@ function chatComponent(): JSX.Element {
 											</svg>
 										</div>
 									</div>
-									<div
-										ref={messagesRef}
-										className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `}
-									>
+									<div ref={messagesRef} className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `}>
 										<ChatAreaComponent
 											MESSAGES={MESSAGES}
 											userData={userData}
@@ -458,14 +495,27 @@ function chatComponent(): JSX.Element {
 											onOpenModal={onOpenModal}
 											onCloseModal={onCloseModal}
 											modalPicPath={modalPicPath}
+											socketChat={socketChat}
+											getFriend={getFriend}
+											friendId={friendId}
 										/>
 									</div>
-								</>
+								</div>
 							)}
-							{roomMembers && roomMessages && (
-								<>
-									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-4 bg-inherit dark:bg-zinc-800">
+							{roomMembers && roomMessages && channelId !== -1 && (
+								<div className={`${onOpenDetails && channelId != -1 && 'md:visible invisible'}  flex flex-col h-full`}>
+									<div className="chat-area-header flex sticky top-0 left-0 overflow-hidden w-full items-center justify-between p-2 bg-inherit dark:bg-zinc-800">
 										<div className="flex gap-2 items-center">
+											<svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" onClick={()=>{
+													setSelectedMessageIndex('-1');
+													setRoomMembers([]);
+													setRoomMessages([]);
+													setChannelId(-1);
+													setFriendId('');
+												}}>
+												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 19-7-7 7-7"/>
+											</svg>
+
 											<div className="flex flex-row items-center">
 												<Avatar
 													img={
@@ -480,11 +530,11 @@ function chatComponent(): JSX.Element {
 												{lstGroupMessages[selectedMessageIndex].channel.name}
 											</div>
 										</div>
-										<div className="flex flex-row items-center gap-2">
-											<Avatar.Group className="justify-around w-fit h-full">
+										<div className="flex flex-row items-center gap-2 p-1">
+											<Avatar.Group className="justify-around p-2">
 												{roomMembers.map((member, index) => (
-													<Avatar className="avatarImage"
-														img={member.user.picture}
+													<Avatar className="avatarImage p-1"
+														img={baseAPIUrl + member.user.picture}
 														rounded
 														stacked
 														key={index}
@@ -511,10 +561,7 @@ function chatComponent(): JSX.Element {
 											</svg>
 										</div>
 									</div>
-									<div
-										ref={messagesRef}
-										className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `}
-									>
+									<div className={`chat-area-main h-full overflow-auto pb-20 bg-white ${selectedColor} `} >
 										<ChatRoom
 											roomMembers={roomMembers}
 											roomMessages={roomMessages}
@@ -528,21 +575,27 @@ function chatComponent(): JSX.Element {
 											socketChat={socketChat}
 										/>
 									</div>
-								</>
+								</div>
 							)}
 						</div>
 					)}
 					{(friendId !== "" || channelId !== -1) && (
-						<div className="flex flex-row items-center h-16 rounded-xl bg-white dark:bg-main-dark-SPRUCE w-full px-4">
+						<div className={`flex flex-row items-center h-16 rounded-xl bg-white dark:bg-main-dark-SPRUCE w-full px-4 ${!onOpenDetails ? 'md:block' : 'md:block'}`}>
 							<form onSubmit={handleTextSubmit} className="m-0 flex flex-row items-center h-16 rounded-xl w-full px-4" >
 								<div className="flex">
-									<div className="flex items-center justify-center text-gray-400 hover:text-gray-600" onClick={chooseFile} >
+									<div className="flex items-center justify-center text-gray-400 hover:text-gray-600" onClick={() => {
+										if (!isDisabled)
+											chooseFile()
+									}} >
 										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
 										</svg>
 									</div>
-									<div className={`realtive flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600`} onClick={recording ? stopRecording : startRecording}>
-										{<svg stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+									<div className={`realtive flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600`} onClick={() => {
+										if(!isDisabled)
+											recording ? stopRecording() : startRecording()
+									}}>
+										{<svg className={`${recording ? 'text-yellow-300' : ''}`} stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
 											<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
 											<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
 											<line x1="12" y1="19" x2="12" y2="23"></line>
@@ -565,13 +618,13 @@ function chatComponent(): JSX.Element {
 										/>
 									</div>
 								</div>
-								<div className={`ml-4 `}>
+								<div className='ml-2 '>
 									<button
 										onClick={handleTextSubmit}
-										className="flex items-center justify-center bg-main-light-FERN rounded-xl text-white px-4 py-1 flex-shrink-0"
+										className="flex items-center  gap-2 justify-center bg-main-light-FERN dark:bg-main-light-EGGSHELL rounded-xl text-white px-4 py-2 "
 									>
-										<span>Send</span>
-										<span className="ml-2 overflow-hidden">
+										<span className='hidden md:inline'>Send</span>
+										<span className="overflow-hidden">
 											<svg
 												className="w-4 h-auto transform rotate-45 -mt-px"
 												fill="none"
@@ -594,29 +647,25 @@ function chatComponent(): JSX.Element {
 					)}
 				</div>
 				{onOpenDetails && friendId !== ""
-					? DetailsArea({
-						MESSAGES,
-						selectedMessageIndex,
-						handleSelectedColor,
-						selectedColor,
-						modalPicPath,
-						isModalOpen,
-						onCloseModal,
-						onOpenModal,
-						getMessageFriend,
-						handleOpenDetails,
-					})
+					?
+					<div className={`md:w-[340px] w-full h-full`}>
+						<DetailsArea MESSAGES={MESSAGES} selectedMessageIndex={selectedMessageIndex} 
+						selectedColor={selectedColor} handleSelectedColor={handleSelectedColor} modalPicPath={modalPicPath} isModalOpen={isModalOpen} onCloseModal={onCloseModal}
+						onOpenModal={onOpenModal} getMessageFriend={getMessageFriend} getFriend={getFriend} friendId={friendId} handleOpenDetails={handleOpenDetails} />
+					</div>
 					: null}
 				{onOpenDetails && channelId != -1 ? (
+					<div className={`md:w-[340px] w-full h-full`}>
 					<RoomDetails
 						channelInfo={lstGroupMessages[selectedMessageIndex].channel}
-						channelRole={lstGroupMessages[selectedMessageIndex].role}
 						handleOpenDetails={handleOpenDetails}
+						channelRole={lstGroupMessages[selectedMessageIndex].role}
+						userData={userData}
 						chatSocket={socketChat}
 						setRoomMembers={setRoomMembers}
 						roomMembers={roomMembers}
-						userData={userData}
-					/>
+						/>
+					</div>
 				) : null}
 			</div>
 		</>

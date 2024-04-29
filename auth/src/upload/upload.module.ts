@@ -7,9 +7,7 @@ const storage = diskStorage({
     destination: './uploads',
     filename: (req, file, cb) => {
         const extension = file.originalname.split('.').pop();
-        // Replace spaces with underscores or remove them
-        const filenameWithoutSpaces = file.originalname.replace(/\s/g, '_'); // Replace spaces with underscores
-        // const filenameWithoutSpaces = file.originalname.replace(/\s/g, ''); // Remove spaces
+        const filenameWithoutSpaces = file.originalname.replace(/\s/g, '_');
         const filename = `${Date.now()}-${Math.round(Math.random() * 1E9)}.${extension}`;
         cb(null, filenameWithoutSpaces);
     }
@@ -18,7 +16,15 @@ const storage = diskStorage({
 @Module({
     imports: [
         MulterModule.register({
-            storage: storage
+            storage: storage,
+            fileFilter: (req, file, cb) => {
+                console.log(file.mimetype.match(/^(image|audio|video)\/(mp3|wav|jpeg|png|jpg)$/) ? 'true' : 'false');
+                if (file.mimetype.match(/^(image|audio|video)\/(mp3|wav|jpeg|png|jpg)$/)) {
+                    cb(null, true);
+                } else {
+                    cb(new Error('Not a valid file'), false);
+                }
+            }
         })
     ],
     controllers: [UploadController]

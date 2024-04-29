@@ -17,7 +17,7 @@ export class Banned {
     // @JoinColumn({ name: 'channel_id' })
     channel: Channel;
   
-    @Column({default: "idik fih"})
+    @Column({default: "No reason provided"})
     reason: string;
   
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

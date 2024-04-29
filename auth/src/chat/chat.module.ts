@@ -26,6 +26,8 @@ import { MuteService } from 'src/mute/mute.service';
 import { BannedController } from 'src/banned/banned.controller';
 import { BannedService } from 'src/banned/banned.service';
 import { Blocked } from 'src/user/entities/blocked.entity';
+import { BlockedService } from 'src/blocked/blocked.service';
+import { BlockedController } from 'src/blocked/blocked.controller';
 
 @Module({
   imports: [
@@ -36,9 +38,9 @@ import { Blocked } from 'src/user/entities/blocked.entity';
 
     // ChannelModule
   ],
-  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService, NotificationService, BannedService, FriendService, MuteService],
+  providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService, NotificationService, BannedService, FriendService, MuteService, BlockedService],
   // providers: [ChatService, ChatGateway, Repository, MsgController, MsgRepository, UserRepository],
-  controllers: [ChatController, MuteController, BannedController],
+  controllers: [ChatController, MuteController, BannedController, BlockedController],
   // exports: [MsgRepository, UserRepository]
 })
 export class ChatModule {}

@@ -5,6 +5,8 @@ import { map } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
+import { response } from "express";
+import { SettingProfileDto } from "./dto/setting.user";
 @Injectable()
 
 export class UserService {
@@ -60,6 +62,23 @@ export class UserService {
 		}
 	}
 
+	async updateUserSetting(userId: string, payload: SettingProfileDto) {
+		//console.log("the user id is absolutly: ", userId);
+		const existingData = await this.viewUser(userId);
+		if (!existingData) {
+			throw new Error('Data not found');
+		}
+		
+		// //console.log("existing data: --------> ", existingData);
+		existingData.firstName = payload.firstName;
+		existingData.lastName = payload.lastName;
+		existingData.email = payload.email;
+		// //console.log("after existing data: --------> ", existingData);
+
+		// //console.log("*-*-*-*-*-**> : ", existingData);
+		return await this.userRepository.save(existingData);
+	}
+
 	async getUserById(id: string): Promise<User> {
 		return this.userRepository.findOneBy({
 			id
@@ -111,22 +130,35 @@ export class UserService {
 			'Authorization': `Bearer ${providerAccessToken}`
 		}
 		try {
-			const coalition = this.http.get('https://api.intra.42.fr/v2/users/' + id + '/coalitions', { headers })
+			const coalition = this.http.get(process.env.INTRA_USERS + id + '/coalitions', { headers })
 				.pipe(map(
 					(response: AxiosResponse) => {
-						// console.log(response.data);
+						// //console.log(response.data);
 						return response.data
 					}
 				))
 				.toPromise();
 				return coalition;
-			// console.log(coalition);
-			return coalition;
 		} catch (error) {
 			console.error(error);
 		}
 	}
+	async getPicture(picture: string, providerAccessToken: string): Promise<File> {
+        const headers = {
+            'Authorization': `Bearer ${providerAccessToken}`
+        };
 
+        try {
+			const response: AxiosResponse<ArrayBuffer> = await this.http.get(picture, { headers, responseType: 'arraybuffer' }).toPromise();
+			const fileType = picture.split('.').pop() || 'jpg';
+			const mimeType = `image/${fileType}`;
+			const file = new File([response.data], `picture.${fileType}`, { type: mimeType });
+			return file;
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+    }
 	async findAllUsersExcept(id: string): Promise<User[]> {
 		return await this.userRepository.find({
 		where: {
@@ -143,7 +175,34 @@ export class UserService {
 
 	  async turnOnTwoFactorAuthentication(userId: string) {
 		return this.userRepository.update(userId, {
-		  isTwoFactorAuthenticationEnabled: false
+		  isTwoFactorAuthenticationEnabled: true
 		});
+	}
+
+	async findByUserName(username: string): Promise<User> {
+		//console.log(username);
+		return await this.userRepository.findOne({
+			where: {
+				username: username
+			}
+		})
+	}
+
+	async updateUsername(username: string, userId: string) : Promise<User>{
+		await this.userRepository.update(userId, {
+			username: username
+		})
+		return await this.viewUser(userId);
+	}
+
+
+	async update2FAState(userId: string, status: boolean) {
+		const user = await this.viewUser(userId);
+		if (!user) {
+			throw new Error('User not found');
+		}
+		user.isTwoFactorAuthenticationEnabled = status;
+		console.log("user: ", user);
+		return await this.userRepository.save(user);
 	}
 }

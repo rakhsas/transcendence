@@ -7,13 +7,14 @@ import Robot from './../../../assets/robot.png';
 import fire from './../../../assets/Icon/fire.svg';
 import play from './../../../assets/img/Play.svg'
 import videoSource from './../../../assets/avatars/490488ec-2f13-402b-b203-951e4a4775cd.mp4';
-import Chart from 'chart.js/auto';
 import { FriendsService } from '../../../services/friend.service';
 import { Socket, io } from "socket.io-client";
 import User from '../../../model/user.model';
 import { Channel } from '../../../utils/types';
 import ModalComponent from '../../modal/modal';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import InfoModal from '../../modal/Info.modal';
 
 const group = () => {
     return (
@@ -51,12 +52,12 @@ const HomeComponent: React.FC = () => {
     const [friends, setFriends] = useState<any[]>([]);
     const [friendData, setFriendData] = useState<friend[]>([]);
     const [globalSocket, setGlobalSocket] = useState<Socket | null>(null);
+    // const [playingUsers, setPlayingUsers] = useState<string[]>([]);
     const [protectedChannels, setProtectedChannels] = useState<Channel[]>([]);
     const [publicChannels, setPublicChannels] = useState<Channel[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    let chartInstance: Chart | null = null;
-    // if (!userData[0])
-    //     return <LoadingComponent />;
+    const firstLogin = Cookies.get('firstLogin');
+    // const twoFactorAuthentication = Cookies.get('twoFactorAuthentication');
     useEffect(() => {
         if (!userData) {
             return;
@@ -85,70 +86,15 @@ const HomeComponent: React.FC = () => {
             setGlobalSocket(globalSocket);
         };
         fetchFriends();
-        if (chartRef.current) {
-            const ctx = chartRef.current.getContext('2d');
-            if (ctx) {
-                chartInstance = new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: [
-                            'Eating',
-                            'Drinking',
-                            'Sleeping',
-                            'Designing',
-                            'Coding',
-                        ],
-                        datasets: [{
-                            label: 'My First Dataset',
-                            data: [65, 59, 90, 81, 56],
-                            fill: true,
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderColor: 'rgb(255, 99, 132)',
-                            pointBackgroundColor: 'rgb(255, 99, 132)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(255, 99, 132)',
-                            pointBorderWidth: 0,
-                        }, {
-                            label: 'My Second Dataset',
-                            data: [28, 48, 40, 19, 96],
-                            fill: true,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgb(54, 162, 235)',
-                            pointBackgroundColor: 'rgb(54, 162, 235)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(54, 162, 235)'
-                        },]
-                    },
-                    options: {
-                        elements: {
-                            line: {
-                                borderWidth: 3,
-                            }
-                        },
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false,
-                            }
-                        }
-                    },
-                });
-            }
-        }
         return () => {
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
             globalSocket?.disconnect();
         };
     }, [chartRef, userData]);
-    if (!userData[0] || !friends.length)
+    if (!userData || userData.length === 0 || !friends.length)
         return <LoadingComponent />;
     const socket: Socket = userData[1];
     socket?.on('protectedChannels', async (data: any) => {
-        console.log('protectedChannels: ', await data);
+        //console.log('protectedChannels: ', await data);
         setProtectedChannels(data);
     })
     socket?.on('publicChannels', (data: any) => {
@@ -175,7 +121,7 @@ const HomeComponent: React.FC = () => {
                         ...friend,
                         status: 'online',
                         color: statusColor.green,
-                        gameStatus: 'online'
+                        gameStatus: 'offline'
                     };
                 } else {
                     return {
@@ -188,10 +134,27 @@ const HomeComponent: React.FC = () => {
             })
         );
     });
-    
+    globalSocket?.on('playingUsers', (data: any) => {
+        const playingUsers: any = data.userIds;
+        const friendDataCopy = [...friendData];
+        friendDataCopy.forEach(friend => {
+            if (playingUsers?.includes(friend.user.username)) {
+                friend.gameStatus = 'online';
+            } else {
+                friend.gameStatus = 'offline';
+            }
+        });
+        setFriendData(friendDataCopy);
+    });
     return (
         <>
             <main className="flex-1 p-4 overflow-y-auto relative">
+                
+                {
+                    firstLogin === 'true' && (
+                        <InfoModal userData={userData} socketChat={socket}/>
+                    )
+                }
                 <section className="min-h-2/3 flex items-center justify-center p-2 flex-wrap lg:flex-nowrap">
                     <div className="w-full relative overflow-hidden p-4">
                         <div className="relative flex justify-between flex-col mt-8">
@@ -266,18 +229,14 @@ const HomeComponent: React.FC = () => {
                     </div>
                     <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
                         <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
-                        <div className="flex flex-col w-full gap-2">
-                            {
-                                protectedChannels?.length == 0
-                                ?
-                                    (
-                                        <div className="flex justify-center">
-                                            <span className='font-poppins text-lg dark:text-main-light-FERN text-main-light-EGGSHELL'> Noo Roooms</span>
-                                        </div>
-                                    )
-                                :
+                        <div className="flex flex-wrap justify-between w-full">
+                            {protectedChannels?.length === 0 ? (
+                                <div className="flex justify-center">
+                                    <span className='font-poppins text-lg dark:text-main-light-FERN text-main-light-EGGSHELL'> No Rooms</span>
+                                </div>
+                            ) : (
                                 protectedChannels.map((channel, index) => (
-                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2 w-full" key={index}>
+                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL m-1 flex flex-row items-center justify-between p-2 w-full sm:w-full md:w-[48%] xl:w-[48%]" key={index}>
                                         <div className="infos flex flex-row items-center space-x-4">
                                             <div className="pic w-12 h-12 rounded-2xl">
                                                 <img src={baseAPIUrl + channel.picture} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
@@ -291,28 +250,25 @@ const HomeComponent: React.FC = () => {
                                             setOpenModal(!openModal);
                                             setChannel(channel);
                                         }}>
-                                            <img src={play} alt="Play" />
+                                        <img src={play} alt="Play" />
                                         </div>
                                     </div>
                                 ))
-                            }
-                            {
-                                openModal && (
-                                    <ModalComponent isOpen channelData={channel} setOpenModal={setOpenModal} userData={userData}/>
-                                )
-                            }
+                            )}
+                            {openModal && (
+                                <ModalComponent isOpen channelData={channel} setOpenModal={setOpenModal} userData={userData}/>
+                            )}
                         </div>
-                    </div>
+                    </div> 
                 </section>
 
             </main>
             <aside className="m-2 p-4 rounded-3xl lg:block md:block hidden h-fit dark:bg-zinc-900  bg-main-light-WHITE">
                 <div className="contain flex flex-col justify-between items-center mx-auto">
                     <div className="profile mt-2 w-12 h-12 bg-white">
-                        <img src={userData[0].picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData[0].username} />
+                        <img src={baseAPIUrl + userData[0].picture} className='object-cover bg-contain h-full bg-no-repeat bg-center' alt={userData[0].username} />
                     </div>
                     <div className="groupslogo mt-8">
-                        {/* <img src={group} alt='Groups' /> */}
                         {group()}
                     </div>
                     <div className="friends mt-4 flex flex-wrap gap-2 flex-col">
@@ -321,12 +277,11 @@ const HomeComponent: React.FC = () => {
                                 ?
                                     'Loading...'
                                 :
-                                    friendData.map((friend, index) => {
-                                        // console.log('friendData: ', friend)
+                                    friendData.slice(0, 7).map((friend, index) => {
                                         return (
-                                            <div className="w-16 h-20 relative flex flex-col items-center" key={index}>
+                                            <div className="w-16 h-20 relative flex flex-col items-center" key={index} onClick={() => navigate(`/dashboard/profile/${friend.user.id}`)}>
                                                 <div className="img p-2" key={index}>
-                                                    <img src={friend.user.picture} className={`w-10 h-10 mx-auto rounded-full object-cover ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
+                                                    <img src={baseAPIUrl + friend.user.picture} className={`w-10 h-10 mx-auto rounded-full object-cover ring-2 ${friend.color == 'red' ? 'ring-red-400' : 'ring-green-400'} p-1`} color="success" />
                                                 </div>
                                                 <div className="absolute top-0 right-2 mb-1 mr-[1px]">
                                                     <div className={`w-4 h-4 rounded-full ${friend.status === 'online' ? 'bg-green-500' : 'bg-[#A5BAA9]'}  border-2 border-main-dark-SPRUCE`}></div>

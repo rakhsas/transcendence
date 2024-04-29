@@ -55,18 +55,25 @@ export class ChatService {
 
   // ================================= Users functions ================================================================================
 
-  // async handleBlockUse(payload: any): Promise<void>
-	// 	{
-	// 		// the userId and the id the user you want to block
-	// 		const newRecord = this.blockRepository.create({
-	// 			user: {id: payload.userId},
-	// 			blockedUser: {id: payload.blockTargetedId}
-	// 		});
+  async blockUser(payload: any): Promise<Blocked>
+  {
+      // the userId and the id the user you want to block
+      const user = await this.userService.viewUser(payload.userId);
+      const BlockedUser = await this.userService.viewUser(payload.blockedUserId);
+      const blocked = new Blocked();
+      const reverseBlocked = new Blocked();
 
-	// 		return this.blockRepository.save(newRecord);
-	// 	}
+      blocked.user = Promise.resolve(user);
+      blocked.blockedUser = Promise.resolve(BlockedUser);
+
+      reverseBlocked.user = Promise.resolve(BlockedUser);
+      reverseBlocked.blockedUser = Promise.resolve(user);
+
+      return this.blockRepository.save(blocked);
+  }
 
   async banUser(payload: any){
+    
     const newRecord = this.BanRepository.create({
       user: {id: payload.userId},
       channel: {id: payload.channelId}
@@ -163,6 +170,13 @@ export class ChatService {
     return userObject.user.id; // Access the id property within the nested user object
   }
 
+  async leaveFromChannel(payload: any) {
+      await this.channelUserRepository.delete({
+        user: {id: payload.userId},
+        channel: {id: payload.channelId}
+      });
+  }
+
   async isJoined(channelId: number, userId: string): Promise<boolean>{
     
     const users = this.channelService.getMembersOfChannel(channelId);
@@ -220,7 +234,7 @@ export class ChatService {
       newEntityChannel.password = "password" in payload ? payload.password : null;
       newEntityChannel.type = payload.channelType;
       newEntityChannel.picture = payload.picture
-      console.log("=> ", payload.picture);
+      //console.log("=> ", payload.picture);
       newEntityChannel.owner = Promise.resolve(payload.ownerId);
       // Save the new Channel entity
       const savedChannel = await this.channelRepository.save(newEntityChannel);
@@ -233,9 +247,9 @@ export class ChatService {
 
   async addNewMemberToChannel(payload: any, role: string) {
     // Load user and channel entities
-    console.log("payload.__owner__", payload.__owner__)
-    console.log("payload.id", payload.id)
-    console.log("-----------------------------------------------> joined");
+    //console.log("payload.__owner__", payload.__owner__)
+    //console.log("payload.id", payload.id)
+    //console.log("-----------------------------------------------> joined");
     const id = payload.__owner__;
     const user = await this.userService.viewUser(id);
     const channel: Channel = await this.channelRepository.findOne({where: {id: payload.id}});
@@ -260,7 +274,7 @@ export class ChatService {
    */
   async kickUserFromChannel(payload: any)
   {
-    console.log("payload", payload);
+    //console.log("payload", payload);
     const targetedEntity = await this.channelUserRepository.findOne({
       where: {
         channel: {id: payload.channelId},
@@ -295,15 +309,27 @@ export class ChatService {
 
   async promoteUser(payload: any)
   {
+    console.log(payload)
     const channelRecord = await this.channelRepository.findOne({where: {id: payload.channelId}});
     const userRecord = await this.userRepository.findOne({where: {id: payload.userId}});
     
     if (channelRecord === null || userRecord === null)
       throw new NotFoundException("the disire channel or user not found");
-    const recordToUpdate = await this.channelUserRepository.findOne({where: {user: userRecord, channel: channelRecord}});
+    console.log()
+    const recordToUpdate = await this.channelUserRepository.findOne({
+      where: {
+        user: {
+          id: payload.userId,
+        },
+        channel: {
+          id: payload.channelId
+        }
+      },
+      loadRelationIds: true
+    });
     if (recordToUpdate === null)
       throw new NotFoundException("the channel user record not found (updating role of the user in a channel)");
-    recordToUpdate.role = payload.role;
+    recordToUpdate.role = UserRole.ADMIN;
     await this.channelUserRepository.save(recordToUpdate);
   }
 
@@ -316,6 +342,13 @@ export class ChatService {
 
     await this.muteRepository.save(newEntity);
   }
+
+  async getMessage(id: number): Promise<Msg> {
+    return await this.msgRepository.findOne(
+      {
+        where: { id },
+        relations: ['owner', 'reciever']
+      },
+    );
+  }
 }
-
-

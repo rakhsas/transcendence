@@ -47,3 +47,42 @@
     background: #ebebeb;
     border-radius: 30px;
   }
+
+
+  /* .draggable {
+    position: absolute;
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+    line-height: 100px;
+    cursor: grab;
+  }
+  
+  .draggable:active {
+    cursor: grabbing;
+  } */
+
+  .draggable video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This makes the video cover the entire element */
+  }
+
+  .ttt .span {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: #4CAF50; /* Change to desired accent color */
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+  }
+  
+  #accept-call:checked + .span {
+    transform: translateX(100%);
+  }
+
+.rsbcText {
+  font-family: 'poppins' !important;
+}
+.rsbcSliderText {
+  font-family: 'poppins' !important;
+}

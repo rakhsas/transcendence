@@ -7,6 +7,8 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { GlobalGateway } from './global.gateway';
+import { UploadModule } from 'src/upload/upload.module';
+import { HttpModule, HttpService } from '@nestjs/axios';
 
 @Module({
     imports: [
@@ -15,12 +17,14 @@ import { GlobalGateway } from './global.gateway';
             isGlobal: true,
         }),
         PassportModule.register({ defaultStrategy: '42' }),
-        UserModule,     
+        UserModule,
+        UploadModule,
         JwtModule.register({
             global: true,
             secret: process.env.JWTSECRET,
-            signOptions: { expiresIn: '60s' }
-        })
+            signOptions: { expiresIn: '30m' }
+        }),
+        HttpModule
     ],
     controllers: [AuthController],
     providers: [ AuthService, FortyTwoStrategy, JwtService, GlobalGateway],

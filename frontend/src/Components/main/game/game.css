@@ -12,8 +12,8 @@
     
 .owl-item {
     filter: blur(calc(10px / 5));
-    /* width: fit-content !important; */
 }
+/* width: fit-content !important; */
 
 .center :hover {
     transition: 0.7s;
