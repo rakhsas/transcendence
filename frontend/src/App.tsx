@@ -16,7 +16,8 @@ import WithFriend from './Components/Game/withFriend.tsx';
 // const url: string = import.meta.env.VITE_API_AUTH_KEY;
 
 function App() {
-  localStorage.setItem('theme', 'dark');
+  if (!localStorage.getItem('theme'))
+    localStorage.setItem('theme', 'dark');
   return (
     <>
       {/* <BrowserRouter> */}

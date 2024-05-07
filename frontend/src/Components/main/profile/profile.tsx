@@ -182,7 +182,7 @@ const FunctionProfileForm: React.FC = () => {
 	return (
 		<div className="body m-4 flex flex-col new:flex-row w-full h-[90vh] justify-between gap-4 bg-inherit overflow-visible Setting">
 			<div className="side1 flex flex-col gap-4 items-center w-full md:min-w-[35%] min-h-full overflow-hidden">
-				<div className="w-full md:w-[85%] h-1/2 p-4 flex flex-col justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE border-gray-200 rounded-3xl shadow overflow-hidden">
+				<div className="w-full md:w-[85%] h-1/2 p-4 flex flex-col justify-center items-center dark:bg-zinc-900  bg-main-light-PRIMARY09 border-gray-200 rounded-3xl shadow overflow-hidden">
 					<div className="flex flex-col p-2 items-center w-full">
 						<div className="flex justify-center items-center p-1 w-full">
 							<div className={`relative border-4 rounded-full `} style={{
@@ -236,9 +236,9 @@ const FunctionProfileForm: React.FC = () => {
 						<span className="progress-label text-black dark:text-white">{progress.toFixed(2)}%</span>
 					</div>
 				</div>
-				<div className='w-full md:w-[85%] flex flex-col justify-between p-4 rounded-3xl items-center h-[75vh] dark:bg-zinc-900  bg-main-light-WHITE'>
+				<div className='w-full md:w-[85%] flex flex-col justify-between p-4 rounded-3xl items-center h-[75vh] dark:bg-zinc-900  bg-main-light-PRIMARY09'>
 					<div className="header w-full overflow-hidden text-center py-2.5">
-						<h5 className='font-bolder dark:text-main-light-FERN text-main-light-EGGSHELL font-poppins uppercase'>ACHIEVEMENTS</h5>
+						<h5 className='font-extrabold text-2xl text-white font-poppins uppercase overflow-hidden'>ACHIEVEMENTS</h5>
 					</div>
 					<div className="achievements flex flex-col justify-center gap-8 w-full h-full">
 						{
@@ -248,7 +248,7 @@ const FunctionProfileForm: React.FC = () => {
 								return (
 									<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
 										<img src={achievement.icon} className="ml-2 w-16 h-16" />
-										<p className="flex flex-row justify-center items-center dark:text-white text-black">{achievement.name}</p>
+										<p className="flex flex-row justify-center items-center text-white">{achievement.name}</p>
 										{totalGames?.gamePlayed > index ? (
 											<svg className="w-6 h-6 dark:text-main-light-FERN text-main-light-EGGSHELL svgIcon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 												<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />

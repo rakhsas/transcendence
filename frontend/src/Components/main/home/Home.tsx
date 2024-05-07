@@ -3,8 +3,9 @@ import GameModesCarousel from './../game/game';
 import { useContext, useEffect, useRef, useState } from 'react';
 import DataContext from '../../../services/data.context';
 import LoadingComponent from '../../shared/loading/loading';
-import Robot from './../../../assets/robot.png';
+// import Robot from './../../../assets/robot.png';
 // // import RobotBlur from './../../../assets/image48.png';
+import Robot from './../../../assets/image 47.png';
 // import Robot from './../../../assets/image 47.png';
 import fire from './../../../assets/Icon/fire.svg';
 import play from './../../../assets/img/Play.svg'
@@ -158,37 +159,26 @@ const HomeComponent: React.FC = () => {
                 <section className="min-h-2/3 flex items-center justify-center p-2 flex-wrap lg:flex-nowrap">
                     <div className="w-full relative overflow-hidden p-4">
                         <div className="relative flex justify-between flex-col mt-8">
-                            <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-b from-neutral-700 to-slate-900 rounded-3xl overflow-hidden">
-                                <div className="absolute inset-0 bg-teal-500 #blur-[5px] bg-left-bottom fgg"></div>
-                                <div className="absolute top-0 left-0 w-full h-full flex items-center z-10">
-                                    <video className="object-cover w-full h-full" autoPlay loop muted>
-                                        <source src={videoSource} type="video/mp4" />
-                                    </video>
-                                </div>
+                            <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-b from-neutral-700 to-slate-900 rounded-3xl overflow-hidden ads">
                             </div>
                             <div className="flex flex-col p-8 justify-between relative z-10">
-                                <div className="flex flex-col justify-between">
+                                <div className="flex flex-col justify-between py-4 ">
                                     <div className="w-fit flex flex-row p-2 bg-gradient-to-br from-main-light-EGGSHELL to-main-light-FERN rounded-xl">
                                         <img src={fire} alt="Fire" />
-                                        <div className="text-white font-bold text-xl"> Popular</div>
+                                        <div className="text-white font-bold text-lg"> Popular</div>
                                     </div>
                                     <div className="div mt-4">
-                                        <div className="text-white font-semibold text-3xl leading-10">AI: The Next Frontier</div>
-                                    </div>
-                                </div>
-                                <div className="w-fit p-4 bg-gradient-to-r from-slate-900 via-gray-900 to-zinc-600 rounded-full" onClick={() => navigate('/dashboard/game')}>
-                                    <div className="bg-emerald-400 rounded-3xl flex flex-col justify-center hover:cursor-pointer px-4 py-2">
-                                        <div className="text-white font-bold">Play Now</div>
+                                        <div className="text-white font-semibold text-2xl leading-10">AI: The Next Frontier</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="robot absolute overflow-hidden top-[-10%] z-10 max-sm:hidden -right-1">
-                            <img className="w-80 h-[23rem] max-sm:w-40" src={Robot} alt="Robot" />
+                        <div className="robot absolute overflow-hidden bottom-4 z-10 max-sm:z-0 sm:z-0 -right-6">
+                            <img className="w-[30rem] h-[13rem] opacity-95" src={Robot} alt="Robot" />
                         </div>
                     </div>
                     <div className="roomsHolder w-2/3 bg-transparent flex flex-col overflow-auto justify-around flex-1 lg:flex-initial p-4 space-y-4">
-                        <div className="title text-2xl text-black dark:text-white font-poppins overflow-hidden">Public Rooms</div>
+                        <div className="title text-2xl text-white font-poppins overflow-hidden">Public Rooms</div>
                         <div className="rooms flex flex-col overflow-auto p-4 space-y-4">
                             {
                                 publicChannels?.length == 0
@@ -222,13 +212,13 @@ const HomeComponent: React.FC = () => {
                 </section>
                 <section className='flex flex-col mb-20  flex-wrap justify-between p-2'>
                     <div className='min-w-[601px] flex-row flex-1 h-full p-2'>
-                        <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
+                        <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> Games</p>
                         <div className="gamesScrollHolder flex flex-col w-full flex-1  gap-6">
                             <GameModesCarousel />
                         </div>
                     </div>
                     <div className='flex w-full flex-col items-center place-self-start p-4 justify-center gap-4'>
-                        <p className="capitalize text-black dark:text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
+                        <p className="capitalize text-white font-poppins text-2xl self-start overflow-hidden"> Protected Rooms </p>
                         <div className="flex flex-wrap justify-between w-full">
                             {protectedChannels?.length === 0 ? (
                                 <div className="flex justify-center">
@@ -236,21 +226,24 @@ const HomeComponent: React.FC = () => {
                                 </div>
                             ) : (
                                 protectedChannels.map((channel, index) => (
-                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL m-1 flex flex-row items-center justify-between p-2 w-full sm:w-full md:w-[48%] xl:w-[48%]" key={index}>
+                                    <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL m-1 flex flex-row items-center justify-between p-2 w-full sm:w-full md:w-[48%] xl:w-[48%] protectedRoom" key={index}>
                                         <div className="infos flex flex-row items-center space-x-4">
                                             <div className="pic w-12 h-12 rounded-2xl">
                                                 <img src={baseAPIUrl + channel.picture} className=' bg-contain h-full bg-no-repeat bg-center' alt="Profile" />
                                             </div>
                                             <div className="description">
                                                 <div className="text-white font-bold">{channel.name}</div>
-                                                <span className='text-gray-500'>{channel.type}</span>
                                             </div>
                                         </div>
                                         <div className="action cursor-pointer" onClick={() => {
-                                            setOpenModal(!openModal);
-                                            setChannel(channel);
-                                        }}>
-                                        <img src={play} alt="Play" />
+                                                setOpenModal(!openModal);
+                                                setChannel(channel);
+                                            }}>
+                                            <div className="enter rounded-full bg-main-light-EGGSHELL p-2 m-auto">
+                                                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M5 15.0002L5 10.5502C5 5.02523 8.9125 2.76274 13.7 5.52524L17.5625 7.75024L21.425 9.97524C26.2125 12.7377 26.2125 17.2627 21.425 20.0252L17.5625 22.2502L13.7 24.4752C8.9125 27.2377 5 24.9752 5 19.4502L5 15.0002Z" fill="white"/>
+                                                </svg>
+                                            </div>
                                         </div>
                                     </div>
                                 ))

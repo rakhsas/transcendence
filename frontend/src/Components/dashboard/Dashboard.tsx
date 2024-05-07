@@ -171,7 +171,7 @@ function DashboardComponent() {
 	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (
 		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream, userList]}>
-			<div className="flex dark:bg-main-dark-SPRUCE bg-main-light-WHITEBLUE h-lvh relative">
+			<div className="flex dark:bg-main-dark-SPRUCE h-lvh relative dashboard">
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">
 					<NavbarComponent />

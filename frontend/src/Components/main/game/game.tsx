@@ -4,8 +4,8 @@ import "owl.carousel/dist/assets/owl.theme.default.css";
 import playFill from './../../../assets/img/Play-Fill.svg'
 import './game.css';
 import { useNavigate } from 'react-router-dom';
-import AI from './../../../assets/image32.jpeg'
-import MultiPlayer from './../../../assets/image31.jpeg'
+import AI from './../../../assets/rooms/ai.game.jpg'
+import MultiPlayer from './../../../assets/rooms/realTime.game.jpg'
 interface CarouselItemProps {
     image: string;
     heading: string;
@@ -23,8 +23,19 @@ const CarouselItem: React.FC<CarouselItemProps> = ({ image, heading, link, backg
                     <div className="play rounded-full w-8 h-8 bg-main-light-FERN" onClick={() => navigate(link)}>
                         <img src={image} alt="Play" />
                     </div>
-                    <div className="heading m-auto flex-col space-y-4 overflow-y-hidden">
-                        <span className='font-poppins text-white font-bold text-4xl overflow-y-hidden'>{ heading }</span>
+                    <div className="heading flex-col space-y-4 overflow-y-hidden">
+                        <span className='font-poppins text-white font-bold text-xl overflow-y-hidden'>{ heading }</span>
+                        <div className="description">
+                            <p className="font-poppins text-xs overflow-hidden">
+                                Jump into the action instantly!
+                            </p>
+                            <p className="font-poppins text-xs overflow-hidden">
+                                Get matched with another player in real-time.
+                            </p>
+                            <p className="font-poppins text-xs overflow-hidden">
+                                Just join the queue and we'll find your perfect opponent.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

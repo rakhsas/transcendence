@@ -24,6 +24,7 @@ export default {
             FERN: '#3DBDA7',
             EGGSHELL: '#00453F',
             PUMPKIN: '#E86931',
+            PRIMARY09: '#067D71'
           }
         },
         GREEN: '#BFFF3C',

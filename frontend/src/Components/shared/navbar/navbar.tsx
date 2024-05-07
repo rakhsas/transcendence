@@ -19,8 +19,8 @@ const colorSettings: CustomFlowbiteTheme['textInput'] = {
         base: "relative w-full rounded-full",
         input: {
             colors: {
-                primary: 'bg-main-500 text-white border-neutral-500 dark: bg-main-light-EGGSHELL #bg-main-light-FERN focus:border-none focus:ring-0 dark:border-none dark: placeholder-gray-400',
-                gray: "text-black focus:border-none focus:ring-0 dark:border-none placeholder-gray-400 dark:bg-neutral-700 bg-neutral-300 border-gray-300 dark:text-white",
+                primary: 'bg-main-500 text-white border-0 dark: bg-main-light-EGGSHELL #bg-main-light-FERN focus:border-none focus:ring-0 dark:border-none dark: placeholder-gray-400',
+                // gray: "text-black focus:border-none focus:ring-0 dark:border-none placeholder-gray-400 dark:bg-neutral-700 bg-neutral-300 border-gray-300 dark:text-white",
             },
         }
     }
@@ -421,7 +421,7 @@ function NavbarComponent(): JSX.Element {
     return (
         <div className="p-4 flex flex-col sm:flex-row items-center sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
-                <span className="dark:text-white text-black text-xl font-bold subpixel-antialiased font-poppins">{greeting}<span className=" dark:text-main-light-FERN text-main-light-EGGSHELL uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
+                <span className="text-white text-xl font-bold subpixel-antialiased font-poppins">{greeting}<span className="text-main-light-FERN uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
             </div>
             <div className="max-w-md  flex flex-row-reverse gap-3 sm:flex-row px-3 ">
                 <div className="relative h-10 flex items-center  ">
