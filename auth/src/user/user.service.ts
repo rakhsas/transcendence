@@ -1,7 +1,7 @@
 import { Not, Repository } from "typeorm";
 import { Injectable } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
-import { map } from 'rxjs';
+import { map, startWith } from 'rxjs';
 import { AxiosResponse } from 'axios';
 import { User } from "./entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -194,6 +194,12 @@ export class UserService {
 		})
 		return await this.viewUser(userId);
 	}
+	async updatePicture(userId: string, picPath: string) : Promise<User>{
+		await this.userRepository.update(userId, {
+			picture: picPath
+		})
+		return await this.viewUser(userId);
+	}
 
 
 	async update2FAState(userId: string, status: boolean) {
@@ -204,5 +210,13 @@ export class UserService {
 		user.isTwoFactorAuthenticationEnabled = status;
 		console.log("user: ", user);
 		return await this.userRepository.save(user);
+	}
+
+	async searchUser(hint: string): Promise<User[]> {
+		return await this.userRepository.createQueryBuilder('user')
+			.where('LOWER(user.username) LIKE LOWER(:username)', { username: `${hint.toLowerCase()}%` })
+			.orWhere('LOWER(user.firstName) LIKE LOWER(:firstName)', { firstName: `${hint.toLowerCase()}%` })
+			.orWhere('LOWER(user.lastName) LIKE LOWER(:lastName)', { lastName: `${hint.toLowerCase()}%` })
+			.getMany();
 	}
 }

@@ -8,9 +8,10 @@ import User from "../../../model/user.model";
 import { notificationInterface } from './../../../utils/types'
 import { NotificationService } from "../../../services/notification.service";
 import { useNavigate } from "react-router-dom";
+import UserService from "../../../services/user.service";
 
 const SearchIcon = () => (
-    <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-black dark:stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+    <svg fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6 stroke-white"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 );
 
 const colorSettings: CustomFlowbiteTheme['textInput'] = {
@@ -18,7 +19,7 @@ const colorSettings: CustomFlowbiteTheme['textInput'] = {
         base: "relative w-full rounded-full",
         input: {
             colors: {
-                primary: 'bg-neutral-500 text-white border-neutral-500',
+                primary: 'bg-main-500 text-white border-neutral-500 dark: bg-main-light-EGGSHELL #bg-main-light-FERN focus:border-none focus:ring-0 dark:border-none dark: placeholder-gray-400',
                 gray: "text-black focus:border-none focus:ring-0 dark:border-none placeholder-gray-400 dark:bg-neutral-700 bg-neutral-300 border-gray-300 dark:text-white",
             },
         }
@@ -75,6 +76,7 @@ function NavbarComponent(): JSX.Element {
     const [notifications, setNotifications] = useState<notificationInterface[]>([]);
     const [greeting, setGreeting] = useState<string>('');
     const navigate = useNavigate();
+    const userService = new UserService();
     useEffect(() => {
         const updateGreeting = () => {
             const now = new Date();
@@ -103,7 +105,7 @@ function NavbarComponent(): JSX.Element {
     if (!userData)
         return <LoadingComponent />
     useEffect(() => {
-        setUsers(userData[3]);
+        // setUsers(userData[3]);
         //console.log('Users', userData[3]);
         setNotifications(userData[6]);
     }, []);
@@ -120,6 +122,13 @@ function NavbarComponent(): JSX.Element {
             setFilteredUsers([]);
             return;
         }
+        const fetchUsers = async () => {
+            const users = userService.searchUsers(searchInput);
+            users.then((data) => {
+                setUsers(data);
+            })
+        }
+        fetchUsers();
         const filtered = users.filter(user => {
             const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
             return fullName.includes(searchInput.toLowerCase()) || user.username.toLowerCase().includes(searchInput.toLowerCase());
@@ -412,21 +421,24 @@ function NavbarComponent(): JSX.Element {
     return (
         <div className="p-4 flex flex-col sm:flex-row items-center sm:justify-between" id="nav">
             <div className="heading mb-2 sm:mb-0">
-                <span className="text-[#585a6b] text-xl font-bold subpixel-antialiased font-poppins">{greeting}<span className="dark:text-white text-black uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
+                <span className="dark:text-white text-black text-xl font-bold subpixel-antialiased font-poppins">{greeting}<span className=" dark:text-main-light-FERN text-main-light-EGGSHELL uppercase font-poppins"> {userData[0] ? userData[0].username : 'User'}</span></span>
             </div>
             <div className="max-w-md  flex flex-row-reverse gap-3 sm:flex-row px-3 ">
-                <div className="relative h-10 flex items-center ">
-                    <div className="svg" onClick={() =>  {setNotifIsOpen(!isNotifOpen); updateNotif()}}>
-                        <svg  className="w-5 h-5 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
+                <div className="relative h-10 flex items-center  ">
+                    <div className="svg dark: bg-main-light-EGGSHELL #bg-main-light-FERN rounded-full p-2" onClick={() =>  {setNotifIsOpen(!isNotifOpen); updateNotif()}}>
+                        {/* <svg  className="w-6 h-6 fill-black dark:fill-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 14 20">
                             <path d="M12.133 10.632v-1.8A5.406 5.406 0 0 0 7.979 3.57.946.946 0 0 0 8 3.464V1.1a1 1 0 0 0-2 0v2.364a.946.946 0 0 0 .021.106 5.406 5.406 0 0 0-4.154 5.262v1.8C1.867 13.018 0 13.614 0 14.807 0 15.4 0 16 .538 16h12.924C14 16 14 15.4 14 14.807c0-1.193-1.867-1.789-1.867-4.175ZM3.823 17a3.453 3.453 0 0 0 6.354 0H3.823Z" />
+                        </svg> */}
+                        <svg className="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z"/>
                         </svg>
                         {notificationCount ? <div className="absolute block w-3 h-3 bg-red-500 border-2 border-white rounded-full top-1 start-2.5 dark:border-gray-900" /> : ''}
                     </div>
-                    <div id="dropdownNotification" className={`fixed z-50 -right-0 top-14 mt-2 w-full max-w-md bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-800 dark:divide-gray-700 ${isNotifOpen ? 'block' : 'hidden'}`} aria-labelledby="dropdownNotificationButton">
-                        <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-gray-50 dark:bg-gray-800 dark:text-white">
+                    <div id="dropdownNotification" className={`fixed z-50 -right-0 top-14 mt-2 w-full max-w-md bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-zinc-800 dark:divide-gray-700 ${isNotifOpen ? 'block' : 'hidden'}`} aria-labelledby="dropdownNotificationButton">
+                        <div className="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-gray-50 dark:bg-zinc-800 dark:text-white">
                             Notifications
                         </div>
-                        <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                        <div className="divide-y divide-gray-100 dark:divide-gray-400">
                         {
                                 notifications && notifications.length > 0
                                     ?
@@ -818,16 +830,16 @@ function NavbarComponent(): JSX.Element {
                         </div>
                     </div>
                 </div>
-                <div className="mode p-1 mt-[1px] mr-1 cursor-pointer" onClick={() => { setTheme(colorTheme); }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 4000 4000" style={{ display: colorTheme === "dark" ? 'block' : "none" }}>
-                        <path d="M2000 1320A680 680 0 102000 2680 680 680 0 102000 1320zM2000 1047.95c-75.105 0-136-60.895-136-136V776c0-75.105 60.895-136 136-136s136 60.895 136 136v135.95C2136 987.056 2075.105 1047.95 2000 1047.95zM2769.383 1366.634c-34.797 0-69.594-13.265-96.156-39.811-53.125-53.092-53.125-139.204-.066-192.329l96.09-96.14c53.125-53.125 139.254-53.142 192.379-.05s53.125 139.204.066 192.329l-96.09 96.14C2839.043 1353.353 2804.18 1366.634 2769.383 1366.634zM3224 2136h-135.934c-75.105 0-136-60.895-136-136s60.895-136 136-136H3224c75.105 0 136 60.895 136 136S3299.105 2136 3224 2136zM2865.473 3001.506c-34.797 0-69.66-13.281-96.223-39.86l-96.09-96.14c-53.059-53.125-53.059-139.237.066-192.329s139.254-53.108 192.379.05l96.09 96.14c53.059 53.125 53.059 139.237-.066 192.329C2935.066 2988.241 2900.27 3001.506 2865.473 3001.506zM2000 3360c-75.105 0-136-60.895-136-136v-135.95c0-75.105 60.895-136 136-136s136 60.895 136 136V3224C2136 3299.105 2075.105 3360 2000 3360zM1134.527 3001.506c-34.797 0-69.594-13.265-96.156-39.811-53.125-53.092-53.125-139.204-.066-192.329l96.09-96.14c53.125-53.158 139.254-53.142 192.379-.05s53.125 139.204.066 192.329l-96.09 96.14C1204.188 2988.208 1169.324 3001.506 1134.527 3001.506zM911.934 2136H776c-75.105 0-136-60.895-136-136s60.895-136 136-136h135.934c75.105 0 136 60.895 136 136S987.039 2136 911.934 2136zM1230.617 1366.634c-34.797 0-69.66-13.281-96.223-39.86l-96.09-96.14c-53.059-53.125-53.059-139.237.066-192.329s139.254-53.108 192.379.05l96.09 96.14c53.059 53.125 53.059 139.237-.066 192.329C1300.211 1353.369 1265.414 1366.634 1230.617 1366.634z"></path>
+                <div className="mode mt-[1px] mr-1 cursor-pointer dark: bg-main-light-EGGSHELL #bg-main-light-FERN rounded-full p-1" onClick={() => { setTheme(colorTheme); }}>
+                    <svg  xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 4000 4000" style={{ display: colorTheme === "dark" ? 'block' : "none" }}>
+                        <path fill="white" d="M2000 1320A680 680 0 102000 2680 680 680 0 102000 1320zM2000 1047.95c-75.105 0-136-60.895-136-136V776c0-75.105 60.895-136 136-136s136 60.895 136 136v135.95C2136 987.056 2075.105 1047.95 2000 1047.95zM2769.383 1366.634c-34.797 0-69.594-13.265-96.156-39.811-53.125-53.092-53.125-139.204-.066-192.329l96.09-96.14c53.125-53.125 139.254-53.142 192.379-.05s53.125 139.204.066 192.329l-96.09 96.14C2839.043 1353.353 2804.18 1366.634 2769.383 1366.634zM3224 2136h-135.934c-75.105 0-136-60.895-136-136s60.895-136 136-136H3224c75.105 0 136 60.895 136 136S3299.105 2136 3224 2136zM2865.473 3001.506c-34.797 0-69.66-13.281-96.223-39.86l-96.09-96.14c-53.059-53.125-53.059-139.237.066-192.329s139.254-53.108 192.379.05l96.09 96.14c53.059 53.125 53.059 139.237-.066 192.329C2935.066 2988.241 2900.27 3001.506 2865.473 3001.506zM2000 3360c-75.105 0-136-60.895-136-136v-135.95c0-75.105 60.895-136 136-136s136 60.895 136 136V3224C2136 3299.105 2075.105 3360 2000 3360zM1134.527 3001.506c-34.797 0-69.594-13.265-96.156-39.811-53.125-53.092-53.125-139.204-.066-192.329l96.09-96.14c53.125-53.158 139.254-53.142 192.379-.05s53.125 139.204.066 192.329l-96.09 96.14C1204.188 2988.208 1169.324 3001.506 1134.527 3001.506zM911.934 2136H776c-75.105 0-136-60.895-136-136s60.895-136 136-136h135.934c75.105 0 136 60.895 136 136S987.039 2136 911.934 2136zM1230.617 1366.634c-34.797 0-69.66-13.281-96.223-39.86l-96.09-96.14c-53.059-53.125-53.059-139.237.066-192.329s139.254-53.108 192.379.05l96.09 96.14c53.059 53.125 53.059 139.237-.066 192.329C1300.211 1353.369 1265.414 1366.634 1230.617 1366.634z"></path>
                     </svg>
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 64 64" style={{ display: colorTheme === "dark" ? 'none' : "block" }}>
-                        <path className="fill-none dark:fill-white" d="M55.68,36.83c0.32,0.45,0.41,1.02,0.22,1.57C52.59,47.73,43.72,54,33.83,54c-12.9,0-23.4-10.5-23.4-23.41	c0-11.02,7.83-20.65,18.61-22.9c0.12-0.03,0.24-0.04,0.36-0.04c0.65,0,1.23,0.37,1.53,0.96c0.3,0.61,0.24,1.33-0.19,1.89	C28.25,13.62,27,17,27,23c0.44,5.97,3.66,11.21,9,14c2.42,1.23,5.62,1.82,8.38,1.82c3.14,0,6.24-0.86,8.96-2.48	c0.27-0.17,0.58-0.25,0.9-0.25C54.81,36.09,55.35,36.36,55.68,36.83z M33.83,50.68c7.04,0,13.51-3.7,17.13-9.61	c-2.11,0.71-4.31,1.07-6.58,1.07c-11.45,0-20.77-9.32-20.77-20.77c0-3.2,0.73-6.31,2.12-9.14c-7.17,3.17-11.98,10.38-11.98,18.36	C13.75,41.67,22.76,50.68,33.83,50.68z"></path>
+                        <path fill="white" d="M55.68,36.83c0.32,0.45,0.41,1.02,0.22,1.57C52.59,47.73,43.72,54,33.83,54c-12.9,0-23.4-10.5-23.4-23.41	c0-11.02,7.83-20.65,18.61-22.9c0.12-0.03,0.24-0.04,0.36-0.04c0.65,0,1.23,0.37,1.53,0.96c0.3,0.61,0.24,1.33-0.19,1.89	C28.25,13.62,27,17,27,23c0.44,5.97,3.66,11.21,9,14c2.42,1.23,5.62,1.82,8.38,1.82c3.14,0,6.24-0.86,8.96-2.48	c0.27-0.17,0.58-0.25,0.9-0.25C54.81,36.09,55.35,36.36,55.68,36.83z M33.83,50.68c7.04,0,13.51-3.7,17.13-9.61	c-2.11,0.71-4.31,1.07-6.58,1.07c-11.45,0-20.77-9.32-20.77-20.77c0-3.2,0.73-6.31,2.12-9.14c-7.17,3.17-11.98,10.38-11.98,18.36	C13.75,41.67,22.76,50.68,33.83,50.68z"></path>
                     </svg>
                 </div>
                 <div className="group" onClick={() => { toogleSearchDropDown() }}>
-                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="gray" type="text" placeholder="Search" className="w-full sm:w-auto" value={searchInput} onChange={(e) => {e.preventDefault(); setSearchInput(e.target.value)}} />
+                    <TextInput theme={colorSettings} rightIcon={SearchIcon} color="primary" type="text" placeholder="Search" className="w-full sm:w-auto" value={searchInput} onChange={(e) => {e.preventDefault(); setSearchInput(e.target.value)}} />
                     {
                         filteredUsers.length > 0 ? (
                             <div className={`absolute mt-2 z-40 rounded-md shadow-lg dark:bg-neutral-700 md:w-64 bg-neutral-300 ring-1 ring-black ring-opacity-5 p-1 ${isSearchOpen ? 'block' : 'hidden'}`}>

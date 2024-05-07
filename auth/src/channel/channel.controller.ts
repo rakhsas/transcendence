@@ -2,8 +2,9 @@ import { Controller, Get, Param, UseGuards } from "@nestjs/common";
 import { ChannelService } from './channel.service';
 import { UUID } from "crypto";
 import { UserGuard } from "src/guards/user.guard";
-import { ApiParam } from "@nestjs/swagger";
+import { ApiParam, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('channels')
 @Controller('channels')
 export class ChannelController {
 
@@ -67,4 +68,12 @@ export class ChannelController {
     async getPublicChannels(@Param('userId') userId: UUID) {
         return await this.channelService.getPublicChannelsExpectUser(userId);
     }
+
+    @Get('isMember/:userId/:channelId')
+    @ApiParam({ name: 'userId', type: 'string', format: 'uuid'})
+    @ApiParam({ name: 'channelId', type: 'number'})
+    async isMember(@Param('userId') userId: UUID, @Param('channelId') channelId: number) {
+        return await this.channelService.isUserInChannel(userId, channelId);
+    }
+
 }

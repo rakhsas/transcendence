@@ -28,6 +28,7 @@ import { BannedService } from 'src/banned/banned.service';
 import { Blocked } from 'src/user/entities/blocked.entity';
 import { BlockedService } from 'src/blocked/blocked.service';
 import { BlockedController } from 'src/blocked/blocked.controller';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { BlockedController } from 'src/blocked/blocked.controller';
     UserModule,
     NotificationModule,
     FreindsModule,
-
+    HttpModule
     // ChannelModule
   ],
   providers: [ChatService, ChatGateway, Repository, MsgController, AuthService, ChannelService, NotificationService, BannedService, FriendService, MuteService, BlockedService],

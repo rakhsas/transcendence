@@ -5,7 +5,6 @@ import LoadingComponent from "../../shared/loading/loading";
 import { TwoFaService } from "../../../services/twoFa.service";
 import { SettingService } from "../../../services/setting.service";
 import UserService from "../../../services/user.service";
-import TwoFAComponent from "../../modal/2fa.authenticate.modal";
 import TwoFAActivateComponent from "../../modal/2fa.activate.modal";
 import { Socket } from "socket.io-client";
 
@@ -25,21 +24,24 @@ function SettingFunction(): JSX.Element {
 		lastName: '',
 		email: ''
 	});
-	const settingService = new SettingService();
-	const userService = new UserService();
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const fileInput = event.target;
 		const chosenFile = fileInput.files && fileInput.files[0];
 		if (chosenFile) {
-			const reader = new FileReader();
-			reader.onload = () => {
-				const imgElement = document.querySelector("#list") as HTMLImageElement;
-				changePicture(chosenFile);
-				if (imgElement) {
-					imgElement.src = reader.result as string;
-				}
-			};
-			reader.readAsDataURL(chosenFile);
+			const fileName = chosenFile.name.toLowerCase();
+			if (fileName.endsWith('.jpg')) {
+				const reader = new FileReader();
+				reader.onload = () => {
+					const imgElement = document.querySelector("#list") as HTMLImageElement;
+					changePicture(chosenFile);
+					if (imgElement) {
+						imgElement.src = reader.result as string;
+					}
+				};
+				reader.readAsDataURL(chosenFile);
+			} else {
+				alert('Please select a valid file format (JPG)');
+			}
 		}
 	};
 	const enable2FA = async () => {
@@ -50,8 +52,12 @@ function SettingFunction(): JSX.Element {
 		setIsChecked(false);
 	}
 	const changePicture = async (file: File) => {
-		const result = await userService.updateUserPicture(userData[0].id, file);
-		userData[0].picture = result.picture;
+		socketChat?.emit('changePicture', {
+			userId: userData[0].id,
+			picture: file
+		});
+		// const result = await userService.updateUserPicture(userData[0].id, file);
+		// userData[0].picture = result.picture;
 	}
 	useEffect(() => {
 		if (!userData) return;
@@ -142,7 +148,7 @@ function SettingFunction(): JSX.Element {
 						<svg className="hoverIcon__2025e" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="white" d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"></path></svg>
 					</label>
 				</div>
-				<input type="file" id="file" accept="image/jpeg, image/jpg" onChange={handleFileChange}  />
+				<input type="file" id="file" accept=".jpg" onChange={handleFileChange}  />
 				<div className="flex flex-col justify-center items-center gap-6 py-2">
 					<li className="list-none">
 						<div className={`flex p-2 rounded border-green-600 py-2.5 ${ischecked ? 'bg-gradient-to-r from-green-500 via-green-400 to-green-600 border ' : 'bg-red-500'}`}>

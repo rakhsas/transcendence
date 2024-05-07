@@ -14,6 +14,8 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.7",
     "@mui/material": "^5.15.7",
+    "@splinetool/react-spline": "^2.2.6",
+    "@splinetool/runtime": "^1.2.6",
     "chart.js": "^4.4.1",
     "flowbite-react": "^0.7.2",
     "js-cookie": "^3.0.5",

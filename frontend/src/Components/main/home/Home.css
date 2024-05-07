@@ -72,3 +72,20 @@
         justify-content: center !important;
     }
 }
+
+.avatar-rotate {
+    rotate: 57deg;
+    filter: drop-shadow(0px 4.66824px 4.66824px rgba(0, 0, 0, 0.25));
+    transform: matrix(0.87, -0.5, 0.87, 0.5, 0, 0);
+}
+
+.fgg {
+    /* background: linear-gradient(107.11deg, #7BE8D5 3.95%, #00544C 59.04%, #92FFFD 85.27%); */
+    /* transform: matrix(0.87, -0.5, 0.87, 0.5, 0, 0); */
+    background-image: url('./../../../assets/image30.jpeg');
+    /* object-fit: cover; */
+}
+.test {
+    transform: matrix(0.87, -0.5, 0.87, 0.5, 0, 0);
+    filter: drop-shadow(0px 2.33412px 25.6753px rgba(46, 188, 164, 0.73));
+}

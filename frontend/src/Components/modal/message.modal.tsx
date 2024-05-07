@@ -34,13 +34,10 @@ const MessageModal: React.FC<MessageProps> = ({ senderId,recieverName, recieverI
         <Modal show={isOpen} size="md" onClose={() => setNewMessageOpen(false)} popup>
             <Modal.Header  theme={customTheme.modal?.header}> Send Message </Modal.Header>
             <Modal.Body className="overflow-hidden bg-neutral-100 dark:bg-main-dark-SPRUCE">
-            {/* <div className="w-full mt-4 h-32">
-                <TextInput placeholder="Type your message here" onChange={(e) => setMessage(e.target.value)} />
-            </div>
-            <div className="flex justify-center gap-4">
-        </div> */}
-                <div className="flex flex-col h-auto w-full p-4 items-center space-y-4">
-                    <TextInput  className="w-full" theme={customTheme.textInput} color="primary" placeholder="Type your message here" onChange={(e) => setMessage(e.target.value)} />
+                <div className="flex flex-col p-4 items-center space-y-4">
+                    <div className="input">
+                        <TextInput  className="w-full" theme={customTheme.textInput} color="primary" placeholder="Type your message here" onChange={(e) => setMessage(e.target.value)} />
+                    </div>
                     <Button color="success" onClick={() => sendMessage()}>
                         Send
                     </Button>

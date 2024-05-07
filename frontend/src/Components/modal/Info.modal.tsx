@@ -49,9 +49,9 @@ const header: FlowbiteModalHeaderTheme = {
                 <Modal.Body className="bg-zinc-900 p-4">
                     <div className="h-auto">
                         <FloatingLabel variant="outlined" onChange={(e) => setUsername(e.target.value)} label="username"/>
-                        {usernameExist && <div className="text-red-500 text-sm mt-1"> Username already exist. </div>}
-                        <div className="text-white bg-main-light-FERN hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onClick={UpdateUserName}>
-                            Green
+                        {usernameExist && <div className="text-red-500 text-sm mt-1 font-poppins"> Username already exist. </div>}
+                        <div className="text-white bg-main-light-FERN hover:bg-green-800 font-poppins focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onClick={UpdateUserName}>
+                            change username
                         </div>
                     </div>
                 </Modal.Body>

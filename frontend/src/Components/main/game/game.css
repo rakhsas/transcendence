@@ -13,7 +13,7 @@
 .owl-item {
     filter: blur(calc(10px / 5));
 }
-/* width: fit-content !important; */
+
 
 .center :hover {
     transition: 0.7s;
@@ -37,7 +37,6 @@
     transform: rotate(-6deg);
     /* background: radial-gradient(circle, rgba(34,193,195,0.237114914325105) %, theme('colors.zinc.900') 50%); */
     /* rgba(34,193,195,0.237114914325105) */
-    background: theme('colors.zinc.900');
 }
  /* .owl-carousel .owl-stage-outer .owl-stage .active .container-analytics {
     background-color: black;

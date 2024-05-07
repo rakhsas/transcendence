@@ -10,11 +10,15 @@ import { NotificationService } from 'src/notification/notification.service';
 import { NotificationType } from 'src/user/entities/notification.entity';
 import { FriendService } from 'src/friends/friends.service';
 import { MuteService } from 'src/mute/mute.service';
+import * as https from 'https';
+import axios from 'axios';
 @WebSocketGateway({ cors: true, path: '/chat', methods: ['GET', 'POST'] })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
 	usersArray = [];
 	peerConnections: { [userId: string]: RTCPeerConnection } = {};
+	BASEAPIURL = process.env.HOST;
+    UPLOAD_API_URL = process.env.HOST + 'upload';
 
 	private connectedUsers: Map<string, Socket> = new Map();
 	constructor(
@@ -24,7 +28,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly userService: UserService,
 		private readonly notificationService: NotificationService,
 		private readonly friendService: FriendService,
-		private readonly mutedService: MuteService
+		private readonly mutedService: MuteService,
 	) { }
 
 	handleConnection(client: Socket) {
@@ -162,7 +166,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
-
+	@SubscribeMessage('changePicture')
+	async handleChangePicture(client: Socket, payload: any): Promise<void> {
+		const mimeType = `image/jpg`;
+		const file = new File([payload.picture], `picture.jpg`, { type: mimeType });
+		const url = await this.uploadFile(file);
+		const user = await this.userService.updatePicture(payload.userId, url);
+		client.emit('userUpdated', user);
+	}
 
 	@SubscribeMessage('createChannel')
 	async handleCreateChannel(socket: Socket, payload: any): Promise<void> {
@@ -186,9 +197,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleAcceptJoinChannel(client: Socket, payload: any): Promise<void> {
 		//console.log('acceptJoinChannel: ', payload)
 		const channel = await this.chatService.getChannel(payload.id);
-		//console.log("channel: ", channel)
+		const isJoined = await this.channelService.isUserInChannel(payload.__owner__, payload.id, );
+		if (isJoined)
+			return;
 		if (channel.password !== null && channel.password !== "") {
-			//console.log(channel.password, payload.password)
 			if ("password" in payload && channel.password === payload.password) {
 				client.join(payload.id);
 				await this.chatService.addNewMemberToChannel(payload, "");
@@ -197,7 +209,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				client.emit("channelPasswordInvalid", "Cannot join the room (incorrect password)");
 				return;
 			}
-		} else 
+		} else
 		{
 			client.join(payload.channelId);
 			await this.chatService.addNewMemberToChannel(payload, "");
@@ -213,6 +225,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 		this.connectedUsers.get(payload.issuer?.username)?.emit('channelJoined', members);
 		this.connectedUsers.get(payload.__owner__?.username)?.emit('channelJoined', members);
+		this.connectedUsers.get(payload?.userName)?.emit('channelJoined', members);
 		if (channel.type === 'protected') {
 			const ProtectedChannelsMembers = await this.channelService.getProtectedChannelsExpectUser(payload.__owner__);
 			client.emit('protectedChannels', ProtectedChannelsMembers);
@@ -580,4 +593,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		return payload.id
 	}
+
+	async uploadFile(file: File) {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const response = await axios.post(this.UPLOAD_API_URL, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                httpsAgent: new https.Agent({ rejectUnauthorized: false })
+            });
+			// console.log('response: ', response)
+            return response.data.url;
+        } catch (error) {
+            console.error('Error uploading file:', error);
+        }
+    };
 }

@@ -3,3 +3,11 @@
     background-image: linear-gradient(to bottom, #5C93A7, #E15253);
     border-color: transparent;
 }
+.light .example {
+    background-image: linear-gradient(to bottom right, #00453F, #3DBDA7);
+}
+
+.logo {
+    width: 70px !important;
+    rotate: 60deg;
+}

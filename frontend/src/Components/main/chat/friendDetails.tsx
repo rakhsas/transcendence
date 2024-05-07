@@ -98,52 +98,6 @@ function DetailsArea({
                                     ></div>
                                 </div>
                             </div>
-                            {/* <div className="theme change flex p-2 flex-row border-b-2 justify-center">
-                            Theme
-                            <div className="colors">
-                                <Select id="countries" required>
-                                    <option>United States</option>
-                                    <option>Canada</option>
-                                    <option>Morocco</option>
-                                    <option>Germany</option>
-                                </Select>
-                            </div>
-                        </div> */}
-                        </div>
-                        <div className="detail-photos">
-                            <div className="detail-photo-title">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    className="feather feather-image"
-                                >
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                    <path d="M21 15l-5-5L5 21" />
-                                </svg>
-                                Shared photos
-                            </div>
-                            <div className="detail-photo-grid">
-                                {/* {
-                                    //console.log("messagedetails: ", message),
-                                    MESSAGES[selectedMessageIndex].map((message, index) => (
-                                        (message.img! && message.img != "") ?
-                                            <div key={index} className="detail-photo"
-                                                onClick={() => onOpenModal(message.img)}
-                                            >
-                                                <img src={message.img} alt="" />
-                                            </div>
-                                            : null
-                                    ))
-                                } */}
-                                {isModalOpen && <ModalComponent picPath={modalPicPath} status={isModalOpen} onClose={onCloseModal} />}
-                            </div>
-                            {/* <div className="view-more">View More</div> */}
                         </div>
                     </div>
                     // <div id="options" className="options">

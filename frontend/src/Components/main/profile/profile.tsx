@@ -16,6 +16,7 @@ import { GameService } from '../../../services/game.service';
 import { Socket } from 'socket.io-client';
 import MessageService from '../../../services/message.service';
 import MessageModal from '../../modal/message.modal';
+import UserService from '../../../services/user.service';
 
 
 const levels = [
@@ -113,6 +114,7 @@ const FunctionProfileForm: React.FC = () => {
 		},
 	];
 	const gameService = new GameService();
+	const userService = new UserService();
 	useEffect(() => {
 		if (!userData) {
 			return;
@@ -128,10 +130,11 @@ const FunctionProfileForm: React.FC = () => {
 			setUser(userData[0]);
 			return;
 		}
-		const requestedUser = users?.find((u) => u.id === userId) || userData[0];
-		const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
-		setUser({ ...requestedUser, isFriend });
 		const fetchScores = async () => {
+			// const requestedUser = users?.find((u) => u.id === userId) || userData[0];
+			const requestedUser = await userService.getUser(userId? userId : userData[0].id);
+			const isFriend = friends?.some((friend) => friend.id === requestedUser.id);
+			setUser({ ...requestedUser, isFriend });
 			const result = await gameService.GetScoreMatches(requestedUser.id);
 			setScore(result);
 			const totalGames = await gameService.getTotalMatches(requestedUser.id);
@@ -182,7 +185,7 @@ const FunctionProfileForm: React.FC = () => {
 				<div className="w-full md:w-[85%] h-1/2 p-4 flex flex-col justify-center items-center dark:bg-zinc-900  bg-main-light-WHITE border-gray-200 rounded-3xl shadow overflow-hidden">
 					<div className="flex flex-col p-2 items-center w-full">
 						<div className="flex justify-center items-center p-1 w-full">
-							<div className={`relative border-2 rounded-full `} style={{
+							<div className={`relative border-4 rounded-full `} style={{
 								borderColor: user?.coalitionColor,
 							}}>
 								<img alt={user?.username} src={BASE_API_URL + user?.picture } className="w-24 h-24 object-cover" />

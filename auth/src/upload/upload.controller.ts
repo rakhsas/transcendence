@@ -6,10 +6,10 @@ import { Response } from "express";
 const storage = diskStorage({
     destination: './uploads',
     filename: (req, file, cb) => {
-      const name = file.originalname.split('.')[0];
-      const extension = extname(file.originalname);
-      const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
-      cb(null, `${name}-${randomName}${extension}`);
+        const name = file.originalname.split('.')[0];
+        const extension = extname(file.originalname);
+        const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
+        cb(null, `${name}-${randomName}${extension}`);
     },
   });
 @Controller('upload')
@@ -22,6 +22,7 @@ export class UploadController {
     @Post()
     @UseInterceptors(FileInterceptor('file', {storage}))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
+        console.log(file)
         if (file) {
             return { url: `upload/${file.filename}` };
         } else {

@@ -66,40 +66,24 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
         });
         setLstGroupMessages(updatedChannels);
     }
-	// const chooseFile = (event: any) => {
-	// 	const input = document.createElement('input');
-	// 	input.type = 'file';
-	// 	input.accept = 'image/*';
-	// 	input.addEventListener('change', handleChange); // Add event listener
-	// 	input.click();
-	// 	const fileInput = event.target;
-	// 	const chosenFile = fileInput.files && fileInput.files[0];
-	// 	if (chosenFile) {
-	// 		const reader = new FileReader();
-	// 		reader.onload = () => {
-	// 			const imgElement = document.querySelector("#list") as HTMLImageElement;
-	// 			setImagePath(chosenFile);
-	// 			if (imgElement) {
-	// 				imgElement.src = reader.result as string;
-	// 			}
-	// 		};
-	// 		reader.readAsDataURL(chosenFile);
-	// 	}
-	// };
 	const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const fileInput = event.target;
 		const chosenFile = fileInput.files && fileInput.files[0];
 		if (chosenFile) {
-			const reader = new FileReader();
-			reader.onload = () => {
-				const imgElement = document.querySelector("#channelPicture") as any;
-				console.log(imgElement)
-				setImagePath(chosenFile);
-				if (imgElement) {
-					imgElement.src = reader.result as string;
-				}
-			};
-			reader.readAsDataURL(chosenFile);
+			const fileName = chosenFile.name.toLowerCase();
+			if (fileName.endsWith('.jpg')) {
+				const reader = new FileReader();
+				reader.onload = () => {
+					const imgElement = document.querySelector("#channelPicture") as HTMLImageElement;
+					setImagePath(chosenFile);
+					if (imgElement) {
+						imgElement.src = reader.result as string;
+					}
+				};
+				reader.readAsDataURL(chosenFile);
+			} else {
+				alert('Please select a valid file format (JPG)');
+			}
 		}
 	};
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
@@ -110,7 +94,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 					<div className="flex flex-col items-start w-full lg:w-80 gap-1 relative">
 						{latestMessages.length == 0 ?
 							(
-								<div className="flex items-center font-poppins justify-center h-64 w-64 text-red-900">
+								<div className="flex items-center font-poppins justify-center h-64 w-64 text-red-600">
 									You have no messages
 								</div>
 							) : (
@@ -194,7 +178,13 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 					)}
 				</Tabs.Item>
 			</Tabs>
-			<button className="add bottom-6" onClick={() => { setIsOpen(!isOpen) }}></button>
+			<button className="add bottom-6 flex justify-center items-center" onClick={() => { setIsOpen(!isOpen) }}>
+				<svg width="29" height="29" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<circle cx="14.5" cy="14.5" r="10.875" stroke="white" strokeWidth="1.5"/>
+					<path d="M14.5 18.125L14.5 10.875" stroke="white" strokeWidth="1.5" strokeLinecap="square"/>
+					<path d="M18.125 14.5L10.875 14.5" stroke="white" strokeWidth="1.5" strokeLinecap="square"/>
+				</svg>
+			</button>
 			{isOpen ? <Modal show={isOpen} onClose={() => {setIsOpen(false)}} className="bg-zinc-900">
 				<Modal.Header theme={customTheme.modal?.header} className="text-center dark:bg-main-light-EGGSHELL bg-main-light-FERN text-white">Channel Details</Modal.Header>
 				<Modal.Body className="bg-white dark:bg-zinc-800">
@@ -209,7 +199,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 									<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture bg-zinc-800 dark:bg-stone-800 rounded-full m-2">
 										<svg className="hoverIcon__2025e" aria-hidden="true" role="img" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="white" d="m13.96 5.46 4.58 4.58a1 1 0 0 0 1.42 0l1.38-1.38a2 2 0 0 0 0-2.82l-3.18-3.18a2 2 0 0 0-2.82 0l-1.38 1.38a1 1 0 0 0 0 1.42ZM2.11 20.16l.73-4.22a3 3 0 0 1 .83-1.61l7.87-7.87a1 1 0 0 1 1.42 0l4.58 4.58a1 1 0 0 1 0 1.42l-7.87 7.87a3 3 0 0 1-1.6.83l-4.23.73a1.5 1.5 0 0 1-1.73-1.73Z"></path></svg>
 									</label>
-									<input type="file" id="file" accept="image/jpg, image/jpeg" onChange={handleFileChange} />
+									<input type="file" id="file" accept=".jpg" onChange={handleFileChange} />
 								</div>
 							</div>
 							<div className="grid grid-flow-col justify-stretch md:grid-flow-col space-x-4">

@@ -7,7 +7,7 @@ import AnalyticsComponent from './Components/main/analytics/analytics';
 import HomeComponent from './Components/main/home/Home'
 import Game from './Components/Game/Game.tsx';
 import HeadToHead from './Components/Game/headToHead.tsx';
-import chatComponent from './Components/main/chat/chat';
+import ChatComponent from './Components/main/chat/chat';
 import CallComponent from './Components/call/call';
 import ProfileComponent from './Components/main/profile/profile.tsx';
 import SettingFunction from './Components/main/settings/settings.tsx';
@@ -25,7 +25,7 @@ function App() {
         <Route path="/dashboard/*" element={<DashboardComponent />}>
           <Route index element={<HomeComponent />} />
           <Route path="analytics" element={<AnalyticsComponent />} />
-          <Route path="chat" Component={chatComponent} />
+          <Route path="chat" Component={ChatComponent} />
           <Route path="call" element={<CallComponent />} />
           <Route path="settings" element={<SettingFunction />} />
           <Route path="profile">

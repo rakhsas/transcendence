@@ -150,4 +150,14 @@ export class ChannelService {
         return channelsNotJoinedByUser;
     }
 
+    async isUserInChannel(userId: string, channelId: number): Promise<boolean> {
+        const channelUser = await this.channelUserRepository.findOne({
+            where: {
+                user: {id: userId},
+                channel: {id: channelId}
+            }
+        });
+        return !!channelUser;
+    }
+
 }

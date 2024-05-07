@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters, Put, ParseArrayPipe, HttpException, UseInterceptors, UploadedFile, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post, Patch, Param, Body, Delete, UsePipes, UseFilters, Put, ParseArrayPipe, HttpException, UseInterceptors, UploadedFile, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update.user';
@@ -66,9 +66,10 @@ export class UserController {
 	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FileInterceptor('file'))
 	async updatePicture(@Param('userId') id: string, @UploadedFile() file: Express.Multer.File) {
+		console.log('Updating picture:', file)
 		if (!file) {
 			console.log('No file uploaded!');
-			throw new BadRequestException('No file uploaded!');
+			throw new NotFoundException('No file uploaded!');
 		}
 		try {
 			const pictureUrl = await this.uploadFile(file);
@@ -124,4 +125,11 @@ export class UserController {
 		//console.log("id: ", id);
         return this.userService.update2FAState(id, true);
     }
+
+	@Get('search/:hint')
+	@UseGuards(UserGuard)
+	@ApiParam({ name: 'hint', required: true, description: 'hint' })
+	async searchUser(@Param('hint') hint: string) {
+		return await this.userService.searchUser(hint);
+	}
 }

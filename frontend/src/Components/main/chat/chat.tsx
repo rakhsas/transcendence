@@ -29,7 +29,7 @@ interface membersRole {
 	role: roomRoles
 }
 
-function chatComponent(): JSX.Element {
+function ChatComponent(): JSX.Element {
 	const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 	const [roomMessages, setRoomMessages] = useState<any>(null);
 	const [roomMembers, setRoomMembers] = useState<membersRole[]>([])
@@ -293,7 +293,7 @@ function chatComponent(): JSX.Element {
 	}
 
 	const handleSelectedColor = (color: string) => {
-		// setSelectedColor(color);
+		setSelectedColor(color);
 	}
 
 	const onOpenModal = (picPath: string) => {
@@ -587,15 +587,22 @@ function chatComponent(): JSX.Element {
 										if (!isDisabled)
 											chooseFile()
 									}} >
-										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
+										{/* <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" >
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+										</svg> */}
+										<svg width="24" height="24" className="stroke-gray-600 dark:stroke-white" strokeWidth="0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<path d="M3 13V11C3 7.22876 3 5.34315 4.17157 4.17157C5.34315 3 7.22876 3 11 3H13C16.7712 3 18.6569 3 19.8284 4.17157C21 5.34315 21 7.22876 21 11V13C21 16.7712 21 18.6569 19.8284 19.8284C18.6569 21 16.7712 21 13 21H12" className="stroke-gray-600 dark:stroke-white" strokeWidth="1.5"/>
+											<path fillRule="evenodd" clipRule="evenodd" d="M18.9997 13.5854L18.7569 13.3425L18.7422 13.3278C18.6785 13.2641 18.6249 13.2105 18.5777 13.1671C17.1476 11.8531 14.8649 12.2235 13.9237 13.9224C13.8926 13.9785 13.8587 14.0463 13.8185 14.1268L13.8185 14.1268L13.8092 14.1454L13.781 14.2016L13.7791 14.2053L13.7763 14.2021L13.7353 14.1545L8.75926 8.34907C8.39983 7.92975 7.76853 7.88119 7.34921 8.24061C6.92988 8.60003 6.88132 9.23133 7.24074 9.65066L12.2168 15.4561L12.2256 15.4664C12.2545 15.5001 12.2884 15.5397 12.3193 15.5727C13.246 16.5622 14.8679 16.3625 15.5269 15.1778C15.5489 15.1383 15.5722 15.0917 15.592 15.052L15.592 15.0519L15.598 15.0398C15.6528 14.9304 15.6656 14.9052 15.6732 14.8916C15.9869 14.3253 16.7478 14.2018 17.2245 14.6398C17.2359 14.6504 17.2561 14.6702 17.3426 14.7567L18.9441 16.3582C18.9902 15.6404 18.9983 14.7479 18.9997 13.5854Z" className="fill-gray-600 dark:fill-white" strokeWidth="0"/>
+											<circle cx="16.5" cy="7.5" r="1.5" className="fill-gray-600 dark:fill-white"/>
+											<path d="M8 16V15H9V16H8ZM3.62469 20.7809C3.19343 21.1259 2.56414 21.056 2.21913 20.6247C1.87412 20.1934 1.94404 19.5641 2.37531 19.2191L3.62469 20.7809ZM7 21V16H9V21H7ZM8 17H3V15H8V17ZM8.6247 16.7809L3.62469 20.7809L2.37531 19.2191L7.3753 15.2191L8.6247 16.7809Z" className="fill-gray-600 dark:fill-white"/>
 										</svg>
+
 									</div>
-									<div className={`realtive flex items-center justify-center h-full w-12 right-0 top-0 text-gray-400 hover:text-gray-600`} onClick={() => {
+									<div className={`realtive flex items-center justify-center h-full w-12 right-0 top-0 text-gray-600 dark:text-white hover:text-white`} onClick={() => {
 										if(!isDisabled)
 											recording ? stopRecording() : startRecording()
 									}}>
-										{<svg className={`${recording ? 'text-yellow-300' : ''}`} stroke="currentColor" fill="none" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
+										{<svg className={`${recording ? 'text-yellow-300' : ''}`} stroke="currentColor" strokeWidth="1.5" fill="none" viewBox="0 0 24 24" strokeLinecap="round" strokeLinejoin="round" height="1.3em" width="1.3em" xmlns="http://www.w3.org/2000/svg">
 											<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
 											<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
 											<line x1="12" y1="19" x2="12" y2="23"></line>
@@ -621,24 +628,14 @@ function chatComponent(): JSX.Element {
 								<div className='ml-2 '>
 									<button
 										onClick={handleTextSubmit}
-										className="flex items-center  gap-2 justify-center bg-main-light-FERN dark:bg-main-light-EGGSHELL rounded-xl text-white px-4 py-2 "
+										className="justify-center bg-main-light-FERN dark:bg-main-light-EGGSHELL rounded-full text-white p-2"
 									>
-										<span className='hidden md:inline'>Send</span>
 										<span className="overflow-hidden">
-											<svg
-												className="w-4 h-auto transform rotate-45 -mt-px"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-												xmlns="http://www.w3.org/2000/svg"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth="2"
-													d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-												></path>
+											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M7.39969 6.32015L15.8897 3.49015C19.6997 2.22015 21.7697 4.30015 20.5097 8.11015L17.6797 16.6002C15.7797 22.3102 12.6597 22.3102 10.7597 16.6002L9.91969 14.0802L7.39969 13.2402C1.68969 11.3402 1.68969 8.23015 7.39969 6.32015Z" stroke="#FBFDFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+												<path d="M10.1104 13.6501L13.6904 10.0601" stroke="#FBFDFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
 											</svg>
+
 										</span>
 									</button>
 								</div>
@@ -672,5 +669,5 @@ function chatComponent(): JSX.Element {
 	);
 }
 
-export default chatComponent;
+export default ChatComponent;
 

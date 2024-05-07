@@ -188,8 +188,13 @@
 .container-analytics .leader-board .top3 .first-cards .rank
 {
     background-color: var(--green);
-    padding: 5px;
+    /* padding: 5px; */
+    width: 25px;
+    height: 25px;
     position: absolute;
+    /* margin: auto; */
+    text-align: center;
+    line-height: 25px;
     top: 0;
     left: 0;
     border-bottom-right-radius: 7px;
@@ -434,7 +439,7 @@
 {
     padding: 15px 0;
     text-align: center;
-    background-color: var(--green);
+    background-color: theme('colors.main.light.EGGSHELL');
     /* color: white; */
     letter-spacing: 2px;
     position: absolute;

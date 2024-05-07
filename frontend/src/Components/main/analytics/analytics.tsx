@@ -31,8 +31,7 @@ function AnalyticsComponent(): JSX.Element {
 
         const otherPlayer = async () => {
             const result = await analyticsService.otherPlayers();
-            console.log(result);
-            console.log("the length of other players is : --> ", result.length); // Use result.length instead of result.lenght
+            // console.log("the length of other players is : --> ", result.length); // Use result.length instead of result.lenght
             if (result.length > 3 || result.length === 3)
                 result.splice(0, 3);
             else if (result.length < 3){
@@ -110,30 +109,32 @@ function AnalyticsComponent(): JSX.Element {
             <div className="container-analytics font-poppins overflow-x-hidden">
                 <div className='leader-board'>
                     <div className='top3'>
-                        {top3.length === 0 ? (
-                                <div className='dark:bg-black bg-white p-9 w-full'>
+                        {
+                            top3.length === 0 ? (
+                                <div className='dark:bg-black bg-white p-9 w-full text-black dark:text-white font-poppins'>
                                     <p>No users available</p>
                                 </div>
                             ) : (
-                            top3.map((user, index) => (
-                                <div className='dark:bg-black bg-white first-cards' id='one' key={index}>
-                                    <img src={BASE_API_URL + user.picture} alt="" />
-                                    <h3 className='dark:text-white text-black fullName font-poppins '>{user.firstName} {user.lastName}</h3>
-                                    <p className='login font-poppins'>{user.username}</p>
-                                    <div className='btn-profile font-poppins' onClick={() => navigate(`/dashboard/profile/${user.id}`)}>
-                                        Profile
+                                top3.map((user, index) => (
+                                    <div className='dark:bg-black bg-white first-cards' id='one' key={index}>
+                                        <img src={BASE_API_URL + user.picture} alt="" />
+                                        <h3 className='dark:text-white text-black fullName font-poppins '>{user.firstName} {user.lastName}</h3>
+                                        <p className='login font-poppins'>{user.username}</p>
+                                        <div className='btn-profile font-poppins' onClick={() => navigate(`/dashboard/profile/${user.id}`)}>
+                                            Profile
+                                        </div>
+                                        <span className='dark:text-white!important rank font-poppins'>{index + 1}</span>
+                                        <div className='dark:text-white text-black score font-poppins'>Score: {user.score} Pts</div>
                                     </div>
-                                    <span className='dark:text-white!important rank font-poppins'>{index + 1}</span>
-                                    <div className='dark:text-white text-black score font-poppins'>Score: {user.score} Pts</div>
-                                </div>
-                            ))
-                        )}
+                                ))
+                            )
+                        }
                     </div>
                     {/* =========== other player part ================= */}
                     <div className='other-players'>
 
                         {other_players.length === 0 ? (
-                                <div className='dark:bg-black bg-white p-9 w-full'>
+                                <div className='dark:bg-black bg-white p-9 w-full text-center text-black rounded-3xl dark:text-white font-poppins'>
                                     <p>No users available</p>
                                 </div>
                             ) : (
@@ -162,7 +163,7 @@ function AnalyticsComponent(): JSX.Element {
 
                 <div className='analytics'>
                     <div className="mini-profile bg-white dark:bg-black">
-                        <div className="profile-title text-black dark:text-white font-poppins">Profile</div>
+                        <div className="profile-title text-white font-poppins">Profile</div>
                         <div className="midle-content">
                             <div className="user-info">
                                 <img className='profile-img' src={BASE_API_URL + userData[0].picture} alt="" />
