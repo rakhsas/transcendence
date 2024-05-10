@@ -244,7 +244,6 @@ const FunctionProfileForm: React.FC = () => {
 						{
 
 							achievements.map((achievement, index: any) => {
-
 								return (
 									<div key={index} className="flex flex-row justify-around items-center px-2 overflow-hidden rounded-md">
 										<img src={achievement.icon} className="ml-2 w-16 h-16" />
@@ -268,7 +267,7 @@ const FunctionProfileForm: React.FC = () => {
 				</div>
 			</div>
 			<div className="side2 flex flex-col gap-4 items-center w-full md:min-w-[65%] min-h-full overflow-hidden ">
-				<div className="w-full md:w-[85%] p-4 flex flex-col items-center dark:bg-zinc-900 bg-main-light-WHITE h-[75%] border-gray-200 rounded-3xl overflow-hidden">
+				<div className="w-full md:w-[85%] p-4 flex flex-col items-center dark:bg-zinc-900 bg-main-light-PRIMARY09 h-[75%] border-gray-200 rounded-3xl overflow-hidden">
 					<div className="header w-full overflow-hidden text-center py-2.5">
 						<h5 className='font-bolder dark:text-main-light-FERN text-main-light-EGGSHELL font-poppins uppercase'>Games History</h5>
 					</div>
@@ -318,7 +317,7 @@ const FunctionProfileForm: React.FC = () => {
 						</ul>
 					</div>
 				</div>
-				<div className="w-full md:w-[85%] p-4 flex flex-col justify-between items-center dark:bg-zinc-900  bg-main-light-WHITE h-[25%] rounded-3xl">
+				<div className="w-full md:w-[85%] p-4 flex flex-col justify-between items-center dark:bg-zinc-900  bg-main-light-PRIMARY09 h-[25%] rounded-3xl">
 					<div className="header w-full overflow-hidden text-center py-2.5">
 						<h5 className='font-bolder dark:text-main-light-FERN text-main-light-EGGSHELL font-poppins uppercase'>user progress</h5>
 					</div>

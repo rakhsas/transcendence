@@ -221,7 +221,7 @@ class Game {
     this.ball.x += this.ball.vx
     this.ball.y += this.ball.vy
 
-    let computerLevel = 0.1
+    let computerLevel = 0.5
     this.computer.y +=
       (this.ball.y - (this.computer.y + this.computer.height / 2)) *
       computerLevel

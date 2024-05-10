@@ -158,7 +158,7 @@ const HomeComponent: React.FC = () => {
                 }
                 <section className="min-h-2/3 flex items-center justify-center p-2 flex-wrap lg:flex-nowrap">
                     <div className="w-full relative overflow-hidden p-4">
-                        <div className="relative flex justify-between flex-col mt-8">
+                        <div className="relative flex justify-between flex-col mt-8 py-8">
                             <div className="w-full h-full absolute top-0 left-0 bg-gradient-to-b from-neutral-700 to-slate-900 rounded-3xl overflow-hidden ads">
                             </div>
                             <div className="flex flex-col p-8 justify-between relative z-10">
@@ -177,21 +177,21 @@ const HomeComponent: React.FC = () => {
                             <img className="w-[30rem] h-[13rem] opacity-95" src={Robot} alt="Robot" />
                         </div>
                     </div>
-                    <div className="roomsHolder w-2/3 bg-transparent flex flex-col overflow-auto justify-around flex-1 lg:flex-initial p-4 space-y-4">
-                        <div className="title text-2xl text-white font-poppins overflow-hidden">Public Rooms</div>
-                        <div className="rooms flex flex-col overflow-auto p-4 space-y-4">
+                    <div className="roomsHolder w-2/3 bg-transparent flex flex-col overflow-auto justify-around flex-1 lg:flex-initial p-4 space-y-2">
+                        <div className="title text-2xl self-start text-white font-poppins overflow-hidden">Public Rooms</div>
+                        <div className="rooms flex flex-col overflow-auto p-4 space-y-3">
                             {
                                 publicChannels?.length == 0
                                 ?
                                 (
                                     <div className="noRoom flex justify-start">
-                                        <span className='font-poppins text-lg dark:text-main-light-FERN text-main-light-EGGSHELL'> Noo Rooom Yet</span>
+                                        <span className='font-poppins text-lg text-main-light-FERN'> No Room Yet</span>
                                     </div>
                                 )
                                 :
                                 publicChannels.map((channel, index) => {
                                     return (
-                                        <div className="public-room1 rounded-3xl bg-main-light-EGGSHELL items-center justify-between flex flex-row p-2" key={index}>
+                                        <div className="public-room1 rounded-3xl dark:bg-main-light-EGGSHELL bg-main-light-PRIMARY09 items-center justify-between flex flex-row p-2" key={index}>
                                             <div className="infos flex flex-row items-center space-x-4">
                                                 <div className="pic w-12 h-12 rounded-2xl object-cover">
                                                     <img src={baseAPIUrl + channel.picture} className=' h-full w-full bg-cover bg-center' alt="Profile" />
@@ -222,7 +222,7 @@ const HomeComponent: React.FC = () => {
                         <div className="flex flex-wrap justify-between w-full">
                             {protectedChannels?.length === 0 ? (
                                 <div className="flex justify-center">
-                                    <span className='font-poppins text-lg dark:text-main-light-FERN text-main-light-EGGSHELL'> No Rooms</span>
+                                    <span className='font-poppins text-lg text-main-light-FERN'> No Room</span>
                                 </div>
                             ) : (
                                 protectedChannels.map((channel, index) => (

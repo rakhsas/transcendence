@@ -44,14 +44,14 @@ function DetailsArea({
                             <div className="msg-profile group" onClick={handleOpenDetails}>
                                 <img src={baseAPIUrl + messageData.picture} className="object-cover w-full h-full" alt="" />
                             </div>
-                            <div className="font-onest text-xl capitalize text-black dark:text-white">{messageData.username}</div>
+                            <div className="font-onest text-xl capitalize text-white">{messageData.firstName + ' ' + messageData.lastName}</div>
                         </div>
                         <div className="options flex flex-row items-center justify-around p-4 overflow-hidden">
                             <div className="item flex justify-between flex-col items-center space-y-1" onClick={() => navigate(`/dashboard/profile/${messageData.id}`)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="29" height="29" viewBox="0 0 512 512" className="fill-black dark:fill-white">
+                                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="29" height="29" viewBox="0 0 512 512" className="fill-white">
                                     <path d="M257 232c-43.009 0-78-34.991-78-78s34.991-78 78-78c43.01 0 78 34.991 78 78S300.01 232 257 232zM257 96c-31.981 0-58 26.019-58 58s26.019 58 58 58 58-26.019 58-58S288.981 96 257 96zM410 420c-5.522 0-10-4.478-10-10v-93.178C400 288.799 377.201 266 349.178 266H164.822C136.799 266 114 288.799 114 316.822V410c0 5.522-4.477 10-10 10s-10-4.478-10-10v-93.178C94 277.771 125.771 246 164.822 246h184.355C388.229 246 420 277.771 420 316.822V410C420 415.522 415.522 420 410 420z"></path>
                                 </svg>
-                                <span className="font-onest text-xs capitalize text-black dark:text-white"> Profile </span>
+                                <span className="font-onest text-xs capitalize text-white"> Profile </span>
                             </div>
                             
                         </div>
@@ -63,7 +63,7 @@ function DetailsArea({
                             </div>
                         </div>
                         <div className="detail-changes overflow-hidden">
-                            <div className="detail-change">
+                            <div className="detail-change text-white font-onest">
                                 Change Color
                                 <div className="colors">
                                     <div

@@ -111,7 +111,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 											</div>
 										</div>
 										<div className="msg-detail overflow-hidden w-3/4 flex h-20 flex-col justify-center">
-											<div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base">
+											<div className="msg-username font-poppins mb-1 text-white font-semibold text-base">
 												{message.__reciever__.id === userData[0].id ? message.__owner__.firstName + ' ' + message.__owner__.lastName : message.__reciever__.firstName + ' ' + message.__reciever__.lastName}
 											</div>
 											<div className="msg-content font-medium text-xs">
@@ -121,7 +121,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 															?
 															<span className="font-poppins font-bold text-gray-400">
 																YOU:
-																<span className="text-black dark:text-white">
+																<span className="text-white">
 																	{
 																		message.message.length > 0 ? (
 																			message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
@@ -168,7 +168,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 									</div>
 								</div>
 								<div className="msg-detail overflow-hidden ml-2">
-									<div className="msg-username font-poppins mb-1 text-black dark:text-white font-semibold text-base capitalize">
+									<div className="msg-username font-poppins mb-1 text-white font-semibold text-base capitalize">
 										{channel.name}
 									</div>
 								</div>

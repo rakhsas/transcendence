@@ -22,7 +22,6 @@ export class UploadController {
     @Post()
     @UseInterceptors(FileInterceptor('file', {storage}))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
-        console.log(file)
         if (file) {
             return { url: `upload/${file.filename}` };
         } else {
@@ -40,7 +39,6 @@ export class UploadController {
     @UseInterceptors(FileInterceptor('file', {storage}))
     async uploadAudio(@UploadedFile() file: Express.Multer.File) {
         if (file) {
-            console.log(file)
             return { url: `upload/${file.filename}` };
         } else {
             return { message: 'No file uploaded!' };

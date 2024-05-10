@@ -1,11 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import User from "../../../model/user.model";
 import ModalComponent from "../../../utils/modal.component";
 import { Dropdown } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
 import AudioVisualizer from "./audioVisualiser";
+import DataContext from "../../../services/data.context";
+import LoadingComponent from "../../shared/loading/loading";
+import { Socket } from "socket.io-client";
 type props = {
-    MESSAGES: any;
+    MESSAGES: any[];
     userData: any;
     selectedMessageIndex: any;
     getMessageFriend: any;
@@ -15,10 +18,13 @@ type props = {
     modalPicPath: any;
     socketChat: any;
     getFriend: any;
-    friendId: string
+    friendId: string;
+    setMESSAGES: any;
 }
-const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, onOpenModal, onCloseModal, modalPicPath, socketChat, getFriend, friendId }) => {
+const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, onOpenModal, onCloseModal, modalPicPath, socketChat, getFriend, friendId, setMESSAGES }) => {
     const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
+    const userDat = useContext(DataContext);
+    const [socket, setSocket] = useState<Socket>();
     const navigate = useNavigate();
 	const messagesRef = useRef<HTMLDivElement>(null);
     const [messageStates, setMessageStates] = useState<boolean[]>([]);
@@ -26,25 +32,49 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
 		element.scrollTop = element.scrollHeight;
 	};
     useEffect(() => {
-		if (messagesRef.current)
-			scrollToBottom(messagesRef.current!);
-	}, [MESSAGES, messagesRef]);
-    
+        setSocket(userDat[1]);
+    }, [userDat]);
+    // useEffect(() => {
+		// if (messagesRef.current)
+		// 	scrollToBottom(messagesRef.current!);
+	// }, [MESSAGES, messagesRef]);
     const handleInviteOneVsOne = (friendId: string, userId: string) => {
         socketChat?.emit('inviteOneVsOne', { userId, friendId});
         navigate('/dashboard/gameRoom/' + friendId);
     }
     useEffect(() => {
-        const messageStates = MESSAGES.map((message: any) => {
+    const messageStates = MESSAGES.map((message: any) => {
             return message.message.length > 0 || message.img || message.audio ? true : false;
         });
         setMessageStates(messageStates);
     }, [MESSAGES]);
-    return (
-        <>
+    const onDirectMessage = async(data: any) => {
+        console.log(data)
+        if (friendId === data.senderId)
+        {
+        //     console.log(await data)
+            const newMessage = [...MESSAGES];
+            newMessage.push(data);
+        //     // MESSAGES.push(data);
+            setMESSAGES(newMessage);
+            if (messagesRef.current)
+			    scrollToBottom(messagesRef.current!);
+        }
+	}
+   socket?.on("newMessage", onDirectMessage);
+   // setLatestMessages(await messageService.latestMessages(userData[0].id))
+   // useEffect(() => {
+       // }, [socketChat]);
+       // socketChat?.on("directMessageNotif", onDirectMessage);
+       if (!MESSAGES)
+           return <LoadingComponent />
+       if (!userDat)
+       return <LoadingComponent />
+       return (
+           <>
             {MESSAGES.map((message: any, index: any) => {
                 const sender: User = message.senderId === userData[0].id ? userData[0] : getFriend(friendId);
-                const reciever: User = message.senderId === userData[0].id ? getFriend(friendId) : userData[0];
+                // console.log(sender, 'sender')
                 if (message.message.length > 0) {
                     return (
                         <div className="p-4" key={index}>
@@ -53,7 +83,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                                 <div className="flex message flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
                                     <div className="flex items-center justify-between space-x-2 rtl:space-x-reverse">
                                         <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
-                                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
+                                        <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date || message.createdAt).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
                                     <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{message.message}</p>
                                 </div>
@@ -79,7 +109,9 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                         </div>
                     )
                 }
-                else if (message.img) {
+                else if (message.img || message.image) {
+                    const image = message.img || message.image;
+                    console.log(baseAPIUrl + image)
                     return (
                         <div className="p-4" key={index}>
                             <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
@@ -92,7 +124,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                                         </div>
                                         <div className="group relative my-2.5">
                                             <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
-                                                <button onClick={() => onOpenModal(baseAPIUrl + message.img || '')} className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
+                                                <button onClick={() => onOpenModal(baseAPIUrl + image)} className="inline-flex items-center justify-center rounded-full h-10 w-10 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
                                                     {/* <svg className="w-5 h-5 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 18">
                                                         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3" />
                                                     </svg> */}

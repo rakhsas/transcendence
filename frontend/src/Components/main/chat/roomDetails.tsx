@@ -12,7 +12,7 @@ type DetailsAreaProps = {
 	channelRole: string;
 	handleOpenDetails: () => void,
 	userData: any,
-	chatSocket: Socket,
+	chatSocket: any,
 	setRoomMembers: any,
 	roomMembers: any
 }

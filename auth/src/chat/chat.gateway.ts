@@ -34,6 +34,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	handleConnection(client: Socket) {
 		this.GuardsConsumer(client);
 		const userName = String(client.handshake.query.userName);
+		if (this.connectedUsers.has(userName)) {
+			this.connectedUsers.get(userName).disconnect();
+		}
 		this.connectedUsers.set(userName, client);
 		this.usersArray.push(client.id);
 		client.emit('update-user-list', { userIds: this.usersArray });
@@ -66,6 +69,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// you can put the blocked code here {if they are blocked they can't send messages}.
 		// if (await this.chatService.areUsersBlocked(payload.to, payload.from) === true)
 		// 	return;
+		const message = await this.chatService.addMessage(payload)
 		if (payload.hasOwnProperty('recieverName')) {
 			const recieverName = String(payload.recieverName);
 			const toUserSocket = this.connectedUsers.get(recieverName);
@@ -77,7 +81,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					"message": payload.message,
 					"image": payload.image,
 					"audio": payload.audio,
-
 					// "isOwner": false
 				});
 				const notif = await this.notificationService.createNotification({
@@ -90,11 +93,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					channel: null
 				});
 				const lastnotif = await this.notificationService.getNotificationById(notif.id);
-				toUserSocket.emit('directMessageNotif', lastnotif)
-				await this.chatService.addMessage(payload);
+				toUserSocket.emit('directMessageNotif', lastnotif);
+				toUserSocket.emit('newMessage', message);
+				// await this.chatService.addMessage(payload);
 			}
-			else
-				await this.chatService.addMessage(payload)
 			client.emit('message', payload);
 		}
 		//   this.server.emit('message', payload);
@@ -168,7 +170,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('changePicture')
 	async handleChangePicture(client: Socket, payload: any): Promise<void> {
-		const mimeType = `image/jpg`;
+		const mimeType = `image/jpeg`;
 		const file = new File([payload.picture], `picture.jpg`, { type: mimeType });
 		const url = await this.uploadFile(file);
 		const user = await this.userService.updatePicture(payload.userId, url);

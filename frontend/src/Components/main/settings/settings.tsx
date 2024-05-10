@@ -141,7 +141,7 @@ function SettingFunction(): JSX.Element {
     }, [ischecked, userData, disableTwoFA]);
 	return (
 		<div className="flex flex-col new:flex-row w-full h-[90vh] overflow-hidden justify-between gap-4 bg-inherit Setting p-8" >
-			<div className="part1 rounded-3xl space-y-2 w-full md:min-w-[35%] min-h-full Usredit dark:bg-zinc-900 bg-main-light-WHITE px-8">
+			<div className="part1 rounded-3xl w-full md:min-w-[35%] min-h-full Usredit dark:bg-zinc-900 bg-main-light-PRIMARY09 px-8 py-4 overflow-hidden">
 				<div className="p-4 profile-image overflow-hidden flex flex-col w-full justify-center items-center gap-12 relative">
 					<img src={APIURL + userData[0]?.picture || ''} alt={userData[0].username} className="object-cover w-48 h-48 rounded-3xl" id="list" />
 					<label htmlFor="file" id="uploadbtn" className="gap-4 change-picture rounded-3xl bg-zinc-800">
@@ -173,8 +173,8 @@ function SettingFunction(): JSX.Element {
 						ischecked && !userData[0].isTwoFactorAuthenticationEnabled && <TwoFAActivateComponent userData={userData} />
 					}
 				</div>
-				<form onSubmit={handleSubmitForm} className="gap-4 mt-2 m-auto p-5 form--setting flex flex-col custom-shadow overflow-visible">
-					<h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5 ">
+				<form onSubmit={handleSubmitForm} className="mt-2 m-auto p-5 form--setting flex flex-col border-2 border-white overflow-visible">
+					<h2 className="header--info overflow-hidden flex flex-row justify-center items-center left-5">
 						Information
 					</h2>
 					<div className="grid gap-6 mb-6">
@@ -226,7 +226,7 @@ function SettingFunction(): JSX.Element {
 					</div>
 					<button
 						type="submit"
-						className="flex  flex-row justify-center items-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bolder rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+						className="flex  flex-row justify-center items-center text-white dark:bg-main-light-PRIMARY09 bg-main-dark-SPRUCE focus:ring-4 focus:outline-none focus:ring-blue-300 font-bolder rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
 					>
 						Submit
 					</button>

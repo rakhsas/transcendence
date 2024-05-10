@@ -500,7 +500,7 @@ body {
 }
 
 .detail-change {
-  color: var(--detail-font-color);
+  /* color: var(--detail-font-color); */
   font-family: var(--body-font);
   font-weight: 600;
   font-size: 14px;
@@ -528,7 +528,7 @@ body {
 }
 
 .color.selected {
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23fff' strokeWidth='3' fill='none' strokeLinecap='round' strokeLinejoin='round' class='css-i6dzq1' viewBox='0 0 24 24'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='%23000' strokeWidth='5' strokeLinecap='round' strokeLinejoin='round' class='css-i6dzq1' viewBox='0 0 24 24'%3E%3Cpath d='M20 6L9 17l-5-5'/%3E%3C/svg%3E");
   background-size: 10px;
   background-position: center;
   background-repeat: no-repeat;

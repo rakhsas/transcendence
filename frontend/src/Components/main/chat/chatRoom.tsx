@@ -39,25 +39,23 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
         if (messagesRef.current)
             scrollToBottom(messagesRef.current!);
     })
+    
     return (
         <div className=""  ref={messagesRef}>
             {
                 roomMessages.length > 0 && roomMessages?.map((message: any, index: any) => {
+                    console.log(roomMessages)
                     let sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId))?.user
-                    if(!sender)
-                    {
-                        sender = userData[3].find((member: any) => (member.id === message.senderId));
-                    }
                     // if (!sender)
                     //     return <LoadingComponent key={index}/>
                     if (message.message && message.message.length > 0) {
                         return (
                             <div className="p-4" key={index}>
                                 <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                    <img className="w-8 h-8 object-cover rounded-full" src={baseAPIUrl + sender.picture} alt="Jese image" />
+                                    <img className="w-8 h-8 object-cover rounded-full" src={sender ? baseAPIUrl + sender?.picture : 'https://i.pinimg.com/736x/8b/11/a8/8b11a86980c64720a41ec22332a83115.jpg'} alt="Jese image" />
                                     <div className="flex message flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
                                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                            <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
+                                            <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender ? sender?.firstName + ' ' + sender?.lastName : 'Pingpong User'}</span>
                                             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                         <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{message.message}</p>
@@ -70,11 +68,11 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
                         return (
                             <div className="p-4" key={index}>
                                 <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                    <img className="w-8 h-8 object-cover rounded-full" src={baseAPIUrl + sender.picture} alt="" />
+                                    <img className="w-8 h-8 object-cover rounded-full" src={sender ? baseAPIUrl + sender?.picture : 'https://i.pinimg.com/736x/8b/11/a8/8b11a86980c64720a41ec22332a83115.jpg'} alt="" />
                                     <div className="flex flex-col gap-1">
                                         <div className="flex message flex-col w-full max-w-[326px] leading-1.5 p-4 border-gray-200 rounded-e-xl rounded-es-xl">
                                             <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
-                                                <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
+                                                <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender ? sender?.firstName + ' ' + sender?.lastName : 'Pingpong User'}</span>
                                                 <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                             <div className="group relative my-2.5">
@@ -102,10 +100,10 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
                         return (
                             <div className="p-4" key={index}>
                                 <div className={`flex items-start gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>
-                                    <img className="w-8 h-8 object-cover rounded-full" src={baseAPIUrl + sender.picture} alt="" />
+                                    <img className="w-8 h-8 object-cover rounded-full" src={sender ? baseAPIUrl + sender?.picture : 'https://i.pinimg.com/736x/8b/11/a8/8b11a86980c64720a41ec22332a83115.jpg'} alt="" />
                                     <div className="flex message flex-col gap-2.5 w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
                                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                            <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender.firstName + ' ' + sender.lastName}</span>
+                                            <span className="text-sm font-semibold text-gray-900 dark:text-white">{sender ? sender?.firstName + ' ' + sender?.lastName : 'Pingpong User'}</span>
                                             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{new Date(message.date).toLocaleString('en-MA', { hour: '2-digit', minute: '2-digit' })}</span>
                                         </div>
                                         <AudioVisualizer audioSrc={baseAPIUrl + message.audio} />

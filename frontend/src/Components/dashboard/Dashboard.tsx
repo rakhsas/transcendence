@@ -101,10 +101,7 @@ function DashboardComponent() {
 		setFriends(data);
 	});
 	
-	if (!userData || !socket || !globalSocket || !users) {
-		return <LoadingComponent />;
-	}
-	socket.on("update-user-list", (data: any) => {
+	socket?.on("update-user-list", (data: any) => {
 		setUserList(data)
 	})
 	socket?.on("callPermission", async (data: any) => {
@@ -126,7 +123,7 @@ function DashboardComponent() {
 		const stream = await navigator.mediaDevices.getUserMedia(constraints);
 		stream.getTracks().forEach((track: MediaStreamTrack) => {track.enabled = false});
 		setStream(stream)
-		stream && socket.emit("acceptVideoCall", {
+		stream && socket?.emit("acceptVideoCall", {
 			user: userData,
 			caller: callRequest.issuer,
 			permission: true
@@ -154,7 +151,7 @@ function DashboardComponent() {
 	socket?.on("userIsOnline", async (data: any) => {
 		setCallingUserStatus(data);
 	})
-	socket.on("callRejected", async (data: any) => {
+	socket?.on("callRejected", async (data: any) => {
 		callRequest && setCallRequest(null);
 		setCallRejected(true);
 		setTimeout(() => {
@@ -166,12 +163,15 @@ function DashboardComponent() {
 		setUserData(data);
 	})
 	// socket?.on('channelJoined', async (data: any) => {
-	// 	console.log('channelJoined: ', data);
+		// 	console.log('channelJoined: ', data);
 	// })
-	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
-	return (
-		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream, userList]}>
-			<div className="flex dark:bg-main-dark-SPRUCE h-lvh relative dashboard">
+	if (!userData || !socket || !globalSocket || !users) {
+		return <LoadingComponent />;
+	}
+		const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
+		return (
+			<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream, userList]}>
+			<div className="flex dark:bg-main-dark-SPRUCE h-lvh relative dashboard" id='dashboard'>
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">
 					<NavbarComponent />
