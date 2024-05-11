@@ -87,9 +87,9 @@
   font-family: 'poppins' !important;
 }
 
-/* .light .dashboard {
+.light .dashboard {
   background-image: url('./../../assets/light.mode.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-} */
+}

@@ -27,10 +27,10 @@ interface gameProps {
 const CreatChartDesign: React.FC<gameProps> = ({ user, totalGames }) => {
     
     const data = {
-        labels: [ `Played Games`, 'Win Games'],
+        labels: [ `Lost Games`, 'Win Games'],
         datasets: [{
             label: '',
-            data: [totalGames?.gamePlayed || 0, totalGames?.gameWon || 0],
+            data: [totalGames?.gamePlayed - totalGames?.gameWon || 0, totalGames?.gameWon || 0],
             backgroundColor: ['#059669', user?.coalitionColor || ''],
             fontWeight: 'bold'
         }],

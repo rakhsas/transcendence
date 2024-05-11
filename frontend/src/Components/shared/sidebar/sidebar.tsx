@@ -46,7 +46,7 @@ function SidebarComponent(): JSX.Element {
 	return (
 		<>
 			<div className="containe overflow-hidden flex items-center justify-center py-4 px-2">
-				<div className="w-[100px] dark:bg-zinc-900# dark: bg-main-light-EGGSHELL  shadow overflow-y-auto md:flex flex-col justify-between h-full hidden rounded-3xl">
+				<div className="w-[100px] dark:bg-zinc-900# dark: bg-main-light-EGGSHELL overflow-y-auto md:flex flex-col justify-between h-full hidden rounded-3xl shadow-md shadow-black">
 					{/* <img src={logo} alt="Logo" className="mx-auto pt-10" /> */}
 					<div className="logot m-auto p-6">
 						<img src={logo} alt="logo" />

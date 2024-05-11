@@ -20,14 +20,19 @@ import UserService from '../../../services/user.service';
 
 
 const levels = [
-	{ level: 1, minScore: 0, maxScore: 50 },
-	{ level: 1.5, minScore: 51, maxScore: 100 },
-	{ level: 2.5, minScore: 101, maxScore: 150 },
-	{ level: 3, minScore: 151, maxScore: 200 },
-	{ level: 3.5, minScore: 201, maxScore: 250 },
-	{ level: 4, minScore: 251, maxScore: 300 },
-	{ level: 4.5, minScore: 301, maxScore: 350 },
-	{ level: 5, minScore: 351, maxScore: 400 },
+	// { level: 1, minScore: 0, maxScore: 50 },
+	// { level: 1.5, minScore: 51, maxScore: 100 },
+	// { level: 2.5, minScore: 101, maxScore: 150 },
+	// { level: 3, minScore: 151, maxScore: 200 },
+	// { level: 3.5, minScore: 201, maxScore: 250 },
+	// { level: 4, minScore: 251, maxScore: 300 },
+	// { level: 4.5, minScore: 301, maxScore: 350 },
+	// { level: 5, minScore: 351, maxScore: 400 },
+	{ level: 1, minScore: 0, maxScore: 100 },
+	{ level: 1.5, minScore: 101, maxScore: 200 },
+	{ level: 2.5, minScore: 201, maxScore: 300 },
+	{ level: 3, minScore: 301, maxScore: 400 },
+	{ level: 3.5, minScore: 401, maxScore: 500 },
 ];
 
 function getProgress(score: number) {
@@ -42,7 +47,7 @@ function getProgress(score: number) {
 }
 
 function calculateLevel(score: number) {
-	const levelThreshold = 100;
+	const levelThreshold = 10;
 	const level = (score / levelThreshold);
 
 	return level;
@@ -308,7 +313,7 @@ const FunctionProfileForm: React.FC = () => {
 			<div className="side2 flex flex-col gap-4 items-center w-full md:min-w-[65%] min-h-full overflow-hidden ">
 				<div className="w-full md:w-[85%] p-4 flex flex-col items-center dark:bg-zinc-900 bg-main-light-PRIMARY09 h-[75%] border-gray-200 rounded-3xl overflow-hidden">
 					<div className="header w-full overflow-hidden text-center py-2.5">
-						<h5 className='font-bolder dark:text-main-light-FERN text-main-light-EGGSHELL font-poppins uppercase'>Games History</h5>
+						<h5 className='font-bolder text-white font-poppins uppercase'>Games History</h5>
 					</div>
 					<div className="history h-full w-full">
 						<ul className='w-full overflow-y-auto scrollBar1 flex flex-col justify-around items-center gap-4'>
@@ -363,7 +368,7 @@ const FunctionProfileForm: React.FC = () => {
 				</div>
 				<div className="w-full md:w-[85%] p-4 flex flex-col justify-between items-center dark:bg-zinc-900  bg-main-light-PRIMARY09 h-[25%] rounded-3xl">
 					<div className="header w-full overflow-hidden text-center py-2.5">
-						<h5 className='font-bolder dark:text-main-light-FERN text-main-light-EGGSHELL font-poppins uppercase'>user progress</h5>
+						<h5 className='font-bolder text-white font-poppins uppercase'>user progress</h5>
 					</div>
 					<div className="chart-container">
 						<CreatChartDesign user={user} totalGames={totalGames} />

@@ -269,7 +269,7 @@
 .container-analytics .leader-board .other-players{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     padding: 20px 10px;
     position: relative;
     height: 662px;
@@ -484,6 +484,7 @@
     height: 70px;
     margin-right: 20px;
     border-radius: 15px;
+    object-fit: cover;
 }
 
 .analytics .mini-profile .midle-content .last-achivement

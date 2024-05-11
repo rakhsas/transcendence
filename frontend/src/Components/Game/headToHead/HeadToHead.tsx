@@ -121,8 +121,8 @@ const CanvasHeadToHead = (props: {
             <div className=" flex-1 flex justify-center items-center ">
               <div className="flex flex-col gap-4 px-9  py-4 items-center ">
                 <div className="flex-1 text-center ">
-                  <p className="text-xl pb-4">Game Over</p>
-                  <p className="text-xl">You {status.current}</p>
+                  <p className="text-xl pb-4 text-white">Game Over</p>
+                  <p className="text-xl text-white">You {status.current}</p>
                 </div>
                 <Button
                   onClick={handleClick}

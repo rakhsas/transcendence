@@ -17,7 +17,6 @@ import TwoFAComponent from '../modal/2fa.authenticate.modal';
 import cookies from 'js-cookie';
 import DraggableDiv from './draggable';
 import { SwipeableButton } from 'react-swipeable-button';
-import lightModeBackground from './../../assets/light.mode.png';
 
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
@@ -173,7 +172,7 @@ function DashboardComponent() {
 	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
 	return (
 		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream, userList]}>
-			<div className="flex dark:bg-main-dark-SPRUCE h-lvh relative dashboard" id='dashboard' style={{ backgroundImage: `url(${('frontend/src/assets/light.mode.png')})` }}>
+			<div className="flex dark:bg-main-dark-SPRUCE h-lvh relative dashboard" id='dashboard'>
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">
 					<NavbarComponent />
@@ -193,7 +192,7 @@ function DashboardComponent() {
 														<p className="font-bold text-white font-poppins text-lg">{callingUser.firstName + ' ' + callingUser.lastName }</p>
 													</div>
 													<div className="flex justify-center items-center">
-														<p className="font-bold text-gray-300 font-poppins text-xs">
+														<p className="font-bold text-gray-300 font-poppins text-xs overflow-hidden">
 															{callingUser.firstName + ' ' + callingUser.lastName } doesn't answer the call.
 														</p>
 													</div>
@@ -211,7 +210,7 @@ function DashboardComponent() {
 														<p className="font-bold text-white font-poppins text-lg">{callingUser.firstName + ' ' + callingUser.lastName }</p>
 													</div>
 													<div className="flex justify-center items-center">
-														<p className="font-bold text-gray-300 font-poppins text-xs">
+														<p className="font-bold text-gray-300 font-poppins text-xs overflow-hidden">
 														{!callingUserStatus ? 'Connecting...' : 'Ringing...'}
 														</p>
 													</div>

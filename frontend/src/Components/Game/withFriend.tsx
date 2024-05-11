@@ -24,7 +24,7 @@ const WithFriend = () => {
 
   return (
     <div className="flex text-black dark:text-white justify-center w-full h-full items-center">
-      <div className="flex justify-center w-[600px] h-[450px] border-2 border-red-600 rounded-xl">
+      <div className="flex justify-center w-[600px] h-[450px] border-4  border-main-light-FERN dark:border-main-light-EGGSHELL rounded-xl">
         {isStarted && idFoFriend ? (
           <CanvasHeadToHead
             width="600"
