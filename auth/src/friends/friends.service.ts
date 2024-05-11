@@ -35,7 +35,8 @@ export class FriendService {
     async createFriendship(userId: string, friendId: string): Promise<Friendship[]> {
       
         // const { userId, friendId } = createFriendshipDto;
-
+        if (await this.getFriendship(userId, friendId))
+          return null;
         const user = await this.userRepository.findOne({where: {id: userId}});
         const friend = await this.userRepository.findOne({where: {id: friendId}});
 

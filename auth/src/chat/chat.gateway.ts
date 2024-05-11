@@ -341,6 +341,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('acceptFriendRequest')
 	async handleAcceptFriendRequest(client: Socket, payload: any): Promise<void> {
+
+		const checkFriendship = await this.friendService.createFriendship(payload.userId, payload.friendId);
+		if (!checkFriendship)
+			return;
 		const notif = await this.notificationService.createNotification({
 			target: payload.friendId,
 			type: NotificationType.FRIEND_REQUEST_ACCEPTED,
@@ -350,7 +354,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			audio: null,
 			channel: null,
 		});
-		await this.friendService.createFriendship(payload.userId, payload.friendId);
 		const lastnotif = await this.notificationService.getNotificationById(notif.id);
 		const targetFriends = await this.friendService.getFriendsOfUser(payload.friendId);
 		const issuerFriends = await this.friendService.getFriendsOfUser(payload.userId);

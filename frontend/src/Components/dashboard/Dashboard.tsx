@@ -17,6 +17,8 @@ import TwoFAComponent from '../modal/2fa.authenticate.modal';
 import cookies from 'js-cookie';
 import DraggableDiv from './draggable';
 import { SwipeableButton } from 'react-swipeable-button';
+import lightModeBackground from './../../assets/light.mode.png';
+
 const url: string = "https://" + import.meta.env.VITE_API_SOCKET_URL;
 const baseAPIUrl = import.meta.env.VITE_API_AUTH_KEY;
 function DashboardComponent() {
@@ -168,10 +170,10 @@ function DashboardComponent() {
 	if (!userData || !socket || !globalSocket || !users) {
 		return <LoadingComponent />;
 	}
-		const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
-		return (
-			<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream, userList]}>
-			<div className="flex dark:bg-main-dark-SPRUCE h-lvh relative dashboard" id='dashboard'>
+	const twoFactorAuthentication = cookies.get('twoFactorAuthentication');
+	return (
+		<DataContext.Provider value={[userData, socket, globalSocket, users, protectedChannels, publicChannels, notifications, friends, setStream, stream, userList]}>
+			<div className="flex dark:bg-main-dark-SPRUCE h-lvh relative dashboard" id='dashboard' style={{ backgroundImage: `url(${('frontend/src/assets/light.mode.png')})` }}>
 				<SidebarComponent />
 				<div className="overflow-auto  flex flex-col w-full md:mb-0 mb-14 ">
 					<NavbarComponent />
@@ -192,7 +194,7 @@ function DashboardComponent() {
 													</div>
 													<div className="flex justify-center items-center">
 														<p className="font-bold text-gray-300 font-poppins text-xs">
-														{callingUser.firstName + ' ' + callingUser.lastName } doesn't answer the call.
+															{callingUser.firstName + ' ' + callingUser.lastName } doesn't answer the call.
 														</p>
 													</div>
 												</div>
@@ -269,4 +271,5 @@ function DashboardComponent() {
 		</DataContext.Provider>
 	)
 }
+
 export default DashboardComponent;

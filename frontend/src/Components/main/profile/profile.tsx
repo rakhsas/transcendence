@@ -8,7 +8,7 @@ import Achei4 from '../../../assets/acheivements/fire2.png'
 import Achei1 from '../../../assets/acheivements/poker1.png'
 import './updateprofile.css'
 import CreatChartDesign from './Chart';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import LoadingComponent from '../../shared/loading/loading';
 import User from '../../../model/user.model';
 import { gameScores } from '../../../utils/types';
@@ -57,6 +57,7 @@ function calculateLevel(score: number) {
 // 	'Play The Fifth Game'];
 
 const FunctionProfileForm: React.FC = () => {
+	const navigate = useNavigate();
 	const userData = useContext(DataContext);
 	const BASE_API_URL = import.meta.env.VITE_API_AUTH_KEY;
 	const [user, setUser] = useState<any>();
@@ -70,6 +71,7 @@ const FunctionProfileForm: React.FC = () => {
 	const [isBlocked, setIsBlocked] = useState<boolean>(false);
 	const [blockBetween, setBlockBetween] = useState<boolean>(false);
 	const [newMessageOpen, setNewMessageOpen] = useState<boolean>(false);
+	const [isClicked, setIsClicked] = useState<boolean>(false);
 	const messageService = new MessageService();
 	const fillAnimationKeyframes = `
 		@keyframes fillAnimation {
@@ -156,12 +158,14 @@ const FunctionProfileForm: React.FC = () => {
 		return <LoadingComponent />;
 	}
 	const sendFriendRequest = () => {
-		if (socketChat && user) {
+		if (socketChat && user && !isClicked) {
 			socketChat.emit('friendRequest', {
 				userId: userData[0].id,
 				friendId: user.id
 			});
 		}
+		if (!isClicked)
+			setIsClicked(true);
 	}
 	const blockFriend = () => {
 		if (socketChat && user) {
@@ -212,7 +216,9 @@ const FunctionProfileForm: React.FC = () => {
 											<div className="dark:text-white text-black bg-main-light-FERN hover:bg-main-light-EGGSHELL hover:text-white focus:outline-none focus:ring-4 focus:ring-yellow-300 font-medium rounded-full text-sm px-5 py-2 mb-2 me-2 dark:focus:ring-yellow-900" onClick={
 												() => sendFriendRequest()
 											}>
-												Send Friend Request
+												{
+													isClicked ? 'Request Sent' : 'Add Friend'
+												}
 											</div>
 										) : (
 											!isBlocked ? (
@@ -230,10 +236,43 @@ const FunctionProfileForm: React.FC = () => {
 							)
 						}
 					</div>
-					<div className="progress-bar-container text-black dark:text-white">
-						<style>{fillAnimationKeyframes}</style>
-						<div className="progress-bar text-black dark:text-white" />
-						<span className="progress-label text-black dark:text-white">{progress.toFixed(2)}%</span>
+					<div
+						className="text-black dark:text-white border-2 border-white w-full rounded-lg flex relative"
+						style={{
+							position: 'relative',
+							overflow: 'hidden',
+							borderRadius: '14px',
+						}}
+					>
+						<div className="progress-bar"
+							style={{
+								width: `${progress}%`,
+								height: '30px',
+								backgroundColor: '#4caf50',
+								transition: 'width 0.3s ease-in-out',
+								animation: 'fillAnimation 2s ease-in-out forwards',
+							}}
+							role="progressbar"
+							aria-valuenow={progress}
+							aria-valuemin="0"
+							aria-valuemax="100"
+						/>
+						<span className="progress-label text-black dark:text-white text-xs absolute self-center"
+							style={{
+								left: '50%',
+								transform: 'translateX(-50%)', // Center horizontally
+							}}
+							>{progress.toFixed(2)}%</span>
+						<style>
+							{`@keyframes fillAnimation {
+								from {
+									width: 20%;
+								}
+								to {
+									width: ${progress}%;
+								}
+							}`}
+						</style>
 					</div>
 				</div>
 				<div className='w-full md:w-[85%] flex flex-col justify-between p-4 rounded-3xl items-center h-[75vh] dark:bg-zinc-900  bg-main-light-PRIMARY09'>
@@ -289,7 +328,9 @@ const FunctionProfileForm: React.FC = () => {
 														<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 													</svg>
 												</div>
-												<img src={BASE_API_URL + object.player1.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player1?.coalitionColor} ` }} />
+												<img src={BASE_API_URL + object.player1.picture} onClick={
+													() => navigate(`/dashboard/profile/${object.player1.id}`)
+												} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player1?.coalitionColor} ` }} />
 											</div>
 											<div className="flex flex-row gap-2">
 												<p className="w-8 h-8 flex justify-center items-center dark:text-white text-black font-bold text-2xl">{object?.user_score}</p>
@@ -308,7 +349,10 @@ const FunctionProfileForm: React.FC = () => {
 														<path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
 													</svg>
 												</div>
-												<img src={BASE_API_URL + object.player2.picture} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player2?.coalitionColor} ` }} />
+												<img src={BASE_API_URL + object.player2.picture} onClick={
+													() => navigate(`/dashboard/profile/${object.player2.id}`)
+												
+												} alt="" className='w-16 h-16 object-cover rounded-full' style={{ border: `2px solid ${object?.player2?.coalitionColor} ` }} />
 											</div>
 										</div>
 									</li>

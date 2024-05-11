@@ -103,15 +103,15 @@ export class Game {
   resetBall() {
     this.ball.x = this.width / 2
     this.ball.y = this.height / 2
-    const oldx = -this.ball.vx
-    const oldy = this.ball.vy
     this.ball.speed = 5
     this.ball.vx = 0
     this.ball.vy = 0
 
-    setTimeout((vx = oldx, vy = oldy) => {
-      this.ball.vx = vx
-      this.ball.vy = vy
+    setTimeout(() => {
+      const angle = 45
+      const direction: 1 | -1 = this.ball.x < this.width / 2 ? 1 : -1
+      this.ball.vx = direction * this.ball.speed * Math.cos(angle)
+      this.ball.vy = this.ball.speed * Math.sin(angle)
     }, 2000)
   }
 
