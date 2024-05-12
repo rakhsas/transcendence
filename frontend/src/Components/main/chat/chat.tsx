@@ -19,6 +19,7 @@ import { MutedUsers } from "../../../utils/types";
 import VideoCallComponent from "./videocall";
 import { keyframes } from "@emotion/react";
 import ChatForm from "./chat.form";
+import UserService from "../../../services/user.service";
 
 enum roomRoles {
 	OWNER = "OWNER",
@@ -45,6 +46,7 @@ function ChatComponent(): JSX.Element {
 	const [onOpenDetails, setOnOpenDetails] = useState<boolean>(false);
 	const [lstGroupMessages, setLstGroupMessages] = useState<any>([]);
 	const messageService = new MessageService();
+	const userService = new UserService();
 	const channelService = new ChannelService();
 	const muteService = new MuteService();
 	const messagesRef = useRef<HTMLDivElement>(null);
@@ -187,8 +189,16 @@ function ChatComponent(): JSX.Element {
 		const { __owner__, __reciever__ } = message;
 		return __owner__.id === userData[0].id ? __reciever__ : __owner__;
 	};
+
+	const getUser = async (friendId: string) => {
+		const user = await userService.getUser(friendId);
+		console.log(user);
+		return user;
+	}
+
 	const getFriend = (friendId: string): User | undefined => {
-		return friends.find((friend) => friend.id === friendId);
+		return friends.find((friend) => friend.id === friendId) || getUser(friendId)
+		// return getUser(friendId);
 	};
 	
 	socket?.on("userMuted", async (data: any) => {

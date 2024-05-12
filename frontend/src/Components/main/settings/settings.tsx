@@ -184,7 +184,7 @@ function SettingFunction(): JSX.Element {
 								maxLength={15}
 								className=" bg-main-light-WHITE border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			  dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-								placeholder="Ayyoub" autoComplete="OFF" required />
+								placeholder={userData[0].firstName}  autoComplete="OFF" required />
 							{!/^$|^[A-Za-z\s]+$/.test(firstName) && (
 								<p style={{ color: 'red' }}>Please enter a valid first name (only alphabets).</p>
 							)}
@@ -197,7 +197,7 @@ function SettingFunction(): JSX.Element {
 								id="last_name" value={SecondName} onChange={handleSecondNameChange} maxLength={10}
 								className=" bg-main-light-WHITE border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			  dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-								placeholder="GaouGaou"
+								placeholder={userData[0].lastName}
 								required
 							/>
 							{!/^$|^[A-Za-z\s]+$/.test(SecondName) && (
@@ -220,7 +220,7 @@ function SettingFunction(): JSX.Element {
 							onChange={handleEmailChange}
 							className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
 			dark:bg-zinc-900 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-							placeholder="UserName@student.1337.ma"
+							placeholder={userData[0].email}
 							required
 						/>
 					</div>

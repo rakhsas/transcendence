@@ -38,8 +38,9 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 		setImagePath(null);
         const name = event.currentTarget.channelName.value;
         const type = event.currentTarget.types.value;
+		console.log(type)
         const password = event.currentTarget.password?.value;
-		if (password && password.length !== 6) {
+		if (type == "protected" && (!password || password.length != 6)) {
 			return;
 		}
 		const formData = new FormData();
