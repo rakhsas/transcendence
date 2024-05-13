@@ -1,7 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/message'
 import { ChatService } from './chat.service';
 import { ApiTags } from '@nestjs/swagger';
+import { UserGuard } from 'src/guards/user.guard';
 
 @Controller('chat')
 @ApiTags('chat')
@@ -16,7 +17,8 @@ export class ChatController {
     
   }
     @Post()
-    async createMessage(@Body() settingProfileDto : CreateUserDto) {
+	  @UseGuards(UserGuard)
+  async createMessage(@Body() settingProfileDto : CreateUserDto) {
       await this.chatService.addMessage(settingProfileDto);
     }
 }

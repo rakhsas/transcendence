@@ -17,10 +17,14 @@ export class UserGuard implements CanActivate {
 		private readonly httpService: HttpService,
         private jwtService: JwtService
 
-	) { }
+	) {
+		console.log('user guard')
+	}
 	async canActivate(context: ExecutionContext): Promise<boolean> {
+		console.log('user guard1')
 		try {
 			const request = context.switchToHttp().getRequest();
+			console.log('authToken', request);
 			const { cookie } : any = request.headers;
 			const authToken = this.authService.getCookie('access_token', cookie);
 			const providerToken = this.authService.getCookie('provider_access_token', cookie);

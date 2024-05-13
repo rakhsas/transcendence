@@ -15,18 +15,21 @@ export class ChannelController {
     
 
     @Get('protected')
+	@UseGuards(UserGuard)
     async protected() {
         return await this.channelService.getProtectedChannels();
     }
 
     @Get('protected/:userId')
     @ApiParam({ name: 'userId', type: 'string', format: 'uuid'})
+	@UseGuards(UserGuard)
     async getProtectedChannelsExpectUser(@Param('userId') userId: UUID) {
         return await this.channelService.getProtectedChannelsExpectUser(userId);
     }
     
     
     @Get(':userId')
+	@UseGuards(UserGuard)
     @ApiParam({ name: 'userId', type: 'string', format: 'uuid' }) // Adjust type/format if needed
     async getChannelsByUserId(@Param('userId') userId: UUID)
     {
@@ -42,7 +45,7 @@ export class ChannelController {
     }
     
     @Get(':id/users')
-    // @UseGuards(UserGuard)
+	@UseGuards(UserGuard)
     async getMembersOfChannel(@Param('id') channelId: number)
     {
         return await this.channelService.getMembersOfChannel(channelId);
@@ -50,7 +53,7 @@ export class ChannelController {
     
     
     @Get(':id/lastmessage')
-    // @UseGuards(UserGuard)
+	@UseGuards(UserGuard)
     async getLastMessageOfChannel(@Param('id') channelId: number)
     {
         return await this.channelService.getLastMessageOfChannel(channelId);
@@ -65,6 +68,7 @@ export class ChannelController {
     
     @Get('public/rooms/:userId')
     @ApiParam({ name: 'userId', type: 'string', format: 'uuid'})
+	@UseGuards(UserGuard)
     async getPublicChannels(@Param('userId') userId: UUID) {
         return await this.channelService.getPublicChannelsExpectUser(userId);
     }
@@ -72,6 +76,7 @@ export class ChannelController {
     @Get('isMember/:userId/:channelId')
     @ApiParam({ name: 'userId', type: 'string', format: 'uuid'})
     @ApiParam({ name: 'channelId', type: 'number'})
+	@UseGuards(UserGuard)
     async isMember(@Param('userId') userId: UUID, @Param('channelId') channelId: number) {
         return await this.channelService.isUserInChannel(userId, channelId);
     }

@@ -15,15 +15,16 @@ export class friendController {
     @Get(':userId')
     // @UseGuards(UserGuard)
     @ApiParam({ name: 'userId', description: 'ID of the user' })
-    async getFriendsOfUser(@Param('userId')userId: string,)
+	@UseGuards(UserGuard)
+    async getFriendsOfUser(@Param('userId')userId: string)
     {
         return this.friendService.getFriends(userId);
     }
     
     @Post(':userId/:friendId')
-    @UseGuards(UserGuard)
     @ApiParam({ name: 'userId', description: 'ID of the user' })
     @ApiParam({ name: 'friendId', description: 'ID of the user' })
+    @UseGuards(UserGuard)
     async creeateFriendship(@Param('userId')userId: string, @Param('friendId')friendId: string,)
     {
         // this.friendService.createFriendship(friendId, userId);
@@ -34,7 +35,8 @@ export class friendController {
     // @UseGuards(UserGuard)
     @ApiParam({ name: 'userId', description: 'ID of the user' })
     @ApiParam({ name: 'friendId', description: 'ID of the user' })
-    async getFriendship(@Param('userId')userId: string, @Param('friendId')friendId: string,)
+	@UseGuards(UserGuard)
+    async getFriendship(@Param('userId')userId: string, @Param('friendId')friendId: string)
     {
         return this.friendService.getFriendship(userId, friendId);
     }

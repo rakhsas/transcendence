@@ -16,6 +16,7 @@ import axios from 'axios';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
 	usersArray = [];
+	usersInCall = [];
 	peerConnections: { [userId: string]: RTCPeerConnection } = {};
 	BASEAPIURL = process.env.HOST;
     UPLOAD_API_URL = process.env.HOST + 'upload';
@@ -419,7 +420,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('checkUsername')
 	async handleCheckUsername(client: Socket, payload: any): Promise<void> {
 		const user = await this.userService.findByUserName(payload.username);
-		console.timeLog('user: ', user)
 		if (user) {
 			client.emit('usernameExist', "Exist");
 		}
@@ -495,6 +495,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// 	senderId: payload.senderId,
 		// 	recieverId: payload.recieverId
 		// });
+		if (this.usersInCall.includes(payload.recieverId) || this.usersInCall.includes(payload.senderId))
+			return ;
 		const notif = await this.notificationService.createNotification({
 			target: payload.recieverId,
 			type: NotificationType.CALL_REQUEST,
@@ -556,6 +558,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
+	@SubscribeMessage('inCall')
+	async handleInCall(client: Socket, payload: any) {
+		if (this.usersInCall.includes(payload.userId))
+			return ;
+		this.usersInCall.push(payload.userId);
+	}
+
 	@SubscribeMessage("acceptVideoCall")
 	async handleAcceptVideoCall(client: Socket, payload: any) {
 		client.to(this.connectedUsers.get(payload.caller.username).id).emit("callPermission", {
@@ -580,7 +589,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 	@SubscribeMessage("callVideoEnded")
 	async handleCallVideoEnd(client: Socket, payload: any) {
-		client.to(this.connectedUsers.get(payload.opponnet).id).emit("callVideoEnded", true)
+		if (this.usersInCall.includes(payload.userId))
+			this.usersInCall = this.usersInCall.filter(id => id !== payload.userId);
+		if (this.usersInCall.includes(payload.calleId))
+			this.usersInCall = this.usersInCall.filter(id => id !== payload.calleId);
+		client.to(this.connectedUsers.get(payload.opponnet).id).emit("callVideoEnded", true);
 	}
 
 	async GuardsConsumer(client: Socket): Promise<string> {
@@ -596,7 +609,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!payload) {
 			client.disconnect();
 		}
-		return payload.id
+		return null;
 	}
 
 	async uploadFile(file: File) {

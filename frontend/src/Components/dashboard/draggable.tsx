@@ -151,6 +151,9 @@ const DraggableDiv = ({ socketCHAT, user, setCallPermission, setUserCallingWith,
         if (remoteVideo) {
             remoteVideo.srcObject = stream;
         }
+        // socketCHAT?.emit("inCall", {
+        //     userData: userData[0].id,
+        // });
     };
     peer && (peer.addEventListener("track", gotRemoteStream));
     const handleMouseDown = (event: any) => {
@@ -235,6 +238,8 @@ const DraggableDiv = ({ socketCHAT, user, setCallPermission, setUserCallingWith,
                             socketCHAT?.emit("callVideoEnded", {
                                 opponnet: user.username,
                                 permission: true,
+                                userId: userData[0].id,
+                                calleId: user.id,
                             });
                             stream?.getTracks().forEach((track: any) => track.stop());
                             const localVideo = document.getElementById("remoteVideo") as HTMLVideoElement;

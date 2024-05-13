@@ -125,7 +125,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 																<span className="text-white">
 																	{
 																		message.message.length > 0 ? (
-																			message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																			message.message.length > 4 ? message.message.slice(0, 4) + ' ...' : message.message
 																		) : (
 																			message.img ? ' Picture' : ' Audio'
 																		)
@@ -135,10 +135,10 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 															:
 															<span className="font-poppins font-bold text-gray-400">
 																HIM:
-																<span className="text-black dark:text-white">
+																<span className="text-white">
 																	{
 																		message.message.length > 0 ? (
-																			message.message.length > 10 ? message.message.slice(0, 10) + ' ...' : message.message
+																			message.message.length > 4 ? message.message.slice(0, 4) + ' ...' : message.message
 																		) : (
 																			message.img ? ' Picture' : ' Audio'
 																		)
@@ -159,6 +159,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 				<Tabs.Item title="Rooms" icon={RiWechatChannelsFill}>
 					{lstGroupMessages.map((item, index) => {
 						const channel = item.channel;
+						console.log(encodeURI(baseAPIUrl + channel.picture))
 						return (
 							<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 								

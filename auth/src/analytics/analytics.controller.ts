@@ -13,38 +13,42 @@ export class AnalyticsController {
 
 
     @Get('allGame/:userId')
+	@UseGuards(UserGuard)
     async getAllGame(@Param('userId') userId: string)
     {
         return this.analyticsService.getAllGame(userId);
     }
     
     @Get('lastSevenDays/:playerId')
+	@UseGuards(UserGuard)
     async getGamesPlayedByPlayerInLastSevenDays(
         @Param('playerId') playerId: string,
     ): Promise<number[]> {
         const gamesPlayed = await this.analyticsService.getGamesPlayedByPlayerInLastSevenDays(playerId);
         return gamesPlayed;
-        // return null;
     }
 
     @Get('top3')
+	@UseGuards(UserGuard)
     async getPlayerByScore(): Promise<User[]> {
         return this.analyticsService.getPlayerByScore();
     }
 
     @Get('lastGame/:userId')
+	@UseGuards(UserGuard)
     async getLastGame(@Param('userId') userId: string)
     {
         return this.analyticsService.getLastGame(userId);
     }
 
     @Get("allPlayers")
+	@UseGuards(UserGuard)
     async getAllPlayers() {
         return this.analyticsService.getAllPlayers();
     }
     
     @Get(':userId/:friendId')
-    // @UseGuards(UserGuard)
+	@UseGuards(UserGuard)
     async getGameRecord(@Param('userId')userId: string, @Param('friendId')friendId: string,)
     {
         return this.analyticsService.getGameRecord(userId, friendId);
@@ -52,25 +56,9 @@ export class AnalyticsController {
 
 
     @Get(':id')
-    async profileData(@Param('id') userId: string,)
+	@UseGuards(UserGuard)
+    async profileData(@Param('id') userId: string)
     {
         return this.analyticsService.profileData(userId);
     }
-
-   
-
-    
-
-    // @Get('gameCount/:userId')
-    // async gameCount(@Param('userId') userId: string){
-    //     const count = this.analyticsService.gameCounts(userId);
-    //     return count;
-    // }
-
-    // @Get('gameWin/:userId')
-    // async gameWon(@Param('userId') userId: string)
-    // {
-    //     const count = this.analyticsService.gameWon(userId);
-    //     return count;
-    // }
 }

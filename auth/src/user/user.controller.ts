@@ -25,6 +25,7 @@ export class UserController {
 	UPLOAD_API_URL = process.env.HOST + 'upload';
 
 	@Put('settingProfile/:id')
+	@UseGuards(UserGuard)
   	async updateSettingProfile(@Param('id') id: string, @Body() settingProfileDto : SettingProfileDto) {
       const updatedData = await this.userService.updateUserSetting(id, settingProfileDto);
       return updatedData;
@@ -36,6 +37,7 @@ export class UserController {
 	@ApiResponse({ status: 201, description: 'User Created', type: CreateUserDto})
 	@UsePipes(ValidationPipe)
 	@UseFilters(ValidationFilter)
+	@UseGuards(UserGuard)
 	async createUser(@Body() createUserDto: CreateUserDto) {
 		return this.userService.createUser(createUserDto);
 	}
@@ -65,6 +67,7 @@ export class UserController {
 	@ApiParam({ name: 'userId', required: true, description: 'User ID' })
 	@ApiConsumes('multipart/form-data')
 	@UseInterceptors(FileInterceptor('file'))
+	@UseGuards(UserGuard)
 	async updatePicture(@Param('userId') id: string, @UploadedFile() file: Express.Multer.File) {
 		console.log('Updating picture:', file)
 		if (!file) {
@@ -83,6 +86,7 @@ export class UserController {
 	@Put('info/:username/:userId')
 	@ApiParam({ name: 'username', required: true, description: 'Username' })
 	@ApiParam({ name: 'userId', required: true, description: 'User ID' })
+	@UseGuards(UserGuard)
 	async updateUsername(@Param('username') username: string, @Param('userId') userId: string) {
 		return await this.userService.updateUsername(username, userId);
 	}
@@ -90,6 +94,7 @@ export class UserController {
 	@Put(":userId")
 	@ApiParam({ name: 'userId', required: true, description: 'User ID' })
 	@ApiBody({ type: UpdateUserDto, description: 'Update User', required: true,})
+	@UseGuards(UserGuard)
 	async updateUser(@Param('userId') id: string, @Body() updateUserDto: Partial<User>) {
 		return await this.userService.update(id, updateUserDto);
 	}
@@ -113,6 +118,7 @@ export class UserController {
 	}
 
 	@Put("2fa/disable2FA/:userId")
+	@UseGuards(UserGuard)
 	@ApiParam({ name: 'userId', required: true, description: 'User ID' })
     async update2FA(@Param('userId') id: string) {
 		console.log("id: ", id);
@@ -120,6 +126,7 @@ export class UserController {
     }
 	
 	@Put("2fa/enable2FA/:userId")
+	@UseGuards(UserGuard)
 	@ApiParam({ name: 'userId', required: true, description: 'User ID' })
     async enable2FA(@Param('userId') id: string) {
 		//console.log("id: ", id);

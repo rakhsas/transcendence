@@ -107,12 +107,16 @@ function DashboardComponent() {
 	})
 	socket?.on("callPermission", async (data: any) => {
 		callingUser && setCallingUser(null);
-		setUserCallingWith(userData.id !== data.user.id ? data.user : data.caller);
+		setUserCallingWith(userData?.id !== data.user.id ? data.user : data.caller);
 		setCallPermission(data.permission);
 		setSelectedUserSocketId(data.selectedUser)
 		setCaller(data.caller);
+		socket?.emit("inCall", {
+			userId: userData?.id,
+		})
 	})
 	socket?.on("RequestCall", async (data: any) => {
+		// console.log('ikhan')
 		callingUser && setCallingUser(null);
 		setCallRequest(data)
 	})
