@@ -208,7 +208,7 @@ export class UserService {
 			throw new Error('User not found');
 		}
 		user.isTwoFactorAuthenticationEnabled = status;
-		console.log("user: ", user);
+		// console.log("user: ", user);
 		return await this.userRepository.save(user);
 	}
 

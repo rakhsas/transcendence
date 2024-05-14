@@ -5,7 +5,7 @@
 export class SettingService {
     async updateUserInfo(userId: string, userUpdate: any): Promise<any> {
         //console.log("userId and userUpdate: ", userId, userUpdate);
-		console.log("userUpdate: ", userUpdate);
+		// console.log("userUpdate: ", userUpdate);
 		try {
             const APIURL = import.meta.env.VITE_API_AUTH_KEY;
 		  const response = await fetch(APIURL + `user/settingProfile/${userId}`, {

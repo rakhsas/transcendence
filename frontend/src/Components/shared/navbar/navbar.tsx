@@ -406,7 +406,7 @@ function NavbarComponent(): JSX.Element {
             audio: true,
             video: true,
         };
-        console.log('here');
+        // console.log('here');
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         stream.getTracks().forEach((track: MediaStreamTrack) => {track.enabled = false});
         userData[8](stream)

@@ -13,7 +13,7 @@ import ProfileComponent from './Components/main/profile/profile.tsx';
 import SettingFunction from './Components/main/settings/settings.tsx';
 import FunctionProfileForm from './Components/main/profile/profile.tsx';
 import WithFriend from './Components/Game/withFriend.tsx';
-import { NotFoundComponent } from './Components/main/notfound/not.found.tsx';
+import { FourHundredFourError } from './Components/main/notfound/error.tsx';
 // const url: string = import.meta.env.VITE_API_AUTH_KEY;
 
 function App() {
@@ -40,9 +40,9 @@ function App() {
           </Route>
           <Route path="HeadToHead" element={<HeadToHead />} />
           <Route path="profile" element={<FunctionProfileForm />} />
-          <Route path="*" element={<NotFoundComponent />} />
+          <Route path="*" element={<FourHundredFourError />} />
         </Route>
-          <Route path="*" element={<NotFoundComponent />} />
+          <Route path="*" element={<FourHundredFourError />} />
 
         {/* <Route path="*" element={<Navigate to="/dashboard/*" replace />} /> */}
       </Routes>

@@ -111,9 +111,9 @@ function DashboardComponent() {
 		setCallPermission(data.permission);
 		setSelectedUserSocketId(data.selectedUser)
 		setCaller(data.caller);
-		socket?.emit("inCall", {
-			userId: userData?.id,
-		})
+		// socket?.emit("inCall", {
+		// 	userId: userData?.id,
+		// })
 	})
 	socket?.on("RequestCall", async (data: any) => {
 		// console.log('ikhan')

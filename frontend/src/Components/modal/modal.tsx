@@ -36,7 +36,7 @@ const ModalComponent: React.FC<ModalProps> = ({isOpen, channelData, setOpenModal
         });
     }
     socketChat?.on("channelPasswordInvalid", (data: any) => {
-        console.log('channelPasswordInvalid: ', data)
+        // console.log('channelPasswordInvalid: ', data)
         //console.log('channelPasswordInvalid: ', data)
         setIncorrectPassword(true);
         setTimeout(() => {
@@ -44,7 +44,7 @@ const ModalComponent: React.FC<ModalProps> = ({isOpen, channelData, setOpenModal
         }, 2000);
     });
     socketChat?.on("channelJoined", (data: any) => {
-        console.log('channelJoined: ', data)
+        // console.log('channelJoined: ', data)
         setSuccess(true);
         setTimeout(() => {
             setSuccess(false);

@@ -100,7 +100,7 @@ const DraggableDiv = ({ socketCHAT, user, setCallPermission, setUserCallingWith,
     const onMediaOffer = async (data: any) => {
         try {
             if (userList.length < 2) return;
-            console.log("mediaOffer");
+            // console.log("mediaOffer");
             if (peer!.connectionState === "new" || peer!.connectionState === "connecting")
             {
                 await peer!.setRemoteDescription(new RTCSessionDescription(data.offer));

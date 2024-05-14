@@ -69,7 +69,7 @@ export class UserController {
 	@UseInterceptors(FileInterceptor('file'))
 	@UseGuards(UserGuard)
 	async updatePicture(@Param('userId') id: string, @UploadedFile() file: Express.Multer.File) {
-		console.log('Updating picture:', file)
+		// console.log('Updating picture:', file)
 		if (!file) {
 			console.log('No file uploaded!');
 			throw new NotFoundException('No file uploaded!');
@@ -103,7 +103,7 @@ export class UserController {
 		try {
 			const formData: FormData  = new FormData();
 			formData.append('file', file.buffer, file.originalname);
-			console.log('Uploading file:', formData);
+			// console.log('Uploading file:', formData);
 			const response = await axios.post(this.UPLOAD_API_URL, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data'
@@ -121,7 +121,7 @@ export class UserController {
 	@UseGuards(UserGuard)
 	@ApiParam({ name: 'userId', required: true, description: 'User ID' })
     async update2FA(@Param('userId') id: string) {
-		console.log("id: ", id);
+		// console.log("id: ", id);
         return this.userService.update2FAState(id, false);
     }
 	

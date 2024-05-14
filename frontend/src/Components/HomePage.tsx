@@ -75,9 +75,9 @@ function HomePageComponent(): JSX.Element {
 								</div>
 								<div className="w-full md:w-1/2 md:px-3 absolute top-1/2 md:top-1/3">
 									<div className="w-full pb-6 space-y-6 sm:max-w-md lg:max-w-lg md:space-y-4 lg:space-y-8 xl:space-y-9 sm:pr-5 lg:pr-0 md:pb-0 z-50">
-										<h1 className="text-4xl font-extrabold tracking-tight text-black dark:text-white sm:text-5xl md:text-4xl lg:text-5xl xl:text-6xl">
-											<span className="block xl:inline">Join The Adventure</span>
-											<span className="block xl:inline"> PINGPONG.</span>
+										<h1 className="text-4xl font-extrabold tracking-tight text-black dark:text-white sm:text-5xl md:text-4xl lg:text-5xl xl:text-6xl overflow-hidden">
+											<span className="block xl:inline overflow-hidden">Join The Adventure</span>
+											<span className="block xl:inline overflow-hidden"> PINGPONG.</span>
 										</h1>
 										<div className="relative flex flex-col sm:flex-row sm:space-x-4  w-fit">
 											<a className="flex items-center w-full px-6 py-3 mb-3 text-lg text-white bg-gradient-to-r from-main-light-FERN to-main-light-EGGSHELL rounded-md sm:mb-0 sm:w-auto cursor-pointer" onClick={loginWithIntra}>

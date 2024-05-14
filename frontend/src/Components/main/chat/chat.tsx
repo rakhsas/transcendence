@@ -192,7 +192,7 @@ function ChatComponent(): JSX.Element {
 
 	const getUser = async (friendId: string) => {
 		const user = await userService.getUser(friendId);
-		console.log(user);
+		// console.log(user);
 		return user;
 	}
 

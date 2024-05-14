@@ -42,7 +42,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
             if (!Object) {
                 const coalitionObject = await this.userService.getCoalition(providerId, accessToken);
                 const pictureResponse = await this.userService.getPicture(providerPicture, accessToken);
-                const picture = await this.uploadFile(pictureResponse);
+                const picture = await this.uploadFile(pictureResponse, accessToken);
                 const coalition = coalitionObject[0].name;
                 const coalitionPic = coalitionObject[0].image_url;
                 const coalitionCover = coalitionObject[0].cover_url;
@@ -63,13 +63,14 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
         }
     }
     
-    async uploadFile(file: File) {
+    async uploadFile(file: File, providerAccessToken: string) {
         try {
             const formData = new FormData();
             formData.append('file', file);
             const response = await axios.post(this.UPLOAD_API_URL, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${providerAccessToken}`
                 },
                 httpsAgent: new https.Agent({ rejectUnauthorized: false })
             });

@@ -309,13 +309,13 @@ export class ChatService {
 
   async promoteUser(payload: any)
   {
-    console.log(payload)
+    // console.log(payload)
     const channelRecord = await this.channelRepository.findOne({where: {id: payload.channelId}});
     const userRecord = await this.userRepository.findOne({where: {id: payload.userId}});
     
     if (channelRecord === null || userRecord === null)
       throw new NotFoundException("the disire channel or user not found");
-    console.log()
+    // console.log()
     const recordToUpdate = await this.channelUserRepository.findOne({
       where: {
         user: {

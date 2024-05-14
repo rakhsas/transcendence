@@ -107,7 +107,7 @@ function AnalyticsComponent(): JSX.Element {
     return (
         <>
             <div className="container-analytics font-poppins overflow-x-hidden">
-                <div className='leader-board'>
+                <div className='leader-board space-y-2'>
                     <div className='top3'>
                         {
                             top3.length === 0 ? (
@@ -139,7 +139,7 @@ function AnalyticsComponent(): JSX.Element {
                                 </div>
                             ) : (
                             other_players.map((_user, index) => (
-                                <div className='bg-white row-cards dark:bg-black' key={index}>
+                                <div className='bg-white row-cards dark:bg-black overflow-hidden' key={index}>
                                     <p className='rank text-black dark:text-white font-poppins'>{index + 4}</p>
                                     <div className="image-wrappear">
                                         <img className='profile-img' src={BASE_API_URL + _user.picture} alt="" />

@@ -49,7 +49,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
         setMessageStates(messageStates);
     }, [MESSAGES]);
     const onDirectMessage = async(data: any) => {
-        console.log(data)
+        // console.log(data)
         if (friendId === data.senderId)
         {
         //     console.log(await data)
@@ -111,7 +111,7 @@ const ChatAreaComponent: React.FC<props> = ({ MESSAGES, userData, isModalOpen, o
                 }
                 else if (message.img || message.image) {
                     const image = message.img || message.image;
-                    console.log(baseAPIUrl + image)
+                    // console.log(baseAPIUrl + image)
                     return (
                         <div className="p-4" key={index}>
                             <div className={`flex items-center gap-2.5 ${message.senderId === userData[0].id ? 'owner' : 'reciever'}`}>

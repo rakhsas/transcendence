@@ -44,7 +44,7 @@ const ChatRoom: React.FC<props> = ({ roomMessages, userData, channelId, roomMemb
         <div className=""  ref={messagesRef}>
             {
                 roomMessages.length > 0 && roomMessages?.map((message: any, index: any) => {
-                    console.log(roomMessages)
+                    // console.log(roomMessages)
                     let sender: User = roomMembers.find((member: any) => (member.user.id === message.senderId))?.user
                     // if (!sender)
                     //     return <LoadingComponent key={index}/>

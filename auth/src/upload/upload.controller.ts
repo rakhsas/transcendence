@@ -22,7 +22,7 @@ export class UploadController {
 
 
     @Post()
-	@UseGuards(UserGuard)
+	// @UseGuards(UserGuard)
     @UseInterceptors(FileInterceptor('file', {storage}))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
         if (file) {
@@ -33,7 +33,7 @@ export class UploadController {
     }
 
     @Get(':filename')
-	@UseGuards(UserGuard)
+	// @UseGuards(UserGuard)
     getImage(@Param('filename') filename: string, @Res() response: Response){
         const imagePath = join(__dirname, '..', 'uploads', filename);
         return response.sendFile(imagePath);
@@ -41,7 +41,7 @@ export class UploadController {
 
     @Post('audio')
     @UseInterceptors(FileInterceptor('file', {storage}))
-	@UseGuards(UserGuard)
+	// @UseGuards(UserGuard)
     async uploadAudio(@UploadedFile() file: Express.Multer.File) {
         if (file) {
             return { url: `upload/${file.filename}` };
@@ -51,7 +51,7 @@ export class UploadController {
     }
 
     @Get('audio/:filename')
-	@UseGuards(UserGuard)
+	// @UseGuards(UserGuard)
     getAudio(@Param('filename') filename: string, @Res() response: Response){
         const audioPath = join(__dirname, '..', 'uploads', filename);
         return response.sendFile(audioPath);

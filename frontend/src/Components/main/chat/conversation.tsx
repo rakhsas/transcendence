@@ -38,7 +38,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 		setImagePath(null);
         const name = event.currentTarget.channelName.value;
         const type = event.currentTarget.types.value;
-		console.log(type)
+		// console.log(type)
         const password = event.currentTarget.password?.value;
 		if (type == "protected" && (!password || password.length != 6)) {
 			return;
@@ -159,7 +159,7 @@ const ConversationArea: React.FC<data> = ({ latestMessages, selectedMessageIndex
 				<Tabs.Item title="Rooms" icon={RiWechatChannelsFill}>
 					{lstGroupMessages.map((item, index) => {
 						const channel = item.channel;
-						console.log(encodeURI(baseAPIUrl + channel.picture))
+						// console.log(encodeURI(baseAPIUrl + channel.picture))
 						return (
 							<div key={index} className={`msg py-5 px-2 ${selectedMessageIndex === index.toString() ? 'active' : ''}`} onClick={() => {
 								
